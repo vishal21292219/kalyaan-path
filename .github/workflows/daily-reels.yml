@@ -1,0 +1,139 @@
+# Place at .github/workflows/daily-reels.yml in your GitHub repo.
+# Runs TWICE a day: 07:00 IST (Gita shloka episode) + 19:00 IST (trending deity/festival).
+# Free GH Actions tier: 2000 Linux min/mo. We use ~5 min/run × 2/day × 30 days = 300 min. Plenty of headroom.
+name: Daily Bhakti Reels (Shloka + Trending)
+
+on:
+  schedule:
+    - cron: "30 1 * * *"    # 07:00 IST  — Gita shloka episode
+    - cron: "30 13 * * *"   # 19:00 IST  — Trending deity / festival
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: "Which kind to run manually"
+        required: true
+        default: "shloka"
+        type: choice
+        options: [shloka, trending]
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write           # needed to commit shloka_progress.json + create releases
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install ffmpeg + Devanagari fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto fonts-noto-cjk fonts-lohit-deva
+
+      - name: Install python deps
+        run: pip install -r requirements.txt
+
+      - name: Pick kind from schedule
+        id: kind
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "kind=${{ inputs.kind }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "30 1 * * *" ]; then
+            echo "kind=shloka" >> $GITHUB_OUTPUT
+          else
+            echo "kind=trending" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Restore YouTube OAuth token
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
+        run: |
+          mkdir -p secrets
+          if [ -n "$YT_TOKEN_JSON" ]; then
+            echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
+            echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
+          fi
+
+      - name: Generate reel
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python run.py --kind ${{ steps.kind.outputs.kind }}
+
+      - name: Find generated video
+        id: video
+        run: |
+          VIDEO=$(ls -t output/videos/*.mp4 | head -1)
+          echo "path=$VIDEO" >> $GITHUB_OUTPUT
+          echo "name=$(basename $VIDEO)" >> $GITHUB_OUTPUT
+
+      - name: Publish video as GitHub Release (gives IG-compatible public URL)
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: reel-${{ github.run_id }}
+          name: ${{ steps.video.outputs.name }}
+          files: ${{ steps.video.outputs.path }}
+          make_latest: false
+          prerelease: true
+
+      - name: Get public download URL
+        id: url
+        run: |
+          # softprops/action-gh-release outputs to a release page; assets are at
+          # https://github.com/<owner>/<repo>/releases/download/<tag>/<filename>
+          URL="https://github.com/${{ github.repository }}/releases/download/reel-${{ github.run_id }}/${{ steps.video.outputs.name }}"
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "Public video URL: $URL"
+
+      - name: Upload to YouTube
+        if: env.YT_TOKEN_JSON != ''
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python -c "
+          import json, sys
+          sys.path.insert(0, '.')
+          from pathlib import Path
+          from pipeline.uploader_youtube import upload
+          video = Path('${{ steps.video.outputs.path }}')
+          script_file = sorted(Path('output/scripts').glob('*.json'))[-1]
+          script = json.loads(script_file.read_text())
+          print(upload(video, script))
+          "
+
+      - name: Upload to Instagram
+        if: env.IG_ACCESS_TOKEN != ''
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          python -c "
+          import json, sys
+          sys.path.insert(0, '.')
+          from pathlib import Path
+          from pipeline.uploader_instagram import upload
+          script_file = sorted(Path('output/scripts').glob('*.json'))[-1]
+          script = json.loads(script_file.read_text())
+          print(upload('${{ steps.url.outputs.url }}', script))
+          "
+
+      - name: Commit updated shloka progress
+        if: steps.kind.outputs.kind == 'shloka'
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name  "github-actions[bot]"
+          git add data/state/shloka_progress.json || true
+          git diff --cached --quiet || git commit -m "auto: advance shloka episode [skip ci]"
+          git push || true

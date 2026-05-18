@@ -1,0 +1,51 @@
+branding:
+  channel_handle: '@KalyaanPath'
+  cta: "Kalyaan ka path \U0001F64F Subscribe for daily Gita + Bhakti reels"
+  hashtags:
+  - '#hinduism'
+  - '#bhakti'
+  - '#sanatandharma'
+  - '#mantra'
+  - '#shorts'
+  - '#reels'
+  - '#mahadev'
+  - '#krishna'
+  - '#ram'
+  music_credit: "Music: 'The Epic Hero' by Keys of Moon (CC BY 4.0) \u2014 keysofmoon.com"
+images:
+  model: flux
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed
+    limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face,
+    asymmetric face, melted features, blurry, low quality, cartoon, anime, chibi,
+    modern clothing
+  num_per_reel: 7
+  provider: pollinations
+  style_suffix: ', traditional Indian devotional painting in Raja Ravi Varma style,
+    single figure clearly visible, anatomically correct, two natural arms (or canonically-correct
+    count), centered composition, soft golden volumetric divine light, intricate fabric
+    and jewelry detail, vertical 9:16 portrait, cinematic concept art quality, no
+    text'
+llm:
+  language: hindi
+  model: gemini-flash-latest
+  provider: gemini
+publish:
+  instagram: true
+  privacy: public
+  youtube: true
+video:
+  bitrate: 6M
+  duration_target_sec: 50
+  font: /System/Library/Fonts/Supplemental/Devanagari Sangam MN.ttc
+  font_size: 72
+  fps: 30
+  height: 1920
+  subtitle_box_opacity: 0.0
+  width: 1080
+voice:
+  pitch: +25Hz
+  rate: +3%
+  shloka_pitch: -2Hz
+  shloka_rate: -12%
+  shloka_voice: hi-IN-MadhurNeural
+  voice: hi-IN-SwaraNeural
