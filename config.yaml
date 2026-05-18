@@ -11,7 +11,7 @@ branding:
   - '#mahadev'
   - '#krishna'
   - '#ram'
-  music_credit: "Music: 'The Epic Hero' by Keys of Moon (CC BY 4.0) \u2014 keysofmoon.com"
+  music_credit: "Music: synthesized cinematic drone \u2014 original, royalty-free"
 images:
   model: flux
   negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed
