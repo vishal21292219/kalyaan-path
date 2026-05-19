@@ -368,8 +368,8 @@ def assemble(
             "-i", str(voice_path),
             "-stream_loop", "-1", "-i", str(bg),
             "-filter_complex",
-            "[1:a]volume=1.4[voice];"
-            "[2:a]volume=0.35[bg];"
+            "[1:a]volume=1.2,highpass=f=120[voice];"
+            "[2:a]volume=0.32,lowpass=f=8000[bg];"
             "[voice][bg]amix=inputs=2:duration=first:dropout_transition=2:normalize=0[a]",
             "-map", "0:v", "-map", "[a]",
             *common_v,
