@@ -360,7 +360,7 @@ def assemble(
         "-pix_fmt", "yuv420p", "-color_range", "tv",
         "-movflags", "+faststart",
     ]
-    bg = pick_music()
+    bg = pick_music(script.get("kind"))
     if bg:
         _run([
             "ffmpeg", "-y",

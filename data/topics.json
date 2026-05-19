@@ -82,7 +82,11 @@
     {"name": "Goddess Lakshmi", "weight": 3, "wiki": "Lakshmi"},
     {"name": "Goddess Kali", "weight": 3, "wiki": "Kali"},
     {"name": "Lord Kartikeya", "weight": 2, "wiki": "Kartikeya"},
-    {"name": "Goddess Saraswati", "weight": 2, "wiki": "Saraswati"}
+    {"name": "Goddess Saraswati", "weight": 2, "wiki": "Saraswati"},
+    {"name": "Khatu Shyam Ji", "weight": 5, "wiki": "Khatushyamji"},
+    {"name": "Sai Baba of Shirdi", "weight": 3, "wiki": "Sai_Baba_of_Shirdi"},
+    {"name": "Lord Jagannath", "weight": 3, "wiki": "Jagannath"},
+    {"name": "Goddess Vaishno Devi", "weight": 4, "wiki": "Vaishno_Devi"}
   ],
   "festivals_calendar": [
     {"name": "Maha Shivratri", "month": 2, "approx_day": 26},

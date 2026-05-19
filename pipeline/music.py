@@ -20,16 +20,26 @@ from pathlib import Path
 from .utils import ROOT
 
 
-def pick_music() -> Path | None:
+def pick_music(kind: str | None = None) -> Path | None:
+    """Pick a background track. For shloka mode use the slow Mridangam Choir;
+    for trending/deity/festival use the faster Uplifting track.
+    """
     music_dir = ROOT / "data" / "music"
-    tracks = [
-        *music_dir.glob("*.mp3"),
-        *music_dir.glob("*.wav"),
-        *music_dir.glob("*.m4a"),
-    ]
-    if not tracks:
-        return None
-    return random.choice(tracks)
+    if kind == "shloka_episode":
+        candidate = music_dir / "shloka_track.mp3"
+        if candidate.exists():
+            return candidate
+    if kind in ("deity", "festival", "story", "temple", "custom", "trending"):
+        candidate = music_dir / "trending_track.mp3"
+        if candidate.exists():
+            return candidate
+    # fallback — first mp3 in the dir
+    tracks = sorted(
+        list(music_dir.glob("*.mp3"))
+        + list(music_dir.glob("*.wav"))
+        + list(music_dir.glob("*.m4a"))
+    )
+    return tracks[0] if tracks else None
 
 
 if __name__ == "__main__":
