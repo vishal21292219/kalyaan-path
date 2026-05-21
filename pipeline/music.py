@@ -17,14 +17,18 @@ from __future__ import annotations
 import random
 from pathlib import Path
 
-from .utils import ROOT
+from .utils import ROOT, load_config
 
 
 def pick_music(kind: str | None = None) -> Path | None:
     """Pick a background track. For shloka mode use the slow Mridangam Choir;
     for trending/deity/festival use the faster Uplifting track.
     """
-    music_dir = ROOT / "data" / "music"
+    cfg = load_config()
+    music_rel = cfg.get("paths", {}).get("music_dir", "data/music")
+    music_dir = ROOT / music_rel
+    if not music_dir.exists():
+        music_dir = ROOT / "data" / "music"
     if kind == "shloka_episode":
         candidate = music_dir / "shloka_track.mp3"
         if candidate.exists():

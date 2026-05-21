@@ -21,8 +21,16 @@ from PIL import Image, ImageDraw, ImageFont
 from .music import pick_music
 from .utils import load_config
 
+ROOT = Path(__file__).resolve().parent.parent
+
 FONT_CANDIDATES = [
-    # Devanagari-capable bold fonts first (script may be in Hindi)
+    # Project-local Google Fonts — viral display weights, top priority
+    str(ROOT / "assets/fonts/Khand-Bold.ttf"),
+    str(ROOT / "assets/fonts/MuktaVaani-Bold.ttf"),
+    str(ROOT / "assets/fonts/AnekDevanagari.ttf"),
+    str(ROOT / "assets/fonts/YatraOne-Regular.ttf"),
+    str(ROOT / "assets/fonts/Khand-SemiBold.ttf"),
+    # System Devanagari fallbacks
     "/System/Library/Fonts/Supplemental/Kohinoor.ttc",
     "/System/Library/Fonts/Supplemental/Devanagari Sangam MN.ttc",
     "/System/Library/Fonts/Supplemental/ITF Devanagari.ttc",
@@ -155,6 +163,55 @@ def _render_badge_png(text: str, font_size: int, out: Path) -> Path:
     return out
 
 
+def _render_word_png(text: str, font_size: int, color: tuple, out: Path, stroke_w: int = 9) -> Path:
+    """Render a single word with HUGE bold typography for word-by-word captions.
+    color: (R, G, B) tuple for text fill — white/yellow/red for emphasis tiers.
+    """
+    font = _find_font(font_size)
+    pad_x, pad_y = 28, 18
+    dummy = Image.new("RGBA", (10, 10))
+    d = ImageDraw.Draw(dummy)
+    bbox = d.textbbox((0, 0), text, font=font, stroke_width=stroke_w)
+    tw, th = int(bbox[2] - bbox[0]), int(bbox[3] - bbox[1])
+    box_w = tw + pad_x * 2
+    box_h = th + pad_y * 2
+
+    img = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    text_xy = ((box_w - tw) // 2 - bbox[0], (box_h - th) // 2 - bbox[1])
+    draw.text(
+        text_xy, text,
+        fill=color + (255,),
+        stroke_width=stroke_w,
+        stroke_fill=(0, 0, 0, 255),
+        font=font,
+    )
+    img.save(out)
+    return out
+
+
+# Word emphasis tiers for word-by-word captions
+_HIGH_EMPHASIS = {
+    "रहस्य", "सच", "अमर", "श्राप", "वरदान", "जादू", "चमत्कार", "खुलासा",
+    "मौत", "जीवित", "ज़िंदा", "मारा", "खुद", "असली", "वास्तविक", "देखो",
+    "rahasya", "sach", "amar", "shrap", "vardaan", "khulasa", "asli",
+}
+_MED_EMPHASIS = {
+    "कौन", "क्या", "कब", "कैसे", "क्यों", "कहाँ", "कोई",
+    "kaun", "kya", "kab", "kaise", "kyun", "kahan",
+}
+
+
+def _word_color(word: str) -> tuple:
+    """Return (R,G,B) color for word based on emphasis tier."""
+    w = word.strip(",.!?।॥;:\"'()[]")
+    if w in _HIGH_EMPHASIS:
+        return (255, 60, 60)       # red
+    if w in _MED_EMPHASIS:
+        return (255, 220, 0)       # yellow
+    return (255, 255, 255)         # white
+
+
 def _render_caption_png(text: str, width: int, font_size: int, box_opacity: float, out: Path) -> Path:
     """YT-Shorts style caption: bold yellow text + thick black stroke. No box by default."""
     font = _find_font(font_size)
@@ -199,6 +256,7 @@ def assemble(
     voice_path: Path,
     image_paths: list[Path],
     out_video: Path,
+    skip_music: bool = False,
 ) -> Path:
     if not shutil.which("ffmpeg"):
         raise RuntimeError("ffmpeg not found in PATH. Install with: brew install ffmpeg")
@@ -312,27 +370,78 @@ def assemble(
             )
             prev = "v_v"
     else:
-        sub_lines = [
-            script.get("hook_roman") or script["hook"],
-            *(script.get("body_roman") or script["body"]),
-            script.get("cta_roman") or script["cta"],
-        ]
-        n_sub = len(sub_lines)
-        per_sub = duration / n_sub
-        for i, line in enumerate(sub_lines):
-            png = work / f"sub_{i:02d}.png"
-            _render_caption_png(line.strip(), W, font_size, box_opacity, png)
-            inputs += ["-i", str(png)]
-            overlay_idx += 1
-            start = i * per_sub
-            end = (i + 1) * per_sub - 0.05
-            out_lbl = f"v{overlay_idx}"
-            chain_parts.append(
-                f"[{prev}][{overlay_idx}:v]overlay="
-                f"x=(W-w)/2:y=H*0.62:"
-                f"enable='between(t\\,{start:.3f}\\,{end:.3f})'[{out_lbl}]"
-            )
-            prev = out_lbl
+        # NEW: animated word-by-word captions (CapCut/Reels viral style).
+        # Driven by word boundaries captured during TTS → one PNG per word,
+        # overlaid with timed enable filter. Pure overlay chain — works on
+        # minimal ffmpeg builds (no libass/drawtext needed).
+        words_json = voice_path.with_suffix(".words.json")
+        used_words = False
+        if words_json.exists():
+            try:
+                import json as _json
+                boundaries = _json.loads(words_json.read_text(encoding="utf-8"))
+                # Filter out empty / pure-punctuation
+                boundaries = [
+                    b for b in boundaries
+                    if b.get("text", "").strip() and any(ch.isalnum() or ord(ch) > 127 for ch in b["text"])
+                ]
+            except Exception as e:
+                print(f"[captions] failed to read word boundaries ({e})")
+                boundaries = []
+
+            if boundaries:
+                print(f"[captions] rendering {len(boundaries)} word PNGs (animated word-by-word)")
+                word_font_size = int(font_size * 1.7)  # bigger than line-by-line
+                for i, b in enumerate(boundaries):
+                    word = b["text"].strip()
+                    if not word:
+                        continue
+                    color = _word_color(word)
+                    png = work / f"word_{i:04d}.png"
+                    _render_word_png(word, word_font_size, color, png)
+
+                    # Time window: pad slightly on both sides for readability
+                    word_start = max(0.0, b["start"] - 0.05)
+                    word_end = b["end"] + 0.05
+                    if i + 1 < len(boundaries):
+                        word_end = min(word_end, boundaries[i + 1]["start"] - 0.005)
+                    if word_end - word_start < 0.18:
+                        word_end = word_start + 0.18
+
+                    inputs += ["-i", str(png)]
+                    overlay_idx += 1
+                    out_lbl = f"v{overlay_idx}"
+                    chain_parts.append(
+                        f"[{prev}][{overlay_idx}:v]overlay="
+                        f"x=(W-w)/2:y=H*0.62:"
+                        f"enable='between(t\\,{word_start:.3f}\\,{word_end:.3f})'[{out_lbl}]"
+                    )
+                    prev = out_lbl
+                used_words = True
+
+        if not used_words:
+            # Fallback: legacy line-by-line PNG overlay subtitles
+            sub_lines = [
+                script.get("hook_roman") or script["hook"],
+                *(script.get("body_roman") or script["body"]),
+                script.get("cta_roman") or script["cta"],
+            ]
+            n_sub = len(sub_lines)
+            per_sub = duration / n_sub
+            for i, line in enumerate(sub_lines):
+                png = work / f"sub_{i:02d}.png"
+                _render_caption_png(line.strip(), W, font_size, box_opacity, png)
+                inputs += ["-i", str(png)]
+                overlay_idx += 1
+                start = i * per_sub
+                end = (i + 1) * per_sub - 0.05
+                out_lbl = f"v{overlay_idx}"
+                chain_parts.append(
+                    f"[{prev}][{overlay_idx}:v]overlay="
+                    f"x=(W-w)/2:y=H*0.62:"
+                    f"enable='between(t\\,{start:.3f}\\,{end:.3f})'[{out_lbl}]"
+                )
+                prev = out_lbl
 
     final_label = prev
     filter_complex = ";".join(chain_parts) if chain_parts else None
@@ -360,7 +469,7 @@ def assemble(
         "-pix_fmt", "yuv420p", "-color_range", "tv",
         "-movflags", "+faststart",
     ]
-    bg = pick_music(script.get("kind"))
+    bg = None if skip_music else pick_music(script.get("kind"))
     if bg:
         _run([
             "ffmpeg", "-y",

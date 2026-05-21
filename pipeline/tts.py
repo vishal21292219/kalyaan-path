@@ -1,36 +1,453 @@
-"""Voiceover via edge-tts (FREE Microsoft Edge voices, excellent Hindi support)."""
+"""Voiceover via configurable TTS provider.
+
+Supported providers (set via config voice.provider):
+- "edge"        — FREE Microsoft Edge voices via edge-tts (default)
+- "elevenlabs"  — Premium ElevenLabs voices (~$22/mo for daily content)
+
+Edge-tts mode ALSO captures word-level timings → saved as
+{out_path}.words.json — used by captions.py to render animated
+word-by-word subtitles.
+
+ElevenLabs setup:
+1. Sign up at https://elevenlabs.io and add ELEVENLABS_API_KEY to .env
+2. Pick voices at https://elevenlabs.io/app/voice-library (filter: Hindi)
+3. Recommended model: eleven_multilingual_v2
+"""
+from __future__ import annotations
+
 import asyncio
+import json
+import os
 from pathlib import Path
 
-import edge_tts
+from dotenv import load_dotenv
 
 from .utils import load_config
 
+load_dotenv()
+
 
 def _strip_for_speech(text: str) -> str:
-    # Drop emojis / characters that confuse SSML/TTS
     return "".join(ch for ch in text if ord(ch) < 0x2700)
 
 
-async def _synth(text: str, out_path: Path, voice: str, rate: str, pitch: str) -> None:
+def _build_text(script: dict) -> str:
+    lines = [script["hook"], *script["body"], script["cta"]]
+    return ". ".join(_strip_for_speech(l).strip().rstrip(".") for l in lines if l) + "."
+
+
+# ─── Edge TTS (free Microsoft voices) ────────────────────────────────────
+async def _edge_synth_with_boundaries(
+    text: str, out_path: Path, voice: str, rate: str, pitch: str
+) -> list[dict]:
+    """Synthesize via edge-tts, capture audio + word boundaries.
+    Returns list of {text, start, end} dicts (seconds)."""
+    import edge_tts
     communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate, pitch=pitch)
-    await communicate.save(str(out_path))
+    audio = bytearray()
+    boundaries: list[dict] = []
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            audio.extend(chunk["data"])
+        elif chunk["type"] == "WordBoundary":
+            # offset/duration are in 100-nanosecond units
+            start = chunk["offset"] / 1e7
+            duration = chunk["duration"] / 1e7
+            boundaries.append({
+                "text": chunk["text"],
+                "start": round(start, 3),
+                "end": round(start + duration, 3),
+            })
+    out_path.write_bytes(bytes(audio))
+    return boundaries
 
 
-def synthesize(script: dict, out_path: Path) -> Path:
-    cfg = load_config()
-    v = cfg["voice"]
-    # Shloka mode uses a slower, sober male voice — Sanskrit gets jumbled
-    # with a fast high-pitched voice.
-    is_shloka = script.get("kind") == "shloka_episode"
+def _synth_edge(text: str, out_path: Path, v: dict, is_shloka: bool) -> list[dict]:
     voice = v.get("shloka_voice", v["voice"]) if is_shloka else v["voice"]
     rate = v.get("shloka_rate", v["rate"]) if is_shloka else v["rate"]
     pitch = v.get("shloka_pitch", v["pitch"]) if is_shloka else v["pitch"]
+    boundaries = asyncio.run(_edge_synth_with_boundaries(text, out_path, voice, rate, pitch))
+    # Hindi voices (hi-IN-*) don't emit WordBoundary events. Use a layered
+    # alignment strategy:
+    #   1. Silence-based: detect pauses between sentences via ffmpeg's
+    #      silencedetect, match to original sentences, distribute words by
+    #      char-weight within each segment. ACCURATE because TTS sentences
+    #      generate predictable inter-sentence pauses.
+    #   2. Whisper: forced alignment of audio (may miss audio sections).
+    #   3. Uniform: simple char-weighted distribution across full audio.
+    if not boundaries:
+        boundaries = _silence_align(text, out_path)
+    if not boundaries:
+        boundaries = _whisper_align(out_path, original_text=text)
+    if not boundaries:
+        boundaries = _estimate_word_boundaries(text, out_path)
+    return boundaries
 
-    lines = [script["hook"], *script["body"], script["cta"]]
-    full_text = ". ".join(_strip_for_speech(l).strip().rstrip(".") for l in lines if l) + "."
+
+def _silence_align(text: str, audio_path: Path) -> list[dict]:
+    """Align original script words to audio via ffmpeg silence detection.
+
+    Splits text on Devanagari/ASCII sentence terminators, matches each
+    sentence to a speech segment between detected silences, then distributes
+    each sentence's words by character weight across its segment duration.
+    Falls back (returns []) if sentence count doesn't match segment count.
+    """
+    import re
+    import subprocess
+
+    duration = _audio_duration_seconds(audio_path)
+    if duration <= 0:
+        return []
+
+    # Detect silences (1.0s minimum, -45dB threshold — matches TTS pauses)
+    try:
+        r = subprocess.run(
+            ["ffmpeg", "-i", str(audio_path), "-af",
+             "silencedetect=noise=-45dB:d=0.6", "-f", "null", "-"],
+            capture_output=True, text=True,
+        )
+    except FileNotFoundError:
+        return []
+
+    silences: list[tuple[float, float]] = []
+    cur_start = None
+    for line in r.stderr.split("\n"):
+        m = re.search(r"silence_start:\s+([0-9.]+)", line)
+        if m:
+            cur_start = float(m.group(1))
+            continue
+        m = re.search(r"silence_end:\s+([0-9.]+)", line)
+        if m and cur_start is not None:
+            silences.append((cur_start, float(m.group(1))))
+            cur_start = None
+
+    # Build speech segments: between silences (and from 0 / to duration)
+    segments: list[tuple[float, float]] = []
+    cursor = 0.0
+    for sil_start, sil_end in silences:
+        if sil_start - cursor > 0.3:  # ignore micro segments
+            segments.append((cursor, sil_start))
+        cursor = sil_end
+    if duration - cursor > 0.3:
+        segments.append((cursor, duration))
+
+    if not segments:
+        return []
+
+    # Split original text into sentences (Devanagari danda + ASCII terminators)
+    sentences = [s.strip() for s in re.split(r"[।॥\.!?]+", text) if s.strip()]
+    if not sentences:
+        return []
+
+    # If sentence count doesn't match segment count, abort — caller will fall back
+    if len(sentences) != len(segments):
+        print(f"[silence-align] sentences={len(sentences)} != segments={len(segments)}, skipping")
+        return []
+
+    boundaries: list[dict] = []
+    for sent, (seg_start, seg_end) in zip(sentences, segments):
+        words = []
+        for raw in sent.split():
+            w = raw.strip(",.!?।॥;:()[]{}\"'`")
+            if w:
+                words.append(w)
+        if not words:
+            continue
+        weights = [max(1, len(w)) for w in words]
+        total_w = sum(weights)
+        seg_dur = max(0.2, seg_end - seg_start)
+        cumulative = 0
+        for word, weight in zip(words, weights):
+            start_t = seg_start + (cumulative / total_w) * seg_dur
+            cumulative += weight
+            end_t = seg_start + (cumulative / total_w) * seg_dur
+            boundaries.append({
+                "text": word,
+                "start": round(start_t, 3),
+                "end": round(end_t, 3),
+            })
+    print(f"[silence-align] aligned {len(boundaries)} words across {len(segments)} segments")
+    return boundaries
+
+
+# ─── Whisper forced alignment (accurate word timings from audio) ─────────
+_WHISPER_MODEL = None
+
+
+def _whisper_align(
+    audio_path: Path,
+    original_text: str = "",
+    language: str = "hi",
+    model_size: str = "medium",
+) -> list[dict]:
+    """Run faster-whisper on audio for per-word timings, then map back to
+    original script text for correct Devanagari spelling.
+
+    Pass `original_text` (what TTS spoke) to:
+    - bias transcription via initial_prompt (better accuracy)
+    - swap Whisper's transcribed text with original spelling when word counts
+      match closely (timings stay from Whisper)
+
+    'medium' model: ~150MB download, much better Hindi than 'small'.
+    Memory-cached after first load.
+    """
+    global _WHISPER_MODEL
+    try:
+        from faster_whisper import WhisperModel
+    except ImportError:
+        print("[whisper] faster-whisper not installed, skipping alignment")
+        return []
+
+    if _WHISPER_MODEL is None:
+        size_mb = {"small": 75, "medium": 150, "large-v3": 1500}.get(model_size, 75)
+        print(f"[whisper] loading model '{model_size}' (first run downloads ~{size_mb}MB)...")
+        try:
+            _WHISPER_MODEL = WhisperModel(model_size, device="cpu", compute_type="int8")
+        except Exception as e:
+            print(f"[whisper] model load failed: {e}")
+            return []
+
+    try:
+        kwargs = dict(
+            word_timestamps=True,
+            language=language,
+            vad_filter=False,
+            beam_size=1,
+            best_of=1,
+        )
+        if original_text:
+            # initial_prompt biases Whisper toward our exact vocabulary
+            kwargs["initial_prompt"] = original_text[:240]  # 240-char limit
+
+        segments, _info = _WHISPER_MODEL.transcribe(str(audio_path), **kwargs)
+
+        whisper_words: list[dict] = []
+        for seg in segments:
+            if not seg.words:
+                continue
+            for w in seg.words:
+                t = (w.word or "").strip()
+                if not t:
+                    continue
+                whisper_words.append({
+                    "text": t,
+                    "start": round(w.start, 3),
+                    "end": round(w.end, 3),
+                })
+        print(f"[whisper] aligned {len(whisper_words)} words")
+
+        # Try to replace Whisper text with original script text (correct spelling)
+        if original_text and whisper_words:
+            return _map_to_original(whisper_words, original_text)
+        return whisper_words
+    except Exception as e:
+        print(f"[whisper] transcribe failed: {e}")
+        return []
+
+
+def _map_to_original(whisper_words: list[dict], original_text: str) -> list[dict]:
+    """Always produce original-script text with timings anchored to Whisper.
+
+    Strategy:
+    - If Whisper word count matches original within 5% → direct 1:1 map.
+    - Otherwise → use Whisper's first-word start and last-word end as anchors,
+      distribute original words by character-count weight across that window.
+      Original spelling is always preserved; Whisper provides timing anchors.
+    """
+    original = []
+    for raw in original_text.split():
+        w = raw.strip(",.!?।॥;:()[]{}\"'`")
+        if w:
+            original.append(w)
+
+    if not original or not whisper_words:
+        return whisper_words
+
+    nw, no = len(whisper_words), len(original)
+    diff_ratio = abs(nw - no) / max(no, 1)
+
+    if diff_ratio <= 0.05:
+        # Direct 1:1 mapping
+        n = min(nw, no)
+        result = []
+        for i in range(n):
+            result.append({
+                "text": original[i],
+                "start": whisper_words[i]["start"],
+                "end": whisper_words[i]["end"],
+            })
+        print(f"[whisper] direct remap to original script ({n} words)")
+        return result
+
+    # Counts differ — interpolate original words by char-weight between
+    # Whisper's first start and last end (still TTS-anchored sync).
+    speech_start = whisper_words[0]["start"]
+    speech_end = whisper_words[-1]["end"]
+    speech_dur = max(0.5, speech_end - speech_start)
+
+    weights = [max(1, len(w)) for w in original]
+    total_w = sum(weights)
+
+    result = []
+    cumulative = 0
+    for word, weight in zip(original, weights):
+        start_t = speech_start + (cumulative / total_w) * speech_dur
+        cumulative += weight
+        end_t = speech_start + (cumulative / total_w) * speech_dur
+        result.append({
+            "text": word,
+            "start": round(start_t, 3),
+            "end": round(end_t, 3),
+        })
+    print(f"[whisper] interpolated remap (whisper={nw}, original={no}) anchored to {speech_start:.2f}-{speech_end:.2f}s")
+    return result
+
+
+def _estimate_word_boundaries(text: str, audio_path: Path) -> list[dict]:
+    """Distribute words across audio duration weighted by char count.
+    Used when TTS doesn't emit per-word timing (e.g., Hindi edge-tts voices).
+    """
+    duration = _audio_duration_seconds(audio_path)
+    if duration <= 0:
+        return []
+
+    # Split into spoken words (skip pure punctuation)
+    raw_words = text.split()
+    words: list[str] = []
+    for rw in raw_words:
+        w = rw.strip(",.!?।॥;:()[]{}\"'`")
+        if w:
+            words.append(w)
+    if not words:
+        return []
+
+    # Weight by char length (proxy for syllable count — works reasonably
+    # for Hindi where each akshara is ~1 syllable).
+    weights = [max(1, len(w)) for w in words]
+    total_w = sum(weights)
+
+    # Leave 200ms head silence and 200ms tail silence
+    head = 0.20
+    tail = 0.20
+    speech_dur = max(0.1, duration - head - tail)
+
+    boundaries = []
+    cumulative = 0
+    for word, w in zip(words, weights):
+        start_t = head + (cumulative / total_w) * speech_dur
+        cumulative += w
+        end_t = head + (cumulative / total_w) * speech_dur
+        boundaries.append({
+            "text": word,
+            "start": round(start_t, 3),
+            "end": round(end_t, 3),
+        })
+    return boundaries
+
+
+# ─── ElevenLabs (premium) ────────────────────────────────────────────────
+def _synth_elevenlabs(text: str, out_path: Path, v: dict, is_shloka: bool) -> list[dict]:
+    """ElevenLabs doesn't give word timings via standard endpoint.
+    We synthesize audio + estimate uniform word distribution from audio duration."""
+    import requests
+    api_key = os.getenv("ELEVENLABS_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "ELEVENLABS_API_KEY not set in .env. "
+            "Get one at https://elevenlabs.io → Profile → API Keys."
+        )
+
+    voice_id = (
+        v.get("elevenlabs_shloka_voice_id", v.get("elevenlabs_voice_id"))
+        if is_shloka
+        else v.get("elevenlabs_voice_id")
+    )
+    if not voice_id:
+        raise RuntimeError("voice.elevenlabs_voice_id not set in config.")
+
+    model = v.get("elevenlabs_model", "eleven_multilingual_v2")
+    settings = v.get("elevenlabs_settings", {}) or {}
+
+    r = requests.post(
+        f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+        headers={
+            "xi-api-key": api_key,
+            "Content-Type": "application/json",
+            "Accept": "audio/mpeg",
+        },
+        json={
+            "text": text,
+            "model_id": model,
+            "voice_settings": {
+                "stability": settings.get("stability", 0.55),
+                "similarity_boost": settings.get("similarity_boost", 0.80),
+                "style": settings.get("style", 0.35),
+                "use_speaker_boost": settings.get("use_speaker_boost", True),
+            },
+        },
+        timeout=120,
+    )
+    if r.status_code != 200:
+        raise RuntimeError(f"ElevenLabs API error {r.status_code}: {r.text[:300]}")
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    asyncio.run(_synth(full_text, out_path, voice, rate, pitch))
+    out_path.write_bytes(r.content)
+
+    # Estimate word boundaries by uniform distribution across audio duration
+    duration = _audio_duration_seconds(out_path)
+    words = text.split()
+    boundaries = []
+    if words and duration > 0:
+        per_word = duration / len(words)
+        for i, w in enumerate(words):
+            boundaries.append({
+                "text": w,
+                "start": round(i * per_word, 3),
+                "end": round((i + 1) * per_word, 3),
+            })
+    return boundaries
+
+
+def _audio_duration_seconds(path: Path) -> float:
+    import subprocess
+    r = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
+        capture_output=True, text=True,
+    )
+    try:
+        return float(r.stdout.strip())
+    except Exception:
+        return 0.0
+
+
+# ─── Public API ──────────────────────────────────────────────────────────
+def synthesize(script: dict, out_path: Path) -> Path:
+    cfg = load_config()
+    v = cfg["voice"]
+    provider = v.get("provider", "edge").lower()
+    is_shloka = script.get("kind") == "shloka_episode"
+    text = _build_text(script)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    boundaries: list[dict] = []
+    if provider == "elevenlabs":
+        try:
+            boundaries = _synth_elevenlabs(text, out_path, v, is_shloka)
+            print(f"[tts] provider=elevenlabs ({len(text)} chars)")
+        except Exception as e:
+            if v.get("fallback_to_edge", True):
+                print(f"[tts] ElevenLabs failed ({e}), falling back to edge-tts")
+                boundaries = _synth_edge(text, out_path, v, is_shloka)
+            else:
+                raise
+    else:
+        boundaries = _synth_edge(text, out_path, v, is_shloka)
+
+    # Save word boundaries alongside audio
+    words_path = out_path.with_suffix(".words.json")
+    words_path.write_text(json.dumps(boundaries, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"[tts] captured {len(boundaries)} word boundaries → {words_path.name}")
+
     return out_path
 
 

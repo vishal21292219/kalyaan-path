@@ -29,10 +29,10 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 
 
 def _get_service():
-    secrets_path = ROOT / os.getenv(
-        "YOUTUBE_CLIENT_SECRETS_FILE", "secrets/youtube_client_secret.json"
-    )
-    token_path = ROOT / os.getenv("YOUTUBE_TOKEN_FILE", "secrets/youtube_token.json")
+    cfg = load_config()
+    secrets = cfg.get("secrets", {})
+    secrets_path = ROOT / secrets.get("youtube_client_secret", "secrets/youtube_client_secret.json")
+    token_path = ROOT / secrets.get("youtube_token", "secrets/youtube_token.json")
     token_path.parent.mkdir(parents=True, exist_ok=True)
 
     creds = None

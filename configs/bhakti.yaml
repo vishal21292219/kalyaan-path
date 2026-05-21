@@ -1,0 +1,90 @@
+niche: bhakti
+
+branding:
+  channel_handle: '@KalyaanPath'
+  cta: "Kalyaan ka path \U0001F64F Subscribe for daily Gita + Bhakti reels"
+  hashtags:
+  - '#hinduism'
+  - '#bhakti'
+  - '#sanatandharma'
+  - '#mantra'
+  - '#shorts'
+  - '#reels'
+  - '#mahadev'
+  - '#krishna'
+  - '#ram'
+  music_credit: "Music: synthesized cinematic drone — original, royalty-free"
+
+paths:
+  topics_file: data/topics.json
+  music_dir: data/music
+  state_dir: data/state
+  shloka_progress: data/state/shloka_progress.json
+
+secrets:
+  youtube_client_secret: secrets/youtube_client_secret.json
+  youtube_token: secrets/youtube_token.json
+
+images:
+  model: flux
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, blurry, low quality, cartoon, anime, chibi, modern clothing
+  num_per_reel: 7
+  provider: pollinations
+  style_suffix: ', traditional Indian devotional painting in Raja Ravi Varma style, single figure clearly visible, anatomically correct, two natural arms (or canonically-correct count), centered composition, soft golden volumetric divine light, intricate fabric and jewelry detail, vertical 9:16 portrait, cinematic concept art quality, no text'
+
+llm:
+  language: hindi
+  model: gemini-flash-latest
+  provider: gemini
+  persona: |
+    You are a viral short-form scriptwriter for a Hindu devotional channel "KalyaanPath".
+    Tone: reverent, warm, devotional, never satirical or doctrinal/divisive.
+    Audience: Hindi-speaking devotees, 25-65 age, India + diaspora.
+  image_style_guidance: |
+    - Always specify "single figure, full body, centered, anatomically correct, two arms" (unless the deity canonically has more, then specify exact count: "four arms holding lotus, conch, mace, chakra").
+    - Art style: "traditional Indian devotional painting, Raja Ravi Varma style" or "cinematic concept art, soft volumetric light".
+    - Lighting + mood: "golden hour sunrise", "soft divine glow".
+    - NO text, watermarks, or words in image.
+  topic_guidance: |
+    Topics include Hindu deities, Gita shlokas, mythological stories, sacred temples, and Hindu festivals.
+    Avoid political content, modern figures, or controversial claims.
+
+publish:
+  instagram: true
+  privacy: public
+  youtube: true
+
+video:
+  bitrate: 6M
+  duration_target_sec: 50
+  font: /System/Library/Fonts/Supplemental/Devanagari Sangam MN.ttc
+  font_size: 72
+  fps: 30
+  height: 1920
+  subtitle_box_opacity: 0.0
+  width: 1080
+
+voice:
+  # provider: "edge" (free Microsoft voices) or "elevenlabs" (premium)
+  provider: edge
+  fallback_to_edge: true
+
+  # Edge TTS (free) — Microsoft Hindi voices
+  pitch: +25Hz
+  rate: +3%
+  shloka_pitch: -2Hz
+  shloka_rate: -12%
+  shloka_voice: hi-IN-MadhurNeural
+  voice: hi-IN-SwaraNeural
+
+  # ElevenLabs (premium) — pick voices at elevenlabs.io/app/voice-library
+  # "Charlotte" (warm female) — good for devotional. Swap with Hindi-native if preferred.
+  elevenlabs_voice_id: XB0fDUnXU5powFXDhCwa
+  # "Adam" (deep male) — better for shloka narration
+  elevenlabs_shloka_voice_id: pNInz6obpgDQGcFmaJgB
+  elevenlabs_model: eleven_multilingual_v2
+  elevenlabs_settings:
+    stability: 0.55
+    similarity_boost: 0.80
+    style: 0.30
+    use_speaker_boost: true

@@ -1,0 +1,102 @@
+niche: itihaas
+
+branding:
+  channel_handle: '@Itihaasvani'
+  cta: "\U0001F4DC Itihaas ki awaaz suno — Subscribe Itihaasvani"
+  hashtags:
+  - '#itihaasvani'
+  - '#itihaas'
+  - '#mythology'
+  - '#mahabharata'
+  - '#ramayana'
+  - '#hindumythology'
+  - '#sanatan'
+  - '#bharatkahistory'
+  - '#shorts'
+  - '#reels'
+  - '#ancientindia'
+  - '#puranas'
+  music_credit: "Music: cinematic epic drone — original, royalty-free"
+
+paths:
+  topics_file: data/topics_itihaas.json
+  music_dir: data/music_itihaas
+  state_dir: data/state
+  shloka_progress: data/state/itihaas_progress.json
+
+secrets:
+  youtube_client_secret: secrets/itihaas_youtube_client_secret.json
+  youtube_token: secrets/itihaas_youtube_token.json
+
+images:
+  model: flux
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars
+  num_per_reel: 7
+  provider: pollinations
+  style_suffix: ', epic cinematic concept art, dramatic chiaroscuro lighting, ancient Indian setting, detailed period-accurate armor and ornaments, mythological art style inspired by Raja Ravi Varma fused with cinematic concept art, golden hour or dramatic dusk light, ultra detailed atmospheric scene, vertical 9:16 portrait, single focal subject, no text'
+
+llm:
+  language: hindi
+  model: gemini-flash-latest
+  provider: gemini
+  persona: |
+    You are a viral short-form storyteller for "Itihaasvani" — an Indian mythology + history channel whose name literally means "Voice of History".
+    Tone: mysterious, dramatic, intriguing, authoritative. Hook the viewer with a "did you know" angle in the first 3 seconds.
+    Audience: Hindi-speaking, 18-45 age, curious about Bharat's hidden history and lesser-known epic stories.
+    Style: Like a podcast host revealing secrets. Use phrases like "क्या आप जानते हैं...", "इतिहास का वो रहस्य...", "वेदों में लिखा है...".
+    Brand voice: When ending or asking subscribe, ALWAYS use the channel name "Itihaasvani" (इतिहासवाणी), never any other name. CTA examples: "Itihaasvani ko abhi subscribe karein", "Itihaasvani parivaar mein jud jao".
+  image_style_guidance: |
+    - Cinematic epic mood: chiaroscuro lighting, dramatic shadows, atmospheric depth.
+    - Period-accurate: ancient Indian architecture (stone temples, palaces, fortresses), traditional weapons (bow, mace, sword), period clothing (dhoti, sari, armor).
+    - Single dominant subject in 9:16 frame. Heroes, warriors, sages, deities.
+    - Anatomically correct (two arms unless canonically more — Vishnu's 4 arms, Durga's 8/10 arms etc.).
+    - Time/place hints: ancient Bharat, mountains, rivers, ruins, sacred groves.
+    - NO modern elements (cars, buildings, clothing), NO text/watermarks.
+  topic_guidance: |
+    Topics include:
+    - Mahabharata hidden facts (Karna's secrets, Eklavya, Ashwatthama, Barbarik)
+    - Ramayana lesser-known stories (Urmila, Lakshman's tapasya, Ravana's library)
+    - Lost kingdoms (Vijayanagara, Chola, Maurya, Maratha)
+    - Mythological mysteries (Saraswati river, Dwarka submergence, Ram Setu, Kailasa temple)
+    - Forgotten warriors and rulers (Lalitaditya, Bajirao, Rani Abbakka)
+    - Hybrid mythology+science angles (Vimanas, Brahmastra theories)
+    Avoid: religious controversy, political bias, modern politics, claims that disrespect any community.
+    Frame as historical/mythological education, never devotional preaching.
+
+publish:
+  instagram: false
+  privacy: public
+  youtube: true
+
+video:
+  bitrate: 6M
+  duration_target_sec: 50
+  font: /System/Library/Fonts/Supplemental/Devanagari Sangam MN.ttc
+  font_size: 72
+  fps: 30
+  height: 1920
+  subtitle_box_opacity: 0.0
+  width: 1080
+
+voice:
+  # provider: "edge" (free) or "elevenlabs" (premium — recommended for itihaas drama)
+  provider: edge
+  fallback_to_edge: true
+
+  # Edge TTS (free)
+  pitch: -5Hz
+  rate: -2%
+  shloka_pitch: -8Hz
+  shloka_rate: -12%
+  shloka_voice: hi-IN-MadhurNeural
+  voice: hi-IN-MadhurNeural
+
+  # ElevenLabs (premium) — Adam = deep dramatic male, perfect for storytelling
+  elevenlabs_voice_id: pNInz6obpgDQGcFmaJgB
+  elevenlabs_shloka_voice_id: pNInz6obpgDQGcFmaJgB
+  elevenlabs_model: eleven_multilingual_v2
+  elevenlabs_settings:
+    stability: 0.45        # lower = more emotion/drama
+    similarity_boost: 0.85
+    style: 0.45            # higher = more characterful, dramatic
+    use_speaker_boost: true

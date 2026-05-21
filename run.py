@@ -11,11 +11,16 @@ from pipeline.scraper import gather_context
 from pipeline.script_writer import write_script
 from pipeline.topic_generator import pick_shloka_episode, pick_topic, pick_trending
 from pipeline.tts import synthesize
-from pipeline.utils import out_path, slugify, today_stamp
+from pipeline.utils import out_path, set_active_niche, slugify, today_stamp
 
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--niche", default="bhakti",
+        choices=["bhakti", "itihaas"],
+        help="Which niche to run (bhakti = KalyaanPath; itihaas = Itihaas Rahasya)",
+    )
     ap.add_argument(
         "--kind", default="auto",
         choices=["auto", "shloka", "trending"],
@@ -31,19 +36,38 @@ def main(argv: list[str]) -> int:
         help="Public HTTPS URL for the video (required for Instagram upload)",
     )
     ap.add_argument("--skip-images", action="store_true", help="Reuse existing images if present (debug)")
+    ap.add_argument(
+        "--no-music", action="store_true",
+        help="Skip background music — produces voice-only mp4. Use for YouTube Shorts so you can add trending audio at upload time (algorithm boost).",
+    )
+    ap.add_argument(
+        "--auto-thumb", action="store_true",
+        help="Auto-generate a custom thumbnail for the video and save to output/thumbnails/.",
+    )
+    ap.add_argument(
+        "--notify-telegram", action="store_true",
+        help="Send video + thumbnail + metadata to Telegram bot for manual upload. Auto-enables --auto-thumb.",
+    )
+    ap.add_argument(
+        "--seed-offset", type=int, default=0,
+        help="Integer offset to vary topic pick on the same day. Use 1 for first daily drop, 2 for second, etc.",
+    )
     args = ap.parse_args(argv)
+    if args.notify_telegram:
+        args.auto_thumb = True
 
-    print("== Bhakti Reels pipeline ==")
+    set_active_niche(args.niche)
+    print(f"== Reels pipeline ({args.niche}) ==")
 
     # 1. topic
     if args.topic and args.topic != "auto":
-        topic = pick_topic(args.topic)
+        topic = pick_topic(args.topic, seed_offset=args.seed_offset)
     elif args.kind == "shloka":
         topic = pick_shloka_episode()
     elif args.kind == "trending":
-        topic = pick_trending()
+        topic = pick_trending(seed_offset=args.seed_offset)
     else:
-        topic = pick_topic("auto")
+        topic = pick_topic("auto", seed_offset=args.seed_offset)
     print(f"[topic] {topic}")
 
     stamp = today_stamp()
@@ -81,29 +105,59 @@ def main(argv: list[str]) -> int:
 
     # 6. assemble
     video_path = out_path("videos", f"{base}.mp4")
-    assemble(script, voice_path, images, video_path)
-    print(f"[video] FINAL → {video_path}")
+    assemble(script, voice_path, images, video_path, skip_music=args.no_music)
+    print(f"[video] FINAL → {video_path}{' (no-music)' if args.no_music else ''}")
+
+    # 6b. thumbnail (optional)
+    thumb_path = None
+    if args.auto_thumb:
+        try:
+            from pipeline.thumbnail_gen import make_thumbnail
+            thumb_path = out_path("thumbnails", f"{base}.jpg")
+            make_thumbnail(script, args.niche, thumb_path)
+        except Exception:
+            traceback.print_exc()
+            print("[thumbnail] generation failed — continuing without")
+
+    # 6c. notify Telegram (optional)
+    if args.notify_telegram:
+        try:
+            from pipeline.notifier_telegram import notify as tg_notify
+            tg_notify(video_path, thumb_path, script, args.niche)
+        except Exception:
+            traceback.print_exc()
+            print("[telegram] notify failed")
 
     # 7. publish
     if args.publish:
-        try:
-            from pipeline.uploader_youtube import upload as yt_upload
-            url = yt_upload(video_path, script)
-            print(f"[publish] youtube: {url}")
-        except Exception:
-            traceback.print_exc()
-            print("[publish] youtube failed — see traceback above")
+        from pipeline.utils import load_config
+        cfg = load_config()
+        publish_cfg = cfg.get("publish", {})
 
-        if args.public_url:
+        if publish_cfg.get("youtube", True):
             try:
-                from pipeline.uploader_instagram import upload as ig_upload
-                media_id = ig_upload(args.public_url, script)
-                print(f"[publish] instagram: {media_id}")
+                from pipeline.uploader_youtube import upload as yt_upload
+                url = yt_upload(video_path, script)
+                print(f"[publish] youtube: {url}")
             except Exception:
                 traceback.print_exc()
-                print("[publish] instagram failed — see traceback above")
+                print("[publish] youtube failed — see traceback above")
         else:
-            print("[publish] skipped instagram (no --public-url provided)")
+            print("[publish] skipped youtube (disabled in config)")
+
+        if publish_cfg.get("instagram", False):
+            if args.public_url:
+                try:
+                    from pipeline.uploader_instagram import upload as ig_upload
+                    media_id = ig_upload(args.public_url, script)
+                    print(f"[publish] instagram: {media_id}")
+                except Exception:
+                    traceback.print_exc()
+                    print("[publish] instagram failed — see traceback above")
+            else:
+                print("[publish] skipped instagram (no --public-url provided)")
+        else:
+            print(f"[publish] skipped instagram (disabled for niche '{args.niche}')")
 
     return 0
 

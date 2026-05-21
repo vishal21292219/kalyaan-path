@@ -7,17 +7,25 @@ import random
 from datetime import date, timedelta
 from pathlib import Path
 
-from .utils import ROOT, load_topics
-
-STATE_DIR = ROOT / "data" / "state"
-SHLOKA_STATE = STATE_DIR / "shloka_progress.json"
+from .utils import ROOT, load_config, load_topics
 
 
-def _seed_for_today() -> int:
-    return int(hashlib.md5(date.today().isoformat().encode()).hexdigest(), 16) % (2**32)
+def _shloka_state_path() -> Path:
+    cfg = load_config()
+    rel = cfg.get("paths", {}).get("shloka_progress", "data/state/shloka_progress.json")
+    p = ROOT / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    return p
 
 
-def pick_topic(force: str | None = None) -> dict:
+def _seed_for_today(offset: int = 0) -> int:
+    """Date-based deterministic seed. Pass offset to get a DIFFERENT pick
+    on the same day (e.g. for multiple runs/day on the same niche)."""
+    key = f"{date.today().isoformat()}#{offset}"
+    return int(hashlib.md5(key.encode()).hexdigest(), 16) % (2**32)
+
+
+def pick_topic(force: str | None = None, seed_offset: int = 0) -> dict:
     topics = load_topics()
 
     if force and force != "auto":
@@ -40,7 +48,7 @@ def pick_topic(force: str | None = None) -> dict:
             }
 
     # 2. rotate across categories by day-of-year mod
-    rng = random.Random(_seed_for_today())
+    rng = random.Random(_seed_for_today(seed_offset))
     bucket = rng.choice(["deity", "story", "shloka", "temple"])
 
     if bucket == "deity":
@@ -60,9 +68,9 @@ def pick_shloka_episode() -> dict:
     """Pick next Gita shloka in sequence and advance state."""
     topics = load_topics()
     episodes = topics["gita_episodes"]
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
-    if SHLOKA_STATE.exists():
-        state = json.loads(SHLOKA_STATE.read_text())
+    state_path = _shloka_state_path()
+    if state_path.exists():
+        state = json.loads(state_path.read_text())
     else:
         state = {"next_index": 0, "history": []}
     idx = state["next_index"] % len(episodes)
@@ -71,7 +79,7 @@ def pick_shloka_episode() -> dict:
     title = f"Bhagavad Gita Shloka {ep_num} | {ep['ref']} | {ep['theme']}"
     state["next_index"] = idx + 1
     state["history"].append({"ep": ep_num, "ref": ep["ref"], "date": date.today().isoformat()})
-    SHLOKA_STATE.write_text(json.dumps(state, indent=2, ensure_ascii=False))
+    state_path.write_text(json.dumps(state, indent=2, ensure_ascii=False))
     return {
         "kind": "shloka_episode",
         "title": title,
@@ -84,11 +92,13 @@ def pick_shloka_episode() -> dict:
     }
 
 
-def pick_trending() -> dict:
-    """Pick today's trending: nearby festival > weighted random deity."""
+def pick_trending(seed_offset: int = 0) -> dict:
+    """Pick today's trending: nearby festival > weighted random deity.
+    Pass seed_offset to vary the pick on the same day (multi-drop schedule).
+    """
     topics = load_topics()
     today = date.today()
-    # festival in next 5 days wins
+    # festival in next 5 days wins (festival overrides any offset — same fest all day)
     for fest in topics["festivals_calendar"]:
         try:
             f_date = date(today.year, fest["month"], fest["approx_day"])
@@ -102,9 +112,9 @@ def pick_trending() -> dict:
                 "wiki": fest["name"].replace(" ", "_"),
                 "tags": ["festival", fest["name"].lower().replace(" ", "")],
             }
-    # weighted random deity from trending pool
+    # weighted random deity from trending pool — different per offset
     pool = topics.get("trending_deities", topics["deities"])
-    rng = random.Random(_seed_for_today())
+    rng = random.Random(_seed_for_today(seed_offset))
     weights = [d.get("weight", 1) for d in pool]
     d = rng.choices(pool, weights=weights, k=1)[0]
     return {
