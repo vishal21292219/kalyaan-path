@@ -70,7 +70,7 @@ DEFAULT_IMAGE_GUIDE = "- Describe a clear simple scene, vertical 9:16, no text o
 DEFAULT_TOPIC_GUIDE = "- Avoid political content, modern figures, or controversial claims."
 
 
-def _build_system_prompt(cfg: dict, n_images: int) -> str:
+def _build_system_prompt(cfg: dict, n_images: int, long_form: bool = False) -> str:
     llm = cfg.get("llm", {})
     persona = llm.get("persona", DEFAULT_PERSONA).strip()
     image_guide = llm.get("image_style_guidance", DEFAULT_IMAGE_GUIDE).strip()
@@ -107,11 +107,30 @@ def _build_system_prompt(cfg: dict, n_images: int) -> str:
 
     spec_block = f"\n\nCONTENT SPEC (STRICT — follow exactly):\n{content_spec}" if content_spec else ""
 
+    long_form_block = ""
+    if long_form:
+        long_form_block = """
+
+LONG-FORM MODE (CRITICAL OVERRIDE — overrides the 45-55 sec rule above):
+- Target total spoken duration: ~20-25 MINUTES (NOT seconds).
+- Generate 50-80 body lines (each one-breath line ~10-15 words).
+- The narrative should arc like a documentary: intro hook → setup → main
+  revelations (5-7 sub-sections) → climactic insight → call to action.
+- Each body line is one short sentence the narrator says. Pace = audiobook.
+- Generate exactly 30 visual prompts (one image per ~45 sec of narration).
+- Description should be LONG (1500-1800 chars) with a "इस वीडियो में
+  हम जानेंगे:" / "In this video you'll learn:" bullet list of 7-9 sub-topics
+  (this section drives long-form retention and SEO).
+- Title format: "[Topic] रहस्य | [hook question] | [sub-curiosity]" —
+  chain 3 hooks for maximum CTR (like ITIHAAS RAZ 619K-view formula).
+- Hashtags: 12-15 mix of niche + long-form-specific (#documentary #hindirahasya).
+"""
+
     return f"""{persona}
 
 {schema}
 
-{lang_block}
+{lang_block}{long_form_block}
 
 IMAGE STYLE GUIDANCE:
 {image_guide}
@@ -129,7 +148,7 @@ def _lang_instruction(lang: str) -> str:
     }.get(lang, "Hinglish")
 
 
-def _build_user_prompt(topic: dict, context: str, n_images: int, niche: str) -> str:
+def _build_user_prompt(topic: dict, context: str, n_images: int, niche: str, long_form: bool = False) -> str:
     if topic.get("kind") == "shloka_episode":
         return f"""You are creating EPISODE {topic['episode_number']} of a Bhagavad Gita shloka series.
 
@@ -165,6 +184,25 @@ Structure the reel like this:
   All vertical 9:16, single figure (anatomically correct), warm golden
   cinematic light, painting-quality not photographic.
 - description + hashtags as usual
+
+Return ONLY the JSON object."""
+    if long_form:
+        return f"""Topic: {topic['title']}
+Niche: {niche}
+Format: LONG-FORM DOCUMENTARY (20-25 min, NOT a Short)
+
+Reference facts (from Wikipedia, distill the essentials):
+\"\"\"
+{context}
+\"\"\"
+
+CRITICAL: Generate a 20-25 minute documentary-style script.
+- body: 50-80 short narration lines (one breath each, ~10-15 words)
+- Structure: hook → setup → 5-7 major revelations → climax → CTA
+- description: long-form style, include "इस वीडियो में हम जानेंगे:" with 7-9 sub-topics
+- title: 3-hook chained format like "[Topic] रहस्य | [question] | [sub-curiosity]"
+- visuals: {n_images} prompts (one per ~45 sec of narration), cinematic mythology art
+- hashtags: 12-15 mix
 
 Return ONLY the JSON object."""
     return f"""Topic: {topic['title']}
@@ -225,13 +263,18 @@ def _extract_json(text: str) -> dict:
     return json.loads(text[start : end + 1])
 
 
-def write_script(topic: dict, context: str) -> dict:
+def write_script(topic: dict, context: str, long_form: bool = False) -> dict:
     cfg = load_config()
-    n_images = cfg["images"]["num_per_reel"]
+    if long_form:
+        # Long-form videos use ~30 scenes (vs 10 for Shorts) and 50-80 body
+        # lines (vs 5-9). Each scene plays ~30-45 sec.
+        n_images = 30
+    else:
+        n_images = cfg["images"]["num_per_reel"]
     niche = cfg.get("niche", "bhakti")
 
-    system = _build_system_prompt(cfg, n_images)
-    user = _build_user_prompt(topic, context, n_images, niche)
+    system = _build_system_prompt(cfg, n_images, long_form=long_form)
+    user = _build_user_prompt(topic, context, n_images, niche, long_form=long_form)
 
     provider = cfg["llm"]["provider"]
     model = cfg["llm"]["model"]

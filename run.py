@@ -61,6 +61,10 @@ def main(argv: list[str]) -> int:
         "--seed-offset", type=int, default=0,
         help="Integer offset to vary topic pick on the same day. Use 1 for first daily drop, 2 for second, etc.",
     )
+    ap.add_argument(
+        "--long-form", action="store_true",
+        help="Generate a 20-25 min long-form video (vs default 50-sec Short). Uses more scenes (~30), longer script (~3500 words), heavier production. Best for weekly/bi-weekly drops.",
+    )
     args = ap.parse_args(argv)
     if args.notify_telegram:
         args.auto_thumb = True
@@ -91,8 +95,8 @@ def main(argv: list[str]) -> int:
     context = gather_context(topic)
     print(f"[scrape] context length: {len(context)}")
 
-    # 3. script via LLM
-    script = write_script(topic, context)
+    # 3. script via LLM (long-form mode generates 50-80 lines + 30 visuals)
+    script = write_script(topic, context, long_form=args.long_form)
     # attach topic metadata so assembler can render episode badge / verse overlay
     for key in ("kind", "episode_number", "ref", "verse", "theme"):
         if key in topic and key not in script:

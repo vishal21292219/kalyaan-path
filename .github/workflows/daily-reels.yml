@@ -17,6 +17,7 @@ on:
     - cron: "30 1 * * *"    # 07:00 IST → bhakti shloka publish
     - cron: "30 13 * * *"   # 19:00 IST → bhakti trending publish
     - cron: "0 14 * * *"    # 19:30 IST = 14:00 UTC → ancient (TimeDecoders) auto-publish (US afternoon + EU evening)
+    - cron: "30 2 * * 0"    # 08:00 IST Sunday → itihaas LONG-FORM (20-25 min) weekly auto-publish + GitHub Release
   workflow_dispatch:
     inputs:
       niche:
@@ -37,6 +38,12 @@ on:
         default: "telegram"
         type: choice
         options: [publish, telegram]
+      long_form:
+        description: "Generate long-form 20-25 min video (Sunday weekly mode)"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
       seed_offset:
         description: "Topic variation offset"
         required: false
@@ -101,7 +108,7 @@ jobs:
           IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
           EOF
 
-      - name: Route this run (cron → niche/kind/mode/seed)
+      - name: Route this run (cron → niche/kind/mode/seed/long_form)
         id: route
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -109,31 +116,43 @@ jobs:
             echo "kind=${{ inputs.kind }}"             >> $GITHUB_OUTPUT
             echo "mode=${{ inputs.mode }}"             >> $GITHUB_OUTPUT
             echo "seed=${{ inputs.seed_offset }}"      >> $GITHUB_OUTPUT
+            echo "long_form=${{ inputs.long_form }}"   >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 0 * * *" ]; then
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "45 0 * * *" ]; then
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 1 * * *" ]; then
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
             echo "kind=shloka"   >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 14 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "30 2 * * 0" ]; then
+            echo "niche=itihaas" >> $GITHUB_OUTPUT
+            echo "kind=trending" >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
+            echo "seed=0"        >> $GITHUB_OUTPUT
+            echo "long_form=true" >> $GITHUB_OUTPUT
           else
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Run pipeline (telegram mode)
@@ -147,13 +166,43 @@ jobs:
             --seed-offset ${{ steps.route.outputs.seed }}
 
       - name: Run pipeline (publish mode)
-        if: steps.route.outputs.mode == 'publish'
+        if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form != 'true'
         run: |
           python run.py \
             --niche ${{ steps.route.outputs.niche }} \
             --kind ${{ steps.route.outputs.kind }} \
             --publish \
             --seed-offset ${{ steps.route.outputs.seed }}
+
+      - name: Run pipeline (LONG-FORM publish mode, 20-25 min)
+        if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form == 'true'
+        timeout-minutes: 90
+        run: |
+          python run.py \
+            --niche ${{ steps.route.outputs.niche }} \
+            --kind ${{ steps.route.outputs.kind }} \
+            --publish \
+            --long-form \
+            --seed-offset ${{ steps.route.outputs.seed }}
+
+      - name: Find generated long-form video
+        if: steps.route.outputs.long_form == 'true'
+        id: longform_video
+        run: |
+          VIDEO=$(ls -t output/videos/*.mp4 | head -1)
+          echo "path=$VIDEO" >> $GITHUB_OUTPUT
+          echo "name=$(basename $VIDEO)" >> $GITHUB_OUTPUT
+          echo "Long-form video: $VIDEO ($(du -h "$VIDEO" | cut -f1))"
+
+      - name: Upload long-form mp4 to GitHub Release (downloadable backup)
+        if: steps.route.outputs.long_form == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: longform-${{ github.run_id }}
+          name: "Long-form: ${{ steps.longform_video.outputs.name }}"
+          files: ${{ steps.longform_video.outputs.path }}
+          prerelease: false
+          make_latest: false
 
       - name: Commit updated state files (shloka progress etc.)
         if: steps.route.outputs.niche == 'bhakti' && steps.route.outputs.kind == 'shloka'
