@@ -86,19 +86,52 @@ Rules:
 
 
 def _gen_base_image(script: dict) -> Image.Image:
-    """Generate a dramatic close-up thumbnail image via Pollinations."""
+    """Generate a dramatic close-up thumbnail image — Gemini Nano Banana 2
+    primary, Pollinations as fallback if Gemini fails or quota exhausted.
+    """
+    import os
+    import base64
     visuals = script.get("visuals") or []
     base_prompt = visuals[0] if visuals else script.get("title", "")
     prompt = (
         f"{base_prompt}, dramatic close-up portrait framing, intense emotional expression, "
-        f"deep chiaroscuro lighting, vertical 9:16 portrait composition, "
-        f"ultra detailed, cinematic concept art, no text, no watermark, "
-        f"single character centered"
+        f"deep chiaroscuro lighting with bright divine highlights, vertical 9:16 portrait "
+        f"composition, ultra detailed, cinematic concept art, single character centered, "
+        f"anatomically correct, well-illuminated face, traditional Indian devotional art "
+        f"masterpiece, no text, no watermark"
     )
+
+    # Try Gemini Nano Banana 2 first
+    api_key = os.getenv("GEMINI_API_KEY")
+    if api_key:
+        try:
+            r = requests.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/"
+                f"gemini-3.1-flash-image-preview:generateContent?key={api_key}",
+                json={
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]},
+                },
+                timeout=180,
+            )
+            if r.status_code == 200:
+                for part in r.json()["candidates"][0]["content"]["parts"]:
+                    if "inlineData" in part:
+                        img_bytes = base64.b64decode(part["inlineData"]["data"])
+                        if len(img_bytes) > 5000:
+                            print("[thumbnail] base via Gemini Nano Banana 2")
+                            return Image.open(BytesIO(img_bytes)).convert("RGB")
+            else:
+                print(f"[thumbnail] Gemini failed ({r.status_code}), falling back to Pollinations")
+        except Exception as e:
+            print(f"[thumbnail] Gemini error ({e}), falling back to Pollinations")
+
+    # Fallback: Pollinations flux-realism
     url = (
         f"https://image.pollinations.ai/prompt/{requests.utils.quote(prompt)}"
-        f"?width=1080&height=1920&nologo=true&model=flux"
+        f"?width=1080&height=1920&nologo=true&model=flux-realism"
     )
+    print("[thumbnail] base via Pollinations (fallback)")
     r = requests.get(url, timeout=240)
     r.raise_for_status()
     return Image.open(BytesIO(r.content)).convert("RGB")
