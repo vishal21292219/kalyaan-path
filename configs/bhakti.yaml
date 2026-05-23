@@ -30,7 +30,7 @@ images:
   model: gemini-3.1-flash-image-preview
   fallback_model: flux-realism
   negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, dark gloomy mood, underexposed, muddy colors, washed out
-  num_per_reel: 7
+  num_per_reel: 10
   style_suffix: ', traditional Indian devotional painting in Raja Ravi Varma style fused with cinematic ultra realistic 3D rendering, single deity figure clearly visible and sharply in focus, anatomically correct (two arms, one head, five fingers per hand unless canonically more like Vishnu four arms or Durga eight arms), centered composition, BRIGHT divine warm golden volumetric light bathing the scene, well-illuminated peaceful face with clear devotional expression, rich saturated golden-saffron-warm color palette, intricate fabric and jewelry detail, polished masterpiece quality, vertical 9:16 portrait, ultra detailed 8K rendering, no text no watermark'
 
 llm:
