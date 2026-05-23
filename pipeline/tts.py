@@ -145,7 +145,13 @@ def _silence_align(text: str, audio_path: Path) -> list[dict]:
         return []
 
     boundaries: list[dict] = []
+    sentence_segments: list[dict] = []  # for image sync — saved separately
     for sent, (seg_start, seg_end) in zip(sentences, segments):
+        sentence_segments.append({
+            "text": sent,
+            "start": round(seg_start, 3),
+            "end": round(seg_end, 3),
+        })
         words = []
         for raw in sent.split():
             w = raw.strip(",.!?।॥;:()[]{}\"'`")
@@ -166,6 +172,18 @@ def _silence_align(text: str, audio_path: Path) -> list[dict]:
                 "start": round(start_t, 3),
                 "end": round(end_t, 3),
             })
+
+    # Save sentence-level segments so assembler can sync images to them
+    try:
+        import json as _json
+        sents_path = audio_path.with_suffix(".sentences.json")
+        sents_path.write_text(
+            _json.dumps(sentence_segments, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+    except Exception as e:
+        print(f"[silence-align] could not write sentences.json: {e}")
+
     print(f"[silence-align] aligned {len(boundaries)} words across {len(segments)} segments")
     return boundaries
 

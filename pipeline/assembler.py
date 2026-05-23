@@ -53,6 +53,51 @@ def _run(cmd: list[str], cwd: Path | None = None) -> None:
         raise RuntimeError(f"ffmpeg failed: {cmd[0]}")
 
 
+def _compute_image_durations(voice_path: Path, n_images: int, total_duration: float) -> list[float] | None:
+    """Map N images proportionally across the M silence-aligned sentences so
+    each image appears WHILE its corresponding script sentence is being
+    narrated, instead of the equal-split default.
+
+    Reads {voice_path}.sentences.json (written by tts._silence_align). If the
+    sidecar isn't present or has zero/one segments, returns None and caller
+    falls back to equal split.
+
+    Mapping rule: image i covers sentences [floor(i*M/N), floor((i+1)*M/N)).
+    Image duration = sum of those sentences' durations.
+    """
+    import json as _json
+    sents_path = voice_path.with_suffix(".sentences.json")
+    if not sents_path.exists():
+        return None
+    try:
+        sentences = _json.loads(sents_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not sentences or n_images <= 0:
+        return None
+    M = len(sentences)
+    if M < 2:
+        return None
+
+    durations: list[float] = []
+    for i in range(n_images):
+        s_idx = int(i * M / n_images)
+        e_idx = int((i + 1) * M / n_images)
+        e_idx = max(s_idx + 1, e_idx)
+        e_idx = min(e_idx, M)
+        # Cover from start of first sentence in window to end of last
+        start_t = sentences[s_idx]["start"]
+        end_t = sentences[e_idx - 1]["end"]
+        durations.append(max(0.5, end_t - start_t))
+
+    # Rescale to total_duration (handles head/tail silence not in sentence span)
+    sum_d = sum(durations)
+    if sum_d > 0:
+        scale = total_duration / sum_d
+        durations = [d * scale for d in durations]
+    return durations
+
+
 def _audio_duration(path: Path) -> float:
     out = subprocess.check_output(
         [
@@ -271,8 +316,19 @@ def assemble(
 
     duration = _audio_duration(voice_path)
     n = len(image_paths)
-    per = duration / n
-    per_frames = max(int(per * FPS), 30)
+
+    # Sync images to script sentences (silence-aligned). Each image's display
+    # window covers a proportional range of sentences, so the visual on screen
+    # actually matches the line being narrated. Falls back to equal split if
+    # the sentences.json sidecar isn't available (e.g., for ElevenLabs).
+    image_durations = _compute_image_durations(voice_path, n, duration)
+    if image_durations is None:
+        per_uniform = duration / n
+        image_durations = [per_uniform] * n
+        print(f"[assembler] image timing: equal split ({per_uniform:.2f}s each)")
+    else:
+        print(f"[assembler] image timing: sentence-synced "
+              f"(durations {[round(d, 2) for d in image_durations]})")
 
     work = out_video.parent / f"_work_{out_video.stem}"
     if work.exists():
@@ -285,19 +341,21 @@ def assemble(
     # the full image. Pre-scaling by 2x and using z=2.0 was the old bug
     # (visible window covered only 25% of the image content).
     clips: list[Path] = []
-    denom = max(per_frames - 1, 1)
-    # iw/ih here = input width/height after scale below = W and H
     pan_range = "(iw-iw/zoom)"   # max x offset while keeping window inside frame
-    motions = [
+    motion_templates = [
         # (start_z, end_z, x_expr_template, y_expr_template)
         ("1.00", "1.15", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),               # zoom in, center
         ("1.15", "1.00", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),               # zoom out, center
-        ("1.10", "1.10", f"on*{pan_range}/{denom}", "ih/2-(ih/zoom/2)"),         # pan L→R
-        ("1.10", "1.10", f"{pan_range}-on*{pan_range}/{denom}", "ih/2-(ih/zoom/2)"),  # pan R→L
+        ("1.10", "1.10", "on*PAN_RANGE/DENOM", "ih/2-(ih/zoom/2)"),              # pan L→R
+        ("1.10", "1.10", "PAN_RANGE-on*PAN_RANGE/DENOM", "ih/2-(ih/zoom/2)"),    # pan R→L
     ]
     for i, img in enumerate(image_paths):
         clip = work / f"clip_{i:02d}.mp4"
-        start_z, end_z, x_expr, y_expr = motions[i % len(motions)]
+        per = max(0.5, image_durations[i])  # min 0.5s per image
+        per_frames = max(int(per * FPS), 15)
+        denom = max(per_frames - 1, 1)
+        start_z, end_z, x_expr_tpl, y_expr = motion_templates[i % len(motion_templates)]
+        x_expr = x_expr_tpl.replace("PAN_RANGE", pan_range).replace("DENOM", str(denom))
         z_expr = f"({start_z})+(({end_z})-({start_z}))*on/{denom}"
         zoompan = (
             # high-quality upscale from Pollinations' 576x1024 → 1080x1920
