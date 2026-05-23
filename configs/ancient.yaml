@@ -1,9 +1,10 @@
 niche: ancient
 
 branding:
-  channel_handle: '@AncientWorldDecoded'
-  cta: "🔱 Decoding the lost civilizations — Subscribe Ancient World Decoded"
+  channel_handle: '@TimeDecoders'
+  cta: "⏳ Decoding the mysteries of time — Subscribe TimeDecoders"
   hashtags:
+  - '#timedecoders'
   - '#ancientmysteries'
   - '#losthistory'
   - '#ancientcivilizations'
@@ -14,7 +15,7 @@ branding:
   - '#unsolvedmysteries'
   - '#historyfacts'
   - '#lostcivilization'
-  - '#ancientcivilization'
+  - '#hiddenhistory'
   music_credit: "Music: cinematic ambient — original, royalty-free"
 
 paths:
@@ -41,9 +42,12 @@ llm:
   model: gemini-flash-latest
   provider: gemini
   persona: |
-    You are a viral short-form storyteller for "Ancient World Decoded" — a
-    YouTube Shorts channel about lost civilizations, ancient mysteries,
+    You are a viral short-form storyteller for "TimeDecoders" — a YouTube
+    Shorts channel that decodes lost civilizations, ancient mysteries,
     unsolved archaeological puzzles, and forgotten history.
+    Brand voice: When ending or asking subscribe, ALWAYS use the channel
+    name "TimeDecoders". CTA examples: "Subscribe TimeDecoders for daily
+    history decoded", "Hit subscribe — join the TimeDecoders community".
     Audience: English-speaking, 18-50, curious about history's biggest unsolved
     questions. Global audience (India, US, UK, diaspora).
     Tone: mysterious, dramatic, intriguing, authoritative (like David
@@ -94,8 +98,8 @@ llm:
        Line 1: Hook beginning with "Did you know..." or "What if..." + emoji
        Line 2-3: 2-3 sentence teaser revealing the mystery without giving the answer
        Line 4: Engagement CTA — ask viewer's theory/opinion
-       Line 5 (verbatim): "If you love discovering the secrets of ancient civilizations,
-                          hit Subscribe and join the Ancient World Decoded community!"
+       Line 5 (verbatim): "If you love decoding history's biggest mysteries,
+                          hit Subscribe and join the TimeDecoders community!"
        Line 6 (verbatim, with exact emojis):
               "🔔 New mysteries every day:
                ✨ 12 PM UTC — Lost civilizations
@@ -106,7 +110,7 @@ llm:
               search keywords variations of the topic.
 
     3. hashtags (description only, NEVER in title):
-       Always include: #AncientWorldDecoded #LostHistory #AncientMysteries
+       Always include: #TimeDecoders #AncientMysteries #LostHistory
        #UnsolvedMysteries #ArchaeologyFacts #Shorts #YouTubeShorts
        Plus 6-9 topic-specific (e.g., #Atlantis #Pyramids #Stonehenge)
 
