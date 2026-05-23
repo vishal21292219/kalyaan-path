@@ -1,0 +1,96 @@
+niche: bhajan
+
+branding:
+  channel_handle: '@KalyaanPath'
+  cta: "\U0001F64F Daily devotional bhajans — Subscribe KalyaanPath"
+  hashtags:
+  - '#bhajan'
+  - '#bhajans'
+  - '#bhakti'
+  - '#kalyaanpath'
+  - '#hindubhajan'
+  - '#hinduism'
+  - '#sanatandharma'
+  - '#shorts'
+  - '#youtubeshorts'
+  - '#devotional'
+  music_credit: "Music: AI-generated devotional bhajan, original composition"
+
+paths:
+  bhajan_audio_root: data/music_bhajan
+  processed_state: data/state/bhajan_processed.json
+  state_dir: data/state
+
+secrets:
+  # Bhajan uploads to KalyaanPath (same OAuth as bhakti)
+  youtube_client_secret: secrets/youtube_client_secret.json
+  youtube_token: secrets/youtube_token.json
+
+images:
+  provider: gemini
+  model: gemini-3.1-flash-image-preview
+  fallback_model: flux-realism
+  num_per_bhajan: 25
+  xfade_duration: 0.6
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, dark gloomy mood, underexposed, muddy colors, washed out
+
+llm:
+  language: hindi
+  model: gemini-flash-latest
+  provider: gemini
+  # Persona used to generate scene storyboard for each bhajan
+  persona: |
+    You are a cinematic storyboard director for Indian devotional bhajan videos.
+    Given a bhajan deity (Krishna, Shiva, Ram, Hanuman, Devi, Ganesh, Sai Baba),
+    generate a 5-6 scene visual storyboard that takes the viewer through the
+    deity's most iconic moments. Each scene must be a vivid English image
+    prompt suitable for AI image generation. Tone: peaceful, divine, devotional.
+  image_style_guidance: |
+    - BRIGHT divine warm lighting (golden volumetric rays, well-illuminated)
+    - Single deity figure clearly visible, sharply in focus, centered
+    - Anatomically correct (two arms, one head, five fingers per hand unless
+      canonically more like Vishnu 4 arms, Durga 8 arms etc.)
+    - Traditional Indian devotional painting in Raja Ravi Varma style fused
+      with cinematic ultra realistic 3D rendering
+    - Rich saturated golden-saffron-warm color palette
+    - Vertical 9:16 portrait composition (1080x1920)
+    - Intricate fabric and jewelry detail
+    - Polished masterpiece quality, ultra detailed 8K rendering
+    - NO text, NO watermark, NO modern clothing
+
+publish:
+  instagram: false
+  privacy: public
+  youtube: true
+
+video:
+  bitrate: 6M
+  fps: 30
+  height: 1920
+  width: 1080
+  font: assets/fonts/Khand-Bold.ttf
+  branding_text: KalyaanPath
+
+# Per-deity branding hints (mood + key visual motifs)
+deities:
+  hanuman:
+    title_hint: "Jai Hanuman 🚩"
+    description_hook: "हनुमान जी की भक्ति में डूब जाइए 🙏"
+  krishna:
+    title_hint: "Hare Krishna 🦚"
+    description_hook: "कृष्ण कन्हैया की मधुर भक्ति 🙏"
+  shiva:
+    title_hint: "Har Har Mahadev 🕉️"
+    description_hook: "महादेव की शक्तिशाली भक्ति 🙏"
+  ram:
+    title_hint: "Jai Shri Ram 🏹"
+    description_hook: "मर्यादा पुरुषोत्तम राम की शांत भक्ति 🙏"
+  devi:
+    title_hint: "Jai Mata Di 🔱"
+    description_hook: "माँ दुर्गा की पावन भक्ति 🙏"
+  ganesh:
+    title_hint: "Ganpati Bappa Morya 🐘"
+    description_hook: "विघ्नहर्ता गणेश की मंगलमय भक्ति 🙏"
+  sai:
+    title_hint: "Om Sai Ram 🌹"
+    description_hook: "साईं बाबा की प्रेम भरी भक्ति 🙏"
