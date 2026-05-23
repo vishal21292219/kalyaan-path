@@ -38,12 +38,14 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
 
 Rules:
 - Total spoken duration ~45-55 seconds when read calmly.
-- hook / body / cta MUST be in Devanagari Hindi (so TTS pronounces correctly).
-- *_roman fields MUST be the SAME content transliterated to Roman/English script
-  (so captions render cleanly in a Latin font). Keep proper Sanskrit words
-  recognizable, e.g. "धर्म" → "Dharma", "कर्म" → "Karma".
-- Captions = the *_roman fields. Keep each *_roman line SHORT (<60 chars)
-  so it fits 2 caption lines max on screen.
+- LANGUAGE: hook / body / cta MUST be in the channel's primary language
+  (see "LANGUAGE INSTRUCTION" section below). For Hindi channels use
+  Devanagari script. For English channels write directly in English (in
+  this case the *_roman fields equal hook/body/cta — no transliteration
+  needed, set them to the same English text).
+- *_roman fields are used for on-screen captions. For Hindi channels they
+  are the Roman transliteration. For English channels just repeat the
+  English content. Keep each *_roman line SHORT (<60 chars).
 - Visuals (image prompts): VERY important — write in English following the
   image style guidance below.
 
@@ -74,13 +76,42 @@ def _build_system_prompt(cfg: dict, n_images: int) -> str:
     image_guide = llm.get("image_style_guidance", DEFAULT_IMAGE_GUIDE).strip()
     topic_guide = llm.get("topic_guidance", DEFAULT_TOPIC_GUIDE).strip()
     content_spec = (llm.get("content_spec") or "").strip()
+    language = llm.get("language", "hindi").lower()
     schema = SCHEMA_BLOCK.replace("{n_images}", str(n_images))
+
+    # Build explicit language instruction so LLM doesn't default to Hindi
+    if language == "english":
+        lang_block = (
+            "LANGUAGE INSTRUCTION (STRICT):\n"
+            "- Write hook / body / cta ENTIRELY IN ENGLISH (no Hindi, no Devanagari).\n"
+            "- *_roman fields = same English text (no transliteration needed).\n"
+            "- Title in English. Description in English. All hashtags in English.\n"
+            "- Tone is global English mystery podcast (David Attenborough meets Bright Side)."
+        )
+    elif language == "hinglish":
+        lang_block = (
+            "LANGUAGE INSTRUCTION (STRICT):\n"
+            "- Write hook / body / cta in HINGLISH (Hindi words in Roman script,\n"
+            "  e.g., 'Kya aap jaante hain ki Krishna ne...').\n"
+            "- *_roman fields = same Hinglish text.\n"
+            "- NO Devanagari script. NO pure English sentences."
+        )
+    else:  # hindi (default)
+        lang_block = (
+            "LANGUAGE INSTRUCTION (STRICT):\n"
+            "- Write hook / body / cta in PURE HINDI (Devanagari script) for TTS.\n"
+            "- *_roman fields MUST be Roman transliteration of the same Devanagari\n"
+            "  content (used for on-screen captions). Keep Sanskrit words recognizable\n"
+            "  ('धर्म' → 'Dharma', 'कर्म' → 'Karma')."
+        )
 
     spec_block = f"\n\nCONTENT SPEC (STRICT — follow exactly):\n{content_spec}" if content_spec else ""
 
     return f"""{persona}
 
 {schema}
+
+{lang_block}
 
 IMAGE STYLE GUIDANCE:
 {image_guide}
