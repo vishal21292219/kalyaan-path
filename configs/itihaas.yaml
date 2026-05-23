@@ -29,11 +29,11 @@ secrets:
   youtube_token: secrets/itihaas_youtube_token.json
 
 images:
-  model: flux
-  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars
+  model: flux-realism
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars, dark gloomy mood, underexposed, muddy colors, washed out
   num_per_reel: 7
   provider: pollinations
-  style_suffix: ', epic cinematic concept art, dramatic chiaroscuro lighting, ancient Indian setting, detailed period-accurate armor and ornaments, mythological art style inspired by Raja Ravi Varma fused with cinematic concept art, golden hour or dramatic dusk light, ultra detailed atmospheric scene, vertical 9:16 portrait, single focal subject, no text'
+  style_suffix: ', cinematic Indian mythology art, ultra realistic 3D rendering, anatomically correct (two arms, one head, five fingers per hand), single focal subject sharply in focus, BRIGHT vibrant warm lighting with golden volumetric rays, well-illuminated faces with clear expressions, rich saturated orange-saffron-gold color palette, polished masterpiece quality, Raja Ravi Varma painting style fused with modern cinematic concept art, period-accurate ornaments and clothing, vertical 9:16 portrait composition, ultra detailed 8K rendering, no text no watermark'
 
 llm:
   language: hindi

@@ -305,8 +305,8 @@ def assemble(
             f"crop={W}:{H},setsar=1,"
             # sharpen so AI image doesn't look soft after upscale
             f"unsharp=lx=5:ly=5:la=1.2:cx=5:cy=5:ca=0.4,"
-            # mild saturation/contrast bump for cinematic feel
-            f"eq=contrast=1.08:saturation=1.15,"
+            # BRIGHTER + more vibrant cinematic grading (lifts dark areas, pops colors)
+            f"eq=contrast=1.10:saturation=1.32:brightness=0.07:gamma=0.86,"
             f"zoompan=z='{z_expr}':"
             f"x='{x_expr}':y='{y_expr}':"
             f"d={per_frames}:s={W}x{H}:fps={FPS},"
