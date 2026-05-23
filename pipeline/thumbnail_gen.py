@@ -197,30 +197,36 @@ def _gen_base_image(script: dict, niche: str = "bhakti") -> Image.Image:
         f"NO text, NO watermark, NO modern objects, NO extra limbs, NO distorted anatomy."
     )
 
-    # Try Gemini Nano Banana 2 first
+    # Try Gemini Nano Banana 2 with up to 4 retries (Gemini timeouts are common)
     api_key = os.getenv("GEMINI_API_KEY")
     if api_key:
-        try:
-            r = requests.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/"
-                f"gemini-3.1-flash-image-preview:generateContent?key={api_key}",
-                json={
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]},
-                },
-                timeout=180,
-            )
-            if r.status_code == 200:
-                for part in r.json()["candidates"][0]["content"]["parts"]:
-                    if "inlineData" in part:
-                        img_bytes = base64.b64decode(part["inlineData"]["data"])
-                        if len(img_bytes) > 5000:
-                            print("[thumbnail] base via Gemini Nano Banana 2")
-                            return Image.open(BytesIO(img_bytes)).convert("RGB")
-            else:
-                print(f"[thumbnail] Gemini failed ({r.status_code}), falling back to Pollinations")
-        except Exception as e:
-            print(f"[thumbnail] Gemini error ({e}), falling back to Pollinations")
+        import time
+        for attempt in range(1, 5):
+            try:
+                r = requests.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/"
+                    f"gemini-3.1-flash-image-preview:generateContent?key={api_key}",
+                    json={
+                        "contents": [{"parts": [{"text": prompt}]}],
+                        "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]},
+                    },
+                    timeout=240,  # longer timeout for image gen
+                )
+                if r.status_code == 200:
+                    for part in r.json()["candidates"][0]["content"]["parts"]:
+                        if "inlineData" in part:
+                            img_bytes = base64.b64decode(part["inlineData"]["data"])
+                            if len(img_bytes) > 5000:
+                                print(f"[thumbnail] base via Gemini Nano Banana 2 (attempt {attempt})")
+                                return Image.open(BytesIO(img_bytes)).convert("RGB")
+                    print(f"[thumbnail] Gemini attempt {attempt}: no inlineData in response")
+                else:
+                    print(f"[thumbnail] Gemini attempt {attempt}: HTTP {r.status_code}")
+            except Exception as e:
+                print(f"[thumbnail] Gemini attempt {attempt}: {e}")
+            if attempt < 4:
+                time.sleep(3 * attempt)  # backoff: 3s, 6s, 9s
+        print(f"[thumbnail] all 4 Gemini attempts failed, falling back to Pollinations flux-realism")
 
     # Fallback: Pollinations flux-realism
     url = (
