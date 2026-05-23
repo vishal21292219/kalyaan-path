@@ -27,7 +27,7 @@ from .utils import ROOT, load_config
 
 load_dotenv()
 
-VALID_DEITIES = {"hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "general"}
+VALID_DEITIES = {"hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "khatu_shyam", "general"}
 
 
 def _audio_duration(audio_path: Path) -> float:
@@ -141,6 +141,15 @@ DEITY_STYLE_GUIDE = {
         "Focus on Sai Baba of Shirdi: orange/saffron kafni robe, head cloth, "
         "sitting on stone, with dog/cat/devotees, dhuni fire, Shirdi mosque, "
         "wooden plank bed, simple peaceful expression, blessing pose, walking stick."
+    ),
+    "khatu_shyam": (
+        "Focus on Khatu Shyam Ji (Barbarik, grandson of Bhima blessed by Krishna). "
+        "Iconic imagery: young warrior with three glowing arrows (teen baan), "
+        "head-only form (sheesh) atop a high hill overlooking Kurukshetra, severed "
+        "head on a golden plate offered to Krishna, blue divine glow, peacock-feather "
+        "crown (Shyam = Krishna's name), Khatu temple in Rajasthan, golden Shyam baba "
+        "idol with red/saffron robes, 'Hare ka Sahara' tagline mood. Mix Mahabharata "
+        "Kurukshetra battle scenes with peaceful temple devotion scenes."
     ),
 }
 
