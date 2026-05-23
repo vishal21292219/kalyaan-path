@@ -1,53 +1,49 @@
-"""Image generation — multi-provider with auto-fallback.
+"""Image generation via Gemini Nano Banana 2 (primary, only).
 
-Supported providers (cfg images.provider):
-- "gemini"       — Google Gemini 3.1 Flash Image (Nano Banana 2). Best quality,
-                   free tier 1500 req/day. Requires GEMINI_API_KEY in .env.
-- "pollinations" — Free no-key tier via pollinations.ai. Lower quality but
-                   unlimited.
+Pollinations removed per user direction — Gemini-only stack now.
 
-Models for "gemini" provider:
-- gemini-3.1-flash-image-preview  (Nano Banana 2 — default, free-tier friendly)
-- nano-banana-pro-preview          (premium quality, lower free tier)
-- imagen-4.0-generate-001          (paid only)
-
-If the configured provider fails, falls through to pollinations as a safety net.
+When Gemini fails (503 high-demand, timeout, etc.):
+- 5 in-process retries with 30s spacing (covers brief Google hiccups)
+- If all 5 fail → raise GeminiUnavailable so run.py can record the failure
+  in retry_queue.json and exit cleanly. Hourly retry cron will pick it up.
 """
 from __future__ import annotations
 
 import base64
-import hashlib
 import os
 import time
 from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
-from PIL import Image
 
 from .utils import load_config
 
 load_dotenv()
 
-POLLINATIONS_BASE = "https://image.pollinations.ai/prompt/"
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
+MAX_RETRIES = 5
+RETRY_SPACING_SEC = 30
 
 
-# ─── Gemini (Nano Banana) ────────────────────────────────────────────────
+class GeminiUnavailable(RuntimeError):
+    """Raised when Gemini image gen fails after all in-process retries."""
+
+
 def _generate_gemini(prompt: str, out_path: Path, model: str) -> bool:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        print("[image_gen] GEMINI_API_KEY missing — cannot use gemini provider")
-        return False
+        raise GeminiUnavailable("GEMINI_API_KEY missing in .env")
 
     url = f"{GEMINI_BASE}/{model}:generateContent?key={api_key}"
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]},
     }
-    for attempt in range(3):
+    last_err = None
+    for attempt in range(1, MAX_RETRIES + 1):
         try:
-            r = requests.post(url, json=body, timeout=120)
+            r = requests.post(url, json=body, timeout=180)
             if r.status_code == 200:
                 data = r.json()
                 for part in data["candidates"][0]["content"]["parts"]:
@@ -55,77 +51,43 @@ def _generate_gemini(prompt: str, out_path: Path, model: str) -> bool:
                         out_path.write_bytes(base64.b64decode(part["inlineData"]["data"]))
                         if out_path.stat().st_size > 5000:
                             return True
-                # No image in response
-                print(f"[image_gen][gemini] attempt {attempt+1}: no image in response")
+                last_err = "no inlineData in response"
+                print(f"[image_gen][gemini] attempt {attempt}: {last_err}")
+            elif r.status_code == 503:
+                last_err = "503 UNAVAILABLE (Google high demand)"
+                print(f"[image_gen][gemini] attempt {attempt}: {last_err}")
             else:
-                print(f"[image_gen][gemini] attempt {attempt+1}: HTTP {r.status_code} — {r.text[:200]}")
+                last_err = f"HTTP {r.status_code} — {r.text[:200]}"
+                print(f"[image_gen][gemini] attempt {attempt}: {last_err}")
         except Exception as e:
-            print(f"[image_gen][gemini] attempt {attempt+1}: {e}")
-        time.sleep(2 ** attempt)
-    return False
-
-
-# ─── Pollinations (free, no key) ─────────────────────────────────────────
-def _generate_pollinations(prompt: str, out_path: Path, width: int, height: int, model: str) -> bool:
-    seed = int(hashlib.md5(prompt.encode()).hexdigest(), 16) % (10**9)
-    full = requests.utils.quote(prompt, safe="")
-    url = (
-        f"{POLLINATIONS_BASE}{full}"
-        f"?width={width}&height={height}&model={model}&seed={seed}&nologo=true&enhance=true"
-    )
-    for attempt in range(3):
-        try:
-            r = requests.get(url, timeout=120)
-            r.raise_for_status()
-            out_path.write_bytes(r.content)
-            if out_path.stat().st_size > 5000:
-                return True
-        except Exception as e:
-            print(f"[image_gen][pollinations] attempt {attempt+1}: {e}")
-            time.sleep(2 ** attempt)
-    return False
-
-
-# ─── Dispatcher ──────────────────────────────────────────────────────────
-def _generate_one(prompt: str, out_path: Path, width: int, height: int, provider: str, model: str) -> bool:
-    if provider == "gemini":
-        if _generate_gemini(prompt, out_path, model):
-            return True
-        # Fall through to pollinations as safety
-        print("[image_gen] gemini failed, falling back to pollinations (flux)")
-        return _generate_pollinations(prompt, out_path, width, height, "flux-realism")
-    return _generate_pollinations(prompt, out_path, width, height, model)
+            last_err = str(e)
+            print(f"[image_gen][gemini] attempt {attempt}: {e}")
+        if attempt < MAX_RETRIES:
+            time.sleep(RETRY_SPACING_SEC)
+    raise GeminiUnavailable(f"Gemini failed after {MAX_RETRIES} retries: {last_err}")
 
 
 def generate_images(visual_prompts: list[str], out_dir: Path) -> list[Path]:
     cfg = load_config()
     style = cfg["images"]["style_suffix"]
     negative = cfg["images"]["negative"]
-    provider = cfg["images"].get("provider", "pollinations")
-    model = cfg["images"]["model"]
-    w = cfg["video"]["width"]
-    h = cfg["video"]["height"]
+    model = cfg["images"].get("model", "gemini-3.1-flash-image-preview")
 
     out_dir.mkdir(parents=True, exist_ok=True)
     results: list[Path] = []
     for i, raw_prompt in enumerate(visual_prompts):
         prompt = f"{raw_prompt}{style}. Avoid: {negative}"
         path = out_dir / f"img_{i:02d}.jpg"
-        ok = _generate_one(prompt, path, w, h, provider, model)
-        if ok:
-            results.append(path)
-        else:
-            print(f"[image_gen] giving up on image {i}")
-    if not results:
-        raise RuntimeError(f"No images generated via provider={provider}")
-    print(f"[image_gen] generated {len(results)}/{len(visual_prompts)} via {provider}")
+        try:
+            if _generate_gemini(prompt, path, model):
+                results.append(path)
+        except GeminiUnavailable:
+            # Re-raise so run.py can save to retry queue + exit cleanly.
+            # We DO NOT silently skip — partial videos look broken.
+            raise
+    print(f"[image_gen] generated {len(results)}/{len(visual_prompts)} via gemini")
     return results
 
 
-if __name__ == "__main__":
-    out = Path("output/images/demo")
-    prompts = [
-        "Lord Shiva meditating on Mount Kailash, snow peaks, sunrise",
-        "Goddess Parvati in a forest, peacock nearby",
-    ]
-    print(generate_images(prompts, out))
+# Public exception for run.py to catch
+__all__ = ["generate_images", "GeminiUnavailable", "_generate_gemini"]

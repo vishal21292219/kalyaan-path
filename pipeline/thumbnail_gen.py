@@ -197,36 +197,48 @@ def _gen_base_image(script: dict, niche: str = "bhakti") -> Image.Image:
         f"NO text, NO watermark, NO modern objects, NO extra limbs, NO distorted anatomy."
     )
 
-    # Try Gemini Nano Banana 2 with up to 4 retries (Gemini timeouts are common)
+    # Gemini Nano Banana 2 with 5 retries (30s spacing). NO Pollinations
+    # fallback per user direction — if all 5 fail, raise GeminiUnavailable
+    # so caller can save to retry_queue.
+    from .image_gen import GeminiUnavailable
+    import time as _time
     api_key = os.getenv("GEMINI_API_KEY")
-    if api_key:
-        import time
-        for attempt in range(1, 5):
-            try:
-                r = requests.post(
-                    f"https://generativelanguage.googleapis.com/v1beta/models/"
-                    f"gemini-3.1-flash-image-preview:generateContent?key={api_key}",
-                    json={
-                        "contents": [{"parts": [{"text": prompt}]}],
-                        "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]},
-                    },
-                    timeout=240,  # longer timeout for image gen
-                )
-                if r.status_code == 200:
-                    for part in r.json()["candidates"][0]["content"]["parts"]:
-                        if "inlineData" in part:
-                            img_bytes = base64.b64decode(part["inlineData"]["data"])
-                            if len(img_bytes) > 5000:
-                                print(f"[thumbnail] base via Gemini Nano Banana 2 (attempt {attempt})")
-                                return Image.open(BytesIO(img_bytes)).convert("RGB")
-                    print(f"[thumbnail] Gemini attempt {attempt}: no inlineData in response")
-                else:
-                    print(f"[thumbnail] Gemini attempt {attempt}: HTTP {r.status_code}")
-            except Exception as e:
-                print(f"[thumbnail] Gemini attempt {attempt}: {e}")
-            if attempt < 4:
-                time.sleep(3 * attempt)  # backoff: 3s, 6s, 9s
-        print(f"[thumbnail] all 4 Gemini attempts failed, falling back to Pollinations flux-realism")
+    if not api_key:
+        raise GeminiUnavailable("GEMINI_API_KEY missing in .env")
+
+    last_err = None
+    for attempt in range(1, 6):
+        try:
+            r = requests.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/"
+                f"gemini-3.1-flash-image-preview:generateContent?key={api_key}",
+                json={
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]},
+                },
+                timeout=180,
+            )
+            if r.status_code == 200:
+                for part in r.json()["candidates"][0]["content"]["parts"]:
+                    if "inlineData" in part:
+                        img_bytes = base64.b64decode(part["inlineData"]["data"])
+                        if len(img_bytes) > 5000:
+                            print(f"[thumbnail] base via Gemini Nano Banana 2 (attempt {attempt})")
+                            return Image.open(BytesIO(img_bytes)).convert("RGB")
+                last_err = "no inlineData"
+                print(f"[thumbnail] Gemini attempt {attempt}: {last_err}")
+            elif r.status_code == 503:
+                last_err = "503 UNAVAILABLE (Google high demand)"
+                print(f"[thumbnail] Gemini attempt {attempt}: {last_err}")
+            else:
+                last_err = f"HTTP {r.status_code}"
+                print(f"[thumbnail] Gemini attempt {attempt}: {last_err}")
+        except Exception as e:
+            last_err = str(e)
+            print(f"[thumbnail] Gemini attempt {attempt}: {e}")
+        if attempt < 5:
+            _time.sleep(30)
+    raise GeminiUnavailable(f"Thumbnail Gemini failed after 5 retries: {last_err}")
 
     # Fallback: Pollinations flux-realism
     url = (

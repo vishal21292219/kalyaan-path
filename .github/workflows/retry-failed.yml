@@ -1,0 +1,113 @@
+# Hourly retry processor for failed pipeline runs.
+# Reads data/state/retry_queue.json — for each PENDING entry whose
+# next_retry_at <= now, re-runs the pipeline. Cap 3 attempts per entry
+# before marking PERMANENTLY_FAILED.
+
+name: Retry Failed Runs (hourly)
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # every hour at :00
+  workflow_dispatch:       # also runnable manually
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install ffmpeg + fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto fonts-noto-cjk fonts-lohit-deva fontconfig
+          fc-cache -f
+
+      - name: Install python deps
+        run: pip install -r requirements.txt
+
+      - name: Restore secrets to .env + secrets/
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
+          YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
+          YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          mkdir -p secrets
+          [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
+          [ -n "$YT_CLIENT_SECRET_JSON" ] && echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
+          [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
+          [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
+          cat > .env <<EOF
+          GEMINI_API_KEY=$GEMINI_API_KEY
+          GROQ_API_KEY=$GROQ_API_KEY
+          TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
+          TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
+          IG_USER_ID=$IG_USER_ID
+          IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
+          EOF
+
+      - name: Process retry queue
+        run: |
+          python -c "
+          from pipeline.retry_queue import get_pending_due, remove, list_all
+          import subprocess, sys
+
+          due = get_pending_due()
+          all_entries = list_all()
+          print(f'Total queue: {len(all_entries)}, due for retry: {len(due)}')
+          for e in all_entries:
+              status = e.get('status', 'PENDING')
+              print(f\"  - {e['id']}: attempts={e.get('attempts',0)}/3 status={status}\")
+
+          if not due:
+              print('Nothing due for retry — exit clean')
+              sys.exit(0)
+
+          for entry in due:
+              print(f'\\n=== Retrying: {entry[\"id\"]} (attempt {entry[\"attempts\"]+1}) ===')
+              cmd = [
+                  'python', 'run.py',
+                  '--niche', entry['niche'],
+                  '--kind', entry['kind'],
+                  '--seed-offset', str(entry.get('seed_offset', 0)),
+              ]
+              if entry.get('topic') and entry['topic'] != 'auto':
+                  cmd += ['--topic', entry['topic']]
+              mode = entry.get('mode', 'publish')
+              if mode == 'publish':
+                  cmd.append('--publish')
+              elif mode == 'telegram':
+                  cmd += ['--no-music', '--notify-telegram']
+              print(f'  cmd: {\" \".join(cmd)}')
+              r = subprocess.run(cmd)
+              if r.returncode == 0:
+                  print(f'  ✅ retry succeeded — removing from queue')
+                  remove(entry['id'])
+              else:
+                  print(f'  ❌ retry failed (rc={r.returncode}) — will retry again in 1 hour')
+          "
+
+      - name: Commit retry_queue.json state
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name  "github-actions[bot]"
+          git add data/state/retry_queue.json || true
+          git diff --cached --quiet || git commit -m "auto: update retry queue [skip ci]"
+          git push || true

@@ -113,8 +113,25 @@ def main(argv: list[str]) -> int:
         images = sorted(img_dir.glob("img_*.jpg"))
         print(f"[images] reusing {len(images)} cached")
     else:
-        images = generate_images(script["visuals"], img_dir)
-        print(f"[images] generated {len(images)}")
+        try:
+            images = generate_images(script["visuals"], img_dir)
+            print(f"[images] generated {len(images)}")
+        except Exception as e:
+            # GeminiUnavailable etc. — save to retry queue, exit cleanly
+            from pipeline.image_gen import GeminiUnavailable
+            from pipeline.retry_queue import add_or_update
+            reason = f"{type(e).__name__}: {e}"
+            print(f"[retry-queue] saving for hourly retry: {reason}")
+            entry = add_or_update(
+                niche=args.niche,
+                kind=args.kind,
+                topic=args.topic or "auto",
+                seed_offset=args.seed_offset,
+                mode=("publish" if args.publish else ("telegram" if args.notify_telegram else "local")),
+                failed_reason=reason,
+            )
+            print(f"[retry-queue] entry attempts={entry['attempts']}/3, next_retry_at={entry['next_retry_at']}")
+            return 2  # signal: temporary failure, will be retried
 
     # 6. assemble
     video_path = out_path("videos", f"{base}.mp4")
