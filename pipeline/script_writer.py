@@ -73,7 +73,11 @@ def _build_system_prompt(cfg: dict, n_images: int) -> str:
     persona = llm.get("persona", DEFAULT_PERSONA).strip()
     image_guide = llm.get("image_style_guidance", DEFAULT_IMAGE_GUIDE).strip()
     topic_guide = llm.get("topic_guidance", DEFAULT_TOPIC_GUIDE).strip()
+    content_spec = (llm.get("content_spec") or "").strip()
     schema = SCHEMA_BLOCK.replace("{n_images}", str(n_images))
+
+    spec_block = f"\n\nCONTENT SPEC (STRICT — follow exactly):\n{content_spec}" if content_spec else ""
+
     return f"""{persona}
 
 {schema}
@@ -82,7 +86,7 @@ IMAGE STYLE GUIDANCE:
 {image_guide}
 
 TOPIC GUIDANCE:
-{topic_guide}
+{topic_guide}{spec_block}
 """
 
 
