@@ -18,8 +18,17 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--niche", default="bhakti",
-        choices=["bhakti", "itihaas"],
-        help="Which niche to run (bhakti = KalyaanPath; itihaas = Itihaas Rahasya)",
+        choices=["bhakti", "itihaas", "bhajan", "ancient"],
+        help="Which niche to run (bhakti = KalyaanPath; itihaas = Itihaasvani; bhajan = Flow Music MP3; ancient = Ancient World Decoded English)",
+    )
+    ap.add_argument(
+        "--deity",
+        choices=["hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "general"],
+        help="For --niche bhajan: pick MP3 from data/music_bhajan/[deity]/. If omitted, scans all deity folders.",
+    )
+    ap.add_argument(
+        "--bhajan-audio",
+        help="For --niche bhajan: explicit path to MP3 (overrides --deity auto-pick).",
     )
     ap.add_argument(
         "--kind", default="auto",
@@ -58,6 +67,10 @@ def main(argv: list[str]) -> int:
 
     set_active_niche(args.niche)
     print(f"== Reels pipeline ({args.niche}) ==")
+
+    # Bhajan mode: MP3 → bhajan video (separate flow, no script/TTS)
+    if args.niche == "bhajan":
+        return _run_bhajan(args)
 
     # 1. topic
     if args.topic and args.topic != "auto":
@@ -168,6 +181,105 @@ def main(argv: list[str]) -> int:
         else:
             print(f"[publish] skipped instagram (disabled for niche '{args.niche}')")
 
+    return 0
+
+
+# ─── Bhajan mode ─────────────────────────────────────────────────────────
+def _run_bhajan(args) -> int:
+    """Flow Music MP3 → bhajan video pipeline (vertical 9:16 Short)."""
+    from pipeline.bhajan import (
+        pick_bhajan_audio, mark_audio_processed,
+        generate_scene_prompts, _generate_images,
+        assemble_bhajan_video, build_bhajan_metadata,
+    )
+
+    # 1. Pick audio
+    if args.bhajan_audio:
+        mp3 = Path(args.bhajan_audio).resolve()
+        if not mp3.exists():
+            print(f"[bhajan] MP3 not found: {mp3}")
+            return 1
+        # Try to infer deity from parent folder name
+        deity = mp3.parent.name.lower() if mp3.parent.name.lower() in {
+            "hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "general"
+        } else "general"
+    else:
+        picked = pick_bhajan_audio(args.deity)
+        if not picked:
+            print("[bhajan] nothing to process — drop MP3s in data/music_bhajan/[deity]/")
+            return 0
+        mp3, deity = picked
+
+    print(f"[bhajan] processing {mp3.name} (deity={deity})")
+
+    stamp = today_stamp()
+    slug = slugify(mp3.stem)
+    base = f"{stamp}_bhajan_{deity}_{slug}"
+
+    # 2. Generate scene storyboard via LLM
+    from pipeline.utils import load_config
+    cfg = load_config()
+    n_scenes = cfg["images"]["num_per_bhajan"]
+    scene_prompts = generate_scene_prompts(deity, n_scenes)
+
+    # 3. Generate images
+    img_dir = out_path("images", base)
+    images = _generate_images(scene_prompts, img_dir)
+    if not images:
+        print("[bhajan] image generation failed entirely")
+        return 1
+    print(f"[bhajan] {len(images)} scene images ready")
+
+    # 4. Assemble video
+    video_path = out_path("videos", f"{base}.mp4")
+    assemble_bhajan_video(mp3, images, video_path)
+
+    # 5. Build script-like metadata for thumbnail/telegram/upload
+    script = build_bhajan_metadata(deity, mp3.stem)
+    # Save script JSON (used by uploader)
+    script_path = out_path("scripts", f"{base}.json")
+    script_path.write_text(json.dumps({**script, "visuals": scene_prompts}, indent=2, ensure_ascii=False))
+
+    # 6. Thumbnail (auto-generate via existing module)
+    thumb_path = None
+    if args.auto_thumb or args.notify_telegram:
+        try:
+            from pipeline.thumbnail_gen import make_thumbnail
+            thumb_path = out_path("thumbnails", f"{base}.jpg")
+            make_thumbnail(script, args.niche, thumb_path)
+        except Exception:
+            traceback.print_exc()
+            print("[bhajan] thumbnail failed — continuing without")
+
+    # 7. Endcard
+    if thumb_path and Path(thumb_path).exists():
+        try:
+            from pipeline.endcard import append_thumbnail_endcard
+            append_thumbnail_endcard(video_path, thumb_path, duration_sec=2.5)
+        except Exception:
+            traceback.print_exc()
+
+    # 8. Mark processed (so next cron run doesn't re-pick this MP3)
+    mark_audio_processed(mp3)
+
+    # 9. Notify Telegram
+    if args.notify_telegram:
+        try:
+            from pipeline.notifier_telegram import notify as tg_notify
+            tg_notify(video_path, thumb_path, script, args.niche)
+        except Exception:
+            traceback.print_exc()
+
+    # 10. Publish to YouTube
+    if args.publish:
+        try:
+            from pipeline.uploader_youtube import upload as yt_upload
+            url = yt_upload(video_path, script)
+            print(f"[publish] youtube: {url}")
+        except Exception:
+            traceback.print_exc()
+
+    print(f"[bhajan] DONE → {video_path}")
     return 0
 
 

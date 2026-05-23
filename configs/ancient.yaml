@@ -1,0 +1,155 @@
+niche: ancient
+
+branding:
+  channel_handle: '@AncientWorldDecoded'
+  cta: "🔱 Decoding the lost civilizations — Subscribe Ancient World Decoded"
+  hashtags:
+  - '#ancientmysteries'
+  - '#losthistory'
+  - '#ancientcivilizations'
+  - '#mysteriesofworld'
+  - '#archaeology'
+  - '#shorts'
+  - '#youtubeshorts'
+  - '#unsolvedmysteries'
+  - '#historyfacts'
+  - '#lostcivilization'
+  - '#ancientcivilization'
+  music_credit: "Music: cinematic ambient — original, royalty-free"
+
+paths:
+  topics_file: data/topics_ancient.json
+  music_dir: data/music_ancient
+  state_dir: data/state
+  shloka_progress: data/state/ancient_progress.json
+
+secrets:
+  # Separate OAuth for Ancient World channel (user creates new YT channel)
+  youtube_client_secret: secrets/ancient_youtube_client_secret.json
+  youtube_token: secrets/ancient_youtube_token.json
+
+images:
+  provider: gemini
+  model: gemini-3.1-flash-image-preview
+  fallback_model: flux-realism
+  num_per_reel: 10
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars, dark gloomy mood, underexposed, muddy colors, washed out
+  style_suffix: ', cinematic ancient civilization concept art, atmospheric mysterious mood, dramatic lighting (golden hour, stormy skies, glowing torches, mystical fog), period-accurate architecture and artifacts (pyramids, ziggurats, megaliths, ancient temples, statues), historically inspired details, painterly cinematic realism in the style of National Geographic combined with epic film concept art, ultra detailed 8K rendering, vertical 9:16 portrait composition, single dominant subject sharply in focus, no text, no watermark, no modern objects'
+
+llm:
+  language: english
+  model: gemini-flash-latest
+  provider: gemini
+  persona: |
+    You are a viral short-form storyteller for "Ancient World Decoded" — a
+    YouTube Shorts channel about lost civilizations, ancient mysteries,
+    unsolved archaeological puzzles, and forgotten history.
+    Audience: English-speaking, 18-50, curious about history's biggest unsolved
+    questions. Global audience (India, US, UK, diaspora).
+    Tone: mysterious, dramatic, intriguing, authoritative (like David
+    Attenborough meets Bright Side). Hook with "did you know" or "what if" angles.
+    Style: Like a podcast host revealing forgotten secrets. Use phrases like
+    "What if everything we know about ___ is wrong?", "Scientists are still
+    baffled by...", "Hidden deep beneath the ___ lies..."
+
+  image_style_guidance: |
+    - Cinematic mood: atmospheric mysterious lighting, dramatic shadows
+    - Period-accurate ancient settings (pyramids, megaliths, ruins, temples)
+    - Painterly cinematic realism (NOT photorealistic — accept art style)
+    - Single dominant subject in 9:16 frame (monument, artifact, location)
+    - Hint at the mystery visually (glowing chamber, hidden door, mysterious markings)
+    - Time/place: ancient world (10,000 BCE to 1500 CE)
+    - NO modern elements, NO text/watermarks, NO contemporary clothing
+  topic_guidance: |
+    Topics span:
+    - Lost civilizations (Atlantis, Mu, Lemuria, Indus Valley, Mayan)
+    - Megalithic mysteries (Pyramids, Stonehenge, Easter Island, Göbekli Tepe)
+    - Underwater discoveries (Yonaguni, Dwarka, Antarctic ruins)
+    - Ancient texts & artifacts (Voynich Manuscript, Antikythera Mechanism, Nazca Lines)
+    - Unsolved monuments (Puma Punku, Sacsayhuamán, Coral Castle)
+    - Pre-civilization theories (Ancient Aliens, Lost technology, Atlantis)
+    - Sacred geometry & cosmic alignments
+    - Forgotten warriors and empires
+    - Indian angle (Saraswati civilization, Dwarka, Kailasa Temple) for SEO
+      crossover with diaspora audience
+    Avoid: religious controversy, political claims, debunked conspiracy theories.
+    Frame as scientific/historical investigation, not "aliens did it" tone.
+
+  content_spec: |
+    OUTPUT RULES — apply to every Ancient World Decoded Short.
+
+    1. title (≤80 chars):
+       - English only, NO hashtags in title
+       - Start with the iconic topic name (for YouTube search)
+       - Include a curiosity hook or unresolved question
+       - End with EXACTLY 1 relevant emoji (🔱 ⚱️ 🌊 🗿 ⚡ 🏛️ 👁️ 🔥 ❓)
+       - Format: [Topic/Place] + [Hook/Mystery] + [Emoji]
+       - Good examples:
+         * "The Lost City of Atlantis: New Evidence Found 🌊"
+         * "Pyramids Hidden Chamber: What Scientists Just Discovered 🏛️"
+         * "Why Stonehenge Was Really Built — The Truth ⚡"
+         * "Voynich Manuscript: 600-Year-Old Code Still Unbroken 🔱"
+
+    2. description (≤1800 chars, EXACT structure in this order):
+       Line 1: Hook beginning with "Did you know..." or "What if..." + emoji
+       Line 2-3: 2-3 sentence teaser revealing the mystery without giving the answer
+       Line 4: Engagement CTA — ask viewer's theory/opinion
+       Line 5 (verbatim): "If you love discovering the secrets of ancient civilizations,
+                          hit Subscribe and join the Ancient World Decoded community!"
+       Line 6 (verbatim, with exact emojis):
+              "🔔 New mysteries every day:
+               ✨ 12 PM UTC — Lost civilizations
+               ✨ 9 PM UTC — Ancient artifacts decoded"
+       Line 7 (verbatim): "📩 Business: gopulabs@gmail.com"
+       Line 8: 12-15 hashtags
+       Line 9 (SEO BLOCK): "Your Queries:" followed by 18-25 long-tail
+              search keywords variations of the topic.
+
+    3. hashtags (description only, NEVER in title):
+       Always include: #AncientWorldDecoded #LostHistory #AncientMysteries
+       #UnsolvedMysteries #ArchaeologyFacts #Shorts #YouTubeShorts
+       Plus 6-9 topic-specific (e.g., #Atlantis #Pyramids #Stonehenge)
+
+    4. thumbnail text suggestion (3-5 bold English words):
+       - Question or shock-hook format
+       - Example: "Atlantis FOUND?!" or "Stonehenge's Real Purpose 🗿"
+
+publish:
+  instagram: false
+  privacy: public
+  youtube: true
+
+video:
+  bitrate: 6M
+  duration_target_sec: 50
+  font: assets/fonts/Anton-Regular.ttf
+  font_size: 80
+  fps: 30
+  height: 1920
+  subtitle_box_opacity: 0.0
+  width: 1080
+
+voice:
+  # Edge TTS English voices — choose dramatic narrator
+  provider: edge
+  fallback_to_edge: true
+
+  # Default voice for narration
+  voice: en-US-GuyNeural          # Deep narrator male
+  rate: -2%
+  pitch: -5Hz
+
+  # For dramatic intro mode (not used yet)
+  shloka_voice: en-GB-RyanNeural  # British gravitas
+  shloka_rate: -8%
+  shloka_pitch: -8Hz
+
+  # ElevenLabs (premium English voices — when paid)
+  elevenlabs_voice_id: pNInz6obpgDQGcFmaJgB
+  elevenlabs_shloka_voice_id: nPczCjzI2devNBz1zQrb
+  elevenlabs_model: eleven_multilingual_v2
+  elevenlabs_settings:
+    stability: 0.50
+    similarity_boost: 0.82
+    style: 0.40
+    use_speaker_boost: true

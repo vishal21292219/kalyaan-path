@@ -29,6 +29,9 @@ from .utils import ROOT, load_config
 _FONT_CANDIDATES = [
     str(ROOT / "assets/fonts/Khand-Bold.ttf"),
     str(ROOT / "assets/fonts/MuktaVaani-Bold.ttf"),
+    str(ROOT / "assets/fonts/Anton-Regular.ttf"),
+    str(ROOT / "assets/fonts/BebasNeue-Regular.ttf"),
+    str(ROOT / "assets/fonts/Oswald-Bold.ttf"),
     "/System/Library/Fonts/Supplemental/Devanagari Sangam MN.ttc",
     "/usr/share/fonts/truetype/lohit-devanagari/Lohit-Devanagari.ttf",
     "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Bold.ttf",
@@ -36,13 +39,22 @@ _FONT_CANDIDATES = [
 
 
 def _font_path() -> str:
+    """Pick the niche-configured font (cfg.video.font) if available, else
+    fall back to first existing candidate. Called per-thumbnail so each
+    niche gets its own font (Khand for Hindi, Anton for English ancient)."""
+    try:
+        cfg = load_config()
+        configured = cfg.get("video", {}).get("font", "")
+        if configured:
+            path = configured if Path(configured).is_absolute() else str(ROOT / configured)
+            if Path(path).exists():
+                return path
+    except Exception:
+        pass
     for f in _FONT_CANDIDATES:
         if Path(f).exists():
             return f
-    raise RuntimeError("No Devanagari font available (place one under assets/fonts/)")
-
-
-FONT_PATH = _font_path()
+    raise RuntimeError("No display font available (place one under assets/fonts/)")
 MAX_WIDTH_RATIO = 0.92  # text wrap target
 
 
@@ -238,12 +250,12 @@ def _fit_font(draw, text: str, max_width: int, start_size: int, min_size: int, s
     """Shrink font until text fits in max_width."""
     size = start_size
     while size >= min_size:
-        f = ImageFont.truetype(FONT_PATH, size=size)
+        f = ImageFont.truetype(_font_path(), size=size)
         bbox = draw.textbbox((0, 0), text, font=f, stroke_width=stroke_w)
         if (bbox[2] - bbox[0]) <= max_width:
             return f
         size -= 10
-    return ImageFont.truetype(FONT_PATH, size=min_size)
+    return ImageFont.truetype(_font_path(), size=min_size)
 
 
 def _draw_text_block(draw, text: str, W: int, y: int, fill, font, stroke_w: int) -> int:
@@ -310,7 +322,7 @@ def make_thumbnail(script: dict, niche: str, out_path: Path) -> Path:
         .lstrip("@")
         .upper()
     )
-    font_brand = ImageFont.truetype(FONT_PATH, size=60)
+    font_brand = ImageFont.truetype(_font_path(), size=60)
     _draw_text_block(draw, brand, W, y=H - 150, fill=(255, 215, 0), font=font_brand, stroke_w=4)
 
     img.save(str(out_path), "JPEG", quality=95)

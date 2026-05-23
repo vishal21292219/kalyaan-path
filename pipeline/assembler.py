@@ -110,6 +110,18 @@ def _audio_duration(path: Path) -> float:
 
 
 def _find_font(size: int) -> ImageFont.FreeTypeFont:
+    # Try the niche's configured font first (cfg.video.font) so each niche
+    # can pick its own display font — English niches use Anton/Bebas,
+    # Hindi niches use Khand-Bold.
+    try:
+        cfg = load_config()
+        configured = cfg.get("video", {}).get("font", "")
+        if configured:
+            path = configured if Path(configured).is_absolute() else str(ROOT / configured)
+            if Path(path).exists():
+                return ImageFont.truetype(path, size=size)
+    except Exception:
+        pass
     for f in FONT_CANDIDATES:
         if Path(f).exists():
             try:
