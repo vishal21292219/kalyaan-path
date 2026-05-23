@@ -100,8 +100,55 @@ def mark_audio_processed(mp3_path: Path) -> None:
     _save_processed_state(state_path, processed)
 
 
-def generate_scene_prompts(deity: str, n_scenes: int = 6) -> list[str]:
-    """Use Gemini LLM to generate cinematic scene storyboard for a deity bhajan."""
+DEITY_STYLE_GUIDE = {
+    "krishna": (
+        "STRICT: Focus on VRINDAVAN-era Krishna (childhood + youth) — NOT Mahabharata. "
+        "Use settings: Vrindavan forests, Yamuna river, Govardhan hill, Vraj villages. "
+        "Use motifs: bansuri flute, peacock feather crown, blue skin, yellow dhoti, cows, "
+        "gopis, Radha, lotus ponds, Kadamba trees, butter pots, golden sunrise. "
+        "INCLUDE Radha-Krishna scenes. EXCLUDE Kurukshetra, war, Vishvarupa, Arjuna."
+    ),
+    "hanuman": (
+        "Focus on iconic Hanuman moments: baby with Anjani, flying to sun, "
+        "Sanjeevani mountain rescue, at Ram's feet, Sundara Kand scenes, "
+        "tearing chest to show Ram-Sita inside, gada in hand. "
+        "Use saffron/orange dhoti, golden mace, divine aura."
+    ),
+    "shiva": (
+        "Focus on Shiva forms: meditation on Kailash, Tandav cosmic dance, "
+        "drinking Halahala poison (blue throat), with Ganga from hair, "
+        "blessing devotees, third eye, trishul, damru, ash-smeared body, "
+        "snake around neck, tiger skin, snow Himalayas backdrop."
+    ),
+    "ram": (
+        "Focus on Ram's iconic moments: Ayodhya court, bow and arrow, "
+        "forest exile with Sita and Lakshman, meeting Hanuman, Ram Setu, "
+        "Lanka victory, blessing devotees, blue-skinned with yellow dhoti, "
+        "peaceful divine expression. Include Sita and Hanuman in some scenes."
+    ),
+    "devi": (
+        "Focus on Devi/Durga forms: riding lion/tiger, eight arms with weapons, "
+        "trishul, sword, conch, chakra, defeating Mahishasura, blessing devotees, "
+        "red saree, gold jewelry, third eye, fierce yet motherly expression."
+    ),
+    "ganesh": (
+        "Focus on Ganesh: elephant head with one tusk, holding modak/laddu, "
+        "mouse vehicle, four arms with axe-rope-lotus, blessing pose, "
+        "yellow dhoti, garland of marigolds, joyful expression, family with "
+        "Shiva-Parvati and Kartikeya in some scenes."
+    ),
+    "sai": (
+        "Focus on Sai Baba of Shirdi: orange/saffron kafni robe, head cloth, "
+        "sitting on stone, with dog/cat/devotees, dhuni fire, Shirdi mosque, "
+        "wooden plank bed, simple peaceful expression, blessing pose, walking stick."
+    ),
+}
+
+
+def generate_scene_prompts(deity: str, n_scenes: int = 25) -> list[str]:
+    """Use Gemini LLM to generate cinematic scene storyboard for a deity bhajan.
+    Now with deity-specific style guidance to ensure scene relevance.
+    """
     import google.generativeai as genai
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -110,22 +157,33 @@ def generate_scene_prompts(deity: str, n_scenes: int = 6) -> list[str]:
 
     cfg = load_config()
     persona = cfg["llm"]["persona"]
+    deity_guide = DEITY_STYLE_GUIDE.get(deity, "")
 
     user = f"""Generate {n_scenes} cinematic visual scene prompts for a devotional bhajan video about Lord {deity.upper()}.
 
+DEITY-SPECIFIC GUIDANCE (CRITICAL — follow strictly):
+{deity_guide}
+
 Each scene must:
-- Be a vivid English image prompt (1-3 sentences)
-- Cover an iconic moment from {deity}'s mythology
-- Progress as a narrative arc (intro → action → emotional climax → peaceful close)
-- Specify single deity figure, divine atmosphere, traditional Indian art style
-- Avoid text/watermarks/modern objects
+- Be a vivid English image prompt (2-3 sentences)
+- Be HIGHLY RELEVANT to the deity-specific guidance above
+- Show MAXIMUM VARIETY in compositions:
+  * Mix of close-up portraits + medium shots + wide cinematic shots
+  * Different times of day (sunrise, golden hour, twilight, moonlit night)
+  * Different settings (forest, river, palace, temple, garden, mountain)
+  * Different emotional moods (peaceful, joyful, dramatic, blessing, devotional)
+  * Different camera angles (eye-level, low angle epic, top-down devotional)
+- Single dominant subject per scene (no crowded scenes)
+- Anatomically correct (single head, two natural arms unless canonical multi-arm)
+- Bright divine warm lighting, traditional Indian art style
+- NO text, NO watermarks, NO modern objects
+- NO repetition — each scene must be visually distinct from the others
 
 Output ONLY a JSON array of {n_scenes} prompt strings (no markdown fences):
-["prompt 1", "prompt 2", ...]
-"""
+["prompt 1", "prompt 2", "prompt 3", ...]"""
 
     model = genai.GenerativeModel("gemini-flash-latest", system_instruction=persona)
-    resp = model.generate_content(user, generation_config={"temperature": 0.85})
+    resp = model.generate_content(user, generation_config={"temperature": 0.92})
     text = resp.text.strip()
     text = re.sub(r"^```(?:json)?\s*", "", text)
     text = re.sub(r"\s*```$", "", text)
