@@ -119,7 +119,16 @@ def main(argv: list[str]) -> int:
             traceback.print_exc()
             print("[thumbnail] generation failed — continuing without")
 
-    # 6c. notify Telegram (optional)
+    # 6c. append thumbnail as end card on the video (replay-hook)
+    if thumb_path and Path(thumb_path).exists():
+        try:
+            from pipeline.endcard import append_thumbnail_endcard
+            append_thumbnail_endcard(video_path, thumb_path, duration_sec=2.5)
+        except Exception:
+            traceback.print_exc()
+            print("[endcard] failed — video kept without endcard")
+
+    # 6d. notify Telegram (optional)
     if args.notify_telegram:
         try:
             from pipeline.notifier_telegram import notify as tg_notify
