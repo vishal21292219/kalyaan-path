@@ -58,6 +58,7 @@ def _gen_thumb_text(script: dict, niche: str) -> dict:
     hook = script.get("hook", "")
 
     prompt = f"""Generate a YouTube Shorts thumbnail text in Devanagari Hindi.
+Match the viral Kaliyug-style 3M-view formula: short question hook + curiosity sub.
 
 Topic title: {title}
 Video hook: {hook}
@@ -65,16 +66,28 @@ Niche: {niche}
 
 Output ONLY this JSON (no markdown fences):
 {{
-  "top": "main punch in Devanagari Hindi, 2-4 words MAX, dramatic+clickbait",
-  "bottom": "curiosity teaser in Devanagari Hindi, 3-5 words MAX"
+  "top": "main punch in Devanagari Hindi, 2-3 words MAX, ends with ? if possible",
+  "bottom": "curiosity teaser in Devanagari Hindi, 2-4 words MAX"
 }}
 
-Rules:
-- Top text MUST be 2-4 words, max ~20 chars total (it must fit one line in big bold font).
-- Bottom text MUST be 3-5 words, max ~30 chars.
-- NO emojis, NO English words, pure Devanagari.
-- DRAMATIC. Think: "रहस्य", "सच", "खुलासा", "देखो क्या हुआ".
-- Avoid full sentences — punchy fragments only."""
+VIRAL THUMBNAIL TEXT FORMULA (proven):
+- Top text = QUESTION HOOK in 2-3 words like:
+  * "राम सेतु गायब?" (3 words)
+  * "ये सच है?" (3 words)
+  * "क्या हुआ था?" (3 words)
+  * "अमर है?" (2 words)
+  * "कैसे मरा?" (2 words)
+- Bottom text = curiosity confirmation in 2-4 words like:
+  * "देखिए ये रहस्य"
+  * "सच जान के चौंक जाओगे"
+  * "वो हैरान कर देने वाला सच"
+
+CRITICAL:
+- TOTAL words across both lines: max 6-7
+- NO emojis, NO English, pure Devanagari
+- Top SHOULD be a question (?) for curiosity gap
+- Each line MUST fit in 1 line at very big font (no wrapping)
+- Each line max 18 characters including spaces"""
 
     m = genai.GenerativeModel("gemini-flash-latest")
     r = m.generate_content(prompt, generation_config={"temperature": 0.9})
@@ -86,9 +99,15 @@ Rules:
 
 
 def _gen_thumb_image_prompt(script: dict, niche: str) -> str:
-    """Use LLM to craft a DEDICATED thumbnail portrait prompt for the topic.
-    Forces close-up face composition vs reusing video's first scene (which is
-    often a wide shot).
+    """Use LLM to craft a DEDICATED thumbnail composition prompt that matches
+    viral Indian mythology Shorts formula (e.g., Kaliyug Ke Divya Mantra's
+    3M-view Ram Setu thumbnail):
+
+    - TWO characters: hero (calm/discovering) + reactor (shocked, hands on
+      cheeks, open mouth) = relational drama in one frame
+    - Storytelling background (the mystery being revealed visually)
+    - Dramatic stormy/glowing atmosphere with lightning or divine light
+    - Bright lighting on faces, no crops
     """
     import google.generativeai as genai
     api_key = os.getenv("GEMINI_API_KEY")
@@ -107,25 +126,32 @@ Hook: {hook}
 Video opening scene: {first_visual}
 Niche: {niche}
 
-Rules for thumbnail prompt:
-- MUST be a close-up PORTRAIT of the MAIN character/deity/subject — face filling
-  upper 60% of frame, eye-level framing.
-- Face MUST be FULLY VISIBLE (both eyes, full features, NO cropping of face).
-- Direct emotional eye contact with viewer, intense expression matching the
-  topic mood (dramatic / mysterious / devotional / awe-inspiring).
-- Single dominant subject — NO crowd, no multiple figures.
-- Anatomically correct (two eyes symmetric, one head, no extra limbs).
-- Bright cinematic lighting on the face — well-illuminated, NOT dark.
-- Atmospheric blurred background that hints at the topic (battlefield, palace,
-  cosmic sky, divine aura) — don't crowd the background.
-- Traditional Indian devotional art fused with cinematic concept art style.
-- Vertical 9:16 portrait composition (1080x1920).
-- NO text, NO watermarks, NO modern objects.
+VIRAL THUMBNAIL COMPOSITION (proven 3M-view formula):
+- TWO Indian mythological/historical characters in the frame:
+  * LEFT or BACK: the calm "hero" character (e.g., Ram, Bhishma, sage) in
+    discovering pose — back view OR side profile, looking at the mystery
+  * RIGHT FOREGROUND: the "reaction" character (Hanuman, devotee, soldier)
+    with SHOCKED EXPRESSION — hands on cheeks, open mouth, wide eyes,
+    classic "OMG" face that grabs scroll attention
+- BACKGROUND tells the story visually: the mystery being revealed
+  (Ram Setu bridge with glowing stones, ancient submerged Dwarka, cosmic
+  Vishvarupa form, lost temple at sea, etc.)
+- DRAMATIC atmospheric lighting: stormy clouds + lightning bolts, OR
+  divine golden rays bursting through, OR mysterious dark-blue/orange
+  chiaroscuro
+- Bright illumination on BOTH faces — fully visible, no crops, both eyes
+  showing on the reaction character
+- Color palette: deep stormy blue + lightning yellow + saffron orange
+  characters (high contrast)
+- Vertical 9:16 portrait composition (1080x1920)
+- Both characters anatomically correct (two arms each, hands have 5 fingers)
+- Top 20% of frame relatively empty (will be covered by overlay text)
+- NO text in image, NO watermarks, NO modern objects
 
-Output ONLY the prompt string (no markdown, no explanation, ~80-120 words)."""
+Output ONLY the prompt string (no markdown, no explanation, ~100-150 words)."""
     try:
         m = genai.GenerativeModel("gemini-flash-latest")
-        r = m.generate_content(instruction, generation_config={"temperature": 0.6})
+        r = m.generate_content(instruction, generation_config={"temperature": 0.7})
         return r.text.strip().strip("`'\"")
     except Exception:
         return None
@@ -263,18 +289,19 @@ def make_thumbnail(script: dict, niche: str, out_path: Path) -> Path:
     W, H = img.size
     max_w = int(W * MAX_WIDTH_RATIO)
 
-    # Top text — big bold gold
+    # Top text — HUGE bold gold (viral Kaliyug-style 200+ px font)
+    # Positioned in TOP-SAFE-ZONE (y=120 from top)
     if top_text:
-        font_big = _fit_font(draw, top_text, max_w, start_size=180, min_size=110, stroke_w=14)
-        th = _draw_text_block(draw, top_text, W, y=160, fill=(255, 215, 0), font=font_big, stroke_w=14)
-        sub_y = 160 + th + 60
+        font_big = _fit_font(draw, top_text, max_w, start_size=220, min_size=130, stroke_w=16)
+        th = _draw_text_block(draw, top_text, W, y=120, fill=(255, 215, 0), font=font_big, stroke_w=16)
+        sub_y = 120 + th + 40
     else:
         sub_y = 320
 
-    # Sub text — smaller red accent
+    # Sub text — slightly smaller white (high contrast vs gold top)
     if sub_text:
-        font_sub = _fit_font(draw, sub_text, max_w, start_size=92, min_size=58, stroke_w=6)
-        _draw_text_block(draw, sub_text, W, y=sub_y, fill=(255, 80, 80), font=font_sub, stroke_w=8)
+        font_sub = _fit_font(draw, sub_text, max_w, start_size=110, min_size=70, stroke_w=8)
+        _draw_text_block(draw, sub_text, W, y=sub_y, fill=(255, 255, 255), font=font_sub, stroke_w=10)
 
     # Bottom brand
     brand = (

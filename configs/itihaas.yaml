@@ -78,7 +78,7 @@ llm:
          * "Karna ke Janam Ka Woh Raaz Jo School Mein Nahi Padhaya Gaya 🔥"
          * "Dronacharya Ne Eklavya Ka Angutha Kyu Maanga? Asli Sach 😱"
 
-    2. description (≤900 chars, EXACT structure in this order):
+    2. description (≤1800 chars, EXACT structure in this order):
        Line 1: Hook beginning with "Kya aap jaante hain..." + relevant emoji
        Line 2-3: 2-3 sentence teaser revealing just enough to hook but NOT the full answer
        Line 4: Engagement CTA — ask a debate/opinion question to drive comments
@@ -90,6 +90,32 @@ llm:
                ✨ 9 PM — Itihaas ke chupe rahasya"
        Line 7 (verbatim): "📩 Business: gopulabs@gmail.com"
        Line 8: 12-15 hashtags
+       Line 9 (VIRAL SEO BLOCK — proven 3M-view formula): the literal string
+              "Your Queries:" followed by 18-25 long-tail search keyword variations
+              of the topic, one per line, in lowercase English. Mix Hindi-Roman
+              transliterations + English variations + question forms. Targets
+              YouTube long-tail search indexing.
+              Examples for "Ram Setu" topic:
+                ram setu
+                ram setu mystery
+                ram setu truth
+                ram setu real story
+                ram setu hindi
+                ram setu facts
+                ram setu india to sri lanka
+                ram setu stones floating
+                lord ram story
+                ramayan story
+                hanuman ji power
+                adams bridge india
+                ancient india mystery
+                unsolved mystery india
+                hindu mythology facts
+                spiritual story hindi
+                bhagwan ram story
+                viral hindi video
+                trending shorts
+                youtube shorts india
 
     3. hashtags (description-only, NEVER in title):
        Always include these 6: #Itihaasvani #ItihaasKeRahasya #SanatanDharma
