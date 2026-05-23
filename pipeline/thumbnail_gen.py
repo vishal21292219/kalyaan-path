@@ -85,20 +85,78 @@ Rules:
     return json.loads(text[s : e + 1])
 
 
-def _gen_base_image(script: dict) -> Image.Image:
-    """Generate a dramatic close-up thumbnail image — Gemini Nano Banana 2
-    primary, Pollinations as fallback if Gemini fails or quota exhausted.
+def _gen_thumb_image_prompt(script: dict, niche: str) -> str:
+    """Use LLM to craft a DEDICATED thumbnail portrait prompt for the topic.
+    Forces close-up face composition vs reusing video's first scene (which is
+    often a wide shot).
     """
-    import os
-    import base64
+    import google.generativeai as genai
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return None
+    genai.configure(api_key=api_key)
+    title = script.get("title", "")
+    hook = script.get("hook", "")
     visuals = script.get("visuals") or []
-    base_prompt = visuals[0] if visuals else script.get("title", "")
+    first_visual = visuals[0] if visuals else ""
+
+    instruction = f"""Create a single ENGLISH image prompt for a YouTube Shorts THUMBNAIL.
+
+Topic: {title}
+Hook: {hook}
+Video opening scene: {first_visual}
+Niche: {niche}
+
+Rules for thumbnail prompt:
+- MUST be a close-up PORTRAIT of the MAIN character/deity/subject — face filling
+  upper 60% of frame, eye-level framing.
+- Face MUST be FULLY VISIBLE (both eyes, full features, NO cropping of face).
+- Direct emotional eye contact with viewer, intense expression matching the
+  topic mood (dramatic / mysterious / devotional / awe-inspiring).
+- Single dominant subject — NO crowd, no multiple figures.
+- Anatomically correct (two eyes symmetric, one head, no extra limbs).
+- Bright cinematic lighting on the face — well-illuminated, NOT dark.
+- Atmospheric blurred background that hints at the topic (battlefield, palace,
+  cosmic sky, divine aura) — don't crowd the background.
+- Traditional Indian devotional art fused with cinematic concept art style.
+- Vertical 9:16 portrait composition (1080x1920).
+- NO text, NO watermarks, NO modern objects.
+
+Output ONLY the prompt string (no markdown, no explanation, ~80-120 words)."""
+    try:
+        m = genai.GenerativeModel("gemini-flash-latest")
+        r = m.generate_content(instruction, generation_config={"temperature": 0.6})
+        return r.text.strip().strip("`'\"")
+    except Exception:
+        return None
+
+
+def _gen_base_image(script: dict, niche: str = "bhakti") -> Image.Image:
+    """Generate a dedicated thumbnail portrait — LLM crafts a prompt focused
+    on close-up face composition. Gemini Nano Banana 2 primary, Pollinations
+    fallback.
+    """
+    import base64
+
+    # Get a thumbnail-specific portrait prompt from the LLM
+    thumb_prompt = _gen_thumb_image_prompt(script, niche)
+    if not thumb_prompt:
+        # Fallback: construct minimal portrait prompt from visuals[0]
+        visuals = script.get("visuals") or []
+        base = visuals[0] if visuals else script.get("title", "")
+        thumb_prompt = (
+            f"Close-up portrait of the main character from this scene: {base}. "
+            f"Face fills 60% of frame, eye-level framing, both eyes visible, "
+            f"direct emotional eye contact, single subject."
+        )
+
     prompt = (
-        f"{base_prompt}, dramatic close-up portrait framing, intense emotional expression, "
-        f"deep chiaroscuro lighting with bright divine highlights, vertical 9:16 portrait "
-        f"composition, ultra detailed, cinematic concept art, single character centered, "
-        f"anatomically correct, well-illuminated face, traditional Indian devotional art "
-        f"masterpiece, no text, no watermark"
+        f"{thumb_prompt}\n\nIMPORTANT: Close-up portrait composition with face "
+        f"clearly visible. Anatomically correct (two eyes, one head, five fingers "
+        f"per hand). Bright cinematic lighting on the face. Single dominant subject "
+        f"centered. Atmospheric background, NOT crowded. Vertical 9:16 portrait "
+        f"(1080x1920). Traditional Indian devotional art masterpiece. "
+        f"NO text, NO watermark, NO modern objects, NO extra limbs, NO distorted anatomy."
     )
 
     # Try Gemini Nano Banana 2 first
@@ -182,7 +240,7 @@ def make_thumbnail(script: dict, niche: str, out_path: Path) -> Path:
     cfg = load_config()
 
     print(f"[thumbnail] generating base image...")
-    img = _gen_base_image(script)
+    img = _gen_base_image(script, niche)
     if img.size != (1080, 1920):
         img = img.resize((1080, 1920), Image.LANCZOS).filter(
             ImageFilter.UnsharpMask(radius=2, percent=130, threshold=3)
