@@ -100,7 +100,7 @@
     {"name": "Hanuman Jayanti",    "month": 4,  "approx_day": 12, "deity": "Hanuman",   "weight": 10},
     {"name": "Akshaya Tritiya",    "month": 5,  "approx_day": 10, "deity": "Lakshmi",   "weight": 8},
     {"name": "Buddha Purnima",     "month": 5,  "approx_day": 23, "deity": "Buddha",    "weight": 6},
-    {"name": "Ganga Dussehra",     "month": 6,  "approx_day": 14, "deity": "Ganga",     "weight": 7},
+    {"name": "Ganga Dussehra",     "month": 5,  "approx_day": 25, "deity": "Ganga",     "weight": 10},
     {"name": "Jagannath Rath Yatra","month": 6, "approx_day": 27, "deity": "Jagannath", "weight": 8},
     {"name": "Guru Purnima",       "month": 7,  "approx_day": 10, "deity": "Vyasa",     "weight": 7},
     {"name": "Sawan Somvar",       "month": 7,  "approx_day": 21, "deity": "Shiva",     "weight": 9},
