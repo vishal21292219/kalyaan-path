@@ -19,7 +19,8 @@ on:
     - cron: "15 0 * * *"    # fire 05:45 IST → itihaas Telegram drop #2 lands ~06:15 IST
     - cron: "0 1 * * *"     # fire 06:30 IST → bhakti shloka lands ~07:00 IST (KalyaanPath)
     - cron: "0 13 * * *"    # fire 18:30 IST → bhakti trending lands ~19:00 IST (KalyaanPath)
-    - cron: "30 22 * * *"   # fire 04:00 IST = 22:30 UTC → TimeDecoders lands ~23:00 UTC = US PRIME 7PM EST
+    - cron: "30 17 * * *"   # fire 23:00 IST = 17:30 UTC → TimeDecoders #1 lands ~18:00 UTC = UK 7PM / EU 8PM prime
+    - cron: "30 22 * * *"   # fire 04:00 IST = 22:30 UTC → TimeDecoders #2 lands ~23:00 UTC = US 7PM EST prime
     - cron: "0 2 * * 0"     # fire 07:30 IST Sun → itihaas LONG-FORM lands ~08:30 IST (90-min job, buffer wider)
   workflow_dispatch:
     inputs:
@@ -149,11 +150,17 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "30 17 * * *" ]; then
+            echo "niche=ancient" >> $GITHUB_OUTPUT
+            echo "kind=trending" >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
+            echo "seed=1"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 22 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
-            echo "seed=0"        >> $GITHUB_OUTPUT
+            echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 2 * * 0" ]; then
             echo "niche=itihaas" >> $GITHUB_OUTPUT
