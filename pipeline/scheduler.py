@@ -255,10 +255,12 @@ def cleanup(older_than_days: int = 7) -> int:
 
 
 def list_pending(days_ahead: int = 5) -> list[dict]:
-    """For each daily slot, for each of next N days, return slots that need pregen."""
+    """For each daily slot, for each of next N days (INCLUDING today), return
+    slots that need pregen. Includes today so the first nightly run covers
+    today's slots too (otherwise today's daytime fires miss the cache)."""
     today = date_t.today()
     pending = []
-    for offset in range(1, days_ahead + 1):  # tomorrow onwards
+    for offset in range(0, days_ahead + 1):  # today + N days ahead
         d = today + timedelta(days=offset)
         for slot in DAILY_SLOTS:
             key = _make_key(slot["niche"], slot["kind"], d, slot["seed"])
