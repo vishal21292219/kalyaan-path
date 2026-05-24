@@ -110,16 +110,16 @@ CRITICAL:
     return json.loads(text[s : e + 1])
 
 
-def _gen_thumb_image_prompt(script: dict, niche: str) -> str:
-    """Use LLM to craft a DEDICATED thumbnail composition prompt that matches
-    viral Indian mythology Shorts formula (e.g., Kaliyug Ke Divya Mantra's
-    3M-view Ram Setu thumbnail):
+def _gen_thumb_image_prompt(script: dict, niche: str, long_form: bool = False) -> str:
+    """Use LLM to craft a DEDICATED thumbnail composition prompt.
 
-    - TWO characters: hero (calm/discovering) + reactor (shocked, hands on
-      cheeks, open mouth) = relational drama in one frame
-    - Storytelling background (the mystery being revealed visually)
-    - Dramatic stormy/glowing atmosphere with lightning or divine light
-    - Bright lighting on faces, no crops
+    Two modes:
+    - Shorts (vertical 9:16): hero + shocked-reactor face composition (viral
+      Kaliyug Ke Divya Mantra 3M-view formula)
+    - Long-form (horizontal 16:9): split-screen drama composition with
+      character on one side + storytelling background on other side, leaves
+      RIGHT-THIRD empty for the BIG bold text overlay (Praveen Mohan /
+      Project Nightfall documentary thumbnail formula)
     """
     import google.generativeai as genai
     api_key = os.getenv("GEMINI_API_KEY")
@@ -131,7 +131,42 @@ def _gen_thumb_image_prompt(script: dict, niche: str) -> str:
     visuals = script.get("visuals") or []
     first_visual = visuals[0] if visuals else ""
 
-    instruction = f"""Create a single ENGLISH image prompt for a YouTube Shorts THUMBNAIL.
+    if long_form:
+        # 16:9 horizontal documentary thumbnail (1280x720 target)
+        instruction = f"""Create a single ENGLISH image prompt for a YouTube LONG-FORM (16:9 horizontal) documentary THUMBNAIL.
+
+Topic: {title}
+Hook: {hook}
+Video opening scene: {first_visual}
+Niche: {niche}
+
+VIRAL LONG-FORM DOCUMENTARY THUMBNAIL COMPOSITION (Praveen Mohan / Project Nightfall / Kaliyug Ke Divya Mantra formula):
+
+- HORIZONTAL 16:9 wide cinematic composition (1280x720 aspect)
+- LEFT-THIRD: ONE iconic character in dramatic pose
+  * Mythology: hero deity (Ram drawing bow, Krishna with chakra, Hanuman
+    leaping, Devi with weapons) OR shocked-reaction face (devotee, sage)
+  * Ancient mysteries: archaeologist with torch in ruins, explorer pointing
+    at discovery, scholar in shocked discovery pose
+  * Character takes up roughly LEFT 35% of frame, eyes visible, dramatic
+    lighting on face
+- RIGHT TWO-THIRDS: STORYTELLING BACKGROUND
+  * The mystery/topic visualized: ancient ruins, glowing artifacts, cosmic
+    scenes, submerged cities, lit caves, divine landscapes
+  * RIGHT-THIRD specifically should have darker/simpler area where bold
+    overlay text will be placed (no busy detail in right-third)
+- DRAMATIC LIGHTING: cinematic chiaroscuro, lightning bolts, divine golden
+  rays, mysterious dark-blue/saffron-orange contrast
+- Color palette: deep stormy blue/black + lightning yellow accents + warm
+  golden character lighting (max contrast for 16:9 mobile + TV display)
+- Character anatomically correct (proper limbs, eyes, fingers)
+- NO text in image, NO watermarks, NO modern objects, NO logos
+- Camera lens: cinematic 50mm-style, shallow depth-of-field background
+
+Output ONLY the prompt string (no markdown, no explanation, ~120-180 words)."""
+    else:
+        # Vertical 9:16 Shorts thumbnail (1080x1920) — existing viral formula
+        instruction = f"""Create a single ENGLISH image prompt for a YouTube Shorts THUMBNAIL.
 
 Topic: {title}
 Hook: {hook}
@@ -169,15 +204,15 @@ Output ONLY the prompt string (no markdown, no explanation, ~100-150 words)."""
         return None
 
 
-def _gen_base_image(script: dict, niche: str = "bhakti") -> Image.Image:
-    """Generate a dedicated thumbnail portrait — LLM crafts a prompt focused
-    on close-up face composition. Gemini Nano Banana 2 primary, Pollinations
-    fallback.
+def _gen_base_image(script: dict, niche: str = "bhakti", long_form: bool = False) -> Image.Image:
+    """Generate a dedicated thumbnail base image. For Shorts: vertical 9:16
+    close-up. For long-form: horizontal 16:9 cinematic split-screen drama.
+    Gemini Nano Banana 2 primary, Pollinations fallback.
     """
     import base64
 
-    # Get a thumbnail-specific portrait prompt from the LLM
-    thumb_prompt = _gen_thumb_image_prompt(script, niche)
+    # Get a thumbnail-specific composition prompt from the LLM (mode-aware)
+    thumb_prompt = _gen_thumb_image_prompt(script, niche, long_form=long_form)
     if not thumb_prompt:
         # Fallback: construct minimal portrait prompt from visuals[0]
         visuals = script.get("visuals") or []
@@ -188,14 +223,23 @@ def _gen_base_image(script: dict, niche: str = "bhakti") -> Image.Image:
             f"direct emotional eye contact, single subject."
         )
 
-    prompt = (
-        f"{thumb_prompt}\n\nIMPORTANT: Close-up portrait composition with face "
-        f"clearly visible. Anatomically correct (two eyes, one head, five fingers "
-        f"per hand). Bright cinematic lighting on the face. Single dominant subject "
-        f"centered. Atmospheric background, NOT crowded. Vertical 9:16 portrait "
-        f"(1080x1920). Traditional Indian devotional art masterpiece. "
-        f"NO text, NO watermark, NO modern objects, NO extra limbs, NO distorted anatomy."
-    )
+    if long_form:
+        prompt = (
+            f"{thumb_prompt}\n\nIMPORTANT: HORIZONTAL 16:9 cinematic widescreen composition "
+            f"(1280x720 aspect ratio). Left-third dominant character, right two-thirds storytelling "
+            f"background with right-third area kept simple/dark for text overlay. "
+            f"Anatomically correct figures. Dramatic cinematic chiaroscuro lighting. "
+            f"NO text, NO watermark, NO modern objects, NO extra limbs, NO distorted anatomy."
+        )
+    else:
+        prompt = (
+            f"{thumb_prompt}\n\nIMPORTANT: Close-up portrait composition with face "
+            f"clearly visible. Anatomically correct (two eyes, one head, five fingers "
+            f"per hand). Bright cinematic lighting on the face. Single dominant subject "
+            f"centered. Atmospheric background, NOT crowded. Vertical 9:16 portrait "
+            f"(1080x1920). Traditional Indian devotional art masterpiece. "
+            f"NO text, NO watermark, NO modern objects, NO extra limbs, NO distorted anatomy."
+        )
 
     # Gemini Nano Banana 2 with 5 retries (30s spacing). NO Pollinations
     # fallback per user direction — if all 5 fail, raise GeminiUnavailable
@@ -291,19 +335,26 @@ def _draw_text_block(draw, text: str, W: int, y: int, fill, font, stroke_w: int)
     return th
 
 
-def make_thumbnail(script: dict, niche: str, out_path: Path) -> Path:
+def make_thumbnail(script: dict, niche: str, out_path: Path, long_form: bool = False) -> Path:
+    """Generate thumbnail. Shorts mode = 1080x1920 vertical. Long-form mode =
+    1280x720 horizontal with drama composition (text overlay right-side)."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     cfg = load_config()
 
-    print(f"[thumbnail] generating base image...")
-    img = _gen_base_image(script, niche)
-    if img.size != (1080, 1920):
-        img = img.resize((1080, 1920), Image.LANCZOS).filter(
+    print(f"[thumbnail] generating base image (long_form={long_form})...")
+    img = _gen_base_image(script, niche, long_form=long_form)
+
+    target_size = (1280, 720) if long_form else (1080, 1920)
+    if img.size != target_size:
+        img = img.resize(target_size, Image.LANCZOS).filter(
             ImageFilter.UnsharpMask(radius=2, percent=130, threshold=3)
         )
-    img = _apply_gradients(img)
 
-    # Get hook texts
+    if long_form:
+        return _render_longform_thumbnail(img, script, niche, cfg, out_path)
+
+    # ── Shorts (existing layout, unchanged) ──
+    img = _apply_gradients(img)
     try:
         texts = _gen_thumb_text(script, niche)
         top_text = texts.get("top", "").strip()
@@ -318,31 +369,88 @@ def make_thumbnail(script: dict, niche: str, out_path: Path) -> Path:
     draw = ImageDraw.Draw(img)
     W, H = img.size
     max_w = int(W * MAX_WIDTH_RATIO)
-
-    # Top text — HUGE bold gold (viral Kaliyug-style 200+ px font)
-    # Positioned in TOP-SAFE-ZONE (y=120 from top)
     if top_text:
         font_big = _fit_font(draw, top_text, max_w, start_size=220, min_size=130, stroke_w=16)
         th = _draw_text_block(draw, top_text, W, y=120, fill=(255, 215, 0), font=font_big, stroke_w=16)
         sub_y = 120 + th + 40
     else:
         sub_y = 320
-
-    # Sub text — slightly smaller white (high contrast vs gold top)
     if sub_text:
         font_sub = _fit_font(draw, sub_text, max_w, start_size=110, min_size=70, stroke_w=8)
         _draw_text_block(draw, sub_text, W, y=sub_y, fill=(255, 255, 255), font=font_sub, stroke_w=10)
-
-    # Bottom brand
-    brand = (
-        cfg.get("branding", {})
-        .get("channel_handle", f"@{niche}")
-        .lstrip("@")
-        .upper()
-    )
+    brand = (cfg.get("branding", {}).get("channel_handle", f"@{niche}").lstrip("@").upper())
     font_brand = ImageFont.truetype(_font_path(), size=60)
     _draw_text_block(draw, brand, W, y=H - 150, fill=(255, 215, 0), font=font_brand, stroke_w=4)
 
     img.save(str(out_path), "JPEG", quality=95)
     print(f"[thumbnail] saved → {out_path}")
+    return out_path
+
+
+def _render_longform_thumbnail(img: Image.Image, script: dict, niche: str,
+                                cfg: dict, out_path: Path) -> Path:
+    """Long-form 16:9 thumbnail (1280x720): BIG bold 3-5 word text on right-third,
+    character on left, brand chip bottom-left.
+    Inspired by Praveen Mohan / Project Nightfall thumbnails."""
+    W, H = img.size  # 1280x720
+
+    # Darken right-third for text legibility
+    overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ovr_draw = ImageDraw.Draw(overlay)
+    # Vertical gradient on right 40% (left 60% kept clean for character)
+    text_zone_x = int(W * 0.55)
+    for x in range(text_zone_x, W):
+        alpha = int(180 * ((x - text_zone_x) / (W - text_zone_x)))
+        ovr_draw.line([(x, 0), (x, H)], fill=(0, 0, 0, alpha))
+    img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+
+    # Pick punchy text via existing LLM hook generator + take shortest possible
+    try:
+        texts = _gen_thumb_text(script, niche)
+        line1 = texts.get("top", "").strip().upper()
+        line2 = texts.get("bottom", "").strip().upper()
+    except Exception:
+        title = script.get("title", "")
+        words = title.split()
+        line1 = " ".join(words[:2]).upper()
+        line2 = " ".join(words[2:5]).upper()
+
+    # Cap to viral 3-5 word punch
+    line1 = " ".join(line1.split()[:3])
+    line2 = " ".join(line2.split()[:4])
+
+    draw = ImageDraw.Draw(img)
+    text_zone_w = W - text_zone_x - 40  # 40px right padding
+
+    # Line 1: HUGE red/yellow (high contrast)
+    if line1:
+        f1 = _fit_font(draw, line1, text_zone_w, start_size=130, min_size=72, stroke_w=8)
+        bbox = draw.textbbox((0, 0), line1, font=f1, stroke_width=8)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+        x = text_zone_x + (text_zone_w - tw) // 2
+        y = int(H * 0.20)
+        draw.text((x, y), line1, fill=(255, 215, 0), font=f1, stroke_width=8, stroke_fill=(0, 0, 0))
+        line2_y = y + th + 30
+
+    # Line 2: medium white
+    if line2:
+        f2 = _fit_font(draw, line2, text_zone_w, start_size=90, min_size=56, stroke_w=6)
+        bbox = draw.textbbox((0, 0), line2, font=f2, stroke_width=6)
+        tw = bbox[2] - bbox[0]
+        x = text_zone_x + (text_zone_w - tw) // 2
+        draw.text((x, line2_y), line2, fill=(255, 255, 255), font=f2, stroke_width=6, stroke_fill=(0, 0, 0))
+
+    # Brand chip bottom-left
+    brand = (cfg.get("branding", {}).get("channel_handle", f"@{niche}").lstrip("@").upper())
+    fb = ImageFont.truetype(_font_path(), size=40)
+    bbox = draw.textbbox((0, 0), brand, font=fb, stroke_width=3)
+    bw, bh = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    # Brand box
+    bx, by = 30, H - bh - 50
+    draw.rounded_rectangle([bx - 15, by - 10, bx + bw + 15, by + bh + 15], radius=12, fill=(200, 20, 20))
+    draw.text((bx, by), brand, fill=(255, 255, 255), font=fb, stroke_width=2, stroke_fill=(0, 0, 0))
+
+    img.save(str(out_path), "JPEG", quality=95)
+    print(f"[thumbnail] LONG-FORM 16:9 saved → {out_path}  (1280x720 drama composition)")
     return out_path

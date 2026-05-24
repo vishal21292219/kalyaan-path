@@ -124,6 +124,16 @@ def main(argv: list[str]) -> int:
             topic = pick_trending(seed_offset=args.seed_offset)
         else:
             topic = pick_topic("auto", seed_offset=args.seed_offset)
+
+        # Long-form mode: wrap base topic in proven viral title format
+        # (Top 10 / Untold story / Complete history etc. — proven on
+        # Praveen Mohan, KrazzyKreations, Kaliyug ke Divya Mantra scale).
+        if args.long_form and args.topic == "auto":
+            from pipeline.topic_generator import viralize_longform_title
+            from pipeline.utils import load_config as _lc
+            lang = _lc().get("llm", {}).get("language", "hindi").lower()
+            topic = viralize_longform_title(topic, language=lang)
+            print(f"[topic] long-form viral-format applied: {topic.get('title')}")
     print(f"[topic] {topic}")
 
     stamp = today_stamp()
@@ -206,7 +216,7 @@ def main(argv: list[str]) -> int:
         else:
             try:
                 from pipeline.thumbnail_gen import make_thumbnail
-                make_thumbnail(script, args.niche, thumb_path)
+                make_thumbnail(script, args.niche, thumb_path, long_form=args.long_form)
             except Exception:
                 traceback.print_exc()
                 print("[thumbnail] generation failed — continuing without")
@@ -261,8 +271,10 @@ def main(argv: list[str]) -> int:
         else:
             print(f"[publish] skipped instagram (disabled for niche '{args.niche}')")
 
-    # 7b. If long-form was just published, auto-clip 3 viral Shorts for the week
-    if args.long_form and args.publish:
+    # 7b. If long-form was just produced (published OR telegram-dropped),
+    # auto-clip 3 viral Shorts for the week. Fires for BOTH modes — Itihaasvani
+    # is telegram-mode (no OAuth) but still benefits from the multiplier.
+    if args.long_form and (args.publish or args.notify_telegram):
         try:
             words_path = voice_path.with_suffix(".words.json")
             if not words_path.exists():

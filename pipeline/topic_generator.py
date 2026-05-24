@@ -92,6 +92,53 @@ def pick_shloka_episode() -> dict:
     }
 
 
+# Proven viral long-form title formats (data from Praveen Mohan, KrazzyKreations,
+# Project Nightfall, Kaliyug Ke Divya Mantra channel analysis). Each one drives
+# the "watch till end" psychology — number + curiosity + specific shocking promise.
+_LONGFORM_TITLE_FORMATS = {
+    "hindi": [
+        "{topic} ke 10 anjane rahasya | Sach jo NCERT mein nahi padhaya gaya",
+        "{topic} ki anuponchak kahani | Janma se mrityu tak",
+        "{topic} ka asli sach | Vigyaan bhi jisse hairan hai",
+        "{topic} ke baare mein 15 baatein jo aap nahi jaante",
+        "{topic} ki poori kahani | Ek video mein sab kuch",
+        "{topic} ke 7 rahasya | Jo guru log nahi batate",
+        "{topic} aur uska chupa sach | Itihaas ki sabse badi reveal",
+    ],
+    "english": [
+        "{topic}: 10 Hidden Mysteries Scientists Can't Explain",
+        "The Complete Untold Story of {topic} | From Origin to End",
+        "{topic}: 15 Facts That Defy Modern Science",
+        "Why {topic} Shouldn't Exist — But It Does",
+        "The Real Truth About {topic} | New Evidence Revealed",
+        "{topic} Decoded: The Mystery That Changed Everything",
+    ],
+    "hinglish": [
+        "{topic} ke 10 Rahasya | Hidden Sach Jo Hairan Kar De",
+        "{topic} ki Poori Kahani Ek Video Mein",
+        "{topic} ka ASLI Sach | Vigyaan Bhi Confused",
+        "{topic} ke baare mein 15 Anjaani Baatein",
+        "{topic} ka Untold History | Janma se Maut Tak",
+    ],
+}
+
+
+def viralize_longform_title(base_topic: dict, language: str = "hindi") -> dict:
+    """Wrap base topic in proven viral long-form title format. Idempotent —
+    returns a NEW topic dict with `title` rewritten + `_original_title` preserved.
+    Same topic + same day = same enhanced title (deterministic)."""
+    formats = _LONGFORM_TITLE_FORMATS.get(language, _LONGFORM_TITLE_FORMATS["hindi"])
+    rng = random.Random(_seed_for_today(0) ^ hash(base_topic.get("title", "")))
+    fmt = rng.choice(formats)
+    base_name = base_topic.get("title", "Topic")
+    short_name = base_name.replace("Lord ", "").replace("Goddess ", "")
+    enhanced = dict(base_topic)
+    enhanced["_original_title"] = base_name
+    enhanced["title"] = fmt.format(topic=short_name)
+    enhanced["_longform_format"] = fmt
+    return enhanced
+
+
 def pick_trending(seed_offset: int = 0) -> dict:
     """Pick today's trending: nearby festival > weighted random deity.
     Pass seed_offset to vary the pick on the same day (multi-drop schedule).
