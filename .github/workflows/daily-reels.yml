@@ -44,6 +44,10 @@ on:
         default: "false"
         type: choice
         options: ["false", "true"]
+      topic:
+        description: "Force specific topic (overrides trending pick). Leave empty for auto."
+        required: false
+        default: ""
       seed_offset:
         description: "Topic variation offset"
         required: false
@@ -117,6 +121,7 @@ jobs:
             echo "mode=${{ inputs.mode }}"             >> $GITHUB_OUTPUT
             echo "seed=${{ inputs.seed_offset }}"      >> $GITHUB_OUTPUT
             echo "long_form=${{ inputs.long_form }}"   >> $GITHUB_OUTPUT
+            echo "topic=${{ inputs.topic }}"           >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 0 * * *" ]; then
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
@@ -178,12 +183,23 @@ jobs:
         if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form == 'true'
         timeout-minutes: 90
         run: |
-          python run.py \
-            --niche ${{ steps.route.outputs.niche }} \
-            --kind ${{ steps.route.outputs.kind }} \
-            --publish \
-            --long-form \
-            --seed-offset ${{ steps.route.outputs.seed }}
+          TOPIC="${{ steps.route.outputs.topic }}"
+          if [ -n "$TOPIC" ]; then
+            python run.py \
+              --niche ${{ steps.route.outputs.niche }} \
+              --kind ${{ steps.route.outputs.kind }} \
+              --topic "$TOPIC" \
+              --publish \
+              --long-form \
+              --seed-offset ${{ steps.route.outputs.seed }}
+          else
+            python run.py \
+              --niche ${{ steps.route.outputs.niche }} \
+              --kind ${{ steps.route.outputs.kind }} \
+              --publish \
+              --long-form \
+              --seed-offset ${{ steps.route.outputs.seed }}
+          fi
 
       - name: Find generated long-form video
         if: steps.route.outputs.long_form == 'true'
