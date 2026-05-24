@@ -76,44 +76,96 @@ def main(argv: list[str]) -> int:
     if args.niche == "bhajan":
         return _run_bhajan(args)
 
-    # 1. topic
-    if args.topic and args.topic != "auto":
-        topic = pick_topic(args.topic, seed_offset=args.seed_offset)
-    elif args.kind == "shloka":
-        topic = pick_shloka_episode()
-    elif args.kind == "trending":
-        topic = pick_trending(seed_offset=args.seed_offset)
-    else:
-        topic = pick_topic("auto", seed_offset=args.seed_offset)
+    # 1. topic — check pregen cache FIRST (saves Gemini calls at peak hours)
+    from datetime import date as _date_t
+    from pipeline import pregen as _pregen, scheduler as _scheduler
+    pregen_active = False
+    pregen_dir = None
+    cached_images = None
+    cached_thumb = None
+    cached_script = None
+
+    if args.topic == "auto" and not args.long_form:
+        pregen_dir = _pregen.is_pregen_ready(args.niche, args.kind, _date_t.today(), args.seed_offset)
+        if pregen_dir:
+            pregen_data = _pregen.load_pregen(pregen_dir)
+            cached_topic_meta = pregen_data["meta"].get("topic") or {}
+            # Safety check: verify pregen topic still matches what realtime picker would choose
+            # (catches edge case: shloka sequence drifted, festival appeared since pregen, etc.)
+            if args.kind == "trending":
+                realtime_topic = pick_trending(seed_offset=args.seed_offset)
+            elif args.kind == "shloka":
+                # For shloka, only peek (don't mutate state — we'll mutate at actual publish)
+                from pipeline.scheduler import _peek_shloka_at_offset
+                realtime_topic = _peek_shloka_at_offset(0)
+            else:
+                realtime_topic = pick_topic("auto", seed_offset=args.seed_offset)
+
+            match_keys = ("ref", "title") if args.kind == "shloka" else ("title",)
+            match_ok = all(realtime_topic.get(k) == cached_topic_meta.get(k) for k in match_keys)
+            if match_ok:
+                topic = cached_topic_meta
+                cached_script = pregen_data["script"]
+                cached_images = pregen_data["images"]
+                cached_thumb = pregen_data["thumbnail"]
+                pregen_active = True
+                print(f"[pregen] ✓ cache hit → {pregen_dir.name}")
+                print(f"[pregen] topic: {topic.get('title')}  images: {len(cached_images)}  thumb: {bool(cached_thumb)}")
+            else:
+                print(f"[pregen] ⚠ cache topic mismatch (cached='{cached_topic_meta.get('title')}' vs realtime='{realtime_topic.get('title')}') — falling back to realtime")
+
+    if not pregen_active:
+        if args.topic and args.topic != "auto":
+            topic = pick_topic(args.topic, seed_offset=args.seed_offset)
+        elif args.kind == "shloka":
+            topic = pick_shloka_episode()
+        elif args.kind == "trending":
+            topic = pick_trending(seed_offset=args.seed_offset)
+        else:
+            topic = pick_topic("auto", seed_offset=args.seed_offset)
     print(f"[topic] {topic}")
 
     stamp = today_stamp()
     slug = slugify(topic["title"])
     base = f"{stamp}_{slug}"
 
-    # 2. scrape context
-    context = gather_context(topic)
-    print(f"[scrape] context length: {len(context)}")
+    # 2. scrape context  (skipped if pregen — already in cached script)
+    if not pregen_active:
+        context = gather_context(topic)
+        print(f"[scrape] context length: {len(context)}")
 
-    # 3. script via LLM (long-form mode generates 50-80 lines + 30 visuals)
-    script = write_script(topic, context, long_form=args.long_form)
-    # attach topic metadata so assembler can render episode badge / verse overlay
-    for key in ("kind", "episode_number", "ref", "verse", "theme"):
-        if key in topic and key not in script:
-            script[key] = topic[key]
+    # 3. script via LLM (skipped if pregen — already cached)
+    if pregen_active:
+        script = cached_script
+        print(f"[script] loaded from pregen cache → title: {script.get('title')}")
+    else:
+        script = write_script(topic, context, long_form=args.long_form)
+        # attach topic metadata so assembler can render episode badge / verse overlay
+        for key in ("kind", "episode_number", "ref", "verse", "theme"):
+            if key in topic and key not in script:
+                script[key] = topic[key]
+        print(f"[script] title: {script.get('title')}")
     script_path = out_path("scripts", f"{base}.json")
     script_path.write_text(json.dumps(script, indent=2, ensure_ascii=False))
-    print(f"[script] saved → {script_path}")
-    print(f"[script] title: {script.get('title')}")
 
-    # 4. TTS voiceover
+    # 4. TTS voiceover (always realtime — fast + deterministic, not worth caching)
     voice_path = out_path("audio", f"{base}.mp3")
     synthesize(script, voice_path)
     print(f"[tts] saved → {voice_path}")
 
-    # 5. images
+    # 5. images — pregen cache wins, else realtime gen
     img_dir = out_path("images", base)
-    if args.skip_images and img_dir.exists() and any(img_dir.iterdir()):
+    if pregen_active and cached_images and len(cached_images) >= 5:
+        # Copy cached images into the run's image dir (so cleanup logic stays consistent)
+        img_dir.mkdir(parents=True, exist_ok=True)
+        import shutil as _shutil
+        for i, src in enumerate(cached_images):
+            dst = img_dir / f"img_{i:02d}.jpg"
+            if not dst.exists():
+                _shutil.copy2(src, dst)
+        images = sorted(img_dir.glob("img_*.jpg"))
+        print(f"[images] ✓ used {len(images)} pre-generated images from cache")
+    elif args.skip_images and img_dir.exists() and any(img_dir.iterdir()):
         images = sorted(img_dir.glob("img_*.jpg"))
         print(f"[images] reusing {len(images)} cached")
     else:
@@ -142,16 +194,22 @@ def main(argv: list[str]) -> int:
     assemble(script, voice_path, images, video_path, skip_music=args.no_music)
     print(f"[video] FINAL → {video_path}{' (no-music)' if args.no_music else ''}")
 
-    # 6b. thumbnail (optional)
+    # 6b. thumbnail — pregen cache wins, else realtime gen
     thumb_path = None
     if args.auto_thumb:
-        try:
-            from pipeline.thumbnail_gen import make_thumbnail
-            thumb_path = out_path("thumbnails", f"{base}.jpg")
-            make_thumbnail(script, args.niche, thumb_path)
-        except Exception:
-            traceback.print_exc()
-            print("[thumbnail] generation failed — continuing without")
+        thumb_path = out_path("thumbnails", f"{base}.jpg")
+        if pregen_active and cached_thumb and Path(cached_thumb).exists():
+            import shutil as _shutil
+            _shutil.copy2(cached_thumb, thumb_path)
+            print(f"[thumbnail] ✓ used pre-generated thumbnail from cache")
+        else:
+            try:
+                from pipeline.thumbnail_gen import make_thumbnail
+                make_thumbnail(script, args.niche, thumb_path)
+            except Exception:
+                traceback.print_exc()
+                print("[thumbnail] generation failed — continuing without")
+                thumb_path = None
 
     # 6c. append thumbnail as end card on the video (replay-hook)
     if thumb_path and Path(thumb_path).exists():
@@ -201,6 +259,14 @@ def main(argv: list[str]) -> int:
                 print("[publish] skipped instagram (no --public-url provided)")
         else:
             print(f"[publish] skipped instagram (disabled for niche '{args.niche}')")
+
+    # 8. Mark pregen as consumed (so it gets cleaned up + slot freed)
+    if pregen_active:
+        try:
+            _scheduler.mark_consumed(args.niche, args.kind, _date_t.today(), args.seed_offset)
+            print(f"[pregen] ✓ marked consumed for today's {args.niche}/{args.kind} s{args.seed_offset}")
+        except Exception:
+            traceback.print_exc()
 
     return 0
 

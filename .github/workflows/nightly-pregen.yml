@@ -1,0 +1,94 @@
+# Nightly pre-generation — generates scripts + images + thumbnails for next 5 days
+# during Gemini's idle window so daytime publish runs never wait on Gemini.
+#
+# Fires daily at 21:00 UTC = 02:30 IST (Asia/IND dead night, US west late night, EU asleep)
+# — proven Gemini-fast window from production runs.
+#
+# Output: data/pregenerated/{niche}/{YYYYMMDD}_{kind}_s{seed}/
+#   ├─ script.json
+#   ├─ images/img_*.jpg
+#   ├─ thumbnail.jpg
+#   └─ meta.json
+#
+# Schedule state: data/state/upload_schedule.json (committed back to repo)
+#
+name: Nightly Pregen (Gemini idle window)
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 21:00 UTC = 02:30 IST every day
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "How many days ahead to pre-gen"
+        required: false
+        default: "5"
+      cleanup:
+        description: "Also sweep consumed/old pregen dirs"
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+
+jobs:
+  pregen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install ffmpeg + fonts (system)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto fonts-noto-cjk fonts-lohit-deva fontconfig
+          fc-cache -f
+
+      - name: Install python deps
+        run: pip install -r requirements.txt
+
+      - name: Restore secrets to .env
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          cat > .env <<EOF
+          GEMINI_API_KEY=$GEMINI_API_KEY
+          GROQ_API_KEY=$GROQ_API_KEY
+          TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
+          TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
+          EOF
+
+      - name: Run nightly pregen
+        run: |
+          DAYS="${{ github.event.inputs.days || '5' }}"
+          CLEANUP="${{ github.event.inputs.cleanup || 'true' }}"
+          if [ "$CLEANUP" = "true" ]; then
+            python run_pregen.py --days $DAYS --cleanup
+          else
+            python run_pregen.py --days $DAYS
+          fi
+
+      - name: Commit pregen state + assets
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name  "github-actions[bot]"
+          git add data/state/upload_schedule.json || true
+          git add data/pregenerated/ || true
+          if ! git diff --cached --quiet; then
+            git commit -m "auto: nightly pregen results [skip ci]"
+            git push || true
+          else
+            echo "no pregen changes to commit"
+          fi
