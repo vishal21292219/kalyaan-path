@@ -169,12 +169,14 @@ video:
 
 voice:
   # provider: "edge" (free) or "elevenlabs" (premium — recommended for itihaas drama)
+  # NOTE: elevenlabs free tier flagged this account (401 detected_unusual_activity);
+  # using edge with slowed cadence + deeper pitch for storyteller feel.
   provider: edge
   fallback_to_edge: true
 
-  # Edge TTS (free)
-  pitch: -5Hz
-  rate: -2%
+  # Edge TTS (free) — tuned for storyteller drama (slow + deep, but safe values)
+  pitch: -8Hz
+  rate: -8%
   shloka_pitch: -8Hz
   shloka_rate: -12%
   shloka_voice: hi-IN-MadhurNeural
@@ -183,10 +185,9 @@ voice:
   # Voice rotation pool — different voice per Telegram drop slot
   # (3 drops/day with seeds 1,2,3 → rotates across these 3 voices).
   # Anti-pattern detection: algo sees variety, not templated channel.
+  # For long-form drops we pin a single dramatic male voice (override below).
   voice_pool:
-    - hi-IN-MadhurNeural  # male, current default
-    - hi-IN-SwaraNeural   # female, calm storyteller
-    - hi-IN-PrabhatNeural # male, distinct timbre
+    - hi-IN-MadhurNeural  # male, deepest — pinned for long-form drama
 
   # ElevenLabs (premium) — Adam = deep dramatic male, perfect for storytelling
   elevenlabs_voice_id: pNInz6obpgDQGcFmaJgB
