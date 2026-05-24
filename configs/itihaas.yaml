@@ -180,6 +180,14 @@ voice:
   shloka_voice: hi-IN-MadhurNeural
   voice: hi-IN-MadhurNeural
 
+  # Voice rotation pool — different voice per Telegram drop slot
+  # (3 drops/day with seeds 1,2,3 → rotates across these 3 voices).
+  # Anti-pattern detection: algo sees variety, not templated channel.
+  voice_pool:
+    - hi-IN-MadhurNeural  # male, current default
+    - hi-IN-SwaraNeural   # female, calm storyteller
+    - hi-IN-PrabhatNeural # male, distinct timbre
+
   # ElevenLabs (premium) — Adam = deep dramatic male, perfect for storytelling
   elevenlabs_voice_id: pNInz6obpgDQGcFmaJgB
   elevenlabs_shloka_voice_id: pNInz6obpgDQGcFmaJgB

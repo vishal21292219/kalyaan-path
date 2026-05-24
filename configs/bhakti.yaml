@@ -79,6 +79,14 @@ voice:
   shloka_voice: hi-IN-MadhurNeural
   voice: hi-IN-SwaraNeural
 
+  # Voice rotation pool (used only for non-shloka kinds — bhakti trending,
+  # katha, etc.). Shloka keeps its dedicated male voice for series consistency.
+  # When morning aarti slot goes live, seed=1 picks pool[1] = MadhurNeural etc.
+  voice_pool:
+    - hi-IN-SwaraNeural   # female, peaceful (evening katha)
+    - hi-IN-MadhurNeural  # male, devotional
+    - hi-IN-PrabhatNeural # male, distinct (rotates pattern)
+
   # ElevenLabs (premium) — pick voices at elevenlabs.io/app/voice-library
   # "Charlotte" (warm female) — good for devotional. Swap with Hindi-native if preferred.
   elevenlabs_voice_id: XB0fDUnXU5powFXDhCwa

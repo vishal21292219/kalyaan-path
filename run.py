@@ -150,7 +150,7 @@ def main(argv: list[str]) -> int:
 
     # 4. TTS voiceover (always realtime — fast + deterministic, not worth caching)
     voice_path = out_path("audio", f"{base}.mp3")
-    synthesize(script, voice_path)
+    synthesize(script, voice_path, seed_offset=args.seed_offset)
     print(f"[tts] saved → {voice_path}")
 
     # 5. images — pregen cache wins, else realtime gen

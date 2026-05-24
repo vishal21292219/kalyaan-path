@@ -439,11 +439,25 @@ def _audio_duration_seconds(path: Path) -> float:
 
 
 # ─── Public API ──────────────────────────────────────────────────────────
-def synthesize(script: dict, out_path: Path) -> Path:
+def synthesize(script: dict, out_path: Path, seed_offset: int = 0) -> Path:
+    """Synthesize voice. `seed_offset` rotates voice across slots if `voice_pool`
+    is configured (anti-AI-slop diversification — each slot uses a different
+    voice fingerprint so YT can't pattern-detect a templated channel)."""
     cfg = load_config()
-    v = cfg["voice"]
+    v = dict(cfg["voice"])  # copy so we can mutate locally
     provider = v.get("provider", "edge").lower()
     is_shloka = script.get("kind") == "shloka_episode"
+
+    # Voice rotation: if a pool is defined, pick by (date + seed) so the same
+    # slot uses the same voice on a given day, but different slots use different.
+    pool = v.get("voice_pool") or []
+    if pool and not is_shloka:
+        from datetime import date as _date_t
+        idx = (int(_date_t.today().toordinal()) + seed_offset) % len(pool)
+        chosen = pool[idx]
+        print(f"[tts] voice rotation: pool[{idx}/{len(pool)}] = {chosen}  (seed={seed_offset})")
+        v["voice"] = chosen
+
     text = _build_text(script)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 

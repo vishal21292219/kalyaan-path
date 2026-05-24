@@ -140,10 +140,22 @@ voice:
   provider: edge
   fallback_to_edge: true
 
-  # Default voice for narration
+  # Default voice for narration (used when voice_pool empty or for shloka mode)
   voice: en-US-GuyNeural          # Deep narrator male
   rate: -2%
   pitch: -5Hz
+
+  # Voice rotation pool — pipeline picks (date + seed_offset) % len.
+  # CRITICAL anti-flag for ancient-mystery niche (en-US-GuyNeural is the
+  # exact voice signature of 1000s of "AI ancient aliens" channels — YT
+  # algo has learned to deprioritize that pattern). Rotation across less-
+  # common voices makes the channel feel like multiple human creators.
+  voice_pool:
+    - en-US-AndrewMultilingualNeural  # natural conversational US male
+    - en-US-BrianMultilingualNeural   # warm baritone US male
+    - en-GB-OllieMultilingualNeural   # warm British male
+    - en-US-EricNeural                # confident US male
+    - en-GB-ThomasNeural              # dramatic British narrator
 
   # For dramatic intro mode (not used yet)
   shloka_voice: en-GB-RyanNeural  # British gravitas
