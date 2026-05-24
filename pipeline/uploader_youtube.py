@@ -61,10 +61,16 @@ def upload(video_path: Path, script: dict) -> str:
     if "#shorts" not in title.lower():
         title = (title[:90] + " #Shorts").strip()
     credit = cfg["branding"].get("music_credit", "")
+    # Friendly disclosure footer (helps trust signal + YT AI policy compliance)
+    disclosure = cfg["branding"].get(
+        "ai_disclosure",
+        "🤖 Made with AI tools | Hand-curated by our team for authentic devotional/educational content."
+    )
     description = (
         f"{script.get('description', '')}\n\n"
         f"{cfg['branding']['cta']}\n\n"
         f"{credit}\n\n"
+        f"{disclosure}\n\n"
         f"{hashtags} {' '.join(script.get('hashtags', []))}"
     )
     body = {
