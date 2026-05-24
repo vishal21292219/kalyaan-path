@@ -224,7 +224,7 @@ def main(argv: list[str]) -> int:
     if args.notify_telegram:
         try:
             from pipeline.notifier_telegram import notify as tg_notify
-            tg_notify(video_path, thumb_path, script, args.niche)
+            tg_notify(video_path, thumb_path, script, args.niche, seed_offset=args.seed_offset)
         except Exception:
             traceback.print_exc()
             print("[telegram] notify failed")

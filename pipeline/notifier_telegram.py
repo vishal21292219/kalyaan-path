@@ -50,7 +50,8 @@ def _send_code_block(token: str, chat_id: str, header: str, content: str) -> Non
         print(f"[telegram] code block failed: {res}")
 
 
-def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: str) -> None:
+def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: str,
+           seed_offset: int = 0) -> None:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not (token and chat_id):
@@ -63,15 +64,34 @@ def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: s
     cta = script.get("cta", "")
     tags = ", ".join(h.lstrip("#") for h in script.get("hashtags", []))
 
-    channel_name = {"bhakti": "KalyaanPath", "itihaas": "Itihaasvani"}.get(niche, niche.title())
-    upload_slots = {
-        "bhakti": "Best slots: 7 AM (morning aarti audience) or 7 PM (sandhya pooja)",
-        "itihaas": "Best slots: 12 PM (lunch-break browsing) or 8 PM (mythology prime time)",
-    }
-    slot_hint = upload_slots.get(niche, "Best slot: 7-9 PM IST (peak)")
+    # Per-channel + per-seed scheduling hint (tomorrow's IST slot for user to set in YT Studio)
+    channel_name = {
+        "bhakti": "@KalyaanPath",
+        "itihaas": "@Itihaasvani",
+        "ancient": "@TimeDecoders",
+    }.get(niche, niche.title())
 
-    # 1. Header
-    _send_text(token, chat_id, f"🎬 {channel_name} — Upload Ready\n\n{title}\n\n⏰ {slot_hint}")
+    schedule_map = {
+        ("itihaas", 1): "TOMORROW 06:00 IST (morning commute audience)",
+        ("itihaas", 2): "TOMORROW 13:00 IST (lunch-break browsing)",
+        ("itihaas", 3): "TOMORROW 22:30 IST (late-night prime mythology hour)",
+        ("bhakti", 0):  "TODAY 19:00 IST (sandhya pooja audience)",
+        ("ancient", 1): "TOMORROW 23:30 IST (UK 7PM / EU 8PM prime)",
+        ("ancient", 2): "TOMORROW 04:30 IST (US 7PM EST prime)",
+    }
+    slot_hint = schedule_map.get(
+        (niche, seed_offset),
+        "Best slot: 7-9 PM IST (peak)"
+    )
+
+    # 1. Header — clear YT channel + scheduled upload time so user can use YT Studio scheduler
+    header = (
+        f"🎬 *Upload-ready video* 🎬\n\n"
+        f"📺 Channel: {channel_name}\n"
+        f"⏰ Schedule for: {slot_hint}\n\n"
+        f"📋 Title:\n{title}"
+    )
+    _send_text(token, chat_id, header)
 
     # 2. Video file
     print(f"[telegram] sending video ({video_path.stat().st_size / 1024 / 1024:.1f} MB)...")

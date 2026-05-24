@@ -14,11 +14,18 @@ on:
   # NOTE: each cron triggers GENERATION; video lands on YT ~25 min later.
   # Crons are scheduled 30 min BEFORE the intended publish time so videos
   # hit the algorithm window precisely.
+  #
+  # ITIHAASVANI (Telegram drop, manual upload): videos delivered to TG the
+  # NIGHT BEFORE so user can schedule via YouTube Studio for next-day slots.
+  # User receives 3 videos in TG at 21:00, 21:15, 21:30 IST — schedules them
+  # for next day at 06:00 / 13:00 / 22:30 IST respectively (5 min/night).
+  #
   schedule:
-    - cron: "0 0 * * *"     # fire 05:30 IST → itihaas Telegram drop #1 lands ~06:00 IST
-    - cron: "15 0 * * *"    # fire 05:45 IST → itihaas Telegram drop #2 lands ~06:15 IST
-    - cron: "0 1 * * *"     # fire 06:30 IST → bhakti shloka lands ~07:00 IST (KalyaanPath)
-    - cron: "0 13 * * *"    # fire 18:30 IST → bhakti trending lands ~19:00 IST (KalyaanPath)
+    - cron: "30 15 * * *"   # fire 21:00 IST → Itihaasvani drop #1 for TOMORROW 06:00 IST upload
+    - cron: "45 15 * * *"   # fire 21:15 IST → Itihaasvani drop #2 for TOMORROW 13:00 IST upload
+    - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #3 for TOMORROW 22:30 IST upload
+    - cron: "0 1 * * *"     # fire 06:30 IST → bhakti shloka lands ~07:00 IST (KalyaanPath auto-publish)
+    - cron: "0 13 * * *"    # fire 18:30 IST → bhakti trending lands ~19:00 IST (KalyaanPath auto-publish)
     - cron: "30 17 * * *"   # fire 23:00 IST = 17:30 UTC → TimeDecoders #1 lands ~18:00 UTC = UK 7PM / EU 8PM prime
     - cron: "30 22 * * *"   # fire 04:00 IST = 22:30 UTC → TimeDecoders #2 lands ~23:00 UTC = US 7PM EST prime
     - cron: "0 2 * * 0"     # fire 07:30 IST Sun → itihaas LONG-FORM lands ~08:30 IST (90-min job, buffer wider)
@@ -126,17 +133,23 @@ jobs:
             echo "seed=${{ inputs.seed_offset }}"      >> $GITHUB_OUTPUT
             echo "long_form=${{ inputs.long_form }}"   >> $GITHUB_OUTPUT
             echo "topic=${{ inputs.topic }}"           >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 0 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "30 15 * * *" ]; then
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "15 0 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "45 15 * * *" ]; then
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
+            echo "niche=itihaas" >> $GITHUB_OUTPUT
+            echo "kind=trending" >> $GITHUB_OUTPUT
+            echo "mode=telegram" >> $GITHUB_OUTPUT
+            echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 1 * * *" ]; then
             echo "niche=bhakti"  >> $GITHUB_OUTPUT

@@ -3,6 +3,7 @@ niche: itihaas
 branding:
   channel_handle: '@Itihaasvani'
   cta: "\U0001F4DC Itihaas ki awaaz suno — Subscribe Itihaasvani"
+  ai_disclosure: "📜 Itihaasvani | Hand-researched stories, AI-assisted visuals, human-curated narration for authentic Indian history & mythology."
   hashtags:
   - '#itihaasvani'
   - '#itihaas'
@@ -85,9 +86,10 @@ llm:
        Line 5 (verbatim): "Agar aapko bhi Bharat ke aise hi ansune itihaas aur pauranik
                           rahasya pasand hain, toh Itihaasvani ko abhi Subscribe karein!"
        Line 6 (verbatim, with the exact emojis and line breaks):
-              "🔔 Daily uploads:
-               ✨ 12 PM — Pauranik kathayein
-               ✨ 9 PM — Itihaas ke chupe rahasya"
+              "🔔 Daily uploads on @Itihaasvani:
+               ✨ 6 AM — Pauranik kathayein
+               ✨ 1 PM — Itihaas ke chupe rahasya
+               ✨ 10:30 PM — Late-night rahasya prime time"
        Line 7 (verbatim): "📩 Business: gopulabs@gmail.com"
        Line 8: 12-15 hashtags
        Line 9 (VIRAL SEO BLOCK — proven 3M-view formula): the literal string
