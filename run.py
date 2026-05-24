@@ -1,6 +1,7 @@
 """End-to-end pipeline: topic → script → tts → images → video → (publish)."""
 import argparse
 import json
+import os
 import sys
 import traceback
 from pathlib import Path
@@ -259,6 +260,47 @@ def main(argv: list[str]) -> int:
                 print("[publish] skipped instagram (no --public-url provided)")
         else:
             print(f"[publish] skipped instagram (disabled for niche '{args.niche}')")
+
+    # 7b. If long-form was just published, auto-clip 3 viral Shorts for the week
+    if args.long_form and args.publish:
+        try:
+            words_path = voice_path.with_suffix(".words.json")
+            if not words_path.exists():
+                print("[clip] no words.json — skipping long-form → Shorts clipping")
+            else:
+                from pipeline.clip_to_shorts import clip_long_form
+                print(f"[clip] auto-clipping long-form into 3 viral Shorts...")
+                shorts = clip_long_form(
+                    video_path=video_path,
+                    words_json_path=words_path,
+                    long_form_script=script,
+                    niche=args.niche,
+                    n_clips=3,
+                )
+                # Deliver each Short to Telegram for manual upload throughout the week
+                if shorts:
+                    try:
+                        from pipeline.notifier_telegram import _send_text, _post
+                        token = os.getenv("TELEGRAM_BOT_TOKEN")
+                        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+                        if token and chat_id:
+                            _send_text(token, chat_id,
+                                f"🎬 LONG-FORM CLIPPED: {len(shorts)} viral Shorts ready\n\n"
+                                f"Schedule one each day this week on {args.niche} channel for max reach.")
+                            for s in shorts:
+                                clip_p = Path(s["clip_path"])
+                                with open(clip_p, "rb") as f:
+                                    _post("sendVideo", token,
+                                          data={"chat_id": chat_id,
+                                                "caption": f"📋 {s['hook_title']}\n\n💡 {s['why_viral']}"},
+                                          files={"video": f})
+                    except Exception:
+                        traceback.print_exc()
+                        print("[clip] TG delivery failed — Shorts saved locally")
+                print(f"[clip] ✓ created {len(shorts)} Shorts in {video_path.parent}")
+        except Exception:
+            traceback.print_exc()
+            print("[clip] long-form → Shorts clipping failed — long-form already published, continuing")
 
     # 8. Mark pregen as consumed (so it gets cleaned up + slot freed)
     if pregen_active:
