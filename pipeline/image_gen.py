@@ -67,11 +67,36 @@ def _generate_gemini(prompt: str, out_path: Path, model: str) -> bool:
     raise GeminiUnavailable(f"Gemini failed after {MAX_RETRIES} retries: {last_err}")
 
 
-def generate_images(visual_prompts: list[str], out_dir: Path) -> list[Path]:
+def generate_images(visual_prompts: list[str], out_dir: Path,
+                    long_form: bool = False) -> list[Path]:
+    """Generate scene images. For long-form (documentary), output 1920x1080
+    horizontal. For Shorts, output 1080x1920 vertical (existing default).
+    Post-processes each image to enforce target aspect (Gemini doesn't always
+    honor the prompt orientation).
+    """
+    from PIL import Image
     cfg = load_config()
     style = cfg["images"]["style_suffix"]
     negative = cfg["images"]["negative"]
     model = cfg["images"].get("model", "gemini-3.1-flash-image-preview")
+
+    if long_form:
+        # Override the cfg-supplied vertical hint with landscape orientation
+        # Replace common vertical-orientation phrases in style suffix
+        style_fixed = style
+        for vert_phrase in ["vertical 9:16 portrait composition", "vertical 9:16 portrait",
+                            "9:16 portrait", "vertical portrait", "(1080x1920)"]:
+            style_fixed = style_fixed.replace(vert_phrase, "")
+        orientation_hint = (
+            " HORIZONTAL 16:9 LANDSCAPE composition (1920x1080), cinematic widescreen "
+            "documentary frame, subject occupies left or center with environmental depth, "
+            "wide establishing shot perspective."
+        )
+        style = style_fixed + orientation_hint
+        target_w, target_h = 1920, 1080
+        print(f"[image_gen] LONG-FORM mode → 1920x1080 horizontal landscape")
+    else:
+        target_w, target_h = 1080, 1920
 
     out_dir.mkdir(parents=True, exist_ok=True)
     results: list[Path] = []
@@ -80,13 +105,40 @@ def generate_images(visual_prompts: list[str], out_dir: Path) -> list[Path]:
         path = out_dir / f"img_{i:02d}.jpg"
         try:
             if _generate_gemini(prompt, path, model):
+                # Enforce target aspect ratio: resize+center-crop if Gemini gave wrong orientation
+                try:
+                    img = Image.open(path)
+                    if img.size != (target_w, target_h):
+                        img = _fit_to_aspect(img, target_w, target_h)
+                        img.save(str(path), "JPEG", quality=92)
+                except Exception as e:
+                    print(f"[image_gen] resize warning on img {i}: {e}")
                 results.append(path)
         except GeminiUnavailable:
             # Re-raise so run.py can save to retry queue + exit cleanly.
             # We DO NOT silently skip — partial videos look broken.
             raise
-    print(f"[image_gen] generated {len(results)}/{len(visual_prompts)} via gemini")
+    print(f"[image_gen] generated {len(results)}/{len(visual_prompts)} via gemini ({target_w}x{target_h})")
     return results
+
+
+def _fit_to_aspect(img, target_w: int, target_h: int):
+    """Center-crop + resize image to exact target dimensions, preserving content."""
+    from PIL import Image
+    sw, sh = img.size
+    target_aspect = target_w / target_h
+    src_aspect = sw / sh
+    if src_aspect > target_aspect:
+        # Source is wider — crop sides
+        new_w = int(sh * target_aspect)
+        left = (sw - new_w) // 2
+        img = img.crop((left, 0, left + new_w, sh))
+    elif src_aspect < target_aspect:
+        # Source is taller — crop top/bottom
+        new_h = int(sw / target_aspect)
+        top = (sh - new_h) // 2
+        img = img.crop((0, top, sw, top + new_h))
+    return img.resize((target_w, target_h), Image.LANCZOS)
 
 
 # Public exception for run.py to catch

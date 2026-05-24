@@ -181,7 +181,7 @@ def main(argv: list[str]) -> int:
         print(f"[images] reusing {len(images)} cached")
     else:
         try:
-            images = generate_images(script["visuals"], img_dir)
+            images = generate_images(script["visuals"], img_dir, long_form=args.long_form)
             print(f"[images] generated {len(images)}")
         except Exception as e:
             # GeminiUnavailable etc. — save to retry queue, exit cleanly
@@ -202,7 +202,7 @@ def main(argv: list[str]) -> int:
 
     # 6. assemble
     video_path = out_path("videos", f"{base}.mp4")
-    assemble(script, voice_path, images, video_path, skip_music=args.no_music)
+    assemble(script, voice_path, images, video_path, skip_music=args.no_music, long_form=args.long_form)
     print(f"[video] FINAL → {video_path}{' (no-music)' if args.no_music else ''}")
 
     # 6b. thumbnail — pregen cache wins, else realtime gen

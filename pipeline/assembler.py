@@ -314,14 +314,22 @@ def assemble(
     image_paths: list[Path],
     out_video: Path,
     skip_music: bool = False,
+    long_form: bool = False,
 ) -> Path:
     if not shutil.which("ffmpeg"):
         raise RuntimeError("ffmpeg not found in PATH. Install with: brew install ffmpeg")
 
     cfg = load_config()
-    W = cfg["video"]["width"]
-    H = cfg["video"]["height"]
-    FPS = cfg["video"]["fps"]
+    if long_form:
+        # Long-form documentary = 1920x1080 horizontal (YouTube standard)
+        # Larger font for desktop/TV viewing
+        W, H = 1920, 1080
+        FPS = cfg["video"]["fps"]
+        print(f"[assembler] LONG-FORM mode → 1920x1080 horizontal documentary")
+    else:
+        W = cfg["video"]["width"]
+        H = cfg["video"]["height"]
+        FPS = cfg["video"]["fps"]
     BR = cfg["video"]["bitrate"]
     font_size = cfg["video"]["font_size"]
     box_opacity = cfg["video"]["subtitle_box_opacity"]
@@ -458,6 +466,61 @@ def assemble(
             except Exception as e:
                 print(f"[captions] failed to read word boundaries ({e})")
                 boundaries = []
+
+            # Long-form safety: ffmpeg filter_complex chokes above ~600 simultaneous
+            # PNG inputs (OS fd limit + filtergraph cap). For long-form (1000+ words)
+            # we group consecutive words into PHRASES of ~4 words (or until punctuation),
+            # render each as a yellow-bold caption PNG, and time it precisely using the
+            # first/last word boundaries. This keeps overlays under ~400 (ffmpeg-safe)
+            # AND keeps captions synced to actual speech (unlike even-split fallback).
+            MAX_WORDS_FOR_PER_WORD = 600
+            PHRASE_WORDS_TARGET = 4   # words per caption chunk
+            PHRASE_WORDS_MAX = 6      # hard cap before forced break
+            PUNCT_BREAK = set(".!?,;:।")
+
+            if boundaries and len(boundaries) > MAX_WORDS_FOR_PER_WORD:
+                print(f"[captions] {len(boundaries)} words > {MAX_WORDS_FOR_PER_WORD} — grouping into phrases (long-form mode)")
+                phrases = []
+                buf, buf_start = [], None
+                for b in boundaries:
+                    if buf_start is None:
+                        buf_start = b["start"]
+                    buf.append(b)
+                    last_char = b["text"].strip()[-1:] if b["text"].strip() else ""
+                    if len(buf) >= PHRASE_WORDS_MAX or (len(buf) >= PHRASE_WORDS_TARGET and last_char in PUNCT_BREAK):
+                        phrases.append({
+                            "text": " ".join(w["text"].strip() for w in buf),
+                            "start": buf_start,
+                            "end": buf[-1]["end"],
+                        })
+                        buf, buf_start = [], None
+                if buf:
+                    phrases.append({
+                        "text": " ".join(w["text"].strip() for w in buf),
+                        "start": buf_start,
+                        "end": buf[-1]["end"],
+                    })
+                print(f"[captions] grouped {len(boundaries)} words → {len(phrases)} phrases (~{PHRASE_WORDS_TARGET}-word chunks, audio-synced)")
+                for i, p in enumerate(phrases):
+                    png = work / f"phrase_{i:04d}.png"
+                    _render_caption_png(p["text"], W, int(font_size * 1.25), box_opacity, png)
+                    p_start = max(0.0, p["start"] - 0.05)
+                    p_end = p["end"] + 0.05
+                    if i + 1 < len(phrases):
+                        p_end = min(p_end, phrases[i + 1]["start"] - 0.005)
+                    if p_end - p_start < 0.4:
+                        p_end = p_start + 0.4
+                    inputs += ["-i", str(png)]
+                    overlay_idx += 1
+                    out_lbl = f"v{overlay_idx}"
+                    chain_parts.append(
+                        f"[{prev}][{overlay_idx}:v]overlay="
+                        f"x=(W-w)/2:y=H*0.65:"
+                        f"enable='between(t\\,{p_start:.3f}\\,{p_end:.3f})'[{out_lbl}]"
+                    )
+                    prev = out_lbl
+                used_words = True
+                boundaries = []  # skip the word-by-word branch below
 
             if boundaries:
                 print(f"[captions] rendering {len(boundaries)} word PNGs (animated word-by-word)")
