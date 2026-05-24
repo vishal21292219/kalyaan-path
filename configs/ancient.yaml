@@ -82,43 +82,75 @@ llm:
     Frame as scientific/historical investigation, not "aliens did it" tone.
 
   content_spec: |
-    OUTPUT RULES — apply to every Ancient World Decoded Short.
+    OUTPUT RULES — apply to every TimeDecoders Short, no exceptions.
 
     1. title (≤80 chars):
        - English only, NO hashtags in title
-       - Start with the iconic topic name (for YouTube search)
-       - Include a curiosity hook or unresolved question
-       - End with EXACTLY 1 relevant emoji (🔱 ⚱️ 🌊 🗿 ⚡ 🏛️ 👁️ 🔥 ❓)
+       - Start with iconic topic/place name (YouTube search ranking)
+       - Use PROVEN VIRAL FRAMEWORKS:
+         * "X That Shouldn't Exist: ..."
+         * "Why X Is Older Than We Thought"
+         * "What [Authority] Doesn't Want You To Know About X"
+         * "X: The [Number]-Year-Old Mystery Still Unsolved"
+         * "Scientists Are Baffled by ..."
+       - End with EXACTLY 1 emoji (🔱 ⚱️ 🌊 🗿 ⚡ 🏛️ 👁️ 🔥 ❓ ⏳ 🗝️)
        - Format: [Topic/Place] + [Hook/Mystery] + [Emoji]
        - Good examples:
-         * "The Lost City of Atlantis: New Evidence Found 🌊"
-         * "Pyramids Hidden Chamber: What Scientists Just Discovered 🏛️"
-         * "Why Stonehenge Was Really Built — The Truth ⚡"
-         * "Voynich Manuscript: 600-Year-Old Code Still Unbroken 🔱"
+         * "Gunung Padang: The Pyramid Older Than History 🗿"
+         * "Atlantis Found? New Evidence Defies Science 🌊"
+         * "What's Hidden Inside the Sphinx? Scientists Don't Know 🏛️"
+         * "Why Stonehenge Was REALLY Built — The Truth ⚡"
+       - BAD: "Stonehenge Story" / "Ancient Egypt Facts" (no curiosity = no clicks)
 
     2. description (≤1800 chars, EXACT structure in this order):
-       Line 1: Hook beginning with "Did you know..." or "What if..." + emoji
-       Line 2-3: 2-3 sentence teaser revealing the mystery without giving the answer
-       Line 4: Engagement CTA — ask viewer's theory/opinion
-       Line 5 (verbatim): "If you love decoding history's biggest mysteries,
-                          hit Subscribe and join the TimeDecoders community!"
-       Line 6 (verbatim, with exact emojis):
-              "🔔 New mysteries every day:
-               ✨ 12 PM UTC — Lost civilizations
-               ✨ 9 PM UTC — Ancient artifacts decoded"
+       Line 1: Hook beginning with "What if..." OR "Scientists are still baffled by..."
+                OR "Hidden deep beneath..." + relevant emoji
+       Line 2-3: 2-3 sentence teaser revealing the mystery WITHOUT giving the answer
+       Line 4: Engagement CTA — ask viewer's theory ("Drop your theory in comments —
+                ancient civilization OR natural formation?")
+       Line 5 (verbatim): "If you love decoding history's biggest mysteries, hit
+                          Subscribe and join the TimeDecoders community —
+                          new mysteries decoded every day!"
+       Line 6 (verbatim, with exact emojis and line breaks):
+              "🔔 Daily uploads on @TimeDecoders:
+               ✨ 6 PM UK / 1 PM EST — Lost civilizations
+               ✨ 7 PM EST — Ancient artifacts decoded
+               ✨ Saturday 1 PM EST — Long-form documentary"
        Line 7 (verbatim): "📩 Business: gopulabs@gmail.com"
        Line 8: 12-15 hashtags
-       Line 9 (SEO BLOCK): "Your Queries:" followed by 18-25 long-tail
-              search keywords variations of the topic.
+       Line 9 (VIRAL SEO BLOCK — proven on multi-M-view channels):
+              the literal string "Your Queries:" followed by 18-25 long-tail
+              English search keyword variations, one per line, lowercase.
+              Mix: questions ("was atlantis real"), statements
+              ("evidence of pre-flood civilization"), search forms
+              ("gunung padang age controversy"). Targets YT search indexing.
 
-    3. hashtags (description only, NEVER in title):
+    3. body lines:
+       - Each line = ONE breath, 8-14 words, simple grade-8 English
+       - Every 2-3 lines: drop a NEW jaw-dropping fact or mini-cliffhanger
+       - Use authority-name credibility: "Pliny the Elder wrote...",
+         "NASA confirmed...", "Oxford researchers found..."
+       - Use the STATEMENT → COUNTER → REVELATION pattern in every sub-section
+       - End each section with a hook into the next:
+         "But that's just the surface..."
+         "The real mystery begins here..."
+         "Science still can't explain what happened next..."
+
+    4. cta:
+       - Always ask BINARY question for max comments:
+         "Lost civilization or natural formation — which one? Comment 👇"
+       - Mention channel: "Subscribe TimeDecoders for daily history decoded"
+
+    5. hashtags (description only, NEVER in title):
        Always include: #TimeDecoders #AncientMysteries #LostHistory
-       #UnsolvedMysteries #ArchaeologyFacts #Shorts #YouTubeShorts
-       Plus 6-9 topic-specific (e.g., #Atlantis #Pyramids #Stonehenge)
+       #UnsolvedMysteries #ArchaeologyFacts #LostCivilization
+       #Shorts #YouTubeShorts
+       Plus 6-9 topic-specific (#Atlantis #Pyramids #Stonehenge #Megaliths etc.)
 
-    4. thumbnail text suggestion (3-5 bold English words):
-       - Question or shock-hook format
-       - Example: "Atlantis FOUND?!" or "Stonehenge's Real Purpose 🗿"
+    6. thumbnail text suggestion (3-5 bold English words):
+       - Question or shock-hook format only
+       - Examples: "ATLANTIS FOUND?!" / "1000-Year MYSTERY" / "Older Than HISTORY"
+       - Will be rendered in Anton font (high-impact display) over base image
 
 publish:
   instagram: false

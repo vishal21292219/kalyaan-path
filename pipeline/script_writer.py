@@ -70,6 +70,78 @@ DEFAULT_IMAGE_GUIDE = "- Describe a clear simple scene, vertical 9:16, no text o
 DEFAULT_TOPIC_GUIDE = "- Avoid political content, modern figures, or controversial claims."
 
 
+# ─────────────────────────────────────────────────────────────────────────
+# VIRAL CREATOR PLAYBOOK — universal best-practices distilled from top
+# Indian + global Shorts creators (8M+ subs). Injected into EVERY script
+# prompt regardless of niche. These rules drive retention, completion,
+# and re-shares — the three signals YT Shorts algorithm weights heaviest.
+# ─────────────────────────────────────────────────────────────────────────
+VIRAL_PLAYBOOK = """
+TOP-CREATOR PLAYBOOK (MANDATORY — applies to every line you write):
+
+1. THREE-SECOND RULE (most important):
+   - First 3 sec of hook MUST stop the scroll. Use one of:
+     a) Shocking claim ("Hanuman ji aaj bhi zinda hain")
+     b) Mystery question ("Kya aap jaante hain ki Krishna ki mrityu kaise hui?")
+     c) Specific number teaser ("3 cheezein jo Geeta me chupi hain")
+     d) Authority dropping a bomb ("NASA ne maan liya...")
+   - NEVER open with narrative setup, history dates, or generic praise.
+   - The viewer's thumb is hovering — give them a reason NOT to swipe.
+
+2. PATTERN INTERRUPT (in every body section):
+   - Use the STATEMENT → COUNTER → REVELATION structure.
+     Example: "Sab kehte hain Ravan asur tha." (statement)
+              "Lekin sach kuch aur hai." (counter)
+              "Ravan ne hi pehli baar Shiv Tandav stotra likha tha." (revelation)
+   - Break expected statements every 15-20 sec. Viewer must think "WAIT, kya?!"
+
+3. MINI-CLIFFHANGERS (every 10-15 sec):
+   - Phrases that pull viewer forward:
+     "Lekin asli sach yahan se shuru hota hai..."
+     "Aage aap jaaneंge..."
+     "Vigyaan aaj bhi iska jawab nahi de paya..."
+     "Ek aur baat jo aapko hairan kar degi..."
+   - End of every 2-3 lines should make viewer NEED to know what's next.
+
+4. SPECIFIC > GENERIC:
+   - "5000 saal pehle" > "ancient times"
+   - "12 jyotirlingon mein se ek" > "a famous temple"
+   - "Krishna 125 saal jeeye" > "Krishna lived long"
+   - Numbers, names, places, dates EVERYWHERE. Specifics = credibility = retention.
+
+5. SIMPLE VOCABULARY (grade 8 level):
+   - Avoid Sanskrit jargon unless explaining it.
+   - "Dharm" = "sahi kaam"; "moksh" = "mukti"; "karm" = "actions".
+   - One simple word > one fancy word. Audience is on mobile, scrolling fast.
+
+6. ACTIVE VOICE + "AAP" (personal):
+   - "Aap ye sun ke chaunk jaayenge" > "Listeners may be surprised"
+   - "Krishna ne kiya" > "Kiya gaya tha" (passive kills energy)
+   - Speak TO the viewer, not ABOUT the topic.
+
+7. BINARY ENGAGEMENT CTA:
+   - Ask question with only 2 possible answers (more comments):
+     "Aap kya maante hain — Krishna asli the ya kalpa?"
+     "Comment me likhein: A ya B?"
+   - NEVER ask open-ended "what do you think" — too much friction.
+
+8. RETENTION HOOKS (the "loops"):
+   - Open with a question OR claim, but DON'T answer it until 70% point.
+   - "Aakhir mein bataenge ki ye kyun hua" → forces watch-to-end.
+
+9. ANTI-AI-SLOP MARKERS:
+   - Don't use "in this video" / "today we will explore" intros.
+   - Don't use "the answer might surprise you" generic placeholder.
+   - Don't list 5 things with no narrative arc — story > list.
+   - Don't repeat the channel name more than 2x in the script.
+
+10. EVERY LINE HAS A JOB:
+    - Either ADVANCES the narrative, REVEALS a fact, or BUILDS curiosity.
+    - If a line is just transition/filler — DELETE IT.
+    - Tightness > length. 7 sharp lines > 12 average lines.
+"""
+
+
 def _build_system_prompt(cfg: dict, n_images: int, long_form: bool = False) -> str:
     llm = cfg.get("llm", {})
     persona = llm.get("persona", DEFAULT_PERSONA).strip()
@@ -193,6 +265,8 @@ in our channel. Pretend your salary depends on retention curve being flat.
     return f"""{persona}
 
 {schema}
+
+{VIRAL_PLAYBOOK}
 
 {lang_block}{long_form_block}
 
