@@ -169,10 +169,12 @@ voice:
   # Voice rotation pool (used only for non-shloka kinds — bhakti trending,
   # katha, etc.). Shloka keeps its dedicated male voice for series consistency.
   # When morning aarti slot goes live, seed=1 picks pool[1] = MadhurNeural etc.
+  # Edge-TTS has only 2 valid Hindi voices (Madhur + Swara) — verified via API.
+  # Cycle between them across slots; pitch/rate variation per cfg adds further
+  # fingerprint diversity.
   voice_pool:
     - hi-IN-SwaraNeural   # female, peaceful (evening katha)
     - hi-IN-MadhurNeural  # male, devotional
-    - hi-IN-PrabhatNeural # male, distinct (rotates pattern)
 
   # ElevenLabs (premium) — pick voices at elevenlabs.io/app/voice-library
   # "Charlotte" (warm female) — good for devotional. Swap with Hindi-native if preferred.

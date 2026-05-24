@@ -185,7 +185,6 @@ voice:
   voice_pool:
     - en-US-AndrewMultilingualNeural  # natural conversational US male
     - en-US-BrianMultilingualNeural   # warm baritone US male
-    - en-GB-OllieMultilingualNeural   # warm British male
     - en-US-EricNeural                # confident US male
     - en-GB-ThomasNeural              # dramatic British narrator
 
