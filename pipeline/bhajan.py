@@ -205,27 +205,28 @@ Output ONLY a JSON array of {n_scenes} prompt strings (no markdown fences):
 
 
 def _generate_images(prompts: list[str], out_dir: Path) -> list[Path]:
-    """Reuse existing image_gen module with bhajan config's image settings."""
-    from .image_gen import _generate_one
+    """Reuse existing image_gen module with bhajan config's image settings.
+    Uses new Gemini-only generator (Pollinations removed); on failure
+    raises GeminiUnavailable so caller can save to retry queue."""
+    from .image_gen import _generate_gemini, GeminiUnavailable
 
     cfg = load_config()
     img_cfg = cfg["images"]
-    provider = img_cfg.get("provider", "gemini")
-    model = img_cfg["model"]
+    model = img_cfg.get("model", "gemini-3.1-flash-image-preview")
     negative = img_cfg.get("negative", "")
     style = cfg["llm"].get("image_style_guidance", "")
-    W = cfg["video"]["width"]
-    H = cfg["video"]["height"]
 
     out_dir.mkdir(parents=True, exist_ok=True)
     results = []
     for i, raw in enumerate(prompts):
         full_prompt = f"{raw}\n\nStyle guidance:\n{style}\n\nAvoid: {negative}"
         path = out_dir / f"scene_{i:02d}.jpg"
-        if _generate_one(full_prompt, path, W, H, provider, model):
-            results.append(path)
-        else:
-            print(f"[bhajan] failed scene {i}")
+        try:
+            if _generate_gemini(full_prompt, path, model):
+                results.append(path)
+        except GeminiUnavailable as e:
+            print(f"[bhajan] scene {i} failed permanently: {e}")
+            raise  # let run.py save to retry queue
     return results
 
 
