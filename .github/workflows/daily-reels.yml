@@ -104,6 +104,7 @@ jobs:
           YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
           YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -117,6 +118,7 @@ jobs:
           [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
           cat > .env <<EOF
           GEMINI_API_KEY=$GEMINI_API_KEY
+          HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN
           GROQ_API_KEY=$GROQ_API_KEY
           TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
           TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID

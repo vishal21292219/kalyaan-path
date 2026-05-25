@@ -1,11 +1,13 @@
-"""Image generation via Gemini Nano Banana 2 (primary, only).
+"""Image generation — multi-provider chain.
 
-Pollinations removed per user direction — Gemini-only stack now.
+Primary: HuggingFace FLUX schnell (FREE, fast ~3s, reliable)
+Fallback: Gemini Nano Banana 2 (FREE, slower, prone to outages)
 
-When Gemini fails (503 high-demand, timeout, etc.):
-- 5 in-process retries with 30s spacing (covers brief Google hiccups)
-- If all 5 fail → raise GeminiUnavailable so run.py can record the failure
-  in retry_queue.json and exit cleanly. Hourly retry cron will pick it up.
+If BOTH fail after retries → raise GeminiUnavailable so run.py can record
+the failure in retry_queue.json and exit cleanly. Hourly retry cron retries.
+
+HF FLUX schnell rate limit (free tier): ~3 req/min. For our 70 imgs/day
+total this is plenty — pregen runs at off-hours, spaced naturally.
 """
 from __future__ import annotations
 
@@ -22,12 +24,55 @@ from .utils import load_config
 load_dotenv()
 
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
+HF_ROUTER_BASE = "https://router.huggingface.co/hf-inference/models"
+HF_DEFAULT_MODEL = "black-forest-labs/FLUX.1-schnell"
 MAX_RETRIES = 5
 RETRY_SPACING_SEC = 30
 
 
 class GeminiUnavailable(RuntimeError):
-    """Raised when Gemini image gen fails after all in-process retries."""
+    """Raised when all image providers fail after retries.
+    Name kept for backward compat with run.py's catch logic."""
+
+
+def _generate_hf_flux(prompt: str, out_path: Path, model: str = HF_DEFAULT_MODEL,
+                      max_retries: int = 3) -> bool:
+    """Generate image via HuggingFace FLUX schnell.
+    Returns True on success, False on failure (caller handles fallback)."""
+    token = os.getenv("HUGGINGFACE_TOKEN")
+    if not token:
+        print("[image_gen][hf] HUGGINGFACE_TOKEN missing, skipping HF provider")
+        return False
+    url = f"{HF_ROUTER_BASE}/{model}"
+    headers = {"Authorization": f"Bearer {token}"}
+    payload = {"inputs": prompt}
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=90)
+            ctype = r.headers.get("content-type", "")
+            if r.status_code == 200 and "image" in ctype:
+                out_path.write_bytes(r.content)
+                if out_path.stat().st_size > 5000:
+                    return True
+                print(f"[image_gen][hf] attempt {attempt}: tiny image ({out_path.stat().st_size}B)")
+            elif r.status_code == 503:
+                # Model cold-starting — wait + retry
+                msg = r.text[:200] if r.text else "503 model loading"
+                print(f"[image_gen][hf] attempt {attempt}: {msg}")
+                time.sleep(20)  # cold start usually ~20-40s
+            elif r.status_code == 429:
+                # Rate limited — back off
+                print(f"[image_gen][hf] attempt {attempt}: 429 rate-limited, backing off")
+                time.sleep(25)
+            else:
+                print(f"[image_gen][hf] attempt {attempt}: HTTP {r.status_code} {r.text[:150]}")
+                if attempt < max_retries:
+                    time.sleep(5)
+        except Exception as e:
+            print(f"[image_gen][hf] attempt {attempt}: {e}")
+            if attempt < max_retries:
+                time.sleep(5)
+    return False
 
 
 def _generate_gemini(prompt: str, out_path: Path, model: str) -> bool:
@@ -100,25 +145,48 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 
     out_dir.mkdir(parents=True, exist_ok=True)
     results: list[Path] = []
+    hf_succeeded = 0
+    gemini_succeeded = 0
+    last_error = None
+
     for i, raw_prompt in enumerate(visual_prompts):
         prompt = f"{raw_prompt}{style}. Avoid: {negative}"
         path = out_dir / f"img_{i:02d}.jpg"
-        try:
-            if _generate_gemini(prompt, path, model):
-                # Enforce target aspect ratio: resize+center-crop if Gemini gave wrong orientation
-                try:
-                    img = Image.open(path)
-                    if img.size != (target_w, target_h):
-                        img = _fit_to_aspect(img, target_w, target_h)
-                        img.save(str(path), "JPEG", quality=92)
-                except Exception as e:
-                    print(f"[image_gen] resize warning on img {i}: {e}")
-                results.append(path)
-        except GeminiUnavailable:
-            # Re-raise so run.py can save to retry queue + exit cleanly.
-            # We DO NOT silently skip — partial videos look broken.
-            raise
-    print(f"[image_gen] generated {len(results)}/{len(visual_prompts)} via gemini ({target_w}x{target_h})")
+
+        # Provider chain: HuggingFace FLUX → Gemini fallback
+        ok = False
+        if _generate_hf_flux(prompt, path):
+            ok = True
+            hf_succeeded += 1
+        else:
+            print(f"[image_gen] img {i}: HF failed, trying Gemini fallback...")
+            try:
+                if _generate_gemini(prompt, path, model):
+                    ok = True
+                    gemini_succeeded += 1
+            except GeminiUnavailable as e:
+                last_error = e
+                print(f"[image_gen] img {i}: Gemini also failed: {e}")
+
+        if ok:
+            # Enforce target aspect ratio: resize+center-crop if provider gave wrong orientation
+            try:
+                img = Image.open(path)
+                if img.size != (target_w, target_h):
+                    img = _fit_to_aspect(img, target_w, target_h)
+                    img.save(str(path), "JPEG", quality=92)
+            except Exception as e:
+                print(f"[image_gen] resize warning on img {i}: {e}")
+            results.append(path)
+
+    print(f"[image_gen] {len(results)}/{len(visual_prompts)} generated "
+          f"(HF: {hf_succeeded}, Gemini: {gemini_succeeded}) @ {target_w}x{target_h}")
+
+    # If we got NOTHING and Gemini failed, raise so retry queue catches it
+    if not results and last_error is not None:
+        raise last_error
+    if not results:
+        raise GeminiUnavailable("All providers failed for every image")
     return results
 
 
