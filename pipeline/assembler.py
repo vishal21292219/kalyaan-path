@@ -308,6 +308,87 @@ def _render_caption_png(text: str, width: int, font_size: int, box_opacity: floa
     return out
 
 
+def _cinematic_motion_filter(scene_idx: int, total_scenes: int, duration_frames: int, W: int, H: int) -> str:
+    """Return a ffmpeg zoompan expression set for one of 6 cinematic motion presets.
+
+    Mimics viral mythology channel motion variety (@priyanshshukla_007) — each
+    scene gets a distinct camera move instead of repeating the same zoom.
+
+    Selection logic:
+      - Scene 0 (opening hook):  PUSH_IN     (dramatic entrance)
+      - Scene 1:                 PAN_RIGHT
+      - Scene 2:                 PULL_OUT
+      - Scene 3:                 PAN_LEFT
+      - Scene 4:                 TILT_UP
+      - Scene 5+:                cycle PUSH_IN, PAN_RIGHT, PULL_OUT, PAN_LEFT, TILT_UP, DRIFT_DIAGONAL
+      - Last scene (climax):     PUSH_IN
+
+    Easing: power-curve (pow(on/D, 0.85)) instead of linear for natural feel.
+    """
+    D = max(duration_frames - 1, 1)
+    # Power-curve easing — softer start, smoother arrival (vs linear on/D).
+    # Comma inside pow() must be escaped because zoompan splits sub-options on ':'
+    # and ffmpeg parses commas at the filter level when not quoted; we double-escape
+    # so the expression survives both Python string and ffmpeg arg parsing.
+    t = f"pow(on/{D}\\,0.85)"
+
+    PUSH_IN = 0
+    PAN_RIGHT = 1
+    PULL_OUT = 2
+    PAN_LEFT = 3
+    TILT_UP = 4
+    DRIFT_DIAGONAL = 5
+
+    # Per-scene motion selection
+    if scene_idx == 0:
+        preset = PUSH_IN
+    elif total_scenes > 1 and scene_idx == total_scenes - 1:
+        preset = PUSH_IN
+    elif scene_idx == 1:
+        preset = PAN_RIGHT
+    elif scene_idx == 2:
+        preset = PULL_OUT
+    elif scene_idx == 3:
+        preset = PAN_LEFT
+    elif scene_idx == 4:
+        preset = TILT_UP
+    else:
+        preset = scene_idx % 6
+
+    if preset == PUSH_IN:
+        z = f"1.0+0.18*{t}"
+        x = "iw/2-(iw/zoom/2)"
+        y = "ih/2-(ih/zoom/2)"
+    elif preset == PULL_OUT:
+        z = f"1.18-0.18*{t}"
+        x = "iw/2-(iw/zoom/2)"
+        y = "ih/2-(ih/zoom/2)"
+    elif preset == PAN_LEFT:
+        z = "1.10"
+        x = f"(iw-iw/zoom)*{t}"
+        y = "ih/2-(ih/zoom/2)"
+    elif preset == PAN_RIGHT:
+        z = "1.10"
+        x = f"(iw-iw/zoom)*(1-{t})"
+        y = "ih/2-(ih/zoom/2)"
+    elif preset == TILT_UP:
+        z = f"1.08+0.06*{t}"
+        x = "iw/2-(iw/zoom/2)"
+        y = f"(ih-ih/zoom)*(1-{t})"
+    else:  # DRIFT_DIAGONAL
+        z = "1.06"
+        x = f"(iw-iw/zoom)*{t}*0.5"
+        y = f"(ih-ih/zoom)*{t}*0.5"
+
+    preset_name = ["PUSH_IN", "PAN_RIGHT", "PULL_OUT", "PAN_LEFT", "TILT_UP", "DRIFT_DIAGONAL"][preset]
+    print(f"[motion] scene {scene_idx + 1}/{total_scenes} → {preset_name}")
+
+    return (
+        f"zoompan=z='{z}':x='{x}':y='{y}':"
+        f"d={duration_frames}:s={W}x{H}:fps=__FPS__"
+    )
+
+
 def assemble(
     script: dict,
     voice_path: Path,
@@ -361,22 +442,13 @@ def assemble(
     # the full image. Pre-scaling by 2x and using z=2.0 was the old bug
     # (visible window covered only 25% of the image content).
     clips: list[Path] = []
-    pan_range = "(iw-iw/zoom)"   # max x offset while keeping window inside frame
-    motion_templates = [
-        # (start_z, end_z, x_expr_template, y_expr_template)
-        ("1.00", "1.15", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),               # zoom in, center
-        ("1.15", "1.00", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),               # zoom out, center
-        ("1.10", "1.10", "on*PAN_RANGE/DENOM", "ih/2-(ih/zoom/2)"),              # pan L→R
-        ("1.10", "1.10", "PAN_RANGE-on*PAN_RANGE/DENOM", "ih/2-(ih/zoom/2)"),    # pan R→L
-    ]
+    n_scenes = len(image_paths)
     for i, img in enumerate(image_paths):
         clip = work / f"clip_{i:02d}.mp4"
         per = max(0.5, image_durations[i])  # min 0.5s per image
         per_frames = max(int(per * FPS), 15)
-        denom = max(per_frames - 1, 1)
-        start_z, end_z, x_expr_tpl, y_expr = motion_templates[i % len(motion_templates)]
-        x_expr = x_expr_tpl.replace("PAN_RANGE", pan_range).replace("DENOM", str(denom))
-        z_expr = f"({start_z})+(({end_z})-({start_z}))*on/{denom}"
+        # Cinematic motion variety — 6 distinct presets per video instead of static zoom.
+        motion = _cinematic_motion_filter(i, n_scenes, per_frames, W, H).replace("__FPS__", str(FPS))
         zoompan = (
             # high-quality upscale from Pollinations' 576x1024 → 1080x1920
             f"scale={W}:{H}:flags=lanczos:force_original_aspect_ratio=increase,"
@@ -385,9 +457,7 @@ def assemble(
             f"unsharp=lx=5:ly=5:la=1.2:cx=5:cy=5:ca=0.4,"
             # BRIGHTER + more vibrant cinematic grading (lifts dark areas, pops colors)
             f"eq=contrast=1.10:saturation=1.32:brightness=0.07:gamma=0.86,"
-            f"zoompan=z='{z_expr}':"
-            f"x='{x_expr}':y='{y_expr}':"
-            f"d={per_frames}:s={W}x{H}:fps={FPS},"
+            f"{motion},"
             f"format=yuv420p"
         )
         _run([
