@@ -68,16 +68,31 @@ llm:
   content_spec: |
     OUTPUT RULES — apply to every Itihaasvani Short, no exceptions.
 
-    1. title (≤80 chars):
-       - NO hashtags in title (hashtags ONLY in description)
-       - Start with the character/topic name (for YouTube search ranking)
-       - Include a curiosity hook or unresolved question
-       - Hinglish (Hindi words in Roman script, e.g., "Karna ke Janam Ka Raaz")
-       - End with EXACTLY 1 relevant emoji
-       - Format: [Topic/Character] + [Hook/Question] + [Emoji]
-       - Good examples:
-         * "Karna ke Janam Ka Woh Raaz Jo School Mein Nahi Padhaya Gaya 🔥"
-         * "Dronacharya Ne Eklavya Ka Angutha Kyu Maanga? Asli Sach 😱"
+    1. title (≤80 chars) — VIRAL FORMULA absorbed from @priyanshshukla_007
+       (1.76M subs, avg 1.7M views per Short, same niche):
+       - NO hashtag-only spam in title, BUT MUST end with "#facts" hashtag
+         (this is a brand+SEO signal proven across every viral hit)
+       - MUST contain "😱" emoji placed at the COLON split point (ः or :)
+         between the shock event and the topic descriptor — this is the
+         single highest-signal pattern in the niche
+       - MUST end with a relevant English keyword (e.g., "Krishna Story",
+         "Mahabharat", "Gajasur Story", "Tirupati Mystery") right BEFORE
+         the "#facts" hashtag — drives English-search SEO + brand signal
+       - Structure (preferred): "[SHOCK EVENT]ः [Topic/Character] का सबसे
+         [SUPERLATIVE] रहस्य! 😱 [English keyword] #facts"
+         (Hinglish — Hindi words in Roman script, colon split, 😱, English
+         tail keyword, then literal "#facts")
+       - For AT LEAST 50% of titles, use Template 1:
+         "Jab X ne Y kiya..." / "Jab X aaya..." (When X did Y / When X came)
+         — this is their top-performing template (6.6M & 2.9M view hits)
+       - Start with the character/topic name OR the shock event (both rank)
+       - Avoid pure Devanagari OR pure English — strict Hinglish
+       - Good examples (priyanshshukla-style — copy this pattern):
+         * "Mahadev ko nigalne wala asurः Ganesh ji ke mastak ka sabse bada rahasya! 😱 Gajasur Story #facts"
+         * "Jab Hanuman ji ki ek hunkaar se kaamp utha pura Kurukshetra! 😱 Mahabharat #facts"
+         * "Krishna ke pote ka apaharanः Banasur ka ahankaar! 😱 Krishna Story #facts"
+         * "Jab Tirupati Balaji ne Kuber se karz liya: Ansuna rahasya! 😱 Tirupati Mystery #facts"
+         * "Dronacharya ne Eklavya ka angutha kyu maanga: Asli sach! 😱 Mahabharat #facts"
 
     2. description (≤1800 chars, EXACT structure in this order):
        Line 1: Hook beginning with "Kya aap jaante hain..." + relevant emoji
