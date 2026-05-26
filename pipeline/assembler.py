@@ -16,7 +16,7 @@ import subprocess
 import textwrap
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from .music import pick_music
 from .utils import load_config
@@ -220,22 +220,66 @@ def _render_badge_png(text: str, font_size: int, out: Path) -> Path:
     return out
 
 
-def _render_word_png(text: str, font_size: int, color: tuple, out: Path, stroke_w: int = 9) -> Path:
+# Animated word-effect dictionaries — viral mythology channel style
+# (inspired by @priyanshshukla_007). Words matching GLOW_WORDS get a
+# golden halo, words matching SHOCK_WORDS render in red with thicker
+# stroke. Everything else uses the default yellow/white styling and
+# the universal Y-axis bounce-in animation added at overlay time.
+GLOW_WORDS = {
+    "रहस्य", "चमत्कार", "सच", "जब", "क्यों", "कैसे", "अद्भुत",
+    "खौफनाक", "सबसे", "असली", "गुप्त", "मायावी", "दिव्य",
+    "पहली बार", "अकेला",
+}
+SHOCK_WORDS = {
+    "मारा", "मरा", "खून", "चीख", "डर", "श्राप", "क्रोध",
+    "क्रूर", "मौत", "विनाश", "गिर", "टूट", "चीर", "वध", "हत्या",
+}
+
+
+def _render_word_png(
+    text: str,
+    font_size: int,
+    color: tuple,
+    out: Path,
+    stroke_w: int = 9,
+    glow: bool = False,
+) -> Path:
     """Render a single word with HUGE bold typography for word-by-word captions.
+
     color: (R, G, B) tuple for text fill — white/yellow/red for emphasis tiers.
+    glow: when True, paint a saffron/gold halo behind the text (KEY HINDI WORDS).
     """
     font = _find_font(font_size)
     pad_x, pad_y = 28, 18
+    # Glow needs extra room around the glyphs so the blurred halo isn't clipped.
+    glow_pad = 36 if glow else 0
     dummy = Image.new("RGBA", (10, 10))
     d = ImageDraw.Draw(dummy)
     bbox = d.textbbox((0, 0), text, font=font, stroke_width=stroke_w)
     tw, th = int(bbox[2] - bbox[0]), int(bbox[3] - bbox[1])
-    box_w = tw + pad_x * 2
-    box_h = th + pad_y * 2
+    box_w = tw + pad_x * 2 + glow_pad * 2
+    box_h = th + pad_y * 2 + glow_pad * 2
 
     img = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
     text_xy = ((box_w - tw) // 2 - bbox[0], (box_h - th) // 2 - bbox[1])
+
+    if glow:
+        # Two-pass golden halo: a wide soft blur for the outer aura, then a
+        # tighter, denser pass for body warmth. Stack them under the main glyphs.
+        for blur_radius, alpha in ((22, 200), (10, 230)):
+            halo = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+            halo_draw = ImageDraw.Draw(halo)
+            halo_draw.text(
+                text_xy, text,
+                fill=(255, 190, 60, alpha),
+                stroke_width=stroke_w + 2,
+                stroke_fill=(255, 170, 40, alpha),
+                font=font,
+            )
+            halo = halo.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+            img.alpha_composite(halo)
+
+    draw = ImageDraw.Draw(img)
     draw.text(
         text_xy, text,
         fill=color + (255,),
@@ -259,14 +303,37 @@ _MED_EMPHASIS = {
 }
 
 
-def _word_color(word: str) -> tuple:
-    """Return (R,G,B) color for word based on emphasis tier."""
-    w = word.strip(",.!?।॥;:\"'()[]")
+def _clean_word(word: str) -> str:
+    """Strip punctuation for set-membership lookups."""
+    return word.strip(",.!?।॥;:\"'()[]")
+
+
+def _word_style(word: str) -> tuple[tuple, int, bool]:
+    """Return (color, stroke_width, glow) tuple for a word.
+
+    Priority order:
+      1. SHOCK_WORDS → bright red + thicker stroke for visceral hits
+      2. GLOW_WORDS  → yellow text + golden halo for key story beats
+      3. _HIGH_EMPHASIS → legacy red emphasis
+      4. _MED_EMPHASIS  → legacy yellow
+      5. default      → white
+    """
+    w = _clean_word(word)
+    if w in SHOCK_WORDS:
+        return ((255, 60, 60), 12, False)
+    if w in GLOW_WORDS:
+        return ((255, 230, 120), 9, True)
     if w in _HIGH_EMPHASIS:
-        return (255, 60, 60)       # red
+        return ((255, 60, 60), 9, False)
     if w in _MED_EMPHASIS:
-        return (255, 220, 0)       # yellow
-    return (255, 255, 255)         # white
+        return ((255, 220, 0), 9, False)
+    return ((255, 255, 255), 9, False)
+
+
+def _word_color(word: str) -> tuple:
+    """Backwards-compat: return only the RGB color tuple for a word."""
+    color, _stroke, _glow = _word_style(word)
+    return color
 
 
 def _render_caption_png(text: str, width: int, font_size: int, box_opacity: float, out: Path) -> Path:
@@ -595,13 +662,19 @@ def assemble(
             if boundaries:
                 print(f"[captions] rendering {len(boundaries)} word PNGs (animated word-by-word)")
                 word_font_size = int(font_size * 1.7)  # bigger than line-by-line
+                # Bounce-in animation parameters (drop-in from above over ~150ms).
+                # Y-offset peaks at BOUNCE_PX above resting position at t=word_start,
+                # eases to 0 at t=word_start+BOUNCE_DUR. Resting position = H*0.62.
+                BOUNCE_DUR = 0.15
+                BOUNCE_PX = 40
                 for i, b in enumerate(boundaries):
                     word = b["text"].strip()
                     if not word:
                         continue
-                    color = _word_color(word)
+                    color, stroke_w, glow = _word_style(word)
                     png = work / f"word_{i:04d}.png"
-                    _render_word_png(word, word_font_size, color, png)
+                    _render_word_png(word, word_font_size, color, png,
+                                     stroke_w=stroke_w, glow=glow)
 
                     # Time window: pad slightly on both sides for readability
                     word_start = max(0.0, b["start"] - 0.05)
@@ -614,10 +687,21 @@ def assemble(
                     inputs += ["-i", str(png)]
                     overlay_idx += 1
                     out_lbl = f"v{overlay_idx}"
+                    # Y-axis bounce-in: PNG drops in from BOUNCE_PX above resting
+                    # position over BOUNCE_DUR seconds, then sits at H*0.62 for
+                    # the rest of the word's display window. Resting is computed
+                    # so the PNG is vertically centered on the H*0.62 line.
+                    ws = f"{word_start:.3f}"
+                    we = f"{word_end:.3f}"
+                    y_expr = (
+                        f"'if(lt(t-{ws}\\,{BOUNCE_DUR})\\,"
+                        f"(H*0.62-h/2)-{BOUNCE_PX}*(({BOUNCE_DUR}-(t-{ws}))/{BOUNCE_DUR})\\,"
+                        f"H*0.62-h/2)'"
+                    )
                     chain_parts.append(
                         f"[{prev}][{overlay_idx}:v]overlay="
-                        f"x=(W-w)/2:y=H*0.62:"
-                        f"enable='between(t\\,{word_start:.3f}\\,{word_end:.3f})'[{out_lbl}]"
+                        f"x=(W-w)/2:y={y_expr}:"
+                        f"enable='between(t\\,{ws}\\,{we})'[{out_lbl}]"
                     )
                     prev = out_lbl
                 used_words = True
