@@ -252,13 +252,12 @@ jobs:
 
       - name: Upload long-form mp4 to GitHub Release (downloadable backup)
         if: steps.route.outputs.long_form == 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: longform-${{ github.run_id }}
-          name: "Long-form: ${{ steps.longform_video.outputs.name }}"
-          files: ${{ steps.longform_video.outputs.path }}
-          prerelease: false
-          make_latest: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="longform-${{ github.run_id }}"
+          NAME="Long-form: ${{ steps.longform_video.outputs.name }}"
+          gh release create "$TAG" "${{ steps.longform_video.outputs.path }}" --title "$NAME" --notes "Auto long-form upload from run ${{ github.run_id }}" || true
 
       - name: Commit updated state files (shloka progress etc.)
         if: steps.route.outputs.niche == 'bhakti' && steps.route.outputs.kind == 'shloka'
