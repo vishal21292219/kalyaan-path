@@ -69,7 +69,46 @@ def _gen_thumb_text(script: dict, niche: str) -> dict:
     title = script.get("title", "")
     hook = script.get("hook", "")
 
-    prompt = f"""Generate a YouTube Shorts thumbnail text in Devanagari Hindi.
+    # Niche-aware language: English channels need English thumbnail text,
+    # else font (e.g. Anton in TimeDecoders) renders Devanagari as ####.
+    cfg = load_config()
+    lang = cfg.get("llm", {}).get("language", "hindi").lower()
+    is_english = lang == "english" or niche == "ancient"
+
+    if is_english:
+        prompt = f"""Generate a YouTube Shorts thumbnail text in ENGLISH (NOT Hindi/Devanagari).
+Match viral documentary-style thumbnail formula: short shock hook + curiosity sub.
+
+Topic title: {title}
+Video hook: {hook}
+Niche: {niche}
+
+Output ONLY this JSON (no markdown fences):
+{{
+  "top": "main punch in ENGLISH, 2-3 words MAX, all caps, ends with ? or ! if possible",
+  "bottom": "curiosity teaser in ENGLISH, 2-4 words MAX"
+}}
+
+VIRAL ENGLISH THUMBNAIL FORMULA (proven on Praveen Mohan / Bright Insight):
+- Top text = SHOCK HOOK in 2-3 words like:
+  * "ATLANTIS FOUND?"
+  * "OLDER THAN HISTORY"
+  * "BURIED FOR 5000 YEARS"
+  * "SCIENTISTS BAFFLED"
+  * "THE LOST CITY"
+- Bottom text = curiosity teaser in 2-4 words like:
+  * "What they found inside"
+  * "Decoded after centuries"
+  * "The hidden truth"
+
+CRITICAL:
+- ENGLISH ONLY — absolutely NO Devanagari/Hindi characters
+- TOTAL words across both lines: max 6-7
+- NO emojis
+- ALL CAPS for top, Title Case for bottom
+- Each line MUST fit at very large font (max 18 chars per line)"""
+    else:
+        prompt = f"""Generate a YouTube Shorts thumbnail text in Devanagari Hindi.
 Match the viral Kaliyug-style 3M-view formula: short question hook + curiosity sub.
 
 Topic title: {title}
