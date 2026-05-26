@@ -18,7 +18,13 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from .music import pick_music
+from .music import (
+    compose_audio_track,
+    pick_drone,
+    pick_music,
+    pick_sting,
+    pick_sting_timestamps,
+)
 from .utils import load_config
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -756,32 +762,71 @@ def assemble(
         "-pix_fmt", "yuv420p", "-color_range", "tv",
         "-movflags", "+faststart",
     ]
-    bg = None if skip_music else pick_music(script.get("kind"))
-    if bg:
+    # 4. THREE-LAYER CINEMATIC MIX (voice + drone + sting hits).
+    # Pre-bake the audio in pipeline/music.compose_audio_track() so the final
+    # mux is a simple stream-copy from slides_subbed + the mixed track.
+    # Falls back to the legacy single-track duck mix (and finally to pure
+    # voice) when drone/sting libraries are unavailable.
+    drone = None if skip_music else pick_drone(script.get("kind"))
+    sting_ts = [] if skip_music else pick_sting_timestamps(duration)
+    have_stings = bool(sting_ts) and pick_sting(0) is not None
+
+    composed_audio: Path | None = None
+    if not skip_music and (drone or have_stings):
+        try:
+            composed_audio = compose_audio_track(
+                voice_path=voice_path,
+                video_duration=duration,
+                drone_path=drone,
+                sting_timestamps=sting_ts if have_stings else [],
+                out_path=work / "mix.m4a",
+            )
+            print(
+                f"[audio] 3-layer mix → drone={'yes' if drone else 'no'} "
+                f"stings={len(sting_ts) if have_stings else 0}"
+            )
+        except Exception as e:
+            print(f"[audio] compose_audio_track failed ({e}); falling back to legacy mix")
+            composed_audio = None
+
+    if composed_audio is not None:
         _run([
             "ffmpeg", "-y",
             "-i", str(slides_subbed),
-            "-i", str(voice_path),
-            "-stream_loop", "-1", "-i", str(bg),
-            "-filter_complex",
-            "[1:a]volume=1.2,highpass=f=120[voice];"
-            "[2:a]volume=0.32,lowpass=f=8000[bg];"
-            "[voice][bg]amix=inputs=2:duration=first:dropout_transition=2:normalize=0[a]",
-            "-map", "0:v", "-map", "[a]",
-            *common_v,
-            "-c:a", "aac", "-b:a", "192k",
-            "-shortest", str(out_video),
-        ])
-    else:
-        _run([
-            "ffmpeg", "-y",
-            "-i", str(slides_subbed),
-            "-i", str(voice_path),
+            "-i", str(composed_audio),
             "-map", "0:v", "-map", "1:a",
             *common_v,
             "-c:a", "aac", "-b:a", "192k",
             "-shortest", str(out_video),
         ])
+    else:
+        # Legacy fallback path — single ducked bg, or pure voice if none.
+        bg = None if skip_music else pick_music(script.get("kind"))
+        if bg:
+            _run([
+                "ffmpeg", "-y",
+                "-i", str(slides_subbed),
+                "-i", str(voice_path),
+                "-stream_loop", "-1", "-i", str(bg),
+                "-filter_complex",
+                "[1:a]volume=1.2,highpass=f=120[voice];"
+                "[2:a]volume=0.32,lowpass=f=8000[bg];"
+                "[voice][bg]amix=inputs=2:duration=first:dropout_transition=2:normalize=0[a]",
+                "-map", "0:v", "-map", "[a]",
+                *common_v,
+                "-c:a", "aac", "-b:a", "192k",
+                "-shortest", str(out_video),
+            ])
+        else:
+            _run([
+                "ffmpeg", "-y",
+                "-i", str(slides_subbed),
+                "-i", str(voice_path),
+                "-map", "0:v", "-map", "1:a",
+                *common_v,
+                "-c:a", "aac", "-b:a", "192k",
+                "-shortest", str(out_video),
+            ])
 
     shutil.rmtree(work, ignore_errors=True)
     return out_video
