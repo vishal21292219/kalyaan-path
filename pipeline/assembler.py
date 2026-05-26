@@ -693,20 +693,14 @@ def assemble(
                     inputs += ["-i", str(png)]
                     overlay_idx += 1
                     out_lbl = f"v{overlay_idx}"
-                    # Y-axis bounce-in: PNG drops in from BOUNCE_PX above resting
-                    # position over BOUNCE_DUR seconds, then sits at H*0.62 for
-                    # the rest of the word's display window. Resting is computed
-                    # so the PNG is vertically centered on the H*0.62 line.
+                    # FIXED Y position — bounce-in animation reverted because user
+                    # reported caption desync. Static position is proven reliable.
+                    # Re-enable bounce only after we have a way to verify it works.
                     ws = f"{word_start:.3f}"
                     we = f"{word_end:.3f}"
-                    y_expr = (
-                        f"'if(lt(t-{ws}\\,{BOUNCE_DUR})\\,"
-                        f"(H*0.62-h/2)-{BOUNCE_PX}*(({BOUNCE_DUR}-(t-{ws}))/{BOUNCE_DUR})\\,"
-                        f"H*0.62-h/2)'"
-                    )
                     chain_parts.append(
                         f"[{prev}][{overlay_idx}:v]overlay="
-                        f"x=(W-w)/2:y={y_expr}:"
+                        f"x=(W-w)/2:y=H*0.62-h/2:"
                         f"enable='between(t\\,{ws}\\,{we})'[{out_lbl}]"
                     )
                     prev = out_lbl
