@@ -68,7 +68,7 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45  # bumped from 25 to give buffer for slow Gemini fallback
     permissions:
       contents: write
     steps:
@@ -203,7 +203,7 @@ jobs:
       - name: Run pipeline (telegram mode)
         if: steps.route.outputs.mode == 'telegram'
         run: |
-          python run.py \
+          python -u run.py \
             --niche ${{ steps.route.outputs.niche }} \
             --kind ${{ steps.route.outputs.kind }} \
             --no-music \
@@ -213,7 +213,7 @@ jobs:
       - name: Run pipeline (publish mode)
         if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form != 'true'
         run: |
-          python run.py \
+          python -u run.py \
             --niche ${{ steps.route.outputs.niche }} \
             --kind ${{ steps.route.outputs.kind }} \
             --publish \
@@ -225,7 +225,7 @@ jobs:
         run: |
           TOPIC="${{ steps.route.outputs.topic }}"
           if [ -n "$TOPIC" ]; then
-            python run.py \
+            python -u run.py \
               --niche ${{ steps.route.outputs.niche }} \
               --kind ${{ steps.route.outputs.kind }} \
               --topic "$TOPIC" \
@@ -233,7 +233,7 @@ jobs:
               --long-form \
               --seed-offset ${{ steps.route.outputs.seed }}
           else
-            python run.py \
+            python -u run.py \
               --niche ${{ steps.route.outputs.niche }} \
               --kind ${{ steps.route.outputs.kind }} \
               --publish \
