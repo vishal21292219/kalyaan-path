@@ -94,51 +94,36 @@ llm:
          * "Jab Tirupati Balaji ne Kuber se karz liya: Ansuna rahasya! 😱 Tirupati Mystery #facts"
          * "Dronacharya ne Eklavya ka angutha kyu maanga: Asli sach! 😱 Mahabharat #facts"
 
-    2. description (≤1800 chars, EXACT structure in this order):
-       Line 1: Hook beginning with "Kya aap jaante hain..." + relevant emoji
-       Line 2-3: 2-3 sentence teaser revealing just enough to hook but NOT the full answer
-       Line 4: Engagement CTA — ask a debate/opinion question to drive comments
-       Line 5 (verbatim): "Agar aapko bhi Bharat ke aise hi ansune itihaas aur pauranik
-                          rahasya pasand hain, toh Itihaasvani ko abhi Subscribe karein!"
-       Line 6 (verbatim, with the exact emojis and line breaks):
-              "🔔 Daily uploads on @Itihaasvani:
-               ✨ 6 AM — Pauranik kathayein
-               ✨ 1 PM — Itihaas ke chupe rahasya
-               ✨ 10:30 PM — Late-night rahasya prime time"
-       Line 7 (verbatim): "📩 Business: gopulabs@gmail.com"
-       Line 8: 12-15 hashtags
-       Line 9 (VIRAL SEO BLOCK — proven 3M-view formula): the literal string
-              "Your Queries:" followed by 18-25 long-tail search keyword variations
-              of the topic, one per line, in lowercase English. Mix Hindi-Roman
-              transliterations + English variations + question forms. Targets
-              YouTube long-tail search indexing.
-              Examples for "Ram Setu" topic:
-                ram setu
-                ram setu mystery
-                ram setu truth
-                ram setu real story
-                ram setu hindi
-                ram setu facts
-                ram setu india to sri lanka
-                ram setu stones floating
-                lord ram story
-                ramayan story
-                hanuman ji power
-                adams bridge india
-                ancient india mystery
-                unsolved mystery india
-                hindu mythology facts
-                spiritual story hindi
-                bhagwan ram story
-                viral hindi video
-                trending shorts
-                youtube shorts india
+    2. description (~200-400 chars, MINIMAL — verified from @priyanshshukla_007 7M-view template):
+       Line 1: Title repeated WITH "😱#facts" suffix (no space before #facts)
+       Line 2-7: 6 keyword phrases describing the story (1 per line, English allowed)
+                  Examples for "Hanuman vs Karna" video:
+                    Hanuman vs Karna
+                    Hanuman in Mahabharat
+                    Krishna wounded by Karna
+                    Arjuna's Chariot Flag
+                    Hanuman Anger in Kurukshetra
+                    Power of Hanuman
+       Line 8: "Mahabharat Unknown Stories." (or topic equivalent)
+       Line 9: 5 inline hashtags only: #temple #tourism #[character] #[epic] #dailyfacts
 
-    3. hashtags (description-only, NEVER in title):
-       Always include these 6: #Itihaasvani #ItihaasKeRahasya #SanatanDharma
-       #BharatGatha #Shorts #YouTubeShorts
-       Plus 6-9 topic-specific tags relevant to the character/story
-       (examples: #Karna #Mahabharata #HinduMythology #AncientIndia).
+       NO bloat. NO "Your Queries" SEO block (that's outdated 2022 trick).
+       NO long teaser paragraph. NO daily-uploads schedule line.
+       NO Subscribe ask in description (CTA goes in video, not description).
+       NO Business email in description.
+
+       Total: 200-400 chars MAX. Verified from real 7M-view video template.
+
+    3. hashtags (MINIMAL — verified from Priyansh top 5 viral videos):
+       EXACTLY 5 hashtags ONLY, inline at end of description.
+       Pattern: #temple #tourism #[main_character] #[main_epic] #dailyfacts
+
+       Example for Hanuman/Mahabharat: #temple #tourism #hanuman #mahabharat #dailyfacts
+       Example for Krishna/Ramayan: #temple #tourism #krishna #ramayan #dailyfacts
+
+       DO NOT add Itihaasvani branding hashtags — verified that top creators DON'T.
+       DO NOT add Shorts/YouTubeShorts hashtags — verified unnecessary.
+       Keep it minimal — 5 broad tags only.
 
     4. thumbnail text suggestion (3-5 bold Hindi/Hinglish words):
        - NOT a single word — must give partial context that hints at the twist

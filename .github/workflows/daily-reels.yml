@@ -26,10 +26,11 @@ on:
     - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #3 for TOMORROW 22:30 IST upload
     - cron: "0 1 * * *"     # fire 06:30 IST → bhakti shloka lands ~07:00 IST (KalyaanPath auto-publish)
     - cron: "0 13 * * *"    # fire 18:30 IST → bhakti trending lands ~19:00 IST (KalyaanPath auto-publish)
-    - cron: "30 17 * * *"   # fire 23:00 IST = 17:30 UTC → TimeDecoders #1 lands ~18:00 UTC = UK 7PM / EU 8PM prime
-    - cron: "30 22 * * *"   # fire 04:00 IST = 22:30 UTC → TimeDecoders #2 lands ~23:00 UTC = US 7PM EST prime
+    # PARKED (Day 1 boot camp verdict — slideshow format mismatched for English ancient):
+    # - cron: "30 17 * * *"   # TimeDecoders EU prime
+    # - cron: "30 22 * * *"   # TimeDecoders US prime — PARKED
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
-    - cron: "30 16 * * 6"   # fire 22:00 IST Sat = 16:30 UTC Sat → TimeDecoders LONG-FORM lands ~18:00 UTC Sat = US 1PM Sat / UK 6PM Sat (weekend prime, highest-RPM English niche)
+    # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
   workflow_dispatch:
     inputs:
       niche:

@@ -20,7 +20,7 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
   "hook_roman": "Roman transliteration of the hook line",
   "body": [
      "Devanagari Hindi line for voiceover",
-     "..."   // 5-9 lines, each one breath, ~6-12 words
+     "..."   // 15-22 lines, each one breath, ~10-15 words (target 2:30-3:00 total)
   ],
   "body_roman": [
      "Roman transliteration line for captions",
@@ -37,7 +37,12 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
 }
 
 Rules:
-- Total spoken duration ~45-55 seconds when read calmly.
+- Total spoken duration ~2:30-3:00 (150-180 seconds) when read calmly.
+  THIS IS THE NEW SWEET SPOT — verified from top viral Shorts data:
+  - Priyansh Shukla 7M-view Hanuman = 2:29 duration
+  - Kaliyug 29M-view "sharir ka rahasya" = 1:22 (some go shorter)
+  - Most viral mythology Shorts: 2:30-3:00
+  NOT 45-60 sec anymore — that's outdated 2022-2023 pattern.
 - LANGUAGE: hook / body / cta MUST be in the channel's primary language
   (see "LANGUAGE INSTRUCTION" section below). For Hindi channels use
   Devanagari script. For English channels write directly in English (in

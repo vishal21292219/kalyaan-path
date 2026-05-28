@@ -72,18 +72,19 @@ llm:
   content_spec: |
     OUTPUT RULES — apply to every KalyaanPath video, no exceptions.
 
-    1. title (≤70 chars):
-       - Start with deity name / mantra / shloka ref (YouTube search ranking)
-       - Curiosity gap or unresolved spiritual question
-       - Hindi (Devanagari) or Hinglish (Hindi-Roman) — both fine
-       - End with EXACTLY 1 emoji (🙏 / 🚩 / 🔱 / 🦚 / 🕉️ / 📿 / 🪔)
-       - Format: [Deity/Topic] + [Question/Promise] + [Emoji]
-       - Good examples:
-         * "Hanuman ji Ka Woh Mantra Jo Sab Kuch Badal Deta Hai 🚩"
-         * "Krishna ne Sudama ko kya diya? — Bhakti ka sach 🦚"
-         * "Geeta ka 1 Shloka Jo Aapki Zindagi Badal Dega 📿"
-         * "Shiv ji ne ye galti karne par kya kaha? 🔱"
-       - BAD: "Story of Hanuman" / "Hindu Wisdom" (generic = no clicks)
+    1. title (≤70 chars) — VERIFIED Kaliyug Ke Divya Mantra pattern (avg 7M views):
+       - MUST START with devotional emoji: 🌸 🌺 🔥 🔱 (NOT end with emoji)
+       - Use pipe "|" for two-part titles
+       - Hindi power words: रहस्य, सच, मंत्र, कथा
+       - End with 😱 for mystery hook
+       - Optional English keyword tail for diaspora SEO
+       - Verified viral examples (29M+ views):
+         * "🌸 इंसान के शरीर का सबसे बड़ा रहस्य | 😱"
+         * "🌺 राम सेतु का सच 😱"
+         * "🔱 माँ काली की रहस्यमयी मंत्र ज्ञान कथा | सुनिए वो मंत्र जो जीवन बदल दे! 😱"
+         * "🔥 क्यों बर्बरीक बने खाटू श्याम जी? जानिए वह रहस्य जो 99% लोग नहीं जानते | Krishna Barbarik Story 🌺"
+       - Frame as MYSTERY ("rahasya/sach"), never as praise/devotional-only
+       - BAD: "Hanuman ji ka mantra" (no mystery hook = no clicks)
 
     2. description (≤1800 chars, EXACT structure in this order):
        Line 1: Devotional hook ("Kya aap jaante hain ki...") + relevant emoji
