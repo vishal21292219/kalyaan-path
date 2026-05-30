@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 
 from .utils import load_config
 
-load_dotenv()
+# override=True so .env always wins over shell-exported empty strings
+# (some shells export ANTHROPIC_API_KEY="" which silently blocks loading).
+load_dotenv(override=True)
 
 
 SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
@@ -29,8 +31,16 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
   "cta": "Devanagari Hindi closing line — MUST ask a specific question for engagement (e.g. 'आप क्या मानते हैं — कमेंट में बताएं') AND mention the channel name to subscribe.",
   "cta_roman": "Roman transliteration of the cta",
   "visuals": [
-     "vivid image prompt 1 (in English)",
-     "..."  // exactly {n_images} prompts
+     "vivid image prompt 1 (in English) — depicts EXACTLY what body[0] narrates",
+     "..."  // EXACTLY same count as body[]. visuals[i] must depict the scene narrated in body[i] — same characters, same action, same moment. 1:1 narrative sync.
+  ],
+  "character_bible": [
+     {
+       "name": "Shiva",                       // the EXACT word/name you use for this character inside visuals[] prompts (used to detect which scene shows them)
+       "aliases": ["Mahadev", "Shiv"],        // any other words you use for the same character in visuals[]
+       "look": "a majestic blue-skinned ascetic god, matted jata hair piled with a crescent moon, third eye on forehead, snake around neck, rudraksha beads, tiger-skin around waist, calm powerful face with a neat beard, holding a trident"   // ONE locked head-to-toe appearance, repeated identically every scene
+     }
+     // ONLY the 1-4 RECURRING named characters/deities who appear in MULTIPLE scenes. Skip one-off crowds, landscapes, objects. [] if no recurring character.
   ],
   "description": "Long-form YouTube description (Hindi/Devanagari, 5-8 lines). Structure: 1) Hook in 1-2 lines (re-state the question/claim). 2) Tease the answer in 2-3 lines without fully revealing (curiosity gap). 3) Engagement question — 'comments mein bataiye'. 4) Subscribe CTA mentioning channel name. 5) 10-15 relevant hashtags at the end including #Shorts and #YouTubeShorts. NO English-only descriptions — use Devanagari for the body text and Roman for hashtags.",
   "hashtags": ["#tag1", "#tag2", ...]   // 10-15 relevant — mix English mythology tags + Hindi transliterated tags
@@ -53,6 +63,29 @@ Rules:
   English content. Keep each *_roman line SHORT (<60 chars).
 - Visuals (image prompts): VERY important — write in English following the
   image style guidance below.
+- VISUAL-SCRIPT SYNC (CRITICAL — biggest quality lever):
+  * visuals[] count MUST equal body[] count exactly (1 image per spoken line).
+  * For each i: visuals[i] depicts the scene narrated in body[i] —
+    same characters present, same action happening, same moment of the story.
+  * If body[i] says "Three sons did tapasya before Brahma", visuals[i]
+    shows three sons in tapasya before Brahma — NOT cities, NOT war,
+    NOT what comes later. Match the narrative beat exactly.
+  * Each image gets ~7-12 seconds of screen time. If it shows the wrong
+    moment, viewer feels disconnect and scrolls away.
+  * Hook image (visuals[0]) MUST match the opening line (body[0]),
+    not the climax. Climax visual goes at climax body line.
+- CHARACTER CONSISTENCY (critical for a professional look):
+  * Fill "character_bible" with the 1-4 RECURRING named characters/deities
+    who appear across MULTIPLE scenes (e.g. Shiva, Krishna, Hanuman, a hero).
+  * Each gets ONE locked head-to-toe "look" (skin, hair, crown, weapon,
+    clothing, face). The pipeline generates a single master portrait from it
+    and reuses that exact identity in every scene the character appears in.
+  * In visuals[], refer to each recurring character by the SAME "name" word
+    you put in the bible (and list any other words used as "aliases"), so the
+    pipeline can tell which scenes show them. Describe their ACTION/pose/
+    background in the scene — do NOT re-describe their fixed appearance.
+  * Use [] for character_bible only when the video has no recurring character
+    (pure landscape/mantra/abstract). Most mythology/bhakti videos DO have one.
 
 VIRAL-HOOK CHECKLIST for title (most important field!):
 - ✅ Curiosity gap (not full answer in title)
@@ -372,6 +405,22 @@ def _gemini(system: str, user: str, model: str) -> str:
     return resp.text
 
 
+def _claude(system: str, user: str, model: str) -> str:
+    import anthropic
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError("ANTHROPIC_API_KEY not set in .env")
+    client = anthropic.Anthropic(api_key=api_key)
+    resp = client.messages.create(
+        model=model or "claude-sonnet-4-6",
+        max_tokens=4096,
+        temperature=0.85,
+        system=system,
+        messages=[{"role": "user", "content": user}],
+    )
+    return resp.content[0].text
+
+
 def _groq(system: str, user: str, model: str) -> str:
     import requests
     api_key = os.getenv("GROQ_API_KEY")
@@ -406,14 +455,18 @@ def _extract_json(text: str) -> dict:
     return json.loads(text[start : end + 1])
 
 
-def write_script(topic: dict, context: str, long_form: bool = False) -> dict:
+def write_script(topic: dict, context: str, long_form: bool = False,
+                 prefer_free: bool = False) -> dict:
     cfg = load_config()
     if long_form:
         # Long-form videos use ~30 scenes (vs 10 for Shorts) and 50-80 body
         # lines (vs 5-9). Each scene plays ~30-45 sec.
         n_images = 30
     else:
-        n_images = cfg["images"]["num_per_reel"]
+        # Shorts mode: visuals = 1 per body line for tight script-image sync.
+        # Body is 15-22 lines (target 2:30-3:00), so n_images ≈ 18 on average.
+        # We pass a hint to the LLM but enforce in post-process.
+        n_images = cfg["images"].get("num_per_reel", 18)
     niche = cfg.get("niche", "bhakti")
 
     system = _build_system_prompt(cfg, n_images, long_form=long_form)
@@ -421,14 +474,90 @@ def write_script(topic: dict, context: str, long_form: bool = False) -> dict:
 
     provider = cfg["llm"]["provider"]
     model = cfg["llm"]["model"]
-    if provider == "gemini":
-        raw = _gemini(system, user, model)
-    elif provider == "groq":
-        raw = _groq(system, user, model)
-    else:
-        raise ValueError(f"Unknown provider: {provider}")
 
-    return _extract_json(raw)
+    def _try_chain():
+        """Provider chain: claude → gemini → groq. Fall through on failure.
+
+        prefer_free=True skips Claude entirely and starts at Gemini → Groq.
+        Used by the nightly pregen draft so it never touches the paid stack.
+        """
+        errs = []
+        if not prefer_free and (provider == "claude" or os.getenv("ANTHROPIC_API_KEY")):
+            try:
+                claude_model = model if provider == "claude" else "claude-sonnet-4-6"
+                return _claude(system, user, claude_model)
+            except Exception as e:
+                errs.append(f"claude: {type(e).__name__}: {e}")
+                print(f"[script_writer] Claude failed ({errs[-1]}) — falling back")
+        if provider == "gemini" or os.getenv("GEMINI_API_KEY"):
+            try:
+                gemini_model = model if provider == "gemini" else "gemini-flash-latest"
+                return _gemini(system, user, gemini_model)
+            except Exception as e:
+                errs.append(f"gemini: {type(e).__name__}: {e}")
+                print(f"[script_writer] Gemini failed ({errs[-1]}) — falling back")
+        if os.getenv("GROQ_API_KEY"):
+            try:
+                groq_model = model if provider == "groq" else "llama-3.3-70b-versatile"
+                return _groq(system, user, groq_model)
+            except Exception as e:
+                errs.append(f"groq: {type(e).__name__}: {e}")
+        raise RuntimeError(f"All LLM providers failed: {' | '.join(errs)}")
+
+    raw = _try_chain()
+    script = _extract_json(raw)
+
+    # Enforce 1:1 visual-body sync for Shorts (biggest quality lever).
+    # If LLM returned mismatched counts, pad or truncate visuals to match body.
+    if not long_form:
+        body = script.get("body") or []
+        visuals = script.get("visuals") or []
+        if len(visuals) != len(body) and body:
+            print(f"[script_writer] visual-body count mismatch: {len(visuals)} visuals vs {len(body)} body lines — repairing 1:1")
+            if len(visuals) < len(body):
+                # Pad by re-asking LLM for the missing scene-specific prompts
+                missing = body[len(visuals):]
+                repair_user = (
+                    "The following Hindi narration lines need matching visual prompts "
+                    "(English image-gen prompts, vertical 9:16 cinematic, each tightly "
+                    "depicting that exact line's scene/characters/action):\n\n"
+                    + "\n".join(f"{i+1}. {line}" for i, line in enumerate(missing))
+                    + "\n\nReturn JSON only: {\"visuals\": [\"prompt1\", \"prompt2\", ...]} "
+                    "with EXACTLY one prompt per numbered line above."
+                )
+                try:
+                    repair_raw = _try_chain_repair(
+                        "You generate image prompts that depict specific narration moments. "
+                        "Return JSON only.", repair_user, provider, model)
+                    repair_json = _extract_json(repair_raw)
+                    extra = repair_json.get("visuals") or []
+                    visuals = visuals + extra[:len(missing)]
+                    print(f"[script_writer] repaired: now {len(visuals)} visuals")
+                except Exception as e:
+                    print(f"[script_writer] repair call failed ({e}) — padding by repeating last visual")
+                    last = visuals[-1] if visuals else "Cinematic 9:16 vertical frame: " + (body[0] if body else "Indian mythology scene")
+                    visuals = visuals + [last] * (len(body) - len(visuals))
+            # Truncate excess
+            visuals = visuals[:len(body)]
+            script["visuals"] = visuals
+    return script
+
+
+def _try_chain_repair(system: str, user: str, provider: str, model: str) -> str:
+    """Small helper for the post-process repair call. Same provider chain as main."""
+    if provider == "claude" or os.getenv("ANTHROPIC_API_KEY"):
+        try:
+            return _claude(system, user, model if provider == "claude" else "claude-sonnet-4-6")
+        except Exception:
+            pass
+    if provider == "gemini" or os.getenv("GEMINI_API_KEY"):
+        try:
+            return _gemini(system, user, model if provider == "gemini" else "gemini-flash-latest")
+        except Exception:
+            pass
+    if os.getenv("GROQ_API_KEY"):
+        return _groq(system, user, "llama-3.3-70b-versatile")
+    raise RuntimeError("No LLM provider available for visual repair")
 
 
 if __name__ == "__main__":

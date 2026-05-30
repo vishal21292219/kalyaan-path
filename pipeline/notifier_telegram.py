@@ -93,16 +93,40 @@ def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: s
     )
     _send_text(token, chat_id, header)
 
-    # 2. Video file
-    print(f"[telegram] sending video ({video_path.stat().st_size / 1024 / 1024:.1f} MB)...")
-    with open(video_path, "rb") as f:
+    # 2. Video file — Telegram Bot API caps BOTH sendVideo AND sendDocument
+    # at 50MB (not 2GB unless using local Bot API server). If file is over
+    # the cap, re-encode to a smaller bitrate so the upload fits.
+    size_mb = video_path.stat().st_size / 1024 / 1024
+    send_path = video_path
+    if size_mb > 48:
+        import subprocess
+        compressed = video_path.with_name(video_path.stem + "_tg.mp4")
+        print(f"[telegram] {size_mb:.1f} MB > 48 MB Bot API cap — compressing to fit...")
+        # Target ~2.0 Mbps video + 128 kbps audio ≈ fits 3 min in <45 MB
+        proc = subprocess.run([
+            "ffmpeg", "-y", "-i", str(video_path),
+            "-c:v", "libx264", "-preset", "medium",
+            "-b:v", "2000k", "-maxrate", "2400k", "-bufsize", "4M",
+            "-c:a", "aac", "-b:a", "128k",
+            "-movflags", "+faststart",
+            str(compressed),
+        ], capture_output=True)
+        if proc.returncode == 0 and compressed.exists():
+            send_path = compressed
+            size_mb = send_path.stat().st_size / 1024 / 1024
+            print(f"[telegram] compressed → {size_mb:.1f} MB")
+        else:
+            print(f"[telegram] compression failed: {proc.stderr[-300:]}")
+
+    print(f"[telegram] sending video ({size_mb:.1f} MB)...")
+    with open(send_path, "rb") as f:
         res = _post("sendVideo", token, data={
             "chat_id": chat_id,
             "caption": "📹 Video — save to phone",
             "supports_streaming": "true",
         }, files={"video": f})
-        if not res.get("ok"):
-            print(f"[telegram] sendVideo failed: {res}")
+    if not res.get("ok"):
+        print(f"[telegram] sendVideo failed: {res}")
 
     # 3. Thumbnail
     if thumbnail_path and Path(thumbnail_path).exists():

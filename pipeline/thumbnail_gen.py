@@ -169,6 +169,9 @@ def _gen_thumb_image_prompt(script: dict, niche: str, long_form: bool = False) -
     hook = script.get("hook", "")
     visuals = script.get("visuals") or []
     first_visual = visuals[0] if visuals else ""
+    # English/global niches (TimeDecoders ancient) must NOT use Indian-deity art.
+    _lang = (load_config().get("llm", {}).get("language", "hindi") or "hindi").lower()
+    is_english = _lang == "english" or niche == "ancient"
 
     if long_form:
         # 16:9 horizontal documentary thumbnail (1280x720 target)
@@ -203,8 +206,39 @@ VIRAL LONG-FORM DOCUMENTARY THUMBNAIL COMPOSITION (Praveen Mohan / Project Night
 - Camera lens: cinematic 50mm-style, shallow depth-of-field background
 
 Output ONLY the prompt string (no markdown, no explanation, ~120-180 words)."""
+    elif is_english or niche == "ancient":
+        # Vertical 9:16 Shorts thumbnail for TimeDecoders (English, GLOBAL
+        # ancient-mysteries). MUST NOT use Indian deities — the reactor + scene
+        # should match the topic's real geography/culture (Egyptian, Mesoamerican,
+        # European, underwater, etc.), Praveen-Mohan / Bright-Insight style.
+        instruction = f"""Create a single ENGLISH image prompt for a YouTube Shorts THUMBNAIL
+for a GLOBAL ancient-mysteries / lost-history channel (NOT Indian devotional).
+
+Topic: {title}
+Hook: {hook}
+Video opening scene: {first_visual}
+Niche: {niche}
+
+VIRAL ANCIENT-MYSTERY THUMBNAIL COMPOSITION (Praveen Mohan / Bright Insight formula):
+- RIGHT FOREGROUND: ONE human "reaction" face with a SHOCKED/awed expression —
+  wide eyes, open mouth, hand near face. Pick the face to MATCH the topic's
+  region: a Western explorer/archaeologist, an Egyptian, a Mesoamerican, a
+  Greek/Roman, a European scholar — whatever fits {title}. NEVER an Indian
+  deity, tilak, turban, or Hindu iconography unless the topic is explicitly Indian.
+- LEFT / BACKGROUND: the MONUMENT or mystery itself, hyper-real and dramatic
+  (pyramids, megaliths, ruined citadel, submerged city, stone heads, glowing
+  artifact, ancient map) — matched to the actual topic, photoreal not painterly.
+- DRAMATIC cinematic lighting: god-rays through storm clouds, teal-and-orange
+  color grade, volumetric fog, lightning — high contrast for mobile.
+- Face brightly lit, both eyes visible, photorealistic skin.
+- Vertical 9:16 portrait composition (1080x1920).
+- Anatomically correct (two eyes, five fingers).
+- Top 20% of frame relatively empty (covered by overlay text later).
+- NO text in image, NO watermark, NO modern objects, NO cartoon look.
+
+Output ONLY the prompt string (no markdown, no explanation, ~100-150 words)."""
     else:
-        # Vertical 9:16 Shorts thumbnail (1080x1920) — existing viral formula
+        # Vertical 9:16 Shorts thumbnail (1080x1920) — Indian mythology/bhakti formula
         instruction = f"""Create a single ENGLISH image prompt for a YouTube Shorts THUMBNAIL.
 
 Topic: {title}
@@ -243,10 +277,35 @@ Output ONLY the prompt string (no markdown, no explanation, ~100-150 words)."""
         return None
 
 
-def _gen_base_image(script: dict, niche: str = "bhakti", long_form: bool = False) -> Image.Image:
+def _pick_character_master(script: dict, img_dir: Path | None) -> Path | None:
+    """If the consistency pass produced character master portraits in img_dir,
+    pick the one matching this video's main character (named in the title, else
+    the first available) so the thumbnail face matches the video exactly."""
+    if not img_dir:
+        return None
+    masters = sorted(Path(img_dir).glob("master_*.jpg"))
+    if not masters:
+        return None
+    bible = script.get("character_bible") or []
+    title_low = (script.get("title", "") + " " + " ".join(script.get("visuals") or [])[:1]).lower()
+    from .utils import slugify
+    for ch in bible:
+        name = (ch.get("name") or "")
+        if name and name.lower() in title_low:
+            cand = Path(img_dir) / f"master_{slugify(name)}.jpg"
+            if cand.exists():
+                return cand
+    return masters[0]
+
+
+def _gen_base_image(script: dict, niche: str = "bhakti", long_form: bool = False,
+                    img_dir: Path | None = None) -> Image.Image:
     """Generate a dedicated thumbnail base image. For Shorts: vertical 9:16
     close-up. For long-form: horizontal 16:9 cinematic split-screen drama.
-    Gemini Nano Banana 2 primary, Pollinations fallback.
+
+    If a character master portrait exists in img_dir (from the consistency
+    pass), the base is reference-conditioned off it so the thumbnail's face
+    matches the video. Provider chain: fal FLUX → HF schnell → Gemini.
     """
     import base64
 
@@ -280,58 +339,53 @@ def _gen_base_image(script: dict, niche: str = "bhakti", long_form: bool = False
             f"NO text, NO watermark, NO modern objects, NO extra limbs, NO distorted anatomy."
         )
 
-    # Gemini Nano Banana 2 with 5 retries (30s spacing). NO Pollinations
-    # fallback per user direction — if all 5 fail, raise GeminiUnavailable
-    # so caller can save to retry_queue.
-    from .image_gen import GeminiUnavailable
-    import time as _time
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise GeminiUnavailable("GEMINI_API_KEY missing in .env")
+    # Provider chain (matches image_gen.py): fal.ai FLUX 1.1-pro → HF FLUX schnell → Gemini.
+    # Each thumbnail = 1 image so we just write to a temp path and read back.
+    from .image_gen import _generate_fal_flux, _generate_hf_flux, _generate_gemini, GeminiUnavailable
+    import tempfile
 
-    last_err = None
-    for attempt in range(1, 6):
-        try:
-            r = requests.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/"
-                f"gemini-3.1-flash-image-preview:generateContent?key={api_key}",
-                json={
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]},
-                },
-                timeout=180,
-            )
-            if r.status_code == 200:
-                for part in r.json()["candidates"][0]["content"]["parts"]:
-                    if "inlineData" in part:
-                        img_bytes = base64.b64decode(part["inlineData"]["data"])
-                        if len(img_bytes) > 5000:
-                            print(f"[thumbnail] base via Gemini Nano Banana 2 (attempt {attempt})")
-                            return Image.open(BytesIO(img_bytes)).convert("RGB")
-                last_err = "no inlineData"
-                print(f"[thumbnail] Gemini attempt {attempt}: {last_err}")
-            elif r.status_code == 503:
-                last_err = "503 UNAVAILABLE (Google high demand)"
-                print(f"[thumbnail] Gemini attempt {attempt}: {last_err}")
-            else:
-                last_err = f"HTTP {r.status_code}"
-                print(f"[thumbnail] Gemini attempt {attempt}: {last_err}")
-        except Exception as e:
-            last_err = str(e)
-            print(f"[thumbnail] Gemini attempt {attempt}: {e}")
-        if attempt < 5:
-            _time.sleep(30)
-    raise GeminiUnavailable(f"Thumbnail Gemini failed after 5 retries: {last_err}")
+    use_fal = str(load_config().get("images", {}).get("provider", "fal")).lower() == "fal"
+    target_w, target_h = (1280, 720) if long_form else (1080, 1920)
+    tmp_path = Path(tempfile.mkstemp(suffix=".jpg")[1])
 
-    # Fallback: Pollinations flux-realism
-    url = (
-        f"https://image.pollinations.ai/prompt/{requests.utils.quote(prompt)}"
-        f"?width=1080&height=1920&nologo=true&model=flux-realism"
-    )
-    print("[thumbnail] base via Pollinations (fallback)")
-    r = requests.get(url, timeout=240)
-    r.raise_for_status()
-    return Image.open(BytesIO(r.content)).convert("RGB")
+    # 0. Reference-conditioned off the character master (consistency pass) so the
+    #    thumbnail face matches the video. Vertical Shorts only (nano edit 9:16).
+    if use_fal and not long_form:
+        master = _pick_character_master(script, img_dir)
+        if master:
+            try:
+                from .char_consistent import _fal_upload, generate_scene_with_reference
+                murl = _fal_upload(master)
+                if murl and generate_scene_with_reference(
+                    murl, thumb_prompt, tmp_path,
+                    char_name="the main character",
+                    art_style="match the reference's art style exactly",
+                    target_w=target_w, target_h=target_h,
+                ):
+                    print(f"[thumbnail] base reference-conditioned off {master.name}")
+                    return Image.open(tmp_path).convert("RGB")
+            except Exception as e:
+                print(f"[thumbnail] master-conditioning skipped: {type(e).__name__}: {e}")
+
+    # 1. fal.ai FLUX 1.1-pro (paid, premium) — only when provider == "fal"
+    if use_fal and _generate_fal_flux(prompt, tmp_path, target_w=target_w, target_h=target_h):
+        print("[thumbnail] base via fal.ai FLUX 1.1-pro")
+        return Image.open(tmp_path).convert("RGB")
+
+    # 2. HF FLUX schnell (free fallback)
+    if _generate_hf_flux(prompt, tmp_path):
+        print("[thumbnail] base via HF FLUX schnell (fal failed)")
+        return Image.open(tmp_path).convert("RGB")
+
+    # 3. Gemini (last resort — usually banned/quota'd)
+    try:
+        if _generate_gemini(prompt, tmp_path, "gemini-3.1-flash-image-preview"):
+            print("[thumbnail] base via Gemini (last resort)")
+            return Image.open(tmp_path).convert("RGB")
+    except GeminiUnavailable as e:
+        pass
+
+    raise GeminiUnavailable("Thumbnail base image: fal + HF + Gemini all failed")
 
 
 def _apply_gradients(img: Image.Image) -> Image.Image:
@@ -374,14 +428,19 @@ def _draw_text_block(draw, text: str, W: int, y: int, fill, font, stroke_w: int)
     return th
 
 
-def make_thumbnail(script: dict, niche: str, out_path: Path, long_form: bool = False) -> Path:
+def make_thumbnail(script: dict, niche: str, out_path: Path, long_form: bool = False,
+                   img_dir: Path | None = None) -> Path:
     """Generate thumbnail. Shorts mode = 1080x1920 vertical. Long-form mode =
-    1280x720 horizontal with drama composition (text overlay right-side)."""
+    1280x720 horizontal with drama composition (text overlay right-side).
+
+    img_dir: scene-image dir; if it holds character master portraits from the
+    consistency pass, the base is reference-conditioned so the thumbnail face
+    matches the video."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     cfg = load_config()
 
     print(f"[thumbnail] generating base image (long_form={long_form})...")
-    img = _gen_base_image(script, niche, long_form=long_form)
+    img = _gen_base_image(script, niche, long_form=long_form, img_dir=img_dir)
 
     target_size = (1280, 720) if long_form else (1080, 1920)
     if img.size != target_size:

@@ -35,11 +35,11 @@ DAILY_SLOTS = [
     {"niche": "bhakti", "kind": "shloka",   "seed": 0, "label": "07:00 IST KalyaanPath shloka"},
     {"niche": "bhakti", "kind": "trending", "seed": 0, "label": "19:00 IST KalyaanPath trending"},
     # Itihaasvani: 3 slots delivered to Telegram night-before; user uploads next day at:
-    {"niche": "itihaas","kind": "trending", "seed": 1, "label": "06:00 IST Itihaasvani drop #1 (morning)"},
+    {"niche": "itihaas","kind": "trending", "seed": 1, "label": "08:30 IST Itihaasvani drop #1 (morning)"},
     {"niche": "itihaas","kind": "trending", "seed": 2, "label": "13:00 IST Itihaasvani drop #2 (lunch)"},
     {"niche": "itihaas","kind": "trending", "seed": 3, "label": "22:30 IST Itihaasvani drop #3 (late-night prime)"},
-    {"niche": "ancient","kind": "trending", "seed": 1, "label": "23:30 IST TimeDecoders EU prime"},
-    {"niche": "ancient","kind": "trending", "seed": 2, "label": "04:30 IST TimeDecoders US prime"},
+    # NOTE: ancient/TimeDecoders slots removed — that channel is PARKED in
+    # daily-reels.yml, so pregen-ing it only ever wasted/failed slots.
 ]
 
 

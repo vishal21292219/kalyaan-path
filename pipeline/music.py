@@ -22,6 +22,7 @@ audio file that's then muxed into the final video.
 """
 from __future__ import annotations
 
+import hashlib
 import random
 import subprocess
 from pathlib import Path
@@ -29,26 +30,82 @@ from pathlib import Path
 from .utils import ROOT, load_config
 
 
+# ---- dynamic mood-matched track selection ----------------------------------
+# The data/music/options/ pool holds several mood-distinct beds. Instead of
+# always using one static track, we score each by keywords found in the script
+# (title/hook/body) and pick the best fit — so a Tandav video gets shankh-naad
+# energy while an aarti gets the mandir bed. Ties / no-match fall back to a
+# deterministic per-title rotation so consecutive videos still vary.
+_MOOD_TRACKS = [
+    ("1_mandir_aarti.mp3", ["aarti", "mandir", "pooja", "puja", "darshan", "kirtan", "temple", "ghanti"]),
+    ("2_krishna_bansuri.mp3", ["krishna", "kanha", "kanhaiya", "bansuri", "flute", "radha", "vrindavan", "raas", "murli", "gopal", "govind", "madhav"]),
+    ("3_shankh_naad.mp3", ["shiv", "mahadev", "tandav", "shankh", "rudra", "kaal", "durga", "kali", "shakti", "yudh", "war", "bhairav", "asur", "rakshas", "trishul"]),
+    ("4_bhakti_beat.mp3", ["chamatkar", "trending", "miracle", "modern", "aaj", "secret", "rahasya", "khatu", "shyam", "sai"]),
+    ("A_classic_bhakti.mp3", ["ram", "vishnu", "sita", "hanuman", "bhakti", "devotion", "prem", "shraddha", "bhajan"]),
+    ("B_dholak_bansuri.mp3", ["festival", "utsav", "holi", "diwali", "janmashtami", "navratri", "celebration", "dance", "garba"]),
+    ("C_mridangam_choir.mp3", ["shloka", "shlok", "gita", "geeta", "gyaan", "mantra", "ved", "upanishad", "dharma", "shanti", "meditative", "moksh"]),
+    ("D_uplifting_fast.mp3", ["jai", "vijay", "power", "energy", "uplifting", "glory", "veer", "yoddha", "balwan"]),
+]
+
+
+def _script_text(script: dict | None) -> str:
+    if not script:
+        return ""
+    parts = [str(script.get(k, "")) for k in ("title", "hook", "theme", "topic")]
+    body = script.get("body") or []
+    parts += [str(x) for x in body[:4]]
+    return " ".join(parts).lower()
+
+
+def _pick_mood_track(options_dir: Path, script: dict | None) -> Path | None:
+    """Score the options pool by script keywords; best fit wins, ties/no-match
+    rotate deterministically by title hash so videos don't all reuse one track."""
+    avail = [(options_dir / f, kws) for f, kws in _MOOD_TRACKS if (options_dir / f).exists()]
+    if not avail:
+        return None
+    text = _script_text(script)
+    best, best_score = None, 0
+    for path, kws in avail:
+        score = sum(1 for k in kws if k in text)
+        if score > best_score:
+            best, best_score = path, score
+    if best_score > 0:
+        return best
+    # no keyword hit → deterministic rotation (variety across videos)
+    h = int(hashlib.md5((text or "default").encode()).hexdigest(), 16)
+    return avail[h % len(avail)][0]
+
+
 # ---- music pickers ---------------------------------------------------------
 
-def pick_music(kind: str | None = None) -> Path | None:
-    """Pick a background track. For shloka mode use the slow Mridangam Choir;
-    for trending/deity/festival use the faster Uplifting track.
-    """
+def pick_music(kind: str | None = None, script: dict | None = None) -> Path | None:
+    """Pick a background track, DYNAMICALLY matched to the script's mood when a
+    mood pool (music_dir/options/) exists. Shloka mode pins the slow Mridangam
+    Choir. Falls back to the legacy static tracks if no pool is present (e.g.
+    the ancient niche, which uses its own single cinematic drone)."""
     cfg = load_config()
     music_rel = cfg.get("paths", {}).get("music_dir", "data/music")
     music_dir = ROOT / music_rel
     if not music_dir.exists():
         music_dir = ROOT / "data" / "music"
+    options_dir = music_dir / "options"
+
     if kind == "shloka_episode":
-        candidate = music_dir / "shloka_track.mp3"
-        if candidate.exists():
-            return candidate
+        for cand in (options_dir / "C_mridangam_choir.mp3", music_dir / "shloka_track.mp3"):
+            if cand.exists():
+                return cand
+
+    # Dynamic mood-matched pick from the options pool (bhakti has one).
+    if options_dir.exists():
+        chosen = _pick_mood_track(options_dir, script)
+        if chosen:
+            return chosen
+
+    # Legacy static fallbacks.
     if kind in ("deity", "festival", "story", "temple", "custom", "trending"):
         candidate = music_dir / "trending_track.mp3"
         if candidate.exists():
             return candidate
-    # fallback — first mp3 in the dir
     tracks = sorted(
         list(music_dir.glob("*.mp3"))
         + list(music_dir.glob("*.wav"))
@@ -57,18 +114,27 @@ def pick_music(kind: str | None = None) -> Path | None:
     return tracks[0] if tracks else None
 
 
-def pick_drone(niche: str | None = None) -> Path | None:
-    """Return an ambient drone track for the middle layer of the cinematic mix.
+def pick_drone(niche: str | None = None, script: dict | None = None) -> Path | None:
+    """Return the background bed track for the cinematic mix.
 
     Search order:
-      1. config.paths.drone_dir if set
-      2. data/music_itihaas/ (mythology niche convention)
-      3. data/music_ancient/ (existing cinematic_drone.mp3 lives here)
-      4. fall back to pick_music() so we always have *something* to bed under
+      1. DYNAMIC mood-matched track from music_dir/options/ (bhakti pool) —
+         makes the bed change per script (aarti vs tandav vs krishna).
+      2. config.paths.drone_dir if set
+      3. data/music_itihaas/
+      4. data/music_ancient/ (cinematic_drone.mp3 — used by TimeDecoders)
+      5. fall back to pick_music() so we always have *something* to bed under
     """
     cfg = load_config()
-    drone_rel = cfg.get("paths", {}).get("drone_dir", "")
+    music_rel = cfg.get("paths", {}).get("music_dir", "data/music")
+    music_dir = ROOT / music_rel
+    options_dir = music_dir / "options"
+    if options_dir.exists():
+        chosen = _pick_mood_track(options_dir, script)
+        if chosen:
+            return chosen
 
+    drone_rel = cfg.get("paths", {}).get("drone_dir", "")
     candidates: list[Path] = []
     if drone_rel:
         candidates.append(ROOT / drone_rel)
@@ -87,7 +153,7 @@ def pick_drone(niche: str | None = None) -> Path | None:
             return tracks[0]
 
     # last resort — the generic background track
-    return pick_music(niche)
+    return pick_music(niche, script=script)
 
 
 def pick_sting(emphasis_level: int = 0) -> Path | None:

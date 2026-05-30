@@ -468,8 +468,15 @@ def assemble(
     image_paths: list[Path],
     out_video: Path,
     skip_music: bool = False,
+    skip_captions: bool = False,
     long_form: bool = False,
+    hero_clips: dict[int, Path] | None = None,
 ) -> Path:
+    """hero_clips: optional {scene_index -> mp4 Path}. For those scenes a real
+    generative video clip (e.g. Kling v3) is spliced in at the scene's
+    audio-synced duration instead of a Ken Burns still. All other scenes
+    stay on the cheap zoompan path."""
+    hero_clips = hero_clips or {}
     if not shutil.which("ffmpeg"):
         raise RuntimeError("ffmpeg not found in PATH. Install with: brew install ffmpeg")
 
@@ -519,6 +526,33 @@ def assemble(
     for i, img in enumerate(image_paths):
         clip = work / f"clip_{i:02d}.mp4"
         per = max(0.5, image_durations[i])  # min 0.5s per image
+
+        # Hero scene: splice a real generative video clip (Kling v3) at this
+        # scene's audio-synced duration instead of a Ken Burns still.
+        hero = hero_clips.get(i)
+        if hero and Path(hero).exists():
+            # Scale/crop to frame, grade to match stills, then tpad (clone last
+            # frame) so a short clip still fills `per`; -t trims to exact length.
+            hero_vf = (
+                f"scale={W}:{H}:flags=lanczos:force_original_aspect_ratio=increase,"
+                f"crop={W}:{H},setsar=1,"
+                f"eq=contrast=1.10:saturation=1.32:brightness=0.07:gamma=0.86,"
+                f"tpad=stop_mode=clone:stop_duration={per:.3f},"
+                f"format=yuv420p"
+            )
+            _run([
+                "ffmpeg", "-y", "-i", str(hero),
+                "-t", f"{per:.3f}",
+                "-vf", hero_vf,
+                "-r", str(FPS),
+                "-an",
+                "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p",
+                str(clip),
+            ])
+            print(f"[hero] scene {i + 1}/{n_scenes} → Kling clip ({per:.2f}s)")
+            clips.append(clip)
+            continue
+
         per_frames = max(int(per * FPS), 15)
         # Cinematic motion variety — 6 distinct presets per video instead of static zoom.
         motion = _cinematic_motion_filter(i, n_scenes, per_frames, W, H).replace("__FPS__", str(FPS))
@@ -590,6 +624,8 @@ def assemble(
                 f"enable='between(t\\,{verse_start:.2f}\\,{verse_end:.2f})'[v_v]"
             )
             prev = "v_v"
+    elif skip_captions:
+        print("[captions] skipped per --skip-captions (pure visuals + voice)")
     else:
         # NEW: animated word-by-word captions (CapCut/Reels viral style).
         # Driven by word boundaries captured during TTS → one PNG per word,
@@ -616,7 +652,12 @@ def assemble(
             # render each as a yellow-bold caption PNG, and time it precisely using the
             # first/last word boundaries. This keeps overlays under ~400 (ffmpeg-safe)
             # AND keeps captions synced to actual speech (unlike even-split fallback).
-            MAX_WORDS_FOR_PER_WORD = 600
+            # Above this, group words into ~4-word phrase captions. Kept low
+            # (not 600) because a single ffmpeg filter_complex with a few-hundred
+            # PNG overlays reliably fails ("Conversion failed!") on real builds —
+            # a 22-line script (~280 words) crashed. Phrase mode (~70 overlays)
+            # is ffmpeg-safe AND reads better for documentary narration.
+            MAX_WORDS_FOR_PER_WORD = 150
             PHRASE_WORDS_TARGET = 4   # words per caption chunk
             PHRASE_WORDS_MAX = 6      # hard cap before forced break
             PUNCT_BREAK = set(".!?,;:।")
@@ -761,7 +802,7 @@ def assemble(
     # mux is a simple stream-copy from slides_subbed + the mixed track.
     # Falls back to the legacy single-track duck mix (and finally to pure
     # voice) when drone/sting libraries are unavailable.
-    drone = None if skip_music else pick_drone(script.get("kind"))
+    drone = None if skip_music else pick_drone(script.get("kind"), script=script)
     sting_ts = [] if skip_music else pick_sting_timestamps(duration)
     have_stings = bool(sting_ts) and pick_sting(0) is not None
 
@@ -795,7 +836,7 @@ def assemble(
         ])
     else:
         # Legacy fallback path — single ducked bg, or pure voice if none.
-        bg = None if skip_music else pick_music(script.get("kind"))
+        bg = None if skip_music else pick_music(script.get("kind"), script=script)
         if bg:
             _run([
                 "ffmpeg", "-y",

@@ -10,9 +10,9 @@ from pipeline.assembler import assemble
 from pipeline.image_gen import generate_images
 from pipeline.scraper import gather_context
 from pipeline.script_writer import write_script
-from pipeline.topic_generator import pick_shloka_episode, pick_topic, pick_trending
+from pipeline.topic_generator import pick_mantra, pick_shloka_episode, pick_topic, pick_trending
 from pipeline.tts import synthesize
-from pipeline.utils import out_path, set_active_niche, slugify, today_stamp
+from pipeline.utils import load_config, out_path, set_active_niche, slugify, today_stamp
 
 
 def main(argv: list[str]) -> int:
@@ -33,8 +33,8 @@ def main(argv: list[str]) -> int:
     )
     ap.add_argument(
         "--kind", default="auto",
-        choices=["auto", "shloka", "trending"],
-        help="auto = legacy daily rotation; shloka = next Gita verse episode; trending = current festival or popular deity",
+        choices=["auto", "shloka", "trending", "mantra"],
+        help="auto = legacy daily rotation; shloka = next Gita verse episode (PARKED — pivoted to mantra); trending = current festival/popular deity; mantra = mantra-rahasya format (KalyaanPath morning slot, post-pivot)",
     )
     ap.add_argument(
         "--topic", default="auto",
@@ -51,6 +51,10 @@ def main(argv: list[str]) -> int:
         help="Skip background music — produces voice-only mp4. Use for YouTube Shorts so you can add trending audio at upload time (algorithm boost).",
     )
     ap.add_argument(
+        "--skip-captions", action="store_true",
+        help="Skip word-by-word caption overlays. Faster assembly + lower ffmpeg memory/thread pressure. Use when video is pure visual + voice (no on-screen text).",
+    )
+    ap.add_argument(
         "--auto-thumb", action="store_true",
         help="Auto-generate a custom thumbnail for the video and save to output/thumbnails/.",
     )
@@ -65,6 +69,10 @@ def main(argv: list[str]) -> int:
     ap.add_argument(
         "--long-form", action="store_true",
         help="Generate a 20-25 min long-form video (vs default 50-sec Short). Uses more scenes (~30), longer script (~3500 words), heavier production. Best for weekly/bi-weekly drops.",
+    )
+    ap.add_argument(
+        "--no-motion", action="store_true",
+        help="Disable the single Kling hero-scene animation (saves ~$0.4/video).",
     )
     args = ap.parse_args(argv)
     if args.notify_telegram:
@@ -118,6 +126,8 @@ def main(argv: list[str]) -> int:
     if not pregen_active:
         if args.topic and args.topic != "auto":
             topic = pick_topic(args.topic, seed_offset=args.seed_offset)
+        elif args.kind == "mantra":
+            topic = pick_mantra(seed_offset=args.seed_offset)
         elif args.kind == "shloka":
             topic = pick_shloka_episode()
         elif args.kind == "trending":
@@ -166,6 +176,9 @@ def main(argv: list[str]) -> int:
 
     # 5. images — pregen cache wins, else realtime gen
     img_dir = out_path("images", base)
+    _img_cfg = load_config().get("images", {})
+    footage_mode = str(_img_cfg.get("mode", "image")).lower() == "footage" and not args.long_form
+    footage_clips: dict[int, Path] = {}
     if pregen_active and cached_images and len(cached_images) >= 5:
         # Copy cached images into the run's image dir (so cleanup logic stays consistent)
         img_dir.mkdir(parents=True, exist_ok=True)
@@ -179,9 +192,38 @@ def main(argv: list[str]) -> int:
     elif args.skip_images and img_dir.exists() and any(img_dir.iterdir()):
         images = sorted(img_dir.glob("img_*.jpg"))
         print(f"[images] reusing {len(images)} cached")
+    elif footage_mode:
+        # B-roll mode (TimeDecoders): fetch REAL stock clips per scene instead of
+        # AI stills. Posters (first frames) act as the still fallback + thumbnail
+        # base; the clips are spliced for every scene via hero_clips below.
+        try:
+            from pipeline.stock_footage import build_stock_queries, fetch_clips, extract_posters
+            queries = build_stock_queries(script)
+            clip_dir = out_path("videos", f"_broll_{base}")
+            clips = fetch_clips(queries, clip_dir)
+            images = extract_posters(clips, img_dir)
+            # Align: poster i ↔ clip i. Use whichever count actually materialised.
+            n_ok = min(len(images), len(clips))
+            images = images[:n_ok]
+            footage_clips = {i: clips[i] for i in range(n_ok)}
+            print(f"[footage] {n_ok} B-roll scenes ready")
+            if n_ok < 3:
+                raise RuntimeError(f"only {n_ok} stock clips fetched (<3)")
+        except Exception as e:
+            from pipeline.retry_queue import add_or_update
+            reason = f"footage: {type(e).__name__}: {e}"
+            print(f"[retry-queue] saving for hourly retry: {reason}")
+            add_or_update(
+                niche=args.niche, kind=args.kind, topic=args.topic or "auto",
+                seed_offset=args.seed_offset,
+                mode=("publish" if args.publish else ("telegram" if args.notify_telegram else "local")),
+                failed_reason=reason,
+            )
+            return 2
     else:
         try:
-            images = generate_images(script["visuals"], img_dir, long_form=args.long_form)
+            images = generate_images(script["visuals"], img_dir, long_form=args.long_form,
+                                     character_bible=script.get("character_bible"))
             print(f"[images] generated {len(images)}")
         except Exception as e:
             # GeminiUnavailable etc. — save to retry queue, exit cleanly
@@ -200,10 +242,45 @@ def main(argv: list[str]) -> int:
             print(f"[retry-queue] entry attempts={entry['attempts']}/3, next_retry_at={entry['next_retry_at']}")
             return 2  # signal: temporary failure, will be retried
 
+    # 5b. Hero motion — animate ONE scene (the hook) into a real Kling clip so
+    # the reel doesn't feel like a static slideshow. Single clip keeps cost ~$0.4.
+    # Gated by config (video.hero_motion, default on), --no-motion, and not long-form.
+    hero_clips = None
+    if footage_mode and footage_clips:
+        # Every scene already has a real stock clip → splice them all (no Kling).
+        hero_clips = footage_clips
+        print(f"[footage] splicing {len(footage_clips)} B-roll clips across all scenes")
+    _hero_on = bool(load_config().get("video", {}).get("hero_motion", True))
+    if hero_clips is None and _hero_on and not args.no_motion and not args.long_form and len(images) >= 3:
+        try:
+            from pipeline.kling_video import generate_hero_clip
+            hero_idx = 0  # the hook image — first 3 seconds matter most for retention
+            hero_motion_prompt = (
+                "subtle cinematic motion: a slow gentle camera push-in, soft drifting "
+                "atmosphere and divine light rays, faint particles floating, the figure "
+                "breathes and blinks softly, cloth and hair sway gently — dignified, calm, "
+                "no fast movement, no morphing, keep the face and design exactly the same"
+            )
+            hero_clip = out_path("videos", f"_hero_{base}.mp4")
+            if generate_hero_clip(hero_motion_prompt, images[hero_idx], hero_clip, duration=5):
+                hero_clips = {hero_idx: hero_clip}
+                print(f"[motion] hero scene {hero_idx + 1} animated via Kling v3")
+            else:
+                print("[motion] hero clip failed — using Ken Burns still")
+        except Exception as e:
+            print(f"[motion] hero animation skipped: {type(e).__name__}: {e}")
+
     # 6. assemble
     video_path = out_path("videos", f"{base}.mp4")
-    assemble(script, voice_path, images, video_path, skip_music=args.no_music, long_form=args.long_form)
-    print(f"[video] FINAL → {video_path}{' (no-music)' if args.no_music else ''}")
+    # Music policy: Telegram drops go out WITHOUT background music (user adds
+    # trending audio at manual upload for the algorithm boost). Auto-publish
+    # runs keep the dynamic, mood-matched cinematic music bed.
+    _telegram_only = bool(args.notify_telegram) and not args.publish
+    _skip_music = args.no_music or _telegram_only
+    if _telegram_only and not args.no_music:
+        print("[audio] Telegram drop → background music OFF (add trending audio at upload)")
+    assemble(script, voice_path, images, video_path, skip_music=_skip_music, skip_captions=args.skip_captions, long_form=args.long_form, hero_clips=hero_clips)
+    print(f"[video] FINAL → {video_path}{' (no-music)' if _skip_music else ''}")
 
     # 6b. thumbnail — pregen cache wins, else realtime gen
     thumb_path = None
@@ -216,7 +293,8 @@ def main(argv: list[str]) -> int:
         else:
             try:
                 from pipeline.thumbnail_gen import make_thumbnail
-                make_thumbnail(script, args.niche, thumb_path, long_form=args.long_form)
+                make_thumbnail(script, args.niche, thumb_path, long_form=args.long_form,
+                               img_dir=img_dir)
             except Exception:
                 traceback.print_exc()
                 print("[thumbnail] generation failed — continuing without")
@@ -242,7 +320,6 @@ def main(argv: list[str]) -> int:
 
     # 7. publish
     if args.publish:
-        from pipeline.utils import load_config
         cfg = load_config()
         publish_cfg = cfg.get("publish", {})
 

@@ -5,6 +5,5 @@ __pycache__/
 secrets/
 output/
 data/cache/
-data/music/options/
 logs/
 .DS_Store

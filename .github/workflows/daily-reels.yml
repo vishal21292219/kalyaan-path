@@ -24,11 +24,14 @@ on:
     - cron: "30 15 * * *"   # fire 21:00 IST → Itihaasvani drop #1 for TOMORROW 06:00 IST upload
     - cron: "45 15 * * *"   # fire 21:15 IST → Itihaasvani drop #2 for TOMORROW 13:00 IST upload
     - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #3 for TOMORROW 22:30 IST upload
-    - cron: "0 1 * * *"     # fire 06:30 IST → bhakti shloka lands ~07:00 IST (KalyaanPath auto-publish)
-    - cron: "0 13 * * *"    # fire 18:30 IST → bhakti trending lands ~19:00 IST (KalyaanPath auto-publish)
-    # PARKED (Day 1 boot camp verdict — slideshow format mismatched for English ancient):
-    # - cron: "30 17 * * *"   # TimeDecoders EU prime
-    # - cron: "30 22 * * *"   # TimeDecoders US prime — PARKED
+    # KalyaanPath: AUTOPILOT — cut 14/week → 4/week (review verdict: high-volume
+    # templated content was throttling the channel; rival posts 0.5/week and
+    # takes 1M+ views via packaging, not volume). Morning only, Sun/Tue/Thu/Sat.
+    - cron: "0 1 * * 0,2,4,6"   # fire 06:30 IST 4×/week → KalyaanPath morning (auto-publish)
+    # REVIVED 2026-05-31: B-roll pivot (real Pexels stock footage, not AI slideshow).
+    # TimeDecoders now auto-publishes to YouTube (OAuth wired).
+    - cron: "30 17 * * *"   # fire 23:00 IST → TimeDecoders EU prime (auto-publish)
+    - cron: "30 22 * * *"   # fire 04:00 IST → TimeDecoders US prime (auto-publish)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
   workflow_dispatch:
@@ -44,7 +47,7 @@ on:
         required: true
         default: "trending"
         type: choice
-        options: [shloka, trending]
+        options: [trending, mantra, shloka]
       mode:
         description: "publish (auto-YT) or telegram (manual)"
         required: true
@@ -104,6 +107,8 @@ jobs:
           YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
           YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
           YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -111,6 +116,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
           mkdir -p secrets
           [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
@@ -118,6 +124,8 @@ jobs:
           [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
           [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
           cat > .env <<EOF
+          ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
+          FAL_KEY=$FAL_KEY
           GEMINI_API_KEY=$GEMINI_API_KEY
           HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN
           GROQ_API_KEY=$GROQ_API_KEY
@@ -125,6 +133,7 @@ jobs:
           TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
           IG_USER_ID=$IG_USER_ID
           IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
+          PEXELS_API_KEY=$PEXELS_API_KEY
           EOF
 
       - name: Route this run (cron → niche/kind/mode/seed/long_form)
@@ -156,8 +165,10 @@ jobs:
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 1 * * *" ]; then
+            # PIVOTED 2026-05-28: was --kind shloka (sequential Gita verses, <200 views).
+            # Now --kind mantra (mantra-rahasya format, mystery-framed, per Day 1 boot camp).
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
-            echo "kind=shloka"   >> $GITHUB_OUTPUT
+            echo "kind=mantra"   >> $GITHUB_OUTPUT
             echo "mode=telegram"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
@@ -170,13 +181,13 @@ jobs:
           elif [ "${{ github.event.schedule }}" = "30 17 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
-            echo "mode=telegram"  >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 22 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
-            echo "mode=telegram"  >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 11 * * 6" ]; then

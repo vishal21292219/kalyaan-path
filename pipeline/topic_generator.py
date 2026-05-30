@@ -64,6 +64,56 @@ def pick_topic(force: str | None = None, seed_offset: int = 0) -> dict:
     return {"kind": "temple", "title": t, "wiki": t.split(",")[0].replace(" ", "_"), "tags": ["temple"]}
 
 
+def _mantra_state_path() -> Path:
+    """State file tracking which mantra topics were used recently (avoid 14-day repeats)."""
+    return ROOT / "data/state/mantra_history.json"
+
+
+def pick_mantra(seed_offset: int = 0) -> dict:
+    """Pick a mantra-rahasya topic for KalyaanPath morning slot.
+    Rotates deterministically by date+seed; avoids titles used in last 14 days.
+    Replaces sequential Gita shloka format (pivoted 2026-05-28 after <200-view data)."""
+    mantra_file = ROOT / "data/topics_mantra.json"
+    if not mantra_file.exists():
+        raise FileNotFoundError(f"Mantra topics missing: {mantra_file}")
+    pool = json.loads(mantra_file.read_text())["mantras"]
+
+    # Filter out titles used in last 14 days
+    state_path = _mantra_state_path()
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    if state_path.exists():
+        state = json.loads(state_path.read_text())
+    else:
+        state = {"history": []}
+    cutoff = date.today() - timedelta(days=14)
+    recent_titles = {
+        h["title"] for h in state["history"]
+        if date.fromisoformat(h["date"]) >= cutoff
+    }
+    available = [m for m in pool if m["title"] not in recent_titles]
+    if not available:
+        # Pool exhausted within 14-day window — fall back to full pool
+        available = pool
+
+    rng = random.Random(_seed_for_today(seed_offset))
+    chosen = rng.choice(available)
+
+    state["history"].append({"title": chosen["title"], "date": date.today().isoformat()})
+    # Keep history bounded
+    state["history"] = state["history"][-200:]
+    state_path.write_text(json.dumps(state, indent=2, ensure_ascii=False))
+
+    return {
+        "kind": "mantra",
+        "title": chosen["title"],
+        "deity": chosen.get("deity", "general"),
+        "mantra_text": chosen.get("mantra", ""),
+        "hook": chosen.get("hook", ""),
+        "wiki": None,
+        "tags": chosen.get("tags", []),
+    }
+
+
 def pick_shloka_episode() -> dict:
     """Pick next Gita shloka in sequence and advance state."""
     topics = load_topics()

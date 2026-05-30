@@ -67,7 +67,7 @@ def _notify_telegram(summary: dict) -> None:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--days", type=int, default=5, help="How many days ahead to pre-gen (default 5)")
+    ap.add_argument("--days", type=int, default=2, help="How many days ahead to pre-gen (default 2)")
     ap.add_argument("--cleanup", action="store_true", help="Sweep consumed/old pregen dirs after run")
     ap.add_argument("--cleanup-older", type=int, default=7, help="Days to keep consumed pregen dirs")
     ap.add_argument("--dry-run", action="store_true", help="Just list pending, don't generate")

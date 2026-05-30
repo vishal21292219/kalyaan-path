@@ -31,8 +31,11 @@ secrets:
   youtube_token: secrets/ancient_youtube_token.json
 
 images:
-  # Gemini-only stack (Pollinations removed). On 503/timeout, pipeline saves
-  # to retry_queue.json + exits — hourly cron picks up and retries (max 3x).
+  # B-ROLL MODE: TimeDecoders uses REAL stock footage (Pexels/Pixabay) instead
+  # of AI stills — the "slideshow" format was parked for this English ancient
+  # niche. One stock clip per scene is spliced over the narration.
+  # Set mode: image to fall back to AI stills.
+  mode: footage
   provider: gemini
   model: gemini-3.1-flash-image-preview
   num_per_reel: 10

@@ -21,10 +21,8 @@ from datetime import date as date_t, datetime
 from pathlib import Path
 
 from . import scheduler
-from .image_gen import generate_images, GeminiUnavailable
 from .scraper import gather_context
 from .script_writer import write_script
-from .thumbnail_gen import make_thumbnail
 from .utils import ROOT, set_active_niche, slugify
 
 PREGEN_ROOT = ROOT / "data" / "pregenerated"
@@ -79,53 +77,36 @@ def pregen_slot(niche: str, kind: str, target_date: date_t, seed_offset: int = 0
     pregen_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        # Step 2: Script
+        # SCRIPTS-ONLY pregen (free stack). We deliberately do NOT generate
+        # images or thumbnails here:
+        #   - pregen runs on the FREE keys only (Gemini/HF/Groq) — fal/Claude
+        #     are not available in the nightly workflow, so paid image gen would
+        #     just fail (the old 42/42 failure).
+        #   - publish (run.py) always regenerates images fresh on the paid stack
+        #     (fal FLUX + character consistency + Kling), so we never want to
+        #     ship a free pregen image. is_pregen_ready() still requires >=5
+        #     images, so this scripts-only bundle is never consumed by publish —
+        #     it's purely a topic-reserve + nightly preview for veto.
+        # The draft script forces prefer_free=True so it never touches Claude.
         context = gather_context(topic)
-        script = write_script(topic, context, long_form=False)
+        script = write_script(topic, context, long_form=False, prefer_free=True)
         # Attach topic metadata for downstream stages
         for key in ("kind", "episode_number", "ref", "verse", "theme"):
             if key in topic and key not in script:
                 script[key] = topic[key]
         (pregen_dir / "script.json").write_text(json.dumps(script, indent=2, ensure_ascii=False))
+        print(f"  [pregen] ✓ script draft saved (free stack, scripts-only)", flush=True)
 
-        # Step 3: Images (with extra buffer)
-        visuals = script.get("visuals", [])
-        if extra_image_buffer > 0:
-            # Pad visuals list by repeating the last few prompts (gives Gemini fallback options)
-            extras = visuals[-extra_image_buffer:] if visuals else []
-            visuals_to_gen = visuals + extras
-        else:
-            visuals_to_gen = visuals
-
-        img_dir = pregen_dir / "images"
-        img_dir.mkdir(exist_ok=True)
-        try:
-            images = generate_images(visuals_to_gen, img_dir)
-            print(f"  [pregen] ✓ {len(images)} images saved", flush=True)
-        except GeminiUnavailable as e:
-            print(f"  [pregen] ⚠ image gen partial fail: {e}", flush=True)
-            images = sorted(img_dir.glob("img_*.jpg"))
-            if len(images) < 5:
-                raise
-
-        # Step 4: Thumbnail
-        try:
-            thumb_path = pregen_dir / "thumbnail.jpg"
-            make_thumbnail(script, niche, thumb_path)
-            print(f"  [pregen] ✓ thumbnail saved", flush=True)
-        except Exception:
-            traceback.print_exc()
-            print(f"  [pregen] ⚠ thumbnail failed — continuing without", flush=True)
-
-        # Step 5: Save meta + update scheduler status
+        # Save meta + update scheduler status (status reserved, not "ready for publish")
         meta = {
             "niche": niche,
             "kind": kind,
             "target_date": target_date.isoformat(),
             "seed_offset": seed_offset,
             "topic": topic,
-            "images_count": len(images),
-            "has_thumbnail": (pregen_dir / "thumbnail.jpg").exists(),
+            "scripts_only": True,
+            "images_count": 0,
+            "has_thumbnail": False,
             "generated_at": datetime.now().isoformat(timespec="seconds"),
         }
         (pregen_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
@@ -135,8 +116,8 @@ def pregen_slot(niche: str, kind: str, target_date: date_t, seed_offset: int = 0
             "status": "ready",
             "dir": str(pregen_dir),
             "topic": topic.get("title"),
-            "images": len(images),
-            "has_thumbnail": (pregen_dir / "thumbnail.jpg").exists(),
+            "images": 0,
+            "has_thumbnail": False,
         }
 
     except Exception as e:
