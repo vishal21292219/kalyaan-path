@@ -69,9 +69,61 @@ def _mantra_state_path() -> Path:
     return ROOT / "data/state/mantra_history.json"
 
 
+# Festival deity → mantra-pool deity aliases (so e.g. Rath Yatra rides Krishna
+# mantras, Navratri rides Durga). Festival-timing is a proven reach booster:
+# YouTube search + algorithm both spike a deity's content around its festival.
+_FEST_DEITY_ALIAS = {
+    "jagannath": ["krishna", "vishnu"],
+    "vyasa": ["krishna", "gayatri", "vishnu"],
+    "rama": ["ram", "hanuman"], "ram": ["ram", "hanuman"],
+    "durga": ["durga", "devi", "kali"], "devi": ["durga", "devi", "kali"],
+    "lakshmi": ["lakshmi", "vishnu"],
+    "ganesha": ["ganesh"], "ganesh": ["ganesh"],
+    "krishna": ["krishna", "vishnu"],
+    "shiva": ["shiva"], "hanuman": ["hanuman", "ram"],
+    "vishnu": ["vishnu", "krishna", "ram"],
+}
+
+
+def active_festival(window_days: int = 5) -> dict | None:
+    """Return the nearest festival dict within `window_days` (incl. today), else
+    None. Uses the bhakti festivals_calendar (month/approx_day)."""
+    try:
+        topics = load_topics()
+    except Exception:
+        return None
+    today = date.today()
+    best = None
+    for fest in topics.get("festivals_calendar", []):
+        try:
+            f_date = date(today.year, fest["month"], fest["approx_day"])
+        except (ValueError, KeyError, TypeError):
+            continue
+        delta = (f_date - today).days
+        if 0 <= delta <= window_days and (best is None or delta < best[0]):
+            best = (delta, fest)
+    return best[1] if best else None
+
+
+def _festival_mantra_filter(pool: list[dict], fest: dict) -> list[dict]:
+    """Subset of mantras matching the festival's deity (via alias map), else []."""
+    deity = (fest.get("deity") or "").strip().lower()
+    if not deity:
+        return []
+    cands = set([deity] + _FEST_DEITY_ALIAS.get(deity, []))
+    out = []
+    for m in pool:
+        md = (m.get("deity") or "").lower()
+        tags = {str(t).lower() for t in (m.get("tags") or [])}
+        if md in cands or (cands & tags):
+            out.append(m)
+    return out
+
+
 def pick_mantra(seed_offset: int = 0) -> dict:
     """Pick a mantra-rahasya topic for KalyaanPath morning slot.
     Rotates deterministically by date+seed; avoids titles used in last 14 days.
+    If a festival is within 5 days, biases to that deity's mantra (reach boost).
     Replaces sequential Gita shloka format (pivoted 2026-05-28 after <200-view data)."""
     mantra_file = ROOT / "data/topics_mantra.json"
     if not mantra_file.exists():
@@ -94,6 +146,14 @@ def pick_mantra(seed_offset: int = 0) -> dict:
     if not available:
         # Pool exhausted within 14-day window — fall back to full pool
         available = pool
+
+    # Festival timing: if a festival is near, prefer its deity's mantras.
+    fest = active_festival(window_days=5)
+    if fest:
+        fest_subset = _festival_mantra_filter(available, fest)
+        if fest_subset:
+            print(f"[mantra] festival '{fest.get('name')}' near → biasing to deity '{fest.get('deity')}' ({len(fest_subset)} mantras)")
+            available = fest_subset
 
     rng = random.Random(_seed_for_today(seed_offset))
     chosen = rng.choice(available)

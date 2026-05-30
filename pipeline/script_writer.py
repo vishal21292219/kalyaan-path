@@ -123,6 +123,13 @@ TOP-CREATOR PLAYBOOK (MANDATORY — applies to every line you write):
      b) Mystery question ("Kya aap jaante hain ki Krishna ki mrityu kaise hui?")
      c) Specific number teaser ("3 cheezein jo Geeta me chupi hain")
      d) Authority dropping a bomb ("NASA ne maan liya...")
+   - WINNING TEMPLATE (verified from this channel's own top videos —
+     specific name + dramatic moment beat generic mystery every time):
+     "[Specific naam] ne [specific action] kiya, aur [unexpected result] hua —
+      yeh woh sach hai jo [school / itihaas / kisi] ne kabhi nahi bataya."
+   - ❌ BANNED OPENER: a vague "ek rahasya hai..." / "aaj hum jaanenge..." start.
+     Channel data: generic-rahasya openers got swiped (13–34 views); specific
+     dramatic-moment openers won (370–550 views). Open ON the moment.
    - NEVER open with narrative setup, history dates, or generic praise.
    - The viewer's thumb is hovering — give them a reason NOT to swipe.
 
