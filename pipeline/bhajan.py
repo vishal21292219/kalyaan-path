@@ -42,10 +42,26 @@ def _audio_duration(audio_path: Path) -> float:
         return 0.0
 
 
+def _bhajan_key(mp3_path: Path) -> str:
+    """Portable processed-state key: path RELATIVE to repo root (posix).
+    Absolute paths broke CI (different checkout dir), so we key on the
+    repo-relative path which is identical locally and on GitHub runners."""
+    try:
+        return mp3_path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return mp3_path.name  # outside repo — fall back to filename
+
+
 def _load_processed_state(state_path: Path) -> set:
     if state_path.exists():
         try:
-            return set(json.loads(state_path.read_text()))
+            raw = set(json.loads(state_path.read_text()))
+            # Normalise any legacy absolute entries to relative keys.
+            norm = set()
+            for e in raw:
+                p = Path(e)
+                norm.add(_bhajan_key(p) if p.is_absolute() else e)
+            return norm
         except Exception:
             return set()
     return set()
@@ -77,7 +93,7 @@ def pick_bhajan_audio(deity: str | None = None) -> tuple[Path, str] | None:
         if not folder.is_dir():
             continue
         for mp3 in folder.glob("*.mp3"):
-            if str(mp3.resolve()) in processed:
+            if _bhajan_key(mp3) in processed:
                 continue
             candidates.append((mp3, d, mp3.stat().st_mtime))
 
@@ -96,7 +112,7 @@ def mark_audio_processed(mp3_path: Path) -> None:
     cfg = load_config()
     state_path = ROOT / cfg["paths"]["processed_state"]
     processed = _load_processed_state(state_path)
-    processed.add(str(mp3_path.resolve()))
+    processed.add(_bhajan_key(mp3_path))
     _save_processed_state(state_path, processed)
 
 
@@ -205,28 +221,43 @@ Output ONLY a JSON array of {n_scenes} prompt strings (no markdown fences):
 
 
 def _generate_images(prompts: list[str], out_dir: Path) -> list[Path]:
-    """Reuse existing image_gen module with bhajan config's image settings.
-    Uses new Gemini-only generator (Pollinations removed); on failure
-    raises GeminiUnavailable so caller can save to retry queue."""
-    from .image_gen import _generate_gemini, GeminiUnavailable
+    """Generate bhajan scene images via the full provider chain so it works on
+    the free stack: fal FLUX (only if images.provider == fal) → HF FLUX-schnell
+    → Gemini. Gemini-only used to be the path, but Gemini image quota is ~0 on
+    free, so HF is the real workhorse here. Raises GeminiUnavailable only if
+    NOTHING could be generated."""
+    from .image_gen import (
+        _generate_fal_flux, _generate_hf_flux, _generate_gemini, GeminiUnavailable,
+    )
 
     cfg = load_config()
     img_cfg = cfg["images"]
-    model = img_cfg.get("model", "gemini-3.1-flash-image-preview")
+    use_fal = str(img_cfg.get("provider", "gemini")).lower() == "fal"
+    gemini_model = img_cfg.get("gemini_image_model", "gemini-3.1-flash-image-preview")
+    if str(gemini_model).startswith("fal-ai/") or "flux" in str(gemini_model).lower():
+        gemini_model = "gemini-3.1-flash-image-preview"
     negative = img_cfg.get("negative", "")
     style = cfg["llm"].get("image_style_guidance", "")
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    results = []
+    results: list[Path] = []
+    last_err = None
     for i, raw in enumerate(prompts):
         full_prompt = f"{raw}\n\nStyle guidance:\n{style}\n\nAvoid: {negative}"
         path = out_dir / f"scene_{i:02d}.jpg"
+        if use_fal and _generate_fal_flux(full_prompt, path):
+            results.append(path); continue
+        if _generate_hf_flux(full_prompt, path):
+            results.append(path); continue
         try:
-            if _generate_gemini(full_prompt, path, model):
-                results.append(path)
+            if _generate_gemini(full_prompt, path, gemini_model):
+                results.append(path); continue
         except GeminiUnavailable as e:
-            print(f"[bhajan] scene {i} failed permanently: {e}")
-            raise  # let run.py save to retry queue
+            last_err = e
+        print(f"[bhajan] scene {i}: all providers failed")
+    if not results:
+        raise last_err or GeminiUnavailable("bhajan: all image providers failed")
+    print(f"[bhajan] {len(results)}/{len(prompts)} scene images generated")
     return results
 
 

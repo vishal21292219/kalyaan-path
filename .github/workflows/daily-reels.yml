@@ -28,6 +28,10 @@ on:
     # templated content was throttling the channel; rival posts 0.5/week and
     # takes 1M+ views via packaging, not volume). Morning only, Sun/Tue/Thu/Sat.
     - cron: "0 1 * * 0,2,4,6"   # fire 06:30 IST 4×/week → KalyaanPath morning (auto-publish)
+    # KalyaanPath SUNDAY BHAJAN — its top-performing format (Vrindavan Bhajan =
+    # 843 views, channel best). Music-heavy MP3 → video, auto-pick next unused
+    # bhajan from data/music_bhajan/. Sunday evening prime.
+    - cron: "30 13 * * 0"       # fire 19:00 IST Sunday → KalyaanPath bhajan (auto-publish)
     # REVIVED 2026-05-31: B-roll pivot (real Pexels stock footage, not AI slideshow).
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
     - cron: "30 17 * * *"   # fire 23:00 IST → TimeDecoders EU prime (auto-publish)
@@ -164,18 +168,18 @@ jobs:
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 1 * * *" ]; then
-            # PIVOTED 2026-05-28: was --kind shloka (sequential Gita verses, <200 views).
-            # Now --kind mantra (mantra-rahasya format, mystery-framed, per Day 1 boot camp).
+          elif [ "${{ github.event.schedule }}" = "0 1 * * 0,2,4,6" ]; then
+            # KalyaanPath morning mantra, 4×/week, AUTO-publish to YouTube.
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
             echo "kind=mantra"   >> $GITHUB_OUTPUT
-            echo "mode=telegram"  >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 13 * * *" ]; then
-            echo "niche=bhakti"  >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "30 13 * * 0" ]; then
+            # KalyaanPath SUNDAY BHAJAN — music-MP3 → video, AUTO-publish to YouTube.
+            echo "niche=bhajan"  >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
-            echo "mode=telegram"  >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 17 * * *" ]; then
@@ -219,6 +223,7 @@ jobs:
             --niche ${{ steps.route.outputs.niche }} \
             --kind ${{ steps.route.outputs.kind }} \
             --no-music \
+            --auto-thumb \
             --notify-telegram \
             --seed-offset ${{ steps.route.outputs.seed }}
 
@@ -229,6 +234,7 @@ jobs:
             --niche ${{ steps.route.outputs.niche }} \
             --kind ${{ steps.route.outputs.kind }} \
             --publish \
+            --auto-thumb \
             --seed-offset ${{ steps.route.outputs.seed }}
 
       - name: Run pipeline (LONG-FORM publish mode, 20-25 min)
