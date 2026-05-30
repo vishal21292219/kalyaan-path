@@ -43,7 +43,18 @@ async def _edge_synth_with_boundaries(
     """Synthesize via edge-tts, capture audio + word boundaries.
     Returns list of {text, start, end} dicts (seconds)."""
     import edge_tts
-    communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate, pitch=pitch)
+    # edge-tts >=7 defaults to SentenceBoundary and emits NO WordBoundary events
+    # unless boundary="WordBoundary" is requested. Without this the pipeline fell
+    # back to silence/uniform estimation → captions drifted out of sync with the
+    # voice (worst on long English narration). Requesting WordBoundary restores
+    # accurate per-word timing for every voice, Hindi and English alike.
+    try:
+        communicate = edge_tts.Communicate(
+            text=text, voice=voice, rate=rate, pitch=pitch, boundary="WordBoundary"
+        )
+    except TypeError:
+        # Older edge-tts without the `boundary` kwarg — fall back to default.
+        communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate, pitch=pitch)
     audio = bytearray()
     boundaries: list[dict] = []
     async for chunk in communicate.stream():
