@@ -174,6 +174,54 @@ def pick_mantra(seed_offset: int = 0) -> dict:
     }
 
 
+def _series_state_path():
+    return ROOT / "data/state/series_progress.json"
+
+
+def pick_series(seed_offset: int = 0) -> dict:
+    """Sequential SERIES episode for the active niche (e.g. Itihaasvani).
+    Advances ONE episode per day (idempotent within a day so a pregen peek and
+    the real run agree). Finishes one series before the next, then loops.
+    Series = return viewers → watch-time → algorithm boost. Falls back to
+    trending if no series file exists for the niche."""
+    cfg = load_config()
+    niche = cfg.get("niche", "itihaas")
+    series_file = ROOT / f"data/series_{niche}.json"
+    if not series_file.exists():
+        return pick_trending(seed_offset=seed_offset)
+    series_list = json.loads(series_file.read_text())["series"]
+    flat = [(s, i, ep) for s in series_list for i, ep in enumerate(s["episodes"])]
+    if not flat:
+        return pick_trending(seed_offset=seed_offset)
+    total = len(flat)
+
+    sp = _series_state_path()
+    sp.parent.mkdir(parents=True, exist_ok=True)
+    state = json.loads(sp.read_text()) if sp.exists() else {}
+    today = date.today().isoformat()
+    cursor = int(state.get("cursor", 0))
+    if state.get("last_date") != today:
+        if "last_date" in state:           # not the very first run → advance
+            cursor = (cursor + 1) % total
+        state["cursor"] = cursor
+        state["last_date"] = today
+        sp.write_text(json.dumps(state, indent=2, ensure_ascii=False))
+
+    s, ep_idx, ep = flat[cursor % total]
+    return {
+        "kind": "series",
+        "series_name": s["name"],
+        "series_id": s["id"],
+        "episode_number": ep_idx + 1,
+        "episode_total": len(s["episodes"]),
+        "english_tail": s.get("english_tail", ""),
+        "title": ep["title"],
+        "angle": ep.get("angle", ""),
+        "wiki": ep["title"].replace(" ", "_"),
+        "tags": ["series", s["id"], "mythology"],
+    }
+
+
 def pick_shloka_episode() -> dict:
     """Pick next Gita shloka in sequence and advance state."""
     topics = load_topics()

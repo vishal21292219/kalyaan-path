@@ -388,11 +388,32 @@ CRITICAL: Generate a 20-25 minute documentary-style script.
 - hashtags: 12-15 mix
 
 Return ONLY the JSON object."""
+    series_block = ""
+    if topic.get("kind") == "series":
+        ep = topic.get("episode_number", 1)
+        tot = topic.get("episode_total", 1)
+        sname = topic.get("series_name", "")
+        tail = topic.get("english_tail", "")
+        angle = topic.get("angle", "")
+        series_block = f"""
+THIS IS A SERIES EPISODE (return-viewer engine — CRITICAL):
+- Series: "{sname}" — this is EPISODE {ep} of {tot}.
+- Episode focus: {topic['title']}. Angle: {angle}
+- TITLE format (Hinglish): start with "{sname} #{ep}:" then the dramatic hook,
+  then 😱, then "{tail}", then "#facts".
+  Example: "{sname} #{ep}: <dramatic Hinglish hook>! 😱 {tail} #facts"
+- HOOK / body[0]: open on this episode's most dramatic moment (NOT a recap).
+- In the first 10 sec, remind it's a series ("{sname} ki series ka part {ep}").
+- CTA MUST drive return viewing: tell them Episode {ep + 1} aa raha hai (agle
+  din/drop) AND ask them to subscribe so they don't miss it. Also nudge to watch
+  Episode 1 if they haven't.
+- Keep the SAME visual style across the series so episodes feel connected.
+"""
     return f"""Topic: {topic['title']}
 Kind: {topic.get('kind', 'general')}
 Tags: {', '.join(topic.get('tags', []))}
 Niche: {niche}
-
+{series_block}
 Reference facts (from Wikipedia, may be long — distill the essentials):
 \"\"\"
 {context}

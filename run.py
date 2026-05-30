@@ -10,7 +10,7 @@ from pipeline.assembler import assemble
 from pipeline.image_gen import generate_images
 from pipeline.scraper import gather_context
 from pipeline.script_writer import write_script
-from pipeline.topic_generator import pick_mantra, pick_shloka_episode, pick_topic, pick_trending
+from pipeline.topic_generator import pick_mantra, pick_series, pick_shloka_episode, pick_topic, pick_trending
 from pipeline.tts import synthesize
 from pipeline.utils import load_config, out_path, set_active_niche, slugify, today_stamp
 
@@ -33,7 +33,7 @@ def main(argv: list[str]) -> int:
     )
     ap.add_argument(
         "--kind", default="auto",
-        choices=["auto", "shloka", "trending", "mantra"],
+        choices=["auto", "shloka", "trending", "mantra", "series"],
         help="auto = legacy daily rotation; shloka = next Gita verse episode (PARKED — pivoted to mantra); trending = current festival/popular deity; mantra = mantra-rahasya format (KalyaanPath morning slot, post-pivot)",
     )
     ap.add_argument(
@@ -128,6 +128,8 @@ def main(argv: list[str]) -> int:
             topic = pick_topic(args.topic, seed_offset=args.seed_offset)
         elif args.kind == "mantra":
             topic = pick_mantra(seed_offset=args.seed_offset)
+        elif args.kind == "series":
+            topic = pick_series(seed_offset=args.seed_offset)
         elif args.kind == "shloka":
             topic = pick_shloka_episode()
         elif args.kind == "trending":

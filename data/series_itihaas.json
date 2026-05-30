@@ -1,0 +1,46 @@
+{
+  "series": [
+    {
+      "id": "mahabharat_villains",
+      "name": "Mahabharat ke Villains",
+      "english_tail": "Mahabharat",
+      "episodes": [
+        {"title": "Duryodhan", "angle": "Duryodhan sach me itna bura tha, ya uske saath bhi anyay hua?"},
+        {"title": "Shakuni", "angle": "Shakuni ke paasे — uske pita ki haddiyon ka khaufnak sach"},
+        {"title": "Dushasan", "angle": "Cheer-haran ke baad Dushasan ka anjaam"},
+        {"title": "Jayadrath", "angle": "Ek vardaan jisne Abhimanyu ko maut tak pahunchaya"},
+        {"title": "Ashwatthama", "angle": "Brahmastra ka shraap — aaj bhi bhatak raha amar yoddha"},
+        {"title": "Kritavarma aur Shalya", "angle": "Apno ke khilaaf lade do yoddha ka sach"},
+        {"title": "Shakuni ka asli maqsad", "angle": "Pura Kuru vansh mitane ki uski chhupi pratigya"}
+      ]
+    },
+    {
+      "id": "ramayan_anokhe_patra",
+      "name": "Ramayan ke Anokhe Patra",
+      "english_tail": "Ramayan",
+      "episodes": [
+        {"title": "Urmila", "angle": "14 saal soyi rahi taaki Lakshman jaag sakein — Urmila ki tapasya"},
+        {"title": "Mandavi", "angle": "Bharat ki patni jisne 14 saal pati ka virah jhela"},
+        {"title": "Tara", "angle": "Vanar rani jiski buddhi se Sugriv bach gaya"},
+        {"title": "Trijata", "angle": "Lanka ki rakshasi jisne Sita ki raksha ki"},
+        {"title": "Kumbhakaran", "angle": "Sirf so nahi raha tha — uske jagne ka asli rahasya"},
+        {"title": "Vibhishan", "angle": "Bhai ke khilaaf — gaddaar ya dharma ka rakshak?"},
+        {"title": "Lakshman Rekha ka sach", "angle": "Kya wo sach me ek lakeer thi?"}
+      ]
+    },
+    {
+      "id": "bhulaye_veer",
+      "name": "Bharat ke Bhulaye Veer",
+      "english_tail": "Indian History",
+      "episodes": [
+        {"title": "Lachit Borphukan", "angle": "Jisne Mughalon ko Assam me dhool chatai"},
+        {"title": "Rani Abbakka", "angle": "Portugaliyon se ladne wali pehli rani"},
+        {"title": "Suheldev", "angle": "Jisne Ghazni ke bhatije ko maar bhagaya"},
+        {"title": "Bappa Rawal", "angle": "Mewar ka sansthapak jisse Arab kaamp gaye"},
+        {"title": "Lalitaditya Muktapida", "angle": "Kashmir ka samrat jisne Central Asia jeeta"},
+        {"title": "Rajaraja Chola", "angle": "Jiski navy ne samundar paar saamrajya banaya"},
+        {"title": "Ahilyabai Holkar", "angle": "Rani jisne poore Bharat ke mandir banwaye"}
+      ]
+    }
+  ]
+}

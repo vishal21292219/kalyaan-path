@@ -51,7 +51,7 @@ on:
         required: true
         default: "trending"
         type: choice
-        options: [trending, mantra, shloka]
+        options: [trending, mantra, shloka, series]
       mode:
         description: "publish (auto-YT) or telegram (manual)"
         required: true
@@ -163,8 +163,9 @@ jobs:
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
+            # Night prime drop = SERIES episode (return-viewer engine).
             echo "niche=itihaas" >> $GITHUB_OUTPUT
-            echo "kind=trending" >> $GITHUB_OUTPUT
+            echo "kind=series"   >> $GITHUB_OUTPUT
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
