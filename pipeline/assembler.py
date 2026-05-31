@@ -481,6 +481,10 @@ def assemble(
         raise RuntimeError("ffmpeg not found in PATH. Install with: brew install ffmpeg")
 
     cfg = load_config()
+    # Niche-level music kill switch (video.music: false) — TimeDecoders runs
+    # narration + footage only (viewer feedback: background music annoying).
+    if not bool(cfg.get("video", {}).get("music", True)):
+        skip_music = True
     if long_form:
         # Long-form documentary = 1920x1080 horizontal (YouTube standard)
         # Larger font for desktop/TV viewing

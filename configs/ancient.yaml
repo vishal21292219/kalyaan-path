@@ -162,8 +162,10 @@ publish:
 
 video:
   bitrate: 6M
-  # No devotional bell/cymbal stings on the English documentary (viewer feedback:
-  # "music is so annoying") — keep only a subtle cinematic drone bed.
+  # NO background music at all on TimeDecoders (viewer feedback: "music is so
+  # annoying"). English ancient-mystery docs play cleaner with narration +
+  # footage only. (stings:false is redundant under music:false but kept explicit.)
+  music: false
   stings: false
   duration_target_sec: 50
   font: assets/fonts/Anton-Regular.ttf
