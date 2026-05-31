@@ -51,10 +51,12 @@ def _generate_fal_flux(prompt: str, out_path: Path,
     # Pick closest supported aspect: portrait 9:16 vs landscape 16:9
     is_portrait = target_h > target_w
     image_size = "portrait_16_9" if is_portrait else "landscape_16_9"
+    # schnell is a few-step distilled model (max 12 steps); pro/dev want ~28.
+    steps = 8 if "schnell" in str(model).lower() else 28
     arguments = {
         "prompt": prompt,
         "image_size": image_size,
-        "num_inference_steps": 28,
+        "num_inference_steps": steps,
         "guidance_scale": 3.5,
         "num_images": 1,
         "enable_safety_checker": True,
@@ -198,7 +200,8 @@ def _detect_cast(prompt: str, bible: list[dict]) -> list[dict]:
 
 
 def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
-                             negative: str, target_w: int, target_h: int) -> dict[str, str]:
+                             negative: str, target_w: int, target_h: int,
+                             fal_model: str = FAL_FLUX_PRO) -> dict[str, str]:
     """Generate (once, cached on disk) a master portrait per recurring character
     and upload it to fal. Returns {character_name: fal_url}. Masters use the
     SAME style_suffix as scenes so the reference matches the video's art style."""
@@ -217,7 +220,7 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
                 f"dramatic divine lighting, intricate detail, masterpiece{style}. "
                 f"Avoid: {negative}"
             )
-            if not _generate_fal_flux(prompt, mp, target_w=target_w, target_h=target_h):
+            if not _generate_fal_flux(prompt, mp, model=fal_model, target_w=target_w, target_h=target_h):
                 print(f"[consistency] master FAILED for {name} — scenes will use plain FLUX")
                 continue
         url = _fal_upload(mp)
@@ -245,12 +248,12 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     cfg = load_config()
     style = cfg["images"]["style_suffix"]
     negative = cfg["images"]["negative"]
-    model = cfg["images"].get("model", "gemini-3.1-flash-image-preview")
-    # The "model" above is the PRIMARY provider's model (e.g. a fal-ai/... id).
+    cfg_model = cfg["images"].get("model", "gemini-3.1-flash-image-preview")
+    # The fal model (e.g. fal-ai/flux/schnell). Falls back to flux-pro default.
+    fal_model = cfg_model if str(cfg_model).startswith("fal-ai/") else FAL_FLUX_PRO
     # The Gemini last-resort needs a real Gemini image model — never the fal id.
     gemini_model = cfg["images"].get("gemini_image_model", "gemini-3.1-flash-image-preview")
-    if str(model).startswith("fal-ai/") or "flux" in str(model).lower():
-        model = gemini_model
+    model = gemini_model if (str(cfg_model).startswith("fal-ai/") or "flux" in str(cfg_model).lower()) else cfg_model
     # Provider gate: only attempt the PAID fal.ai stack when images.provider == "fal".
     # Set provider to "huggingface" (free stack) to skip fal entirely — no wasted
     # failing calls, no character-master/nano-banana cost. Flip back to "fal" when
@@ -295,7 +298,7 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     max_ref = int(cfg["images"].get("consistency_max_scenes", 3))
     ref_used = 0
     if consistency_on:
-        masters = _build_character_masters(bible, out_dir, style, negative, target_w, target_h)
+        masters = _build_character_masters(bible, out_dir, style, negative, target_w, target_h, fal_model=fal_model)
         if masters:
             cap = f"first {max_ref}" if max_ref else "all"
             print(f"[consistency] {len(masters)} character master(s) — reference-conditioning {cap} recurring scene(s)")
@@ -327,7 +330,7 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 
         # Provider chain: fal.ai FLUX 1.1-pro (paid premium) → HF FLUX schnell (free) → Gemini (free)
         ok = False
-        if use_fal and _generate_fal_flux(prompt, path, target_w=target_w, target_h=target_h, seed=seed):
+        if use_fal and _generate_fal_flux(prompt, path, model=fal_model, target_w=target_w, target_h=target_h, seed=seed):
             ok = True
             fal_succeeded += 1
         elif _generate_hf_flux(prompt, path):
