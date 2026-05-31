@@ -311,11 +311,15 @@ def main(argv: list[str]) -> int:
             traceback.print_exc()
             print("[endcard] failed — video kept without endcard")
 
+    # Track successful delivery so the catch-up safety net knows this slot is done.
+    _delivered = False
+
     # 6d. notify Telegram (optional)
     if args.notify_telegram:
         try:
             from pipeline.notifier_telegram import notify as tg_notify
             tg_notify(video_path, thumb_path, script, args.niche, seed_offset=args.seed_offset)
+            _delivered = True
         except Exception:
             traceback.print_exc()
             print("[telegram] notify failed")
@@ -330,6 +334,7 @@ def main(argv: list[str]) -> int:
                 from pipeline.uploader_youtube import upload as yt_upload
                 url = yt_upload(video_path, script, thumb_path=thumb_path)
                 print(f"[publish] youtube: {url}")
+                _delivered = True
             except Exception:
                 traceback.print_exc()
                 print("[publish] youtube failed — see traceback above")
@@ -398,6 +403,15 @@ def main(argv: list[str]) -> int:
         try:
             _scheduler.mark_consumed(args.niche, args.kind, _date_t.today(), args.seed_offset)
             print(f"[pregen] ✓ marked consumed for today's {args.niche}/{args.kind} s{args.seed_offset}")
+        except Exception:
+            traceback.print_exc()
+
+    # 9. Record delivery for the catch-up safety net (only if actually delivered).
+    if _delivered:
+        try:
+            from pipeline.publish_log import mark_published
+            mark_published(args.niche, args.kind, args.seed_offset)
+            print(f"[catchup] marked {args.niche}/{args.kind} s{args.seed_offset} as delivered today")
         except Exception:
             traceback.print_exc()
 
@@ -491,11 +505,23 @@ def _run_bhajan(args) -> int:
             traceback.print_exc()
 
     # 10. Publish to YouTube
+    _delivered = False
     if args.publish:
         try:
             from pipeline.uploader_youtube import upload as yt_upload
             url = yt_upload(video_path, script, thumb_path=thumb_path)
             print(f"[publish] youtube: {url}")
+            _delivered = True
+        except Exception:
+            traceback.print_exc()
+    elif args.notify_telegram:
+        _delivered = True  # bhajan TG drop already sent above
+
+    if _delivered:
+        try:
+            from pipeline.publish_log import mark_published
+            mark_published("bhajan", "trending", args.seed_offset)
+            print("[catchup] marked bhajan as delivered today")
         except Exception:
             traceback.print_exc()
 
