@@ -233,6 +233,9 @@ def _generate_images(prompts: list[str], out_dir: Path) -> list[Path]:
     cfg = load_config()
     img_cfg = cfg["images"]
     use_fal = str(img_cfg.get("provider", "gemini")).lower() == "fal"
+    from .image_gen import FAL_FLUX_PRO
+    cfg_model = img_cfg.get("model", "")
+    fal_model = cfg_model if str(cfg_model).startswith("fal-ai/") else FAL_FLUX_PRO
     gemini_model = img_cfg.get("gemini_image_model", "gemini-3.1-flash-image-preview")
     if str(gemini_model).startswith("fal-ai/") or "flux" in str(gemini_model).lower():
         gemini_model = "gemini-3.1-flash-image-preview"
@@ -245,7 +248,7 @@ def _generate_images(prompts: list[str], out_dir: Path) -> list[Path]:
     for i, raw in enumerate(prompts):
         full_prompt = f"{raw}\n\nStyle guidance:\n{style}\n\nAvoid: {negative}"
         path = out_dir / f"scene_{i:02d}.jpg"
-        if use_fal and _generate_fal_flux(full_prompt, path):
+        if use_fal and _generate_fal_flux(full_prompt, path, model=fal_model):
             results.append(path); continue
         if _generate_hf_flux(full_prompt, path):
             results.append(path); continue

@@ -344,7 +344,10 @@ def _gen_base_image(script: dict, niche: str = "bhakti", long_form: bool = False
     from .image_gen import _generate_fal_flux, _generate_hf_flux, _generate_gemini, GeminiUnavailable
     import tempfile
 
-    use_fal = str(load_config().get("images", {}).get("provider", "fal")).lower() == "fal"
+    _icfg = load_config().get("images", {})
+    use_fal = str(_icfg.get("provider", "fal")).lower() == "fal"
+    from .image_gen import FAL_FLUX_PRO
+    _fal_model = _icfg.get("model", "") if str(_icfg.get("model", "")).startswith("fal-ai/") else FAL_FLUX_PRO
     target_w, target_h = (1280, 720) if long_form else (1080, 1920)
     tmp_path = Path(tempfile.mkstemp(suffix=".jpg")[1])
 
@@ -367,9 +370,9 @@ def _gen_base_image(script: dict, niche: str = "bhakti", long_form: bool = False
             except Exception as e:
                 print(f"[thumbnail] master-conditioning skipped: {type(e).__name__}: {e}")
 
-    # 1. fal.ai FLUX 1.1-pro (paid, premium) — only when provider == "fal"
-    if use_fal and _generate_fal_flux(prompt, tmp_path, target_w=target_w, target_h=target_h):
-        print("[thumbnail] base via fal.ai FLUX 1.1-pro")
+    # 1. fal (paid) — only when provider == "fal", using the configured fal model
+    if use_fal and _generate_fal_flux(prompt, tmp_path, model=_fal_model, target_w=target_w, target_h=target_h):
+        print(f"[thumbnail] base via fal ({_fal_model})")
         return Image.open(tmp_path).convert("RGB")
 
     # 2. HF FLUX schnell (free fallback)

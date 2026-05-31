@@ -27,9 +27,11 @@ secrets:
   youtube_token: secrets/youtube_token.json
 
 images:
-  provider: gemini
-  model: gemini-3.1-flash-image-preview
-  fallback_model: flux-realism
+  # PAID fal stack: flux/schnell (cheap). HF/Gemini stay as auto fallbacks.
+  provider: fal
+  model: fal-ai/flux/schnell
+  gemini_image_model: gemini-3.1-flash-image-preview
+  fallback_model: black-forest-labs/FLUX.1-schnell
   num_per_bhajan: 25
   xfade_duration: 0.6
   negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, dark gloomy mood, underexposed, muddy colors, washed out

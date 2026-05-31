@@ -30,16 +30,15 @@ secrets:
   youtube_token: secrets/itihaas_youtube_token.json
 
 images:
-  # FREE STACK MODE (fal balance exhausted): provider=huggingface skips fal
-  # entirely → images run on HF FLUX-schnell → Gemini, zero cost. To restore
-  # premium quality + consistency + Kling motion: recharge fal, then set
-  # provider: fal, consistency: true, video.hero_motion: true.
-  provider: huggingface
-  model: fal-ai/flux-pro/v1.1
+  # PAID fal stack: flux/schnell (cheap, ~$0.003/img) + character consistency.
+  # HF/Gemini stay as automatic fallbacks if fal ever errors.
+  provider: fal
+  model: fal-ai/flux/schnell
+  gemini_image_model: gemini-3.1-flash-image-preview
   fallback_model: black-forest-labs/FLUX.1-schnell
-  # Character consistency: 1 master portrait per recurring character (needs fal —
-  # OFF on free stack; HF/Gemini can't reference-condition).
-  consistency: false
+  # Character consistency: 1 master portrait per recurring character → same
+  # face/design across hero scenes (the pro look). Needs fal.
+  consistency: true
   consistency_max_scenes: 3   # cost guard: only the top N hero scenes conditioned (0 = all)
   negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars, dark gloomy mood, underexposed, muddy colors, washed out
   num_per_reel: 10
