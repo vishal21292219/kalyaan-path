@@ -53,7 +53,7 @@ def _get_service():
     return build("youtube", "v3", credentials=creds)
 
 
-def upload(video_path: Path, script: dict) -> str:
+def upload(video_path: Path, script: dict, thumb_path: Path | None = None) -> str:
     cfg = load_config()
     privacy = cfg["publish"]["privacy"]
     hashtags = " ".join(cfg["branding"]["hashtags"])
@@ -93,6 +93,20 @@ def upload(video_path: Path, script: dict) -> str:
     video_id = response["id"]
     url = f"https://youtube.com/shorts/{video_id}"
     print(f"[youtube] published: {url}")
+
+    # Set our CUSTOM thumbnail (dramatic image + bold text). Without this YouTube
+    # auto-picks a random video frame. NOTE: custom thumbnails require the channel
+    # to be phone-verified; if not, the API 403s and we keep the auto frame.
+    if thumb_path and Path(thumb_path).exists():
+        try:
+            service.thumbnails().set(
+                videoId=video_id,
+                media_body=MediaFileUpload(str(thumb_path), mimetype="image/jpeg"),
+            ).execute()
+            print(f"[youtube] custom thumbnail set ✓")
+        except Exception as e:
+            print(f"[youtube] thumbnail set failed ({type(e).__name__}: {str(e)[:120]}) "
+                  f"— video live with auto-frame. (Channel may need phone verification.)")
     return url
 
 

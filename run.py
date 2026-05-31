@@ -328,7 +328,7 @@ def main(argv: list[str]) -> int:
         if publish_cfg.get("youtube", True):
             try:
                 from pipeline.uploader_youtube import upload as yt_upload
-                url = yt_upload(video_path, script)
+                url = yt_upload(video_path, script, thumb_path=thumb_path)
                 print(f"[publish] youtube: {url}")
             except Exception:
                 traceback.print_exc()
@@ -494,7 +494,7 @@ def _run_bhajan(args) -> int:
     if args.publish:
         try:
             from pipeline.uploader_youtube import upload as yt_upload
-            url = yt_upload(video_path, script)
+            url = yt_upload(video_path, script, thumb_path=thumb_path)
             print(f"[publish] youtube: {url}")
         except Exception:
             traceback.print_exc()
