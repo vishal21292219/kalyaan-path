@@ -25,10 +25,9 @@ on:
     # Morning history/temple drop + night-prime SERIES binge drop.
     - cron: "30 15 * * *"   # fire 21:00 IST → Itihaasvani drop #1 for TOMORROW 08:30 IST upload
     - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #2 (SERIES) for TOMORROW 22:30 IST upload
-    # KalyaanPath: AUTOPILOT — cut 14/week → 4/week (review verdict: high-volume
-    # templated content was throttling the channel; rival posts 0.5/week and
-    # takes 1M+ views via packaging, not volume). Morning only, Sun/Tue/Thu/Sat.
-    - cron: "0 1 * * 0,2,4,6"   # fire 06:30 IST 4×/week → KalyaanPath morning (auto-publish)
+    # KalyaanPath: DAILY morning mantra (fresh viral + festival-timed topics now,
+    # so no more repetitive-template throttling). 1/day keeps it consistent.
+    - cron: "0 1 * * *"        # fire 06:30 IST DAILY → KalyaanPath morning mantra (auto-publish)
     # KalyaanPath SUNDAY BHAJAN — its top-performing format (Vrindavan Bhajan =
     # 843 views, channel best). Music-heavy MP3 → video, auto-pick next unused
     # bhajan from data/music_bhajan/. Sunday evening prime.
@@ -170,8 +169,8 @@ jobs:
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 1 * * 0,2,4,6" ]; then
-            # KalyaanPath morning mantra, 4×/week, AUTO-publish to YouTube.
+          elif [ "${{ github.event.schedule }}" = "0 1 * * *" ]; then
+            # KalyaanPath morning mantra, DAILY, AUTO-publish to YouTube.
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
             echo "kind=mantra"   >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
