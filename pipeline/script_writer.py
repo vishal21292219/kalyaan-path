@@ -484,11 +484,18 @@ def _extract_json(text: str) -> dict:
     try:
         return json.loads(candidate)
     except json.JSONDecodeError:
-        # LLMs occasionally emit malformed JSON. Repair the common offenders:
-        # trailing commas before } or ], and stray control chars in strings.
-        repaired = re.sub(r",(\s*[}\]])", r"\1", candidate)
-        repaired = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", repaired)
-        return json.loads(repaired)  # if still bad, raises → caller retries
+        pass
+    # LLMs occasionally emit malformed JSON. Repair the common offenders:
+    repaired = candidate
+    # 1. MISSING comma between adjacent values: a value-ender (" } ] digit) at a
+    #    line end followed by a value-starter (" { [) at the next line's start.
+    #    This is the #1 LLM JSON error ("Expecting ',' delimiter").
+    repaired = re.sub(r'([}\]"\d])(\s*\n\s*)(["{\[])', r'\1,\2\3', repaired)
+    # 2. Trailing commas before } or ].
+    repaired = re.sub(r",(\s*[}\]])", r"\1", repaired)
+    # 3. Stray control chars inside the JSON.
+    repaired = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", repaired)
+    return json.loads(repaired)  # if still bad, raises → caller retries
 
 
 def write_script(topic: dict, context: str, long_form: bool = False,
