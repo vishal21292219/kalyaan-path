@@ -21,9 +21,10 @@ on:
   # for next day at 06:00 / 13:00 / 22:30 IST respectively (5 min/night).
   #
   schedule:
-    - cron: "30 15 * * *"   # fire 21:00 IST → Itihaasvani drop #1 for TOMORROW 06:00 IST upload
-    - cron: "45 15 * * *"   # fire 21:15 IST → Itihaasvani drop #2 for TOMORROW 13:00 IST upload
-    - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #3 for TOMORROW 22:30 IST upload
+    # Itihaasvani: 2/day (cut from 3 — quality > quantity per review data).
+    # Morning history/temple drop + night-prime SERIES binge drop.
+    - cron: "30 15 * * *"   # fire 21:00 IST → Itihaasvani drop #1 for TOMORROW 08:30 IST upload
+    - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #2 (SERIES) for TOMORROW 22:30 IST upload
     # KalyaanPath: AUTOPILOT — cut 14/week → 4/week (review verdict: high-volume
     # templated content was throttling the channel; rival posts 0.5/week and
     # takes 1M+ views via packaging, not volume). Morning only, Sun/Tue/Thu/Sat.
