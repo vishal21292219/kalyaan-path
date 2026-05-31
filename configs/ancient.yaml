@@ -162,6 +162,9 @@ publish:
 
 video:
   bitrate: 6M
+  # No devotional bell/cymbal stings on the English documentary (viewer feedback:
+  # "music is so annoying") — keep only a subtle cinematic drone bed.
+  stings: false
   duration_target_sec: 50
   font: assets/fonts/Anton-Regular.ttf
   font_size: 80

@@ -802,8 +802,12 @@ def assemble(
     # mux is a simple stream-copy from slides_subbed + the mixed track.
     # Falls back to the legacy single-track duck mix (and finally to pure
     # voice) when drone/sting libraries are unavailable.
+    # Stings = devotional bell/cymbal/om hits. Great for bhakti/itihaas, but they
+    # feel out of place (and viewers called them "annoying") on an English ancient
+    # documentary. Gate per-niche via video.stings (default on).
+    _stings_on = bool(cfg.get("video", {}).get("stings", True))
     drone = None if skip_music else pick_drone(script.get("kind"), script=script)
-    sting_ts = [] if skip_music else pick_sting_timestamps(duration)
+    sting_ts = [] if (skip_music or not _stings_on) else pick_sting_timestamps(duration)
     have_stings = bool(sting_ts) and pick_sting(0) is not None
 
     composed_audio: Path | None = None
