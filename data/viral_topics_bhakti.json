@@ -1,0 +1,33 @@
+{
+  "_note": "Fresh viral bhakti topics (mantras + deity stories, festival-timed). Merged into the mantra pool by pick_mantra. mantra field left blank where the LLM should write the actual shloka.",
+  "mantras": [
+    {"title": "Mahamrityunjay Mantra ka chhupa rahasya", "deity": "shiva", "hook": "Ye 33 akshar maut ko bhi rok dete hain — Markandeya ne yahi raaz jaana tha", "mantra": "ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम्", "tags": ["shiva", "mantra"]},
+    {"title": "Om Namah Shivaya 108 baar kyun", "deity": "shiva", "hook": "108 ka sach 99% log nahi jaante — har manka ek dwar kholta hai", "mantra": "ॐ नमः शिवाय", "tags": ["shiva", "panchakshari"]},
+    {"title": "Kleem beej mantra aakarshan", "deity": "krishna", "hook": "Sirf ek shabd Kleem mein chhupi hai poori srishti ki aakarshan shakti", "mantra": "क्लीं कृष्णाय नमः", "tags": ["krishna", "beej"]},
+    {"title": "Shreem beej mantra dhan rahasya", "deity": "lakshmi", "hook": "Shukravar ko Shreem japne wale kabhi garib nahi rehte", "mantra": "ॐ श्रीं महालक्ष्म्यै नमः", "tags": ["lakshmi", "beej"]},
+    {"title": "Gayatri Mantra ke 24 akshar", "deity": "surya", "hook": "Vedon ki maa kehlane wale mantra ka asli rahasya", "mantra": "ॐ भूर्भुवः स्वः तत्सवितुर्वरेण्यं", "tags": ["gayatri", "veda"]},
+    {"title": "Hanuman Chalisa yug sahasra yojan", "deity": "hanuman", "hook": "600 saal pehle Tulsidas ne surya ki doori likh di thi — NASA bhi hairaan", "mantra": "जुग सहस्र जोजन पर भानु", "tags": ["hanuman", "chalisa"]},
+    {"title": "Aditya Hridaya Stotra rahasya", "deity": "surya", "hook": "Yuddh se theek pehle Agastya muni ne Ram ko ye gupt mantra kyun diya", "mantra": "आदित्यहृदयं पुण्यं सर्वशत्रुविनाशनम्", "tags": ["surya", "ram"]},
+    {"title": "Shani beej mantra Sade Sati", "deity": "general", "hook": "Saadhe saati chal rahi hai? Shanivar ko ye ek mantra sab badal dega", "mantra": "ॐ शं शनैश्चराय नमः", "tags": ["shani", "mantra"]},
+    {"title": "Om Kleem Krishnaya Namah", "deity": "krishna", "hook": "Vrindavan ke sant chupke se yahi japte the — prem aur kripa ka beej", "mantra": "ॐ क्लीं कृष्णाय नमः", "tags": ["krishna", "beej"]},
+    {"title": "Vakratunda Ganesh mantra", "deity": "ganesh", "hook": "Koi bhi shubh kaam se pehle yahi ek pankti kyun boli jaati hai", "mantra": "वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ", "tags": ["ganesh", "mantra"]},
+    {"title": "Dhanvantari arogya mantra", "deity": "vishnu", "hook": "Devon ke vaidya ka mantra roz japne wale bimar kam padte hain", "mantra": "ॐ धन्वन्तरये नमः", "tags": ["vishnu", "health"]},
+    {"title": "Durga Saptashati kaun adhyay", "deity": "durga", "hook": "Har problem ka alag adhyay hai is granth mein — gupt map kisi ne nahi bataya", "mantra": "या देवी सर्वभूतेषु शक्तिरूपेण संस्थिता", "tags": ["durga", "saptashati"]},
+    {"title": "Sankat Mochan Hanuman Ashtak", "deity": "hanuman", "hook": "Mangalvar ki raat ye 8 chaupai padho — har sankat 21 din mein khatam", "mantra": "बाल समय रवि भक्षि लियो तब", "tags": ["hanuman", "sankat"]},
+    {"title": "Ram naam Ram se bada kyun", "deity": "ram", "hook": "Hanuman ji ne khud Ram naam ko Ram se shreshth bataya — vajah chaunka degi", "mantra": "श्री राम जय राम जय जय राम", "tags": ["ram", "naam"]}
+  ],
+  "deity_stories": [
+    {"title": "Nidhivan ka rahasya", "deity": "krishna", "hook": "Shaam 7 baje ke baad koi nahi rukta — subah bistar bikhra milta hai, raat ko raas", "mantra": "", "tags": ["krishna", "vrindavan"]},
+    {"title": "Kedarnath Bheem Shila chamatkar", "deity": "shiva", "hook": "2013 baadh mein ek patthar mandir ke peeche ruka aur paani mod diya", "mantra": "", "tags": ["shiva", "kedarnath"]},
+    {"title": "Ganesh ka gaja-mukh rahasya", "deity": "ganesh", "hook": "Parvati ke ubtan se bana balak, phir Shiv ne apne hi putra ka sir kyun kaata", "mantra": "", "tags": ["ganesh", "katha"]},
+    {"title": "Vat Savitri vrat", "deity": "general", "hook": "Savitri ne maut ke devta Yamraj ko bhi haar maanne par majboor kar diya", "mantra": "", "tags": ["savitri", "vrat"]},
+    {"title": "Nirjala Ekadashi", "deity": "vishnu", "hook": "Saal ka sabse kathin vrat — Bheem ne bhi sirf yahi rakha tha, bina paani 24 ekadashi ka phal", "mantra": "", "tags": ["vishnu", "ekadashi"]},
+    {"title": "Markandeya jise Yamraj nahi le paaye", "deity": "shiva", "hook": "16 saal ki umar mein maut aayi, ladke ne Shivling pakad liya aur Yam haar gaye", "mantra": "", "tags": ["shiva", "katha"]},
+    {"title": "Hanuman ne Surya ko nigal liya", "deity": "hanuman", "hook": "Bachpan mein Hanuman ne surya ko aam samajh kar muh mein daal liya tha", "mantra": "", "tags": ["hanuman", "katha"]},
+    {"title": "Ahilya ka uddhar", "deity": "ram", "hook": "Hazaaron saal patthar bani Ahilya, Ram ke ek charan-sparsh se jeevit ho gayi", "mantra": "", "tags": ["ram", "katha"]},
+    {"title": "Shani ne Surya ko kyun shrap diya", "deity": "surya", "hook": "Beta hokar bhi Shani ne pita Surya ki taraf nahi dekha — uska gupt karan", "mantra": "", "tags": ["shani", "surya"]},
+    {"title": "Krishna aur Sudama ke teen muthi chawal", "deity": "krishna", "hook": "Garib mitra teen muthi chawal laaya, Krishna ne badle mein mahal de diya", "mantra": "", "tags": ["krishna", "sudama"]},
+    {"title": "Lakshmi shukravar kis ghar mein", "deity": "lakshmi", "hook": "Jin gharon mein ye 3 cheezein hain wahan Lakshmi kabhi nahi jaati — check karo", "mantra": "", "tags": ["lakshmi", "upay"]},
+    {"title": "Mahakal Bhasma Aarti rahasya", "deity": "shiva", "hook": "Duniya ki ekmatra jagah jahan murde ki raakh se Shiv ki aarti hoti hai", "mantra": "", "tags": ["shiva", "ujjain"]}
+  ]
+}

@@ -388,6 +388,15 @@ CRITICAL: Generate a 20-25 minute documentary-style script.
 - hashtags: 12-15 mix
 
 Return ONLY the JSON object."""
+    hook_block = ""
+    if topic.get("hook") and topic.get("kind") in ("viral", "mantra"):
+        hook_block = (
+            f"\nVIRAL ANGLE (build the whole video around THIS specific hook — it is the "
+            f"reason this topic is trending, do NOT drift to a generic overview):\n"
+            f"  → {topic['hook']}\n"
+            f"Open body[0] on this exact dramatic point.\n"
+        )
+
     series_block = ""
     if topic.get("kind") == "series":
         ep = topic.get("episode_number", 1)
@@ -413,7 +422,7 @@ THIS IS A SERIES EPISODE (return-viewer engine — CRITICAL):
 Kind: {topic.get('kind', 'general')}
 Tags: {', '.join(topic.get('tags', []))}
 Niche: {niche}
-{series_block}
+{hook_block}{series_block}
 Reference facts (from Wikipedia, may be long — distill the essentials):
 \"\"\"
 {context}

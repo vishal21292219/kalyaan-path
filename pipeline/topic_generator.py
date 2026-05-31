@@ -128,7 +128,17 @@ def pick_mantra(seed_offset: int = 0) -> dict:
     mantra_file = ROOT / "data/topics_mantra.json"
     if not mantra_file.exists():
         raise FileNotFoundError(f"Mantra topics missing: {mantra_file}")
-    pool = json.loads(mantra_file.read_text())["mantras"]
+    pool = list(json.loads(mantra_file.read_text())["mantras"])
+    # Merge the FRESH researched viral bhakti pool (mantras + deity stories) so
+    # KalyaanPath rides currently-trending + festival-timed topics, not just the
+    # static list — kills repetition.
+    vf = ROOT / "data/viral_topics_bhakti.json"
+    if vf.exists():
+        vd = json.loads(vf.read_text())
+        seen = {m["title"] for m in pool}
+        for m in (vd.get("mantras", []) + vd.get("deity_stories", [])):
+            if m.get("title") and m["title"] not in seen:
+                pool.append(m); seen.add(m["title"])
 
     # Filter out titles used in last 14 days
     state_path = _mantra_state_path()
@@ -297,14 +307,57 @@ def viralize_longform_title(base_topic: dict, language: str = "hindi") -> dict:
     return enhanced
 
 
+def _viral_state_path(niche: str):
+    return ROOT / f"data/state/viral_history_{niche}.json"
+
+
+def pick_viral(seed_offset: int = 0) -> dict:
+    """Pick from the FRESH researched viral-topic pool (data/viral_topics_{niche}.json),
+    avoiding anything used in the last 30 days. This is what kills the 'same videos
+    on repeat' problem — a big rotating pool of specific, currently-trending topics
+    instead of a tiny static deity list. Returns None if no viral file for the niche."""
+    from .utils import load_config
+    niche = load_config().get("niche", "itihaas")
+    vf = ROOT / f"data/viral_topics_{niche}.json"
+    if not vf.exists():
+        return None
+    data = json.loads(vf.read_text())
+    pool = list(data.get("topics", []))
+    if not pool:
+        return None
+
+    sp = _viral_state_path(niche)
+    sp.parent.mkdir(parents=True, exist_ok=True)
+    state = json.loads(sp.read_text()) if sp.exists() else {"history": []}
+    cutoff = date.today() - timedelta(days=30)
+    recent = {h["title"] for h in state["history"] if date.fromisoformat(h["date"]) >= cutoff}
+    avail = [t for t in pool if t["title"] not in recent] or pool
+
+    rng = random.Random(_seed_for_today(seed_offset))
+    chosen = rng.choice(avail)
+    state["history"].append({"title": chosen["title"], "date": date.today().isoformat()})
+    state["history"] = state["history"][-500:]
+    sp.write_text(json.dumps(state, indent=2, ensure_ascii=False))
+
+    return {
+        "kind": "viral",
+        "title": chosen["title"],
+        "hook": chosen.get("hook", ""),
+        "angle": chosen.get("hook", ""),
+        "query": chosen.get("query", ""),
+        "wiki": chosen["title"].split(":")[0].replace(" ", "_"),
+        "tags": ["viral", "trending"],
+    }
+
+
 def pick_trending(seed_offset: int = 0) -> dict:
-    """Pick today's trending: nearby festival > weighted random deity.
+    """Pick today's content: nearby festival > FRESH viral pool > legacy deity.
     Pass seed_offset to vary the pick on the same day (multi-drop schedule).
     """
     topics = load_topics()
     today = date.today()
     # festival in next 5 days wins (festival overrides any offset — same fest all day)
-    for fest in topics["festivals_calendar"]:
+    for fest in topics.get("festivals_calendar", []):
         try:
             f_date = date(today.year, fest["month"], fest["approx_day"])
         except ValueError:
@@ -317,8 +370,15 @@ def pick_trending(seed_offset: int = 0) -> dict:
                 "wiki": fest["name"].replace(" ", "_"),
                 "tags": ["festival", fest["name"].lower().replace(" ", "")],
             }
-    # weighted random deity from trending pool — different per offset
-    pool = topics.get("trending_deities", topics["deities"])
+    # FRESH viral pool (researched, 30-day recency) — the anti-repetition engine.
+    viral = pick_viral(seed_offset)
+    if viral:
+        return viral
+
+    # Legacy fallback: weighted random deity from the static pool.
+    pool = topics.get("trending_deities", topics.get("deities", []))
+    if not pool:
+        return {"kind": "deity", "title": "Lord Shiva", "wiki": "Shiva", "tags": ["shiva"]}
     rng = random.Random(_seed_for_today(seed_offset))
     weights = [d.get("weight", 1) for d in pool]
     d = rng.choices(pool, weights=weights, k=1)[0]
