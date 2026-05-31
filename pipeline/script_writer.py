@@ -480,7 +480,15 @@ def _extract_json(text: str) -> dict:
     end = text.rfind("}")
     if start == -1 or end == -1:
         raise ValueError(f"No JSON object found in LLM output: {text[:200]}")
-    return json.loads(text[start : end + 1])
+    candidate = text[start : end + 1]
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError:
+        # LLMs occasionally emit malformed JSON. Repair the common offenders:
+        # trailing commas before } or ], and stray control chars in strings.
+        repaired = re.sub(r",(\s*[}\]])", r"\1", candidate)
+        repaired = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", repaired)
+        return json.loads(repaired)  # if still bad, raises → caller retries
 
 
 def write_script(topic: dict, context: str, long_form: bool = False,
@@ -532,8 +540,21 @@ def write_script(topic: dict, context: str, long_form: bool = False,
                 errs.append(f"groq: {type(e).__name__}: {e}")
         raise RuntimeError(f"All LLM providers failed: {' | '.join(errs)}")
 
-    raw = _try_chain()
-    script = _extract_json(raw)
+    # Generate + parse, retrying the whole LLM call if the JSON won't parse
+    # (malformed JSON is a flaky one-off — a fresh generation almost always fixes
+    # it, far more reliable than failing the entire run).
+    script = None
+    last_err = None
+    for attempt in range(3):
+        try:
+            raw = _try_chain()
+            script = _extract_json(raw)
+            break
+        except (ValueError, json.JSONDecodeError) as e:
+            last_err = e
+            print(f"[script_writer] JSON parse failed (attempt {attempt + 1}/3): {e} — regenerating")
+    if script is None:
+        raise RuntimeError(f"Script JSON unparseable after 3 attempts: {last_err}")
 
     # Enforce 1:1 visual-body sync for Shorts (biggest quality lever).
     # If LLM returned mismatched counts, pad or truncate visuals to match body.
