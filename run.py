@@ -1,4 +1,6 @@
 """End-to-end pipeline: topic → script → tts → images → video → (publish)."""
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -13,6 +15,41 @@ from pipeline.script_writer import write_script
 from pipeline.topic_generator import pick_mantra, pick_series, pick_shloka_episode, pick_topic, pick_trending
 from pipeline.tts import synthesize
 from pipeline.utils import load_config, out_path, set_active_niche, slugify, today_stamp
+
+
+# Exact YouTube go-live time (UTC HH:MM) per auto-publish slot, keyed by
+# (niche, kind, seed_offset). The generation cron fires HOURS earlier (buffer for
+# GitHub's late crons); YouTube flips the private upload public at this exact time.
+PUBLISH_TIMES = {
+    ("bhakti",  "mantra",   0): "01:30",  # ~7:00 AM IST
+    ("ancient", "trending", 1): "18:00",  # 2:00 PM ET (US afternoon)
+    ("ancient", "trending", 2): "00:00",  # 8:00 PM ET (US evening prime)
+    ("bhajan",  "trending", 0): "13:30",  # ~7:00 PM IST Sunday
+}
+
+
+def _slot_publish_at(args) -> str | None:
+    """Explicit --publish-at wins; else the slot's configured go-live time."""
+    return args.publish_at or PUBLISH_TIMES.get((args.niche, args.kind, args.seed_offset))
+
+
+def _publish_at_iso(hhmm: str | None) -> str | None:
+    """Turn a 'HH:MM' UTC time-of-day into an RFC3339 timestamp for the NEXT
+    future occurrence (today if still ahead, else tomorrow). Returns None if not
+    given or malformed (→ caller publishes immediately)."""
+    if not hhmm:
+        return None
+    try:
+        from datetime import datetime, timedelta, timezone
+        h, m = (int(x) for x in hhmm.split(":"))
+        now = datetime.now(timezone.utc)
+        target = now.replace(hour=h, minute=m, second=0, microsecond=0)
+        if target <= now + timedelta(minutes=5):  # already passed / too soon
+            target += timedelta(days=1)
+        return target.strftime("%Y-%m-%dT%H:%M:%SZ")
+    except Exception as e:
+        print(f"[publish-at] bad value {hhmm!r} ({e}) — publishing immediately")
+        return None
 
 
 def main(argv: list[str]) -> int:
@@ -73,6 +110,12 @@ def main(argv: list[str]) -> int:
     ap.add_argument(
         "--no-motion", action="store_true",
         help="Disable the single Kling hero-scene animation (saves ~$0.4/video).",
+    )
+    ap.add_argument(
+        "--publish-at", default=None, metavar="HH:MM",
+        help="UTC time-of-day to SCHEDULE the YouTube go-live (e.g. 00:00). Upload "
+             "happens now (private); YouTube flips it public at the next occurrence "
+             "of this time. Makes go-live exact despite GitHub's late crons.",
     )
     args = ap.parse_args(argv)
     if args.notify_telegram:
@@ -332,7 +375,8 @@ def main(argv: list[str]) -> int:
         if publish_cfg.get("youtube", True):
             try:
                 from pipeline.uploader_youtube import upload as yt_upload
-                url = yt_upload(video_path, script, thumb_path=thumb_path)
+                url = yt_upload(video_path, script, thumb_path=thumb_path,
+                                publish_at=_publish_at_iso(_slot_publish_at(args)))
                 print(f"[publish] youtube: {url}")
                 _delivered = True
             except Exception:
@@ -509,7 +553,8 @@ def _run_bhajan(args) -> int:
     if args.publish:
         try:
             from pipeline.uploader_youtube import upload as yt_upload
-            url = yt_upload(video_path, script, thumb_path=thumb_path)
+            url = yt_upload(video_path, script, thumb_path=thumb_path,
+                            publish_at=_publish_at_iso(_slot_publish_at(args)))
             print(f"[publish] youtube: {url}")
             _delivered = True
         except Exception:

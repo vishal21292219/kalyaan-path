@@ -25,17 +25,17 @@ on:
     # Morning history/temple drop + night-prime SERIES binge drop.
     - cron: "30 15 * * *"   # fire 21:00 IST → Itihaasvani drop #1 for TOMORROW 08:30 IST upload
     - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #2 (SERIES) for TOMORROW 22:30 IST upload
-    # KalyaanPath: DAILY morning mantra (fresh viral + festival-timed topics now,
-    # so no more repetitive-template throttling). 1/day keeps it consistent.
-    - cron: "0 1 * * *"        # fire 06:30 IST DAILY → KalyaanPath morning mantra (auto-publish)
+    # KalyaanPath: DAILY morning mantra. GENERATE early (21:30 UTC); YouTube
+    # schedules go-live at 01:30 UTC (~7 AM IST) via publishAt — exact, on time.
+    - cron: "30 21 * * *"      # generate ~21:30 UTC → scheduled go-live 01:30 UTC
     # KalyaanPath SUNDAY BHAJAN — its top-performing format (Vrindavan Bhajan =
     # 843 views, channel best). Music-heavy MP3 → video, auto-pick next unused
     # bhajan from data/music_bhajan/. Sunday evening prime.
-    - cron: "30 13 * * 0"       # fire 19:00 IST Sunday → KalyaanPath bhajan (auto-publish)
+    - cron: "0 10 * * 0"        # Sun: generate ~10:00 UTC → scheduled go-live 13:30 UTC (~7 PM IST)
     # REVIVED 2026-05-31: B-roll pivot (real Pexels stock footage, not AI slideshow).
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
-    - cron: "0 18 * * *"    # 18:00 UTC = 2:00 PM ET / 11 AM PT → US afternoon peak
-    - cron: "0 0 * * *"     # 00:00 UTC = 8:00 PM ET / 5 PM PT → US evening PRIME (robust year-round)
+    - cron: "0 14 * * *"    # generate ~14:00 UTC → scheduled go-live 18:00 UTC (2 PM ET, US afternoon)
+    - cron: "0 20 * * *"    # generate ~20:00 UTC → scheduled go-live 00:00 UTC (8 PM ET, US evening PRIME)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
   workflow_dispatch:
@@ -169,27 +169,27 @@ jobs:
             echo "mode=telegram" >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 1 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "30 21 * * *" ]; then
             # KalyaanPath morning mantra, DAILY, AUTO-publish to YouTube.
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
             echo "kind=mantra"   >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "30 13 * * 0" ]; then
+          elif [ "${{ github.event.schedule }}" = "0 10 * * 0" ]; then
             # KalyaanPath SUNDAY BHAJAN — music-MP3 → video, AUTO-publish to YouTube.
             echo "niche=bhajan"  >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 18 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "0 14 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 0 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "0 20 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT

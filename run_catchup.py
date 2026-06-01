@@ -33,13 +33,16 @@ from pipeline.publish_log import was_published_today
 #   mode: "publish" (auto-YT) or "telegram" (drop)
 #   weekday: None = daily, else Python weekday (Mon=0 .. Sun=6)
 # Saturday long-form is intentionally EXCLUDED (heavy/expensive; recover by hand).
+# hour/minute = the GENERATION cron time (UTC). run.py auto-schedules each
+# publish slot's exact go-live via its PUBLISH_TIMES map, so recovered videos
+# also get the right scheduled go-live — no need to pass it here.
 SLOTS = [
-    ("bhakti",  "mantra",   0, "publish",   1,  0, None),
+    ("bhakti",  "mantra",   0, "publish",  21, 30, None),
     ("itihaas", "trending", 1, "telegram", 15, 30, None),
     ("itihaas", "series",   3, "telegram", 16,  0, None),
-    ("ancient", "trending", 1, "publish",  18,  0, None),
-    ("ancient", "trending", 2, "publish",   0,  0, None),
-    ("bhajan",  "trending", 0, "publish",  13, 30, 6),  # Sunday only
+    ("ancient", "trending", 1, "publish",  14,  0, None),
+    ("ancient", "trending", 2, "publish",  20,  0, None),
+    ("bhajan",  "trending", 0, "publish",  10,  0, 6),  # Sunday only
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled

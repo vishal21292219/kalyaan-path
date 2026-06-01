@@ -53,7 +53,8 @@ def _get_service():
     return build("youtube", "v3", credentials=creds)
 
 
-def upload(video_path: Path, script: dict, thumb_path: Path | None = None) -> str:
+def upload(video_path: Path, script: dict, thumb_path: Path | None = None,
+           publish_at: str | None = None) -> str:
     cfg = load_config()
     privacy = cfg["publish"]["privacy"]
     hashtags = " ".join(cfg["branding"]["hashtags"])
@@ -73,6 +74,15 @@ def upload(video_path: Path, script: dict, thumb_path: Path | None = None) -> st
         f"{disclosure}\n\n"
         f"{hashtags} {' '.join(script.get('hashtags', []))}"
     )
+    status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False}
+    # Scheduled publish: upload PRIVATE now, YouTube flips it public EXACTLY at
+    # publish_at (RFC3339 UTC). This decouples generation time (which GitHub crons
+    # make late/unreliable) from go-live time (which becomes precise). publishAt
+    # REQUIRES privacyStatus=private and a FUTURE timestamp.
+    if publish_at:
+        status["privacyStatus"] = "private"
+        status["publishAt"] = publish_at
+        print(f"[youtube] scheduling go-live at {publish_at} (uploading private)")
     body = {
         "snippet": {
             "title": title[:100],
@@ -80,7 +90,7 @@ def upload(video_path: Path, script: dict, thumb_path: Path | None = None) -> st
             "tags": [h.lstrip("#") for h in script.get("hashtags", [])][:25],
             "categoryId": "22",  # People & Blogs
         },
-        "status": {"privacyStatus": privacy, "selfDeclaredMadeForKids": False},
+        "status": status,
     }
     service = _get_service()
     media = MediaFileUpload(str(video_path), chunksize=-1, resumable=True, mimetype="video/mp4")
