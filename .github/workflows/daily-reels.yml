@@ -155,11 +155,11 @@ jobs:
             echo "long_form=${{ inputs.long_form }}"   >> $GITHUB_OUTPUT
             echo "topic=${{ inputs.topic }}"           >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 15 * * *" ]; then
-            # AM drop = trending. TELEGRAM review (manual) until user confirms auto-publish.
-            # OAuth + publishAt ready — flip mode=publish to enable auto-YT.
+            # AM drop = trending (monuments/forts/tech — NON-temple). AUTO-publish
+            # to YouTube; go-live ~08:30 IST next day via publishAt.
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
-            echo "mode=telegram" >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "45 15 * * *" ]; then
@@ -169,9 +169,9 @@ jobs:
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
-            # Night prime drop = SERIES episode (return-viewer engine).
-            # TELEGRAM review (manual) until user confirms auto-publish.
-            # OAuth + publishAt ready — flip mode=publish to enable auto-YT.
+            # Night prime drop = Mandir Rahasya SERIES (temple episodes).
+            # TELEGRAM review (manual) — temple visuals being moved to authentic
+            # Wikimedia photos; flip mode=publish only after user confirms quality.
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=series"   >> $GITHUB_OUTPUT
             echo "mode=telegram" >> $GITHUB_OUTPUT
