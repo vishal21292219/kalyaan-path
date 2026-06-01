@@ -345,6 +345,7 @@ def pick_viral(seed_offset: int = 0) -> dict:
         "hook": chosen.get("hook", ""),
         "angle": chosen.get("hook", ""),
         "query": chosen.get("query", ""),
+        "footage": bool(chosen.get("footage", False)),
         "wiki": chosen["title"].split(":")[0].replace(" ", "_"),
         "tags": ["viral", "trending"],
     }

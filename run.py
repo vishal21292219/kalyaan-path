@@ -222,7 +222,13 @@ def main(argv: list[str]) -> int:
     # 5. images — pregen cache wins, else realtime gen
     img_dir = out_path("images", base)
     _img_cfg = load_config().get("images", {})
-    footage_mode = str(_img_cfg.get("mode", "image")).lower() == "footage" and not args.long_form
+    # Footage mode triggers either globally (images.mode=footage) OR per-topic
+    # (place/monument viral topics carry "footage": true → Pexels B-roll, while
+    # mythology-figure topics on the same channel stay on fal AI images).
+    footage_mode = (
+        str(_img_cfg.get("mode", "image")).lower() == "footage"
+        or bool(topic.get("footage"))
+    ) and not args.long_form
     footage_clips: dict[int, Path] = {}
     if pregen_active and cached_images and len(cached_images) >= 5:
         # Copy cached images into the run's image dir (so cleanup logic stays consistent)
