@@ -231,6 +231,13 @@ def main(argv: list[str]) -> int:
         str(_img_cfg.get("mode", "image")).lower() == "footage"
         or bool(topic.get("footage"))
     ) and not args.long_form
+    # Itihaasvani (Indian monuments/temples): Pexels has no real footage of these
+    # → it returned FOREIGN clips (authenticity killer). Use authentic real photos
+    # from Wikimedia Commons instead (Ken Burns motion animates them), with fal AI
+    # India-images as fallback. Other niches (TimeDecoders) keep Pexels footage.
+    wiki_mode = footage_mode and args.niche == "itihaas"
+    if wiki_mode:
+        footage_mode = False
     footage_clips: dict[int, Path] = {}
     if pregen_active and cached_images and len(cached_images) >= 5:
         # Copy cached images into the run's image dir (so cleanup logic stays consistent)
@@ -245,6 +252,40 @@ def main(argv: list[str]) -> int:
     elif args.skip_images and img_dir.exists() and any(img_dir.iterdir()):
         images = sorted(img_dir.glob("img_*.jpg"))
         print(f"[images] reusing {len(images)} cached")
+    elif wiki_mode:
+        # Authentic real photos of the actual Indian monument from Wikimedia
+        # Commons (free-licensed). Falls back to fal AI India-images if too few
+        # real photos exist (e.g. high-security temples). Credits auto-appended
+        # to the description (CC attribution requirement — no payment).
+        from pipeline.wiki_images import fetch_wiki_images, build_credit_block
+        wiki_imgs, wiki_credits = [], []
+        try:
+            wiki_imgs, wiki_credits = fetch_wiki_images(topic, img_dir, want=12)
+        except Exception as e:
+            print(f"[wiki] fetch error ({type(e).__name__}: {e}) — will use AI images")
+        if len(wiki_imgs) >= 5:
+            images = wiki_imgs
+            print(f"[wiki] {len(images)} authentic Wikimedia photos for '{topic.get('title')}'")
+            cb = build_credit_block(wiki_credits)
+            if cb:
+                script["description"] = (script.get("description", "") + "\n\n" + cb).strip()
+        else:
+            print(f"[wiki] only {len(wiki_imgs)} real photos — falling back to fal AI India-images")
+            try:
+                images = generate_images(script["visuals"], img_dir, long_form=args.long_form,
+                                         character_bible=script.get("character_bible"))
+                print(f"[images] generated {len(images)} (AI fallback)")
+            except Exception as e:
+                from pipeline.retry_queue import add_or_update
+                reason = f"wiki+ai: {type(e).__name__}: {e}"
+                print(f"[retry-queue] saving for hourly retry: {reason}")
+                add_or_update(
+                    niche=args.niche, kind=args.kind, topic=args.topic or "auto",
+                    seed_offset=args.seed_offset,
+                    mode=("publish" if args.publish else ("telegram" if args.notify_telegram else "local")),
+                    failed_reason=reason,
+                )
+                return 2
     elif footage_mode:
         # B-roll mode (TimeDecoders): fetch REAL stock clips per scene instead of
         # AI stills. Posters (first frames) act as the still fallback + thumbnail

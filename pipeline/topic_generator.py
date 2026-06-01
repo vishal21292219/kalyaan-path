@@ -228,7 +228,7 @@ def pick_series(seed_offset: int = 0) -> dict:
         "title": ep["title"],
         "angle": ep.get("angle", ""),
         "footage": bool(ep.get("footage", s.get("footage", False))),
-        "wiki": ep["title"].replace(" ", "_"),
+        "wiki": ep.get("wiki") or ep["title"].replace(" ", "_"),
         "tags": ["series", s["id"], "mythology"],
     }
 
