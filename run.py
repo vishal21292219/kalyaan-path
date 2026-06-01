@@ -253,31 +253,69 @@ def main(argv: list[str]) -> int:
         images = sorted(img_dir.glob("img_*.jpg"))
         print(f"[images] reusing {len(images)} cached")
     elif wiki_mode:
-        # Authentic real photos of the actual Indian monument from Wikimedia
-        # Commons (free-licensed). Falls back to fal AI India-images if too few
-        # real photos exist (e.g. high-security temples). Credits auto-appended
-        # to the description (CC attribution requirement — no payment).
+        # HYBRID (Itihaasvani): scene-matched AI images that FOLLOW the script and
+        # build suspense (cinematic, authentic Indian setting) as the base, with a
+        # few REAL Wikimedia photos of the actual monument spliced into establishing
+        # slots for recognizable authenticity. Real-photo credits auto-appended to
+        # the description (CC attribution — name only, no payment). If AI is down,
+        # fall back to all real photos; if both fail, retry-queue.
+        import shutil as _sh
         from pipeline.wiki_images import fetch_wiki_images, build_credit_block
-        wiki_imgs, wiki_credits = [], []
+
+        # 1) AI base — per-scene, cinematic + suspenseful, authentic Indian look.
+        _style = ("cinematic dramatic lighting, moody atmospheric, mysterious and "
+                  "suspenseful, photorealistic, authentic ancient Indian setting, "
+                  "highly detailed, no text, no watermark")
+        _visuals = [f"{v}. {_style}" for v in (script.get("visuals") or [])]
         try:
-            wiki_imgs, wiki_credits = fetch_wiki_images(topic, img_dir, want=12)
+            images = generate_images(_visuals, img_dir, long_form=args.long_form,
+                                     character_bible=script.get("character_bible"))
+            print(f"[images] {len(images)} AI scene-matched (hybrid base)")
         except Exception as e:
-            print(f"[wiki] fetch error ({type(e).__name__}: {e}) — will use AI images")
-        if len(wiki_imgs) >= 5:
-            images = wiki_imgs
-            print(f"[wiki] {len(images)} authentic Wikimedia photos for '{topic.get('title')}'")
-            cb = build_credit_block(wiki_credits)
-            if cb:
-                script["description"] = (script.get("description", "") + "\n\n" + cb).strip()
+            print(f"[images] AI base unavailable ({type(e).__name__}: {e}) — trying all real photos")
+            images = []
+
+        # 2) Real Wikimedia monument photos (for inserts, or full set if AI down).
+        real_dir = out_path("images", base + "_real")
+        real_imgs, real_credits = [], []
+        try:
+            real_imgs, real_credits = fetch_wiki_images(topic, real_dir, want=6)
+        except Exception as e:
+            print(f"[wiki] real-photo fetch error: {type(e).__name__}: {e}")
+        used_credits: list[str] = []
+
+        if images:
+            # Splice real photos into establishing slots (opening + spread).
+            if real_imgs:
+                n = len(images)
+                slots = [0]
+                if n >= 4:
+                    slots.append(n // 2)
+                if n >= 7:
+                    slots.append(n - 2)
+                k = 0
+                for slot, rp in zip(slots, real_imgs):
+                    try:
+                        _sh.copy2(rp, images[slot])
+                        used_credits.append(real_credits[k])
+                        k += 1
+                    except Exception:
+                        pass
+                print(f"[wiki] spliced {k} real monument photos into AI base (slots {slots[:k]})")
         else:
-            print(f"[wiki] only {len(wiki_imgs)} real photos — falling back to fal AI India-images")
-            try:
-                images = generate_images(script["visuals"], img_dir, long_form=args.long_form,
-                                         character_bible=script.get("character_bible"))
-                print(f"[images] generated {len(images)} (AI fallback)")
-            except Exception as e:
+            # AI unavailable → use real photos as the whole set if we have enough.
+            if len(real_imgs) >= 5:
+                img_dir.mkdir(parents=True, exist_ok=True)
+                images = []
+                for i, rp in enumerate(real_imgs):
+                    dst = img_dir / f"img_{i:02d}.jpg"
+                    _sh.copy2(rp, dst)
+                    images.append(dst)
+                used_credits = list(real_credits[:len(images)])
+                print(f"[wiki] AI down — using {len(images)} real Wikimedia photos")
+            else:
                 from pipeline.retry_queue import add_or_update
-                reason = f"wiki+ai: {type(e).__name__}: {e}"
+                reason = f"hybrid: AI base failed and only {len(real_imgs)} real photos"
                 print(f"[retry-queue] saving for hourly retry: {reason}")
                 add_or_update(
                     niche=args.niche, kind=args.kind, topic=args.topic or "auto",
@@ -286,6 +324,11 @@ def main(argv: list[str]) -> int:
                     failed_reason=reason,
                 )
                 return 2
+
+        # 3) Attribution for the real photos actually used.
+        cb = build_credit_block(used_credits)
+        if cb:
+            script["description"] = (script.get("description", "") + "\n\n" + cb).strip()
     elif footage_mode:
         # B-roll mode (TimeDecoders): fetch REAL stock clips per scene instead of
         # AI stills. Posters (first frames) act as the still fallback + thumbnail

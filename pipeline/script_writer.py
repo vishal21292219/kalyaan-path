@@ -406,16 +406,19 @@ Return ONLY the JSON object."""
         angle = topic.get("angle", "")
         series_block = f"""
 THIS IS A SERIES EPISODE (return-viewer engine — CRITICAL):
-- Series: "{sname}" — this is EPISODE {ep} of {tot}.
-- Episode focus: {topic['title']}. Angle: {angle}
+- Series: "{sname}" — episode focus: {topic['title']}. Angle: {angle}
 - TITLE format (Hinglish): start with "{sname} #{ep}:" then the dramatic hook,
   then 😱, then "{tail}", then "#facts".
   Example: "{sname} #{ep}: <dramatic Hinglish hook>! 😱 {tail} #facts"
-- HOOK / body[0]: open on this episode's most dramatic moment (NOT a recap).
-- In the first 10 sec, remind it's a series ("{sname} ki series ka part {ep}").
-- CTA MUST drive return viewing: tell them Episode {ep + 1} aa raha hai (agle
-  din/drop) AND ask them to subscribe so they don't miss it. Also nudge to watch
-  Episode 1 if they haven't.
+- The episode number ({ep}) appears ONLY in the title text. NEVER speak it in the
+  narration — do NOT say "episode {ep}", "part {ep}", "{ep} waala", or "is series ka
+  part". The voiceover must not contain any episode number at all.
+- HOOK / body[0]: open DIRECTLY on this episode's most dramatic, suspenseful
+  moment — no recap, no "is series me", no numbering.
+- Do NOT mention, name, or tease the NEXT episode (or any other episode's topic)
+  anywhere — the schedule may reorder, so naming an upcoming topic would be wrong.
+- CTA: generic return-driver ONLY, e.g. "aise aur rahasya ke liye subscribe karo"
+  + ask a comment. NO episode numbers, NO "agla episode ... aa raha hai".
 - Keep the SAME visual style across the series so episodes feel connected.
 """
     return f"""Topic: {topic['title']}
