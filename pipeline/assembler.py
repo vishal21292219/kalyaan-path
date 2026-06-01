@@ -814,8 +814,16 @@ def assemble(
     sting_ts = [] if (skip_music or not _stings_on) else pick_sting_timestamps(duration)
     have_stings = bool(sting_ts) and pick_sting(0) is not None
 
+    # Tension sound-design (boom on hook, whoosh risers into reveals, heartbeat
+    # bed) — gated per niche via config (video.sfx). Heartbeat only on suspense
+    # series episodes. Off by default so other niches are unaffected.
+    _sfx_on = (not skip_music) and bool(cfg.get("video", {}).get("sfx", False))
+    _hb_on = _sfx_on and bool(cfg.get("video", {}).get("heartbeat", False)) \
+        and script.get("kind") == "series"
+    whoosh_ts = sting_ts if (_sfx_on and have_stings) else []
+
     composed_audio: Path | None = None
-    if not skip_music and (drone or have_stings):
+    if not skip_music and (drone or have_stings or _sfx_on):
         try:
             composed_audio = compose_audio_track(
                 voice_path=voice_path,
@@ -823,10 +831,14 @@ def assemble(
                 drone_path=drone,
                 sting_timestamps=sting_ts if have_stings else [],
                 out_path=work / "mix.m4a",
+                hook_boom=_sfx_on,
+                whoosh_timestamps=whoosh_ts,
+                heartbeat=_hb_on,
             )
             print(
-                f"[audio] 3-layer mix → drone={'yes' if drone else 'no'} "
-                f"stings={len(sting_ts) if have_stings else 0}"
+                f"[audio] mix → drone={'yes' if drone else 'no'} "
+                f"stings={len(sting_ts) if have_stings else 0} "
+                f"sfx={'boom+whoosh' if _sfx_on else 'no'} hb={'yes' if _hb_on else 'no'}"
             )
         except Exception as e:
             print(f"[audio] compose_audio_track failed ({e}); falling back to legacy mix")

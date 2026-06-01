@@ -202,6 +202,8 @@ video:
   bitrate: 6M
   hero_motion: false   # Kling v3 needs fal — OFF on free stack. Set true after recharge.
   duration_target_sec: 50
+  sfx: true            # tension sound-design: impact boom on hook + whoosh risers into reveals
+  heartbeat: true      # subtle heartbeat suspense bed (series episodes only)
   font: /System/Library/Fonts/Supplemental/Devanagari Sangam MN.ttc
   font_size: 72
   fps: 30

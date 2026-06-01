@@ -234,6 +234,9 @@ def compose_audio_track(
     voice_volume: float = 1.2,
     drone_volume: float = 0.10,   # ~-20 dB under voice
     sting_volume: float = 0.18,   # ~-15 dB under voice
+    hook_boom: bool = False,           # deep impact on the opening jolt
+    whoosh_timestamps: list[float] | None = None,  # riser ~0.3s before each reveal
+    heartbeat: bool = False,           # subtle looped suspense bed
 ) -> Path:
     """Bake voice + drone + stings into a single AAC/M4A audio file.
 
@@ -290,7 +293,46 @@ def compose_audio_track(
         )
         sting_labels.append(f"[{lbl}]")
 
+    # --- tension SFX layers (boom on hook, whoosh risers, heartbeat bed) ---
+    sfx_dir = ROOT / "data" / "sfx"
+    sfx_labels: list[str] = []
+
+    def _add_oneshot(fname: str, at_t: float, vol: float, label: str):
+        nonlocal next_input_idx
+        p = sfx_dir / fname
+        if not p.exists():
+            return
+        inputs.extend(["-i", str(p)])
+        idx = next_input_idx
+        next_input_idx += 1
+        delay_ms = max(0, int(at_t * 1000))
+        filter_parts.append(
+            f"[{idx}:a]volume={vol:.3f},adelay={delay_ms}|{delay_ms},"
+            f"apad=pad_dur=0.05[{label}]"
+        )
+        sfx_labels.append(f"[{label}]")
+
+    if hook_boom:
+        _add_oneshot("boom.wav", 0.12, 0.55, "boom")
+    for j, t in enumerate(whoosh_timestamps or []):
+        _add_oneshot("whoosh.wav", max(0.0, float(t) - 0.30), 0.30, f"whoosh{j}")
+
+    if heartbeat:
+        hb = sfx_dir / "heartbeat.wav"
+        if hb.exists():
+            inputs.extend(["-stream_loop", "-1", "-i", str(hb)])
+            idx = next_input_idx
+            next_input_idx += 1
+            fade_out_start = max(0.0, video_duration - 1.0)
+            filter_parts.append(
+                f"[{idx}:a]volume=0.085,atrim=duration={video_duration:.3f},"
+                f"asetpts=PTS-STARTPTS,afade=t=in:st=0:d=0.8,"
+                f"afade=t=out:st={fade_out_start:.3f}:d=1.0[hb]"
+            )
+            sfx_labels.append("[hb]")
+
     mix_labels.extend(sting_labels)
+    mix_labels.extend(sfx_labels)
 
     if len(mix_labels) == 1:
         # voice only — short-circuit to a plain re-encode

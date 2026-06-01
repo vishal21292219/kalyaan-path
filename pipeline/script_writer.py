@@ -420,6 +420,19 @@ THIS IS A SERIES EPISODE (return-viewer engine — CRITICAL):
 - CTA: generic return-driver ONLY, e.g. "aise aur rahasya ke liye subscribe karo"
   + ask a comment. NO episode numbers, NO "agla episode ... aa raha hai".
 - Keep the SAME visual style across the series so episodes feel connected.
+
+⚡ TIGHT + STICKY OVERRIDE (this OVERRIDES the 2:30-3:00 / 15-22 line targets
+above — a tight reel keeps retention; a long slow one gets swiped):
+- TOTAL spoken duration MUST be 45-65 seconds. body = 9-13 SHORT lines only.
+- LINE 0 (the hook) is everything — it must land in the FIRST 1 SECOND:
+  a concrete SHOCKING claim/number on the actual subject, mid-action. NO
+  question setup, NO "kya aap jaante hain", NO "ek rahasya". Drop the bomb.
+  Good: "Is mandir ke shikhar pe 52-ton ka magnet tha — jahaaz tak kheench leta tha."
+- Pace: every single line reveals something NEW and escalates. No setup lines,
+  no recap, no filler. If a line doesn't shock or advance — delete it.
+- Build SUSPENSE: hold the biggest reveal for the 70-80% mark; plant a
+  mini-cliffhanger ("...par asli sach aage hai") every 2-3 lines.
+- Short punchy sentences (≤12 words). Mobile viewer, thumb hovering.
 """
     return f"""Topic: {topic['title']}
 Kind: {topic.get('kind', 'general')}
