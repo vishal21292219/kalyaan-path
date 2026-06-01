@@ -599,7 +599,7 @@ def assemble(
     prev = "0:v"
     overlay_idx = 0
 
-    if script.get("kind") == "shloka_episode" or script.get("episode_number"):
+    if script.get("kind") == "shloka_episode":
         ep_num = script.get("episode_number")
         ref = script.get("ref", "")
         badge_text = f"  Shloka  {ep_num}  |  Gita  {ref}  " if ep_num else "  Bhagavad Gita  "
