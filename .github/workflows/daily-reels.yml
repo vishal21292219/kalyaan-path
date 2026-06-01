@@ -34,8 +34,8 @@ on:
     - cron: "30 13 * * 0"       # fire 19:00 IST Sunday → KalyaanPath bhajan (auto-publish)
     # REVIVED 2026-05-31: B-roll pivot (real Pexels stock footage, not AI slideshow).
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
-    - cron: "30 17 * * *"   # fire 23:00 IST → TimeDecoders EU prime (auto-publish)
-    - cron: "30 22 * * *"   # fire 04:00 IST → TimeDecoders US prime (auto-publish)
+    - cron: "0 18 * * *"    # 18:00 UTC = 2:00 PM ET / 11 AM PT → US afternoon peak
+    - cron: "0 0 * * *"     # 00:00 UTC = 8:00 PM ET / 5 PM PT → US evening PRIME (robust year-round)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
   workflow_dispatch:
@@ -183,13 +183,13 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "30 17 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "0 18 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "30 22 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "0 0 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT

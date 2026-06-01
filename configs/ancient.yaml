@@ -66,7 +66,10 @@ llm:
     name "TimeDecoders". CTA examples: "Subscribe TimeDecoders for daily
     history decoded", "Hit subscribe — join the TimeDecoders community".
     Audience: English-speaking, 18-50, curious about history's biggest unsolved
-    questions. Global audience (India, US, UK, diaspora).
+    questions. PRIMARILY US & WESTERN audience (US, UK, Canada, Australia) —
+    lean US/Western mysteries (Atlantis, Göbekli Tepe, pyramids, Bermuda,
+    Stonehenge, Easter Island); India-centric topics (Kailasa, Dwarka) only as
+    a RARE crossover (≤1 in 10), never the default.
     Tone: mysterious, dramatic, intriguing, authoritative (like David
     Attenborough meets Bright Side). Hook with "did you know" or "what if" angles.
     Style: Like a podcast host revealing forgotten secrets. Use phrases like
@@ -108,7 +111,7 @@ llm:
          * "What [Authority] Doesn't Want You To Know About X"
          * "X: The [Number]-Year-Old Mystery Still Unsolved"
          * "Scientists Are Baffled by ..."
-       - End with EXACTLY 1 emoji (🔱 ⚱️ 🌊 🗿 ⚡ 🏛️ 👁️ 🔥 ❓ ⏳ 🗝️)
+       - End with EXACTLY 1 emoji (⚱️ 🌊 🗿 ⚡ 🏛️ 👁️ 🔥 ❓ ⏳ 🗝️) — no 🔱 (reads Indian)
        - Format: [Topic/Place] + [Hook/Mystery] + [Emoji]
        - Good examples:
          * "Gunung Padang: The Pyramid Older Than History 🗿"
@@ -126,11 +129,10 @@ llm:
        Line 5 (verbatim): "If you love decoding history's biggest mysteries, hit
                           Subscribe and join the TimeDecoders community —
                           new mysteries decoded every day!"
-       Line 6 (verbatim, with exact emojis and line breaks):
+       Line 6 (verbatim, with exact emojis and line breaks — ET-first for US):
               "🔔 Daily uploads on @TimeDecoders:
-               ✨ 6 PM UK / 1 PM EST — Lost civilizations
-               ✨ 7 PM EST — Ancient artifacts decoded
-               ✨ Saturday 1 PM EST — Long-form documentary"
+               ✨ 2 PM ET — Lost civilizations decoded
+               ✨ 8 PM ET — Ancient artifacts & mysteries"
        Line 7 (verbatim): "📩 Business: gopulabs@gmail.com"
        Line 8: 12-15 hashtags
        Line 9 (VIRAL SEO BLOCK — proven on multi-M-view channels):
@@ -179,7 +181,7 @@ video:
   # footage only. (stings:false is redundant under music:false but kept explicit.)
   music: false
   stings: false
-  duration_target_sec: 50
+  duration_target_sec: 42
   font: assets/fonts/Anton-Regular.ttf
   font_size: 80
   fps: 30
@@ -206,7 +208,7 @@ voice:
     - en-US-AndrewMultilingualNeural  # natural conversational US male
     - en-US-BrianMultilingualNeural   # warm baritone US male
     - en-US-EricNeural                # confident US male
-    - en-GB-ThomasNeural              # dramatic British narrator
+    - en-US-RogerNeural               # mature authoritative US narrator (was en-GB-Thomas — British diluted US fit)
 
   # For dramatic intro mode (not used yet)
   shloka_voice: en-GB-RyanNeural  # British gravitas

@@ -37,8 +37,8 @@ SLOTS = [
     ("bhakti",  "mantra",   0, "publish",   1,  0, None),
     ("itihaas", "trending", 1, "telegram", 15, 30, None),
     ("itihaas", "series",   3, "telegram", 16,  0, None),
-    ("ancient", "trending", 1, "publish",  17, 30, None),
-    ("ancient", "trending", 2, "publish",  22, 30, None),
+    ("ancient", "trending", 1, "publish",  18,  0, None),
+    ("ancient", "trending", 2, "publish",   0,  0, None),
     ("bhajan",  "trending", 0, "publish",  13, 30, 6),  # Sunday only
 ]
 
