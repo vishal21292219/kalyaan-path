@@ -25,6 +25,8 @@ PUBLISH_TIMES = {
     ("ancient", "trending", 1): "18:00",  # 2:00 PM ET (US afternoon)
     ("ancient", "trending", 2): "00:00",  # 8:00 PM ET (US evening prime)
     ("bhajan",  "trending", 0): "13:30",  # ~7:00 PM IST Sunday
+    ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
+    ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST next evening prime (PM series)
 }
 
 
