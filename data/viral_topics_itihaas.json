@@ -1,11 +1,6 @@
 {
   "_note": "Fresh viral topic pool (researched). pick_viral() rotates through with recency avoidance so videos don't repeat. Topics with 'footage': true use Pexels B-roll AND get 3x pick-weight (proven 9M monument/mystery pattern). Refresh/extend anytime.",
   "topics": [
-    {"title": "Padmanabhaswamy Vault B", "hook": "5 vault khule, par Vault B aaj tak band — do naag wale darwaze pe likha hai, jo kholega tabaahi aayegi", "query": "ancient temple door", "weight": 2},
-    {"title": "Jagannath Puri ka ulta jhanda", "hook": "Puri mandir ka jhanda 1800 saalon se hawa ke ULTI disha mein lehrata hai — science aaj tak nahi samjha", "query": "temple flag wind"},
-    {"title": "Jagannath Sudarshan Chakra", "hook": "1 ton ka chakra bina machine ke shikhar pe chadhaya gaya, aur Puri mein kahin se bhi dekho wo aap hi ki taraf mudta hai", "query": "temple golden wheel"},
-    {"title": "Jagannath shadowless mandir", "hook": "Din ke kisi bhi pal mein Puri mandir ki parchhai zameen pe nahi padti — optical science fail ho jaata hai", "query": "temple noon sun"},
-    {"title": "Kamakhya Devi Assam", "hook": "Yahan koi murti nahi — Devi har monsoon mein rajaswala hoti hain, aur nadi ka paani 3 din laal ho jaata hai", "query": "ancient hill temple"},
     {"title": "Nidhivan Vrindavan", "hook": "Suraj doobte hi sab nikal jaate hain — kehte hain raat ko Krishna gopiyon ke saath raas karte hain, jo ruka wo paagal ho gaya", "query": "dark forest temple"},
     {"title": "Mahakaleshwar Bhasma Aarti", "hook": "Duniya ki eklauti aarti jahan chita ki raakh se Shiv ko nehlaya jaata hai — aur auratein ise dekh nahi sakti", "query": "shiva temple fire"},
     {"title": "Kal Bhairav Ujjain", "hook": "Yahan bhagwan SHARAB peete hain — pujari pyaala muh se lagate hain aur daaru gaayab ho jaati hai, kahan jaati hai koi nahi jaanta", "query": "temple offering bowl"},
@@ -36,13 +31,9 @@
     {"title": "Jal Mahal paani mein kaise khada", "hook": "300 saal se jheel ke beech doobi 4 manzilein, par mahal aaj bhi salaamat — paani mein neev kaise tiki?", "query": "jal mahal jaipur lake", "footage": true},
     {"title": "Hawa Mahal bina neev ke", "hook": "5 manzil, 953 jharokhe, par koi neev nahi — sabse ooncha bina-foundation building, girta kyun nahi?", "query": "hawa mahal jaipur", "footage": true},
     {"title": "Taj Mahal bina machine ke", "hook": "22 saal, 20,000 mazdoor, 350 ton marble 300km se laaya — bina crane bina machine ye kaise bana?", "query": "taj mahal agra", "footage": true},
-    {"title": "Lepakshi ka latakta khambha", "hook": "Veerabhadra mandir ka ek khambha zameen ko chhuta hi nahi — neeche se kapda nikal jaata hai, angrej engineer bhi haar gaya", "query": "stone temple pillar india", "footage": true},
-    {"title": "Konark ka 52-ton magnet", "hook": "Sun temple ke shikhar pe itna bada magnet tha ki samandar ke jahaaz raaste bhatak jaate the — isliye angrezon ne use nikaal phenka", "query": "konark sun temple", "footage": true},
     {"title": "Brihadeeswara ki parchhai", "hook": "80 ton ka kalash 66m ooncha bina crane ke chadhaya, aur dopahar mein parchhai zameen pe girti hi nahi — 1000 saal pehle", "query": "brihadeeswara temple tanjore", "footage": true},
     {"title": "Delhi ka Iron Pillar", "hook": "1600 saal se khula khada loha, par ek dhabba tak zang nahi — aaj ki science bhi nahi bana paati", "query": "iron pillar delhi", "footage": true},
     {"title": "Chand Baori ki 3500 seedhiyan", "hook": "13 manzil gehri baoli, 3500 seedhiyan perfect symmetry mein — 1200 saal pehle bina calculator kaise?", "query": "chand baori stepwell", "footage": true},
-    {"title": "Kailasa: ek chattan ka mandir", "hook": "Ek hi pahaad ko UPAR se neeche kaata, 2 lakh ton patthar hataya — sirf chheni-hathauda se", "query": "kailasa temple ellora", "footage": true},
-    {"title": "Stambheshwar: samandar nigal leta hai", "hook": "Gujarat ka Shiv mandir din mein do baar poora samandar mein doob jaata hai, phir ubhar aata hai", "query": "sea tide temple gujarat", "footage": true},
 
     {"title": "Bina bijli 1000 saal pehle AC", "hook": "Rajasthan ke mehlon mein 45°C mein bhi andar thanda — bina bijli ye desi cooling kaise?", "query": "rajasthan palace architecture", "footage": true},
     {"title": "Bina fridge barf banti thi", "hook": "2500 saal pehle bharat mein loha-garam registan mein raat ko barf bana lete the — kaise?", "query": "desert night sky", "footage": true},

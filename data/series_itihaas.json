@@ -1,6 +1,21 @@
 {
   "series": [
     {
+      "id": "mandir_rahasya",
+      "name": "Bharat ke Mandir Rahasya",
+      "english_tail": "Temple Mystery",
+      "footage": true,
+      "episodes": [
+        {"title": "Padmanabhaswamy Vault B", "angle": "5 vault khule par Vault B aaj tak band — do naag wale darwaze ke peeche kya dafan hai?"},
+        {"title": "Jagannath Puri ke teen rahasya", "angle": "Ulta jhanda, parchhai-rahit mandir, har taraf mudta Sudarshan chakra — science teenon pe chup"},
+        {"title": "Konark ka 52-ton magnet", "angle": "Shikhar pe aisa magnet ki samandar ke jahaaz bhatak jaate the — angrezon ne kyun nikaal phenka?"},
+        {"title": "Kailasa: ek chattan ka mandir", "angle": "Ek hi pahaad ko upar se neeche kaat ke banaya — 2 lakh ton patthar, sirf chheni-hathauda se"},
+        {"title": "Lepakshi ka latakta khambha", "angle": "Khambha zameen ko chhuta hi nahi — neeche se kapda paar nikal jaata hai, angrej engineer bhi haar gaya"},
+        {"title": "Kamakhya Devi ka rahasya", "angle": "Koi murti nahi — har monsoon Devi rajaswala hoti hain aur Brahmaputra ka paani 3 din laal ho jaata hai"},
+        {"title": "Stambheshwar: gayab hone wala mandir", "angle": "Din me do baar samandar poora Shiv mandir nigal leta hai, phir wapas ubhaar deta hai"}
+      ]
+    },
+    {
       "id": "mahabharat_villains",
       "name": "Mahabharat ke Villains",
       "english_tail": "Mahabharat",
