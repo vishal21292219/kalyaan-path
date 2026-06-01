@@ -40,6 +40,48 @@
     {"title": "Suheldev Rajbhar", "hook": "Bhula diya gaya raja jisne Ghaznavi ke bhatije ki poori sena Bahraich mein khatam kar di — itihaas ne naam tak mita diya", "query": "medieval indian king"},
     {"title": "Gulf of Khambhat lost city", "hook": "Gujarat ke samandar ke neeche 9000 saal purani nagri mili — itni purani ki itihaas ki kitaaben galat sabit ho gayi", "query": "ancient submerged city"},
     {"title": "Banda Singh Bahadur", "hook": "Jisne Mughal saltanat ko hilakar rakh diya — pakde jaane par bhi farz se digga nahi", "query": "sikh warrior battle"},
-    {"title": "Mahishasur Mardini 9 din", "hook": "9 din ka mahasangram jisme Devi ne har roop badla — har din ek nayi shakti, ant mein asur ka vinash", "query": "goddess warrior battle"}
+    {"title": "Mahishasur Mardini 9 din", "hook": "9 din ka mahasangram jisme Devi ne har roop badla — har din ek nayi shakti, ant mein asur ka vinash", "query": "goddess warrior battle"},
+
+    {"title": "Jal Mahal paani mein kaise khada", "hook": "300 saal se jheel ke beech doobi 4 manzilein, par mahal aaj bhi salaamat — paani mein neev kaise tiki?", "query": "jal mahal jaipur lake"},
+    {"title": "Hawa Mahal bina neev ke", "hook": "5 manzil, 953 jharokhe, par koi neev nahi — sabse ooncha bina-foundation building, girta kyun nahi?", "query": "hawa mahal jaipur"},
+    {"title": "Taj Mahal bina machine ke", "hook": "22 saal, 20,000 mazdoor, 350 ton marble 300km se laaya — bina crane bina machine ye kaise bana?", "query": "taj mahal agra"},
+    {"title": "Lepakshi ka latakta khambha", "hook": "Veerabhadra mandir ka ek khambha zameen ko chhuta hi nahi — neeche se kapda nikal jaata hai", "query": "stone temple pillar india"},
+    {"title": "Konark ka 52-ton magnet", "hook": "Sun temple ke shikhar pe itna bada magnet tha ki samandar ke jahaaz raaste bhatak jaate the", "query": "konark sun temple"},
+    {"title": "Brihadeeswara ki parchhai", "hook": "1000 saal purana 66m ooncha mandir — dopahar mein iski parchhai zameen pe girti hi nahi", "query": "brihadeeswara temple tanjore"},
+    {"title": "Delhi ka Iron Pillar", "hook": "1600 saal se khula khada loha, par ek dhabba tak zang nahi — aaj ki science bhi nahi bana paati", "query": "iron pillar delhi"},
+    {"title": "Chand Baori ki 3500 seedhiyan", "hook": "13 manzil gehri baoli, 3500 seedhiyan perfect symmetry mein — 1200 saal pehle bina calculator kaise?", "query": "chand baori stepwell"},
+    {"title": "Kailasa: ek chattan ka mandir", "hook": "Ek hi pahaad ko UPAR se neeche kaata, 2 lakh ton patthar hataya — sirf chheni-hathauda se", "query": "kailasa temple ellora"},
+    {"title": "Stambheshwar: samandar nigal leta hai", "hook": "Gujarat ka Shiv mandir din mein do baar poora samandar mein doob jaata hai, phir ubhar aata hai", "query": "sea tide temple gujarat"},
+
+    {"title": "Bina bijli 1000 saal pehle AC", "hook": "Rajasthan ke mehlon mein 45°C mein bhi andar thanda — bina bijli ye desi cooling kaise?", "query": "rajasthan palace architecture"},
+    {"title": "Bina fridge barf banti thi", "hook": "2500 saal pehle bharat mein loha-garam registan mein raat ko barf bana lete the — kaise?", "query": "desert night sky"},
+    {"title": "Baoli: zameen ke neeche pani-AC", "hook": "Stepwell ke neeche temperature 5-6 degree kam — ancient bharat ka natural fridge aur AC", "query": "ancient stepwell india"},
+    {"title": "Dholavira ka 5000 saal purana water system", "hook": "Registan mein basa shahar jisme 16 reservoir aur underground pipes the — Indus valley ki engineering", "query": "ancient ruins excavation india"},
+    {"title": "Jantar Mantar: patthar ki ghadi", "hook": "Bina kisi machine ke, sirf patthar se bana yantra jo aaj bhi 2 second tak sahi time batata hai", "query": "jantar mantar observatory"},
+    {"title": "Rani ki Vav: ulti banaayi gayi baoli", "hook": "Gujarat ki vav jise mandir ki tarah ulta banaya gaya — UNESCO bhi hairaan, ₹100 ke note pe hai", "query": "rani ki vav stepwell"},
+
+    {"title": "Chittorgarh: 700 ekad ka kila", "hook": "Bharat ka sabse bada kila — itna bada ki andar poora shahar basta tha, 7 darwaze paar karne padte the", "query": "chittorgarh fort rajasthan"},
+    {"title": "Jaivana: duniya ki sabse badi toap", "hook": "Jaigarh ki itni badi toap ki ek gola 35km door gira — chalane par paas ki jheel sookh gayi", "query": "old cannon fort india"},
+    {"title": "Kolar: India ka KGF gold mine", "hook": "3km gehri sone ki khaan jahan se 121 saal mein 800 ton sona nikla — ab band, par rahasya zinda", "query": "deep mine tunnel"},
+    {"title": "Bharat ka sabse purana petrol pump", "hook": "1928 ka petrol pump jahan haath se ghuma ke petrol bharte the — aaj bhi khada hai", "query": "vintage petrol pump"},
+    {"title": "Duniya ki sabse chaudi sadak", "hook": "Bharat ki ek sadak itni chaudi ki uspe ek saath 50 gaadiyan kha sakti hain — kahan hai?", "query": "wide highway road india"},
+    {"title": "Kumbhalgarh: Bharat ki deewar", "hook": "36km lambi deewar jo Great Wall of China ke baad duniya ki doosri sabse lambi hai — ek kile ki", "query": "kumbhalgarh fort wall"},
+
+    {"title": "Bharat ki sabse khatarnak sadak", "hook": "Himalaya ki ye sadak jahan ek galti = seedha 1000 feet neeche khaai — drivers iske naam se kaampte hain", "query": "dangerous mountain road himalaya"},
+    {"title": "Pamban: samandar ke upar train", "hook": "100 saal purana pul jo samandar ke beech khulta hai jahaaz ke liye — toofan mein train rok di jaati hai", "query": "pamban bridge sea train"},
+    {"title": "Howrah Bridge: bina nut-bolt", "hook": "Kolkata ka pul bina ek bhi nut-bolt ke jod ke khada hai, roz 1 lakh gaadiyan jhelta hai", "query": "howrah bridge kolkata"},
+    {"title": "Harihar Fort ki 80-degree seedhiyan", "hook": "Maharashtra ka kila jiski seedhiyan deewar jaisi seedhi — ek phisla to seedha maut", "query": "steep fort steps cliff"},
+    {"title": "Kokan Kada: maut wali chhatan", "hook": "Harishchandragad ki ye cliff itni dehshatnak ki ek kadam aage = 1800 feet ka khaali aasman", "query": "cliff edge mountain india"},
+    {"title": "Kuldhara: raaton-raat khaali gaaon", "hook": "1500 log ek hi raat mein gaaon chhod gaye, shraap aisa ki 200 saal se koi bas nahi paaya", "query": "abandoned desert village ruins"},
+
+    {"title": "Karni Mata: 25000 chuhon ka mandir", "hook": "Yahan chuhon ka joootha prasad log khaate hain par bimar nahi padte — ek safed chuha dikhe to kismat khul jaaye", "query": "rats temple india"},
+    {"title": "Kedarnath: 400 saal baraf mein bach gaya", "hook": "400 saal glacier mein dafan rehkar bhi mandir ki eent nahi hili, aur 2013 baadh mein bhi bach gaya", "query": "kedarnath himalayan temple"},
+    {"title": "Khatu Shyam: gaay ne bataya rahasya", "hook": "Zameen mein dafan sir se doodh khud ba khud girta tha — gaay roz wahan aati thi, phir sach khula", "query": "krishna temple devotion"},
+    {"title": "Mehandipur Balaji ka pret-mukti", "hook": "Yahan log zanjeeron mein bandhe chillaate hain, deewaron pe khoon — science iske aage chup", "query": "haunted temple ritual"},
+
+    {"title": "Antarctica ka behta khoon", "hook": "Baraf se laal khoon jaisa paani behta hai — vaigyanikon ne 100 saal baad iska sach pata lagaya", "query": "antarctica ice red"},
+    {"title": "Do samandar jo milte nahi", "hook": "Alaska mein do samandar aamne-saamne hain par paani mix nahi hota — beech mein saaf lakeer", "query": "two oceans meeting line"},
+    {"title": "Dinosaur raaton-raat kyun gaayab", "hook": "6.6 crore saal pehle 1 din mein sab khatam — ek asteroid ne kaise poori duniya badal di", "query": "asteroid space earth"},
+    {"title": "Dharti ka aakhiri chhor", "hook": "Norway mein ek jagah jahan kehte hain 'yahin dharti khatam hoti hai' — saamne sirf khaali samandar", "query": "norway cliff ocean edge"}
   ]
 }
