@@ -334,7 +334,11 @@ def pick_viral(seed_offset: int = 0) -> dict:
     avail = [t for t in pool if t["title"] not in recent] or pool
 
     rng = random.Random(_seed_for_today(seed_offset))
-    chosen = rng.choice(avail)
+    # Weighted pick: footage topics (proven 9M monument/mystery pattern) get 3x
+    # default weight; any topic can override with an explicit "weight" field.
+    # This pushes the winning pattern to the front while figures still rotate in.
+    weights = [t.get("weight", 3 if t.get("footage") else 1) for t in avail]
+    chosen = rng.choices(avail, weights=weights, k=1)[0]
     state["history"].append({"title": chosen["title"], "date": date.today().isoformat()})
     state["history"] = state["history"][-500:]
     sp.write_text(json.dumps(state, indent=2, ensure_ascii=False))
