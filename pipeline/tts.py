@@ -449,6 +449,85 @@ def _audio_duration_seconds(path: Path) -> float:
         return 0.0
 
 
+def _synth_sarvam(text: str, out_path: Path, v: dict, is_shloka: bool) -> list[dict]:
+    """Sarvam AI (Bulbul) TTS — natural Hindi, cheap. Chunks text to <=480 chars,
+    calls the API per chunk, concatenates the WAVs, encodes to mp3, then aligns
+    word timings via the same fallback chain as edge (Sarvam gives no per-word
+    timing)."""
+    import base64
+    import re as _re
+    import subprocess
+    import wave
+
+    import requests
+
+    api_key = os.getenv("SARVAM_API_KEY")
+    if not api_key:
+        raise RuntimeError("SARVAM_API_KEY not set in .env")
+    speaker = v.get("sarvam_shloka_speaker", v.get("sarvam_speaker", "abhilash")) if is_shloka \
+        else v.get("sarvam_speaker", "abhilash")
+    model = v.get("sarvam_model", "bulbul:v2")
+    lang = v.get("sarvam_language", "hi-IN")
+    pace = float(v.get("sarvam_pace", 1.0))
+    pitch = float(v.get("sarvam_pitch", 0.0))
+
+    def _chunks(s: str, n: int = 480) -> list[str]:
+        s = s.strip()
+        parts, cur = [], ""
+        for sent in _re.split(r"(?<=[.!?।])\s+", s):
+            if len(cur) + len(sent) + 1 <= n:
+                cur = (cur + " " + sent).strip()
+            else:
+                if cur:
+                    parts.append(cur)
+                if len(sent) <= n:
+                    cur = sent
+                else:
+                    for i in range(0, len(sent), n):
+                        parts.append(sent[i:i + n])
+                    cur = ""
+        if cur:
+            parts.append(cur)
+        return parts or [s]
+
+    pcm, params = [], None
+    for idx, ch in enumerate(_chunks(text)):
+        r = requests.post(
+            "https://api.sarvam.ai/text-to-speech",
+            headers={"api-subscription-key": api_key, "Content-Type": "application/json"},
+            json={"inputs": [ch], "target_language_code": lang, "speaker": speaker,
+                  "model": model, "pace": pace, "pitch": pitch,
+                  "speech_sample_rate": 22050, "enable_preprocessing": True},
+            timeout=90,
+        )
+        r.raise_for_status()
+        b64 = (r.json().get("audios") or [None])[0]
+        if not b64:
+            raise RuntimeError(f"Sarvam returned no audio (chunk {idx})")
+        tmp = out_path.with_suffix(f".sv{idx}.wav")
+        tmp.write_bytes(base64.b64decode(b64))
+        with wave.open(str(tmp), "rb") as w:
+            params = params or w.getparams()
+            pcm.append(w.readframes(w.getnframes()))
+        tmp.unlink()
+
+    combined = out_path.with_suffix(".sarvam.wav")
+    with wave.open(str(combined), "wb") as w:
+        w.setparams(params)
+        for fr in pcm:
+            w.writeframes(fr)
+    subprocess.run(["ffmpeg", "-y", "-i", str(combined), "-c:a", "libmp3lame",
+                    "-b:a", "192k", str(out_path)], check=True, capture_output=True)
+    combined.unlink()
+
+    boundaries = _silence_align(text, out_path)
+    if not boundaries:
+        boundaries = _whisper_align(out_path, original_text=text)
+    if not boundaries:
+        boundaries = _estimate_word_boundaries(text, out_path)
+    return boundaries
+
+
 # ─── Public API ──────────────────────────────────────────────────────────
 def synthesize(script: dict, out_path: Path, seed_offset: int = 0) -> Path:
     """Synthesize voice. `seed_offset` rotates voice across slots if `voice_pool`
@@ -480,6 +559,16 @@ def synthesize(script: dict, out_path: Path, seed_offset: int = 0) -> Path:
         except Exception as e:
             if v.get("fallback_to_edge", True):
                 print(f"[tts] ElevenLabs failed ({e}), falling back to edge-tts")
+                boundaries = _synth_edge(text, out_path, v, is_shloka)
+            else:
+                raise
+    elif provider == "sarvam":
+        try:
+            boundaries = _synth_sarvam(text, out_path, v, is_shloka)
+            print(f"[tts] provider=sarvam speaker={v.get('sarvam_speaker', 'abhilash')} ({len(text)} chars)")
+        except Exception as e:
+            if v.get("fallback_to_edge", True):
+                print(f"[tts] Sarvam failed ({e}), falling back to edge-tts")
                 boundaries = _synth_edge(text, out_path, v, is_shloka)
             else:
                 raise
