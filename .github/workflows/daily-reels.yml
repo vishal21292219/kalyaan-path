@@ -231,7 +231,6 @@ jobs:
           python -u run.py \
             --niche ${{ steps.route.outputs.niche }} \
             --kind ${{ steps.route.outputs.kind }} \
-            --no-music \
             --auto-thumb \
             --notify-telegram \
             --seed-offset ${{ steps.route.outputs.seed }}
