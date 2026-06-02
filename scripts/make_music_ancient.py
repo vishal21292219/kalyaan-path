@@ -1,8 +1,9 @@
-"""Western cinematic-ambient beds for TimeDecoders (English ancient-mysteries).
+"""Western cinematic beds for TimeDecoders (English ancient-mysteries) — fully
+synthesized, royalty-free. DISTINCT from Itihaasvani (which is Indian). Pure
+Western: piano, orchestral strings, brass, timpani, choir. NO Indian instruments.
 
-Fully synthesized (MIDI+fluidsynth) → royalty-free. NO Indian instruments
-(sitar/tabla/bells) — those felt out of place before. Pure orchestral:
-strings, cello, choir, French horn, timpani. Kept very soft (documentary bed).
+Built with an ARC (sparse intro → build → climax ~40-45s → settle) so it tracks
+a short reel instead of a flat loop.
 
 Outputs (mood-matched by pick_drone):
 - data/music_ancient/mystery_bed.mp3  → lost/vanished/unexplained (default)
@@ -21,8 +22,19 @@ SOUNDFONT = os.environ.get("SOUNDFONT", "/tmp/gm.sf2")
 MUSIC_DIR = ROOT / "data" / "music_ancient"
 DURATION = 120
 
+PIANO, STR1, STR2, HORN, BRASS, CHOIR, TIMP, TAIKO, CELLO, VLN = 0, 48, 49, 60, 61, 52, 47, 116, 42, 40
 
-def _render(midi: MIDIFile, out_mp3: Path, af: str, gain: str = "0.7"):
+
+def _arc_vel(t, beats, base, peak):
+    frac = t / beats
+    if frac < 0.38:
+        v = base + (peak - base) * (frac / 0.38)
+    else:
+        v = peak - (peak - base) * 0.4 * ((frac - 0.38) / 0.62)
+    return int(max(1, min(127, v)))
+
+
+def _render(midi, out_mp3, af, gain="0.7"):
     mid = Path(f"/tmp/{out_mp3.stem}.mid")
     with open(mid, "wb") as f:
         midi.writeFile(f)
@@ -37,85 +49,112 @@ def _render(midi: MIDIFile, out_mp3: Path, af: str, gain: str = "0.7"):
 
 
 def build_mystery():
-    """A-minor slow ambient dread — strings + choir + lone violin. Eerie, sparse."""
-    A2, C3, E3, A3, E4, A1 = 45, 48, 52, 57, 64, 33
-    BPM = 60
+    """Western investigative dread — lone PIANO motif over low string drone +
+    sub bass + sparse high violin. Sparse, modern-documentary. A minor."""
+    A2, C3, E3, A3, E4, A1, B2, G3 = 45, 48, 52, 57, 64, 33, 47, 55
+    BPM = 64
     beats = DURATION * (BPM / 60)
     m = MIDIFile(5, deinterleave=False)
     for t in range(5):
         m.addTempo(t, 0, BPM)
-    m.addProgramChange(0, 0, 0, 49)   # string ensemble 2 — pad
+    # Track 0: low string drone pad (Am)
+    m.addProgramChange(0, 0, 0, STR2)
     t = 0.0
     while t < beats:
         for n in (A2, C3, E3):
-            m.addNote(0, 0, n, t, 8.0, 40)
+            m.addNote(0, 0, n, t, 8.0, _arc_vel(t, beats, 26, 42))
         t += 8.0
-    m.addProgramChange(1, 1, 0, 43)   # contrabass — sparse root
-    t = 0.0
-    while t < beats:
-        m.addNote(1, 1, A1, t, 3.0, 52)
-        t += 8.0
-    m.addProgramChange(2, 2, 0, 52)   # choir aahs — soft air
+    # Track 1: lone piano motif (the 'investigation' hook) — repeats, builds
+    m.addProgramChange(1, 1, 0, PIANO)
+    motif = [(A3, 1), (C3 + 12, 1), (B2 + 12, 2), (E3 + 12, 1), (A3, 3)]
     t = 8.0
     while t < beats:
-        m.addNote(2, 2, A3, t, 7.0, 30)
-        t += 16.0
-    m.addProgramChange(3, 3, 0, 40)   # solo violin — eerie high long tone
+        for note, dur in motif:
+            if t >= beats:
+                break
+            m.addNote(1, 1, note, t, dur * 0.95, _arc_vel(t, beats, 34, 70))
+            t += dur
+        t += 3.0
+    # Track 2: sub bass
+    m.addProgramChange(2, 2, 0, CELLO)
+    t = 0.0
+    while t < beats:
+        m.addNote(2, 2, A1, t, 3.5, _arc_vel(t, beats, 40, 64))
+        t += 8.0
+    # Track 3: sparse high violin tension long-tone
+    m.addProgramChange(3, 3, 0, VLN)
     t = 24.0
     while t < beats:
-        m.addNote(3, 3, E4, t, 6.0, 30)
-        t += 20.0
-    m.addProgramChange(4, 4, 0, 47)   # timpani — very sparse
+        m.addNote(3, 3, E4, t, 6.0, _arc_vel(t, beats, 24, 44))
+        t += 18.0
+    # Track 4: very sparse timpani pulse, density rises
+    m.addProgramChange(4, 4, 0, TIMP)
     t = 16.0
     while t < beats:
-        m.addNote(4, 4, A1, t, 1.0, 55)
-        t += 32.0
+        m.addNote(4, 4, A1, t, 1.0, _arc_vel(t, beats, 40, 66))
+        t += (16.0 if t / beats < 0.4 else 8.0)
     _render(m, MUSIC_DIR / "mystery_bed.mp3",
-            "lowpass=f=7500,loudnorm=I=-20:TP=-2:LRA=11,"
+            "lowpass=f=8000,loudnorm=I=-20:TP=-2:LRA=11,"
             "acompressor=threshold=0.25:ratio=3:attack=25:release=450")
 
 
 def build_epic():
-    """C-major grand discovery bed — swelling strings + French horn + choir +
-    timpani builds. Hopeful, cinematic, still soft."""
-    C3, E3, G3, C4, G2, C2 = 48, 52, 55, 60, 43, 36
-    BPM = 72
+    """Western discovery trailer — BRASS + horn fanfare + swelling strings +
+    choir + timpani/taiko builds. C major, grand."""
+    C3, E3, G3, C4, G2, C2, E4 = 48, 52, 55, 60, 43, 36, 64
+    BPM = 76
     beats = DURATION * (BPM / 60)
-    m = MIDIFile(5, deinterleave=False)
-    for t in range(5):
+    m = MIDIFile(6, deinterleave=False)
+    for t in range(6):
         m.addTempo(t, 0, BPM)
-    m.addProgramChange(0, 0, 0, 48)   # string ensemble 1 — swelling chords
+    # Track 0: swelling string ensemble chords
+    m.addProgramChange(0, 0, 0, STR1)
     t = 0.0
     while t < beats:
         for n in (C3, E3, G3, C4):
-            m.addNote(0, 0, n, t, 8.0, 46)
+            m.addNote(0, 0, n, t, 8.0, _arc_vel(t, beats, 38, 60))
         t += 8.0
-    m.addProgramChange(1, 1, 0, 60)   # french horn — noble melody
-    horn = [G3, C4, E3, G3]
+    # Track 1: brass fanfare (the trailer hook)
+    m.addProgramChange(1, 1, 0, BRASS)
+    fan = [(G3, 1), (C4, 2), (E4, 1), (G3, 2), (C4, 2)]
+    t = 8.0
+    while t < beats:
+        for note, dur in fan:
+            if t >= beats:
+                break
+            m.addNote(1, 1, note, t, dur * 0.9, _arc_vel(t, beats, 36, 74))
+            t += dur
+        t += 4.0
+    # Track 2: french horn pad
+    m.addProgramChange(2, 2, 0, HORN)
     t = 4.0
-    i = 0
     while t < beats:
-        m.addNote(1, 1, horn[i % len(horn)], t, 3.5, 48)
-        i += 1
+        m.addNote(2, 2, G3, t, 4.0, _arc_vel(t, beats, 30, 52))
         t += 8.0
-    m.addProgramChange(2, 2, 0, 52)   # choir aahs
-    t = 0.0
+    # Track 3: choir aahs
+    m.addProgramChange(3, 3, 0, CHOIR)
+    t = 16.0
     while t < beats:
-        m.addNote(2, 2, G3, t, 8.0, 34)
-        t += 8.0
-    m.addProgramChange(3, 3, 0, 42)   # cello — moving bassline
+        m.addNote(3, 3, C4, t, 8.0, _arc_vel(t, beats, 28, 48))
+        t += 16.0
+    # Track 4: cello moving bassline
+    m.addProgramChange(4, 4, 0, CELLO)
     bass = [C2, G2, C2, E3 - 12]
     t = 0.0
     i = 0
     while t < beats:
-        m.addNote(3, 3, bass[i % len(bass)], t, 1.8, 58)
+        m.addNote(4, 4, bass[i % 4], t, 1.8, _arc_vel(t, beats, 50, 70))
         i += 1
         t += 2.0
-    m.addProgramChange(4, 4, 0, 47)   # timpani — building pulse on the bar
+    # Track 5: timpani + taiko trailer hits (ch via programs), build
+    m.addProgramChange(5, 5, 0, TIMP)
     t = 0.0
     while t < beats:
-        m.addNote(4, 4, C2, t, 1.0, 60)
-        m.addNote(4, 4, G2, t + 4.0, 0.8, 50)
+        v = _arc_vel(t, beats, 45, 95)
+        m.addNote(5, 5, C2, t, 1.0, v)
+        m.addNote(5, 5, G2, t + 4.0, 0.8, v - 10)
+        if t / beats > 0.35:
+            m.addNote(5, 5, C2, t + 6.0, 0.6, v - 6)
         t += 8.0
     _render(m, MUSIC_DIR / "epic_bed.mp3",
             "loudnorm=I=-18:TP=-1.5:LRA=10,"
