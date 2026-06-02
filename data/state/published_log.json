@@ -11,6 +11,7 @@
   "2026-06-02": {
     "itihaas_series_s3": true,
     "ancient_trending_s1": true,
-    "itihaas_trending_s1": true
+    "itihaas_trending_s1": true,
+    "ancient_trending_s2": true
   }
 }
