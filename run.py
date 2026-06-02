@@ -412,10 +412,10 @@ def main(argv: list[str]) -> int:
     # Music policy: Telegram drops go out WITHOUT background music (user adds
     # trending audio at manual upload for the algorithm boost). Auto-publish
     # runs keep the dynamic, mood-matched cinematic music bed.
-    _telegram_only = bool(args.notify_telegram) and not args.publish
-    _skip_music = args.no_music or _telegram_only
-    if _telegram_only and not args.no_music:
-        print("[audio] Telegram drop → background music OFF (add trending audio at upload)")
+    # Music is controlled by --no-music and the niche config (video.music);
+    # NOT forced off for Telegram drops anymore (we now bake our mood music/SFX
+    # into the video instead of relying on manually-added platform audio).
+    _skip_music = args.no_music
     assemble(script, voice_path, images, video_path, skip_music=_skip_music, skip_captions=args.skip_captions, long_form=args.long_form, hero_clips=hero_clips)
     print(f"[video] FINAL → {video_path}{' (no-music)' if _skip_music else ''}")
 
