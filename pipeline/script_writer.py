@@ -497,6 +497,41 @@ def _groq(system: str, user: str, model: str) -> str:
     return r.json()["choices"][0]["message"]["content"]
 
 
+def _loads_lenient(candidate: str) -> dict:
+    """Parse JSON, repairing the malformed output LLMs commonly emit.
+
+    Two stages: (1) regex pre-clean for known offenders, then (2) a TARGETED
+    loop that reads the JSONDecodeError position and patches exactly there —
+    e.g. inserts the missing comma for "Expecting ',' delimiter" (the #1 LLM
+    error) or strips a trailing comma. Far more reliable than blanket regex.
+    """
+    s = candidate
+    # Stage 1 — blanket regex fixes.
+    s = re.sub(r'([}\]"\d])(\s*\n\s*)(["{\[])', r'\1,\2\3', s)   # missing comma at line breaks
+    s = re.sub(r",(\s*[}\]])", r"\1", s)                          # trailing comma before }/]
+    s = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", s)           # stray control chars
+
+    # Stage 2 — targeted, position-aware repair loop.
+    for _ in range(80):
+        try:
+            return json.loads(s)
+        except json.JSONDecodeError as e:
+            pos, msg = e.pos, e.msg
+            if "Expecting ',' delimiter" in msg and 0 < pos <= len(s):
+                s = s[:pos] + "," + s[pos:]                       # insert the missing comma
+                continue
+            if "Expecting property name" in msg or "Expecting value" in msg:
+                # usually a trailing/duplicate comma just before pos → drop it
+                j = pos - 1
+                while j >= 0 and s[j] in " \n\r\t":
+                    j -= 1
+                if j >= 0 and s[j] == ",":
+                    s = s[:j] + s[j + 1:]
+                    continue
+            raise
+    return json.loads(s)  # exhausted → raise the final error
+
+
 def _extract_json(text: str) -> dict:
     text = text.strip()
     text = re.sub(r"^```(?:json)?\s*", "", text)
@@ -509,18 +544,7 @@ def _extract_json(text: str) -> dict:
     try:
         return json.loads(candidate)
     except json.JSONDecodeError:
-        pass
-    # LLMs occasionally emit malformed JSON. Repair the common offenders:
-    repaired = candidate
-    # 1. MISSING comma between adjacent values: a value-ender (" } ] digit) at a
-    #    line end followed by a value-starter (" { [) at the next line's start.
-    #    This is the #1 LLM JSON error ("Expecting ',' delimiter").
-    repaired = re.sub(r'([}\]"\d])(\s*\n\s*)(["{\[])', r'\1,\2\3', repaired)
-    # 2. Trailing commas before } or ].
-    repaired = re.sub(r",(\s*[}\]])", r"\1", repaired)
-    # 3. Stray control chars inside the JSON.
-    repaired = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", repaired)
-    return json.loads(repaired)  # if still bad, raises → caller retries
+        return _loads_lenient(candidate)  # if still bad, raises → caller retries
 
 
 def write_script(topic: dict, context: str, long_form: bool = False,
@@ -577,16 +601,36 @@ def write_script(topic: dict, context: str, long_form: bool = False,
     # it, far more reliable than failing the entire run).
     script = None
     last_err = None
+    last_raw = ""
     for attempt in range(3):
         try:
             raw = _try_chain()
+            last_raw = raw or last_raw
             script = _extract_json(raw)
             break
         except (ValueError, json.JSONDecodeError) as e:
             last_err = e
             print(f"[script_writer] JSON parse failed (attempt {attempt + 1}/3): {e} — regenerating")
+    if script is None and last_raw:
+        # Final fallback: ask the LLM to repair its own broken JSON. Catches
+        # structural errors (unescaped quotes/newlines in Hindi strings) that
+        # regex/position fixes can't. Prevents a whole run failing on bad JSON.
+        try:
+            print("[script_writer] all 3 regenerations failed — asking LLM to repair the JSON")
+            fix_raw = _try_chain_repair(
+                "You are a JSON repair tool. Output ONLY valid minified JSON — no prose, no "
+                "markdown fences. Fix syntax errors (missing/trailing commas, unescaped quotes "
+                "or newlines inside string values) but PRESERVE every key, value and all text "
+                "exactly as given.",
+                "Repair this into valid JSON:\n\n" + last_raw[:14000],
+                provider, model,
+            )
+            script = _extract_json(fix_raw)
+            print("[script_writer] ✓ LLM JSON repair succeeded")
+        except Exception as e:
+            last_err = e
     if script is None:
-        raise RuntimeError(f"Script JSON unparseable after 3 attempts: {last_err}")
+        raise RuntimeError(f"Script JSON unparseable after 3 attempts + repair: {last_err}")
 
     # Enforce 1:1 visual-body sync for Shorts (biggest quality lever).
     # If LLM returned mismatched counts, pad or truncate visuals to match body.
