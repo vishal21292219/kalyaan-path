@@ -114,6 +114,35 @@ def pick_music(kind: str | None = None, script: dict | None = None) -> Path | No
     return tracks[0] if tracks else None
 
 
+_ITIHAAS_UPBEAT_KWS = [
+    "sabse bada", "sabse ooncha", "sabse lamb", "sabse chaud", "sabse purana",
+    "duniya ki", "duniya ka", "kaise bana", "kaise banaya", "engineering",
+    "marvel", "ajooba", "ajuba", "kamaal", "adbhut", "bhavya", "vishal",
+    "shaan", "record", "jeet", "vijay", "taqat", "wonder", "greatest", "khaan",
+]
+_ITIHAAS_SUSPENSE_KWS = [
+    "rahasya", "raaz", "shraap", "shrap", "maut", "doob", "gayab", "khatarnak",
+    "bhoot", "pret", "haunted", "andhera", "mystery", "dafan", "kabar", "amar",
+    "bhatak", "khoon", "darr", "chhupa", "chupa", "naag", "tabaahi", "gufa",
+    "akela", "shaapit", "aatma", "mrityu", "kala jadu", "band", "rahasy",
+]
+
+
+def _pick_itihaas_bed(d: Path, script: dict | None) -> Path | None:
+    """Choose Itihaasvani's bed by mood: upbeat for wonder/achievement scripts,
+    suspense (default) for mystery/dread ones."""
+    sus = d / "suspense_bed.mp3"
+    up = d / "upbeat_bed.mp3"
+    text = (_script_text(script) or "").lower()
+    us = sum(1 for k in _ITIHAAS_UPBEAT_KWS if k in text)
+    ss = sum(1 for k in _ITIHAAS_SUSPENSE_KWS if k in text)
+    if us > ss and up.exists():
+        return up
+    if sus.exists():
+        return sus
+    return up if up.exists() else None
+
+
 def pick_drone(niche: str | None = None, script: dict | None = None) -> Path | None:
     """Return the background bed track for the cinematic mix.
 
@@ -135,17 +164,24 @@ def pick_drone(niche: str | None = None, script: dict | None = None) -> Path | N
             return chosen
 
     drone_rel = cfg.get("paths", {}).get("drone_dir", "")
+    active_niche = cfg.get("niche", "")
     candidates: list[Path] = []
     if drone_rel:
         candidates.append(ROOT / drone_rel)
-    candidates.extend([
-        ROOT / "data" / "music_itihaas",
-        ROOT / "data" / "music_ancient",
-    ])
+    # music_itihaas holds Itihaasvani-specific mood beds — ONLY for that niche
+    # (else TimeDecoders/ancient would wrongly grab them).
+    if active_niche == "itihaas":
+        candidates.append(ROOT / "data" / "music_itihaas")
+    candidates.append(ROOT / "data" / "music_ancient")
 
     for d in candidates:
         if not d.exists() or not d.is_dir():
             continue
+        # Itihaasvani: mood-match the bed (suspense vs upbeat) to the script.
+        if d.name == "music_itihaas":
+            bed = _pick_itihaas_bed(d, script)
+            if bed:
+                return bed
         tracks = sorted(
             list(d.glob("*.mp3")) + list(d.glob("*.wav")) + list(d.glob("*.m4a"))
         )
