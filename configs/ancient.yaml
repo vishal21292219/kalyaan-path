@@ -176,10 +176,13 @@ publish:
 
 video:
   bitrate: 6M
-  # NO background music at all on TimeDecoders (viewer feedback: "music is so
-  # annoying"). English ancient-mystery docs play cleaner with narration +
-  # footage only. (stings:false is redundant under music:false but kept explicit.)
-  music: false
+  # A/B TEST (2026-06): re-enabling music with PROPER western cinematic beds
+  # (mystery/epic, no Indian instruments — the old annoyance was devotional
+  # drone/stings over English footage). Very low volume so narration+footage
+  # stay hero. stings stay OFF (devotional hits don't fit). Flip music:false
+  # to revert if retention drops.
+  music: true
+  music_volume: 0.06
   stings: false
   duration_target_sec: 42
   font: assets/fonts/Anton-Regular.ttf

@@ -128,19 +128,33 @@ _ITIHAAS_SUSPENSE_KWS = [
 ]
 
 
-def _pick_itihaas_bed(d: Path, script: dict | None) -> Path | None:
-    """Choose Itihaasvani's bed by mood: upbeat for wonder/achievement scripts,
-    suspense (default) for mystery/dread ones."""
-    sus = d / "suspense_bed.mp3"
-    up = d / "upbeat_bed.mp3"
+# TimeDecoders (English) — western cinematic beds, mood-matched.
+_ANCIENT_EPIC_KWS = [
+    "discover", "found", "uncover", "greatest", "largest", "biggest", "advanced",
+    "gold", "treasure", "empire", "marvel", "built", "build", "engineering",
+    "technology", "wonder", "lost city", "civilization", "rediscover", "reveal",
+]
+_ANCIENT_MYSTERY_KWS = [
+    "mystery", "mysterious", "vanish", "disappear", "unexplained", "lost",
+    "hidden", "unknown", "strange", "secret", "ancient", "forbidden", "curse",
+    "dark", "eerie", "haunt", "buried", "abandoned", "what happened", "no one knows",
+]
+
+
+def _pick_mood_bed(d: Path, script: dict | None,
+                   a_file: str, a_kws: list[str],
+                   b_file: str, b_kws: list[str]) -> Path | None:
+    """Two-mood bed picker: a_file wins only if its keyword score beats b_file's;
+    b_file is the default on tie/no-signal. Returns an existing path or None."""
+    a, b = d / a_file, d / b_file
     text = (_script_text(script) or "").lower()
-    us = sum(1 for k in _ITIHAAS_UPBEAT_KWS if k in text)
-    ss = sum(1 for k in _ITIHAAS_SUSPENSE_KWS if k in text)
-    if us > ss and up.exists():
-        return up
-    if sus.exists():
-        return sus
-    return up if up.exists() else None
+    sa = sum(1 for k in a_kws if k in text)
+    sb = sum(1 for k in b_kws if k in text)
+    if sa > sb and a.exists():
+        return a
+    if b.exists():
+        return b
+    return a if a.exists() else None
 
 
 def pick_drone(niche: str | None = None, script: dict | None = None) -> Path | None:
@@ -177,9 +191,16 @@ def pick_drone(niche: str | None = None, script: dict | None = None) -> Path | N
     for d in candidates:
         if not d.exists() or not d.is_dir():
             continue
-        # Itihaasvani: mood-match the bed (suspense vs upbeat) to the script.
+        # Mood-match the bed to the script (suspense/upbeat for itihaas;
+        # mystery/epic western cinematic for ancient/TimeDecoders).
         if d.name == "music_itihaas":
-            bed = _pick_itihaas_bed(d, script)
+            bed = _pick_mood_bed(d, script, "upbeat_bed.mp3", _ITIHAAS_UPBEAT_KWS,
+                                 "suspense_bed.mp3", _ITIHAAS_SUSPENSE_KWS)
+            if bed:
+                return bed
+        if d.name == "music_ancient":
+            bed = _pick_mood_bed(d, script, "epic_bed.mp3", _ANCIENT_EPIC_KWS,
+                                 "mystery_bed.mp3", _ANCIENT_MYSTERY_KWS)
             if bed:
                 return bed
         tracks = sorted(

@@ -822,6 +822,7 @@ def assemble(
         and script.get("kind") == "series"
     whoosh_ts = sting_ts if (_sfx_on and have_stings) else []
 
+    _music_vol = float(cfg.get("video", {}).get("music_volume", 0.10))
     composed_audio: Path | None = None
     if not skip_music and (drone or have_stings or _sfx_on):
         try:
@@ -831,6 +832,7 @@ def assemble(
                 drone_path=drone,
                 sting_timestamps=sting_ts if have_stings else [],
                 out_path=work / "mix.m4a",
+                drone_volume=_music_vol,
                 hook_boom=_sfx_on,
                 whoosh_timestamps=whoosh_ts,
                 heartbeat=_hb_on,
