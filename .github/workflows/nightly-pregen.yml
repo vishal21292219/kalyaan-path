@@ -16,8 +16,11 @@
 name: Nightly Pregen (free scripts-only preview)
 
 on:
-  schedule:
-    - cron: "0 21 * * *"   # 21:00 UTC = 02:30 IST every day
+  # DISABLED 2026-06-04: scripts-only Gemini drafts are never consumed by publish
+  # (run.py needs >=5 cached images; pregen makes 0) -> no effect on published
+  # quality, just daily runs + noise commits. Re-enable by uncommenting below.
+  # schedule:
+  #   - cron: "0 21 * * *"   # 21:00 UTC = 02:30 IST every day
   workflow_dispatch:
     inputs:
       days:
