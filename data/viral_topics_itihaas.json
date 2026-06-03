@@ -1,65 +1,490 @@
 {
-  "_note": "Fresh viral topic pool (researched). pick_viral() rotates through with recency avoidance so videos don't repeat. Topics with 'footage': true use Pexels B-roll AND get 3x pick-weight (proven 9M monument/mystery pattern). Refresh/extend anytime.",
+  "_note": "Fresh viral topic pool (researched). pick_viral() rotates with 30-day recency. DATA-DRIVEN weighting: mythology FIGURE topics (non-footage) get 3x weight (they crush monuments for this audience); 'footage': true monument topics get 1x + use Wikimedia/Pexels visuals. Each topic has a retention hook. Refresh/extend anytime.",
   "topics": [
-    {"title": "Nidhivan Vrindavan", "hook": "Suraj doobte hi sab nikal jaate hain — kehte hain raat ko Krishna gopiyon ke saath raas karte hain, jo ruka wo paagal ho gaya", "query": "dark forest temple"},
-    {"title": "Mahakaleshwar Bhasma Aarti", "hook": "Duniya ki eklauti aarti jahan chita ki raakh se Shiv ko nehlaya jaata hai — aur auratein ise dekh nahi sakti", "query": "shiva temple fire"},
-    {"title": "Kal Bhairav Ujjain", "hook": "Yahan bhagwan SHARAB peete hain — pujari pyaala muh se lagate hain aur daaru gaayab ho jaati hai, kahan jaati hai koi nahi jaanta", "query": "temple offering bowl"},
-    {"title": "Mahabalipuram Shore Temple", "hook": "2004 tsunami mein samandar peeche hata to doobi hui 7 mandiron ke khandahar dikhe — Saat Pagoda ki legend sach nikli", "query": "underwater temple ruins"},
-    {"title": "Chennakeshava Belur", "hook": "880 saal purana mandir jiske har khambhe pe alag nakkashi — aur ek murti jo aaj ke engineers bhi nahi dohra sakte", "query": "carved hoysala temple"},
-    {"title": "Vettuvan Koil adhoora mandir", "hook": "Ek pahaad ko upar se kaatna shuru kiya, mandir aadha banakar achanak chhod diya — 1200 saal se adhoora khada hai, kyun", "query": "unfinished rock temple"},
-    {"title": "Hidimba Devi Manali", "hook": "Bheem ki rakshasi patni Hidimba ka mandir — bina murti ke, sirf ek paththar ke pair ki pooja hoti hai deodar jungle mein", "query": "wooden pagoda temple"},
-    {"title": "Barbarik Khatu Shyam", "hook": "Bheem ka pota jo akele 1 minute mein poora Mahabharat khatam kar deta — isiliye Krishna ne yuddh se pehle uska sar maang liya", "query": "ancient warrior archer"},
-    {"title": "Aravan Iravan", "hook": "Arjun ka woh beta jise jeet ke liye bali chadhna tha — shaadi ke ek raat baad hi sar kat gaya, aaj bhi uski pooja hoti hai", "query": "warrior sacrifice ritual"},
-    {"title": "Rani Abbakka", "hook": "Duniya ki eklauti rani jisne Portugees navy ko baar-baar haraya — par itihaas ne use bhula diya", "query": "warrior queen sword"},
-    {"title": "Lachit Borphukan", "hook": "Jisne Mughal sena ko Saraighat mein paani mein dubo diya — beemar hote hue bhi ladha, farz ke liye apne mama ka sar tak kaat diya", "query": "river battle warrior"},
-    {"title": "Eklavya ka angootha", "hook": "Jis ladke ne Dronacharya ki murti se vidya seekhi, usse guru ne dakshina mein angootha maang liya — kyun", "query": "tribal archer forest"},
-    {"title": "Karna ka janm rahasya", "hook": "Surya-putra jo sooraj se paida hua, kunwari Kunti ne nadi mein baha diya — sachchai jaante hue bhi maa zindagi bhar chup rahi", "query": "baby river basket"},
-    {"title": "Ghatotkacha ki bali", "hook": "Bheem ka rakshas beta itna bada tha ki marte waqt uska sharir hi hazaaron sena ko kuchal gaya — Krishna ne jaan-bujhke kurbaan karwaya", "query": "giant warrior battlefield"},
-    {"title": "Rani Durgavati", "hook": "Gond rani jisne Akbar ki sena se ladte hue khud apni chhaati mein khanjar utara — haar manzoor nahi thi", "query": "queen battle horse"},
-    {"title": "Velu Nachiyar", "hook": "Angrezon se ladne wali pehli rani — duniya ka pehla human bomb usne taiyaar kiya, Jhansi se 80 saal pehle", "query": "tamil queen warrior"},
-    {"title": "Rani Tarabai", "hook": "25 saal ki vidhwa jisne Aurangzeb ko maut tak hila diya — Maratha samrajya akele apne kandhon pe utha liya", "query": "maratha queen fort"},
-    {"title": "Abhimanyu Chakravyuh", "hook": "16 saal ka ladka jo maa ke pet mein hi aadha chakravyuh seekh gaya — andar ghus gaya, par bahar nikalna kabhi nahi seekha", "query": "young warrior trapped"},
-    {"title": "Submerged Dwarka", "hook": "Krishna ki sone ki nagri Dwarka — Krishna ke jaate hi samandar ne nigal li, aur 2001 mein samandar ke neeche khandahar mil gaye", "query": "underwater city ruins", "weight": 2},
-    {"title": "Ashwatthama ka shraap", "hook": "Mahabharat ka woh yodha jise amar hone ka shraap mila — kehte hain aaj bhi maathe pe ghaav liye bhatak raha hai", "query": "wandering immortal warrior"},
-    {"title": "Bajirao Peshwa", "hook": "41 saal ki zindagi, 41 ladaiyaan — ek bhi nahi haari, par jeet ke baad pyaar ne use tod diya", "query": "maratha cavalry warrior"},
-    {"title": "Meera Bai ka zeher", "hook": "Rani jise Krishna-bhakti ke liye zeher ka pyaala diya gaya — wo pee gayi par usse kuch nahi hua, phir kahan gayab ho gayi", "query": "devotional queen krishna"},
-    {"title": "Suheldev Rajbhar", "hook": "Bhula diya gaya raja jisne Ghaznavi ke bhatije ki poori sena Bahraich mein khatam kar di — itihaas ne naam tak mita diya", "query": "medieval indian king"},
-    {"title": "Gulf of Khambhat lost city", "hook": "Gujarat ke samandar ke neeche 9000 saal purani nagri mili — itni purani ki itihaas ki kitaaben galat sabit ho gayi", "query": "ancient submerged city", "weight": 2},
-    {"title": "Banda Singh Bahadur", "hook": "Jisne Mughal saltanat ko hilakar rakh diya — pakde jaane par bhi farz se digga nahi", "query": "sikh warrior battle"},
-    {"title": "Mahishasur Mardini 9 din", "hook": "9 din ka mahasangram jisme Devi ne har roop badla — har din ek nayi shakti, ant mein asur ka vinash", "query": "goddess warrior battle"},
-
-    {"title": "Jal Mahal paani mein kaise khada", "hook": "300 saal se jheel ke beech doobi 4 manzilein, par mahal aaj bhi salaamat — paani mein neev kaise tiki?", "query": "jal mahal jaipur lake", "footage": true},
-    {"title": "Hawa Mahal bina neev ke", "hook": "5 manzil, 953 jharokhe, par koi neev nahi — sabse ooncha bina-foundation building, girta kyun nahi?", "query": "hawa mahal jaipur", "footage": true},
-    {"title": "Taj Mahal bina machine ke", "hook": "22 saal, 20,000 mazdoor, 350 ton marble 300km se laaya — bina crane bina machine ye kaise bana?", "query": "taj mahal agra", "footage": true},
-    {"title": "Brihadeeswara ki parchhai", "hook": "80 ton ka kalash 66m ooncha bina crane ke chadhaya, aur dopahar mein parchhai zameen pe girti hi nahi — 1000 saal pehle", "query": "brihadeeswara temple tanjore", "footage": true},
-    {"title": "Delhi ka Iron Pillar", "hook": "1600 saal se khula khada loha, par ek dhabba tak zang nahi — aaj ki science bhi nahi bana paati", "query": "iron pillar delhi", "footage": true},
-    {"title": "Chand Baori ki 3500 seedhiyan", "hook": "13 manzil gehri baoli, 3500 seedhiyan perfect symmetry mein — 1200 saal pehle bina calculator kaise?", "query": "chand baori stepwell", "footage": true},
-
-    {"title": "Baoli: zameen ke neeche pani-AC", "hook": "Stepwell ke neeche temperature 5-6 degree kam — ancient bharat ka natural fridge aur AC", "query": "ancient stepwell india", "footage": true},
-    {"title": "Dholavira ka 5000 saal purana water system", "hook": "Registan mein basa shahar jisme 16 reservoir aur underground pipes the — Indus valley ki engineering", "query": "ancient ruins excavation india", "footage": true},
-    {"title": "Jantar Mantar: patthar ki ghadi", "hook": "Bina kisi machine ke, sirf patthar se bana yantra jo aaj bhi 2 second tak sahi time batata hai", "query": "jantar mantar observatory", "footage": true},
-    {"title": "Rani ki Vav: ulti banaayi gayi baoli", "hook": "Gujarat ki vav jise mandir ki tarah ulta banaya gaya — UNESCO bhi hairaan, ₹100 ke note pe hai", "query": "rani ki vav stepwell", "footage": true},
-
-    {"title": "Chittorgarh: 700 ekad ka kila", "hook": "Bharat ka sabse bada kila — itna bada ki andar poora shahar basta tha, 7 darwaze paar karne padte the", "query": "chittorgarh fort rajasthan", "footage": true},
-    {"title": "Jaivana: duniya ki sabse badi toap", "hook": "Jaigarh ki itni badi toap ki ek gola 35km door gira — chalane par paas ki jheel sookh gayi", "query": "old cannon fort india", "footage": true},
-    {"title": "Kolar: India ka KGF gold mine", "hook": "3km gehri sone ki khaan jahan se 121 saal mein 800 ton sona nikla — ab band, par rahasya zinda", "query": "deep mine tunnel", "footage": true},
-    {"title": "Kumbhalgarh: Bharat ki deewar", "hook": "36km lambi deewar jo Great Wall of China ke baad duniya ki doosri sabse lambi hai — ek kile ki", "query": "kumbhalgarh fort wall", "footage": true},
-
-    {"title": "Bharat ki sabse khatarnak sadak", "hook": "Himalaya ki ye sadak jahan ek galti = seedha 1000 feet neeche khaai — drivers iske naam se kaampte hain", "query": "dangerous mountain road himalaya", "footage": true},
-    {"title": "Pamban: samandar ke upar train", "hook": "100 saal purana pul jo samandar ke beech khulta hai jahaaz ke liye — toofan mein train rok di jaati hai", "query": "pamban bridge sea train", "footage": true},
-    {"title": "Howrah Bridge: bina nut-bolt", "hook": "Kolkata ka pul bina ek bhi nut-bolt ke jod ke khada hai, roz 1 lakh gaadiyan jhelta hai", "query": "howrah bridge kolkata", "footage": true},
-    {"title": "Harihar Fort ki 80-degree seedhiyan", "hook": "Maharashtra ka kila jiski seedhiyan deewar jaisi seedhi — ek phisla to seedha maut", "query": "steep fort steps cliff", "footage": true},
-    {"title": "Kokan Kada: maut wali chhatan", "hook": "Harishchandragad ki ye cliff itni dehshatnak ki ek kadam aage = 1800 feet ka khaali aasman", "query": "cliff edge mountain", "footage": true},
-    {"title": "Kuldhara: raaton-raat khaali gaaon", "hook": "1500 log ek hi raat mein gaaon chhod gaye, shraap aisa ki 200 saal se koi bas nahi paaya", "query": "abandoned desert village ruins", "footage": true},
-
-    {"title": "Karni Mata: 25000 chuhon ka mandir", "hook": "Yahan chuhon ka joootha prasad log khaate hain par bimar nahi padte — ek safed chuha dikhe to kismat khul jaaye", "query": "rats temple india", "footage": true},
-    {"title": "Kedarnath: 400 saal baraf mein bach gaya", "hook": "400 saal glacier mein dafan rehkar bhi mandir ki eent nahi hili, aur 2013 baadh mein bhi bach gaya", "query": "kedarnath himalayan temple", "footage": true},
-    {"title": "Khatu Shyam: gaay ne bataya rahasya", "hook": "Zameen mein dafan sir se doodh khud ba khud girta tha — gaay roz wahan aati thi, phir sach khula", "query": "krishna temple devotion", "footage": true},
-    {"title": "Mehandipur Balaji ka pret-mukti", "hook": "Yahan log zanjeeron mein bandhe chillaate hain, deewaron pe khoon — science iske aage chup", "query": "haunted temple ritual", "footage": true},
-
-    {"title": "Antarctica ka behta khoon", "hook": "Baraf se laal khoon jaisa paani behta hai — vaigyanikon ne 100 saal baad iska sach pata lagaya", "query": "antarctica ice red", "footage": true},
-    {"title": "Do samandar jo milte nahi", "hook": "Alaska mein do samandar aamne-saamne hain par paani mix nahi hota — beech mein saaf lakeer", "query": "two oceans meeting", "footage": true},
-    {"title": "Dinosaur raaton-raat kyun gaayab", "hook": "6.6 crore saal pehle 1 din mein sab khatam — ek asteroid ne kaise poori duniya badal di", "query": "asteroid space earth", "footage": true},
-    {"title": "Dharti ka aakhiri chhor", "hook": "Norway mein ek jagah jahan kehte hain 'yahin dharti khatam hoti hai' — saamne sirf khaali samandar", "query": "norway cliff ocean edge", "footage": true}
+    {
+      "title": "Nidhivan Vrindavan",
+      "hook": "Suraj doobte hi sab nikal jaate hain — kehte hain raat ko Krishna gopiyon ke saath raas karte hain, jo ruka wo paagal ho gaya",
+      "query": "dark forest temple"
+    },
+    {
+      "title": "Mahakaleshwar Bhasma Aarti",
+      "hook": "Duniya ki eklauti aarti jahan chita ki raakh se Shiv ko nehlaya jaata hai — aur auratein ise dekh nahi sakti",
+      "query": "shiva temple fire"
+    },
+    {
+      "title": "Kal Bhairav Ujjain",
+      "hook": "Yahan bhagwan SHARAB peete hain — pujari pyaala muh se lagate hain aur daaru gaayab ho jaati hai, kahan jaati hai koi nahi jaanta",
+      "query": "temple offering bowl"
+    },
+    {
+      "title": "Mahabalipuram Shore Temple",
+      "hook": "2004 tsunami mein samandar peeche hata to doobi hui 7 mandiron ke khandahar dikhe — Saat Pagoda ki legend sach nikli",
+      "query": "underwater temple ruins"
+    },
+    {
+      "title": "Chennakeshava Belur",
+      "hook": "880 saal purana mandir jiske har khambhe pe alag nakkashi — aur ek murti jo aaj ke engineers bhi nahi dohra sakte",
+      "query": "carved hoysala temple"
+    },
+    {
+      "title": "Vettuvan Koil adhoora mandir",
+      "hook": "Ek pahaad ko upar se kaatna shuru kiya, mandir aadha banakar achanak chhod diya — 1200 saal se adhoora khada hai, kyun",
+      "query": "unfinished rock temple"
+    },
+    {
+      "title": "Hidimba Devi Manali",
+      "hook": "Bheem ki rakshasi patni Hidimba ka mandir — bina murti ke, sirf ek paththar ke pair ki pooja hoti hai deodar jungle mein",
+      "query": "wooden pagoda temple"
+    },
+    {
+      "title": "Barbarik Khatu Shyam",
+      "hook": "Bheem ka pota jo akele 1 minute mein poora Mahabharat khatam kar deta — isiliye Krishna ne yuddh se pehle uska sar maang liya",
+      "query": "ancient warrior archer"
+    },
+    {
+      "title": "Aravan Iravan",
+      "hook": "Arjun ka woh beta jise jeet ke liye bali chadhna tha — shaadi ke ek raat baad hi sar kat gaya, aaj bhi uski pooja hoti hai",
+      "query": "warrior sacrifice ritual"
+    },
+    {
+      "title": "Rani Abbakka",
+      "hook": "Duniya ki eklauti rani jisne Portugees navy ko baar-baar haraya — par itihaas ne use bhula diya",
+      "query": "warrior queen sword"
+    },
+    {
+      "title": "Lachit Borphukan",
+      "hook": "Jisne Mughal sena ko Saraighat mein paani mein dubo diya — beemar hote hue bhi ladha, farz ke liye apne mama ka sar tak kaat diya",
+      "query": "river battle warrior"
+    },
+    {
+      "title": "Eklavya ka angootha",
+      "hook": "Jis ladke ne Dronacharya ki murti se vidya seekhi, usse guru ne dakshina mein angootha maang liya — kyun",
+      "query": "tribal archer forest"
+    },
+    {
+      "title": "Karna ka janm rahasya",
+      "hook": "Surya-putra jo sooraj se paida hua, kunwari Kunti ne nadi mein baha diya — sachchai jaante hue bhi maa zindagi bhar chup rahi",
+      "query": "baby river basket"
+    },
+    {
+      "title": "Ghatotkacha ki bali",
+      "hook": "Bheem ka rakshas beta itna bada tha ki marte waqt uska sharir hi hazaaron sena ko kuchal gaya — Krishna ne jaan-bujhke kurbaan karwaya",
+      "query": "giant warrior battlefield"
+    },
+    {
+      "title": "Rani Durgavati",
+      "hook": "Gond rani jisne Akbar ki sena se ladte hue khud apni chhaati mein khanjar utara — haar manzoor nahi thi",
+      "query": "queen battle horse"
+    },
+    {
+      "title": "Velu Nachiyar",
+      "hook": "Angrezon se ladne wali pehli rani — duniya ka pehla human bomb usne taiyaar kiya, Jhansi se 80 saal pehle",
+      "query": "tamil queen warrior"
+    },
+    {
+      "title": "Rani Tarabai",
+      "hook": "25 saal ki vidhwa jisne Aurangzeb ko maut tak hila diya — Maratha samrajya akele apne kandhon pe utha liya",
+      "query": "maratha queen fort"
+    },
+    {
+      "title": "Abhimanyu Chakravyuh",
+      "hook": "16 saal ka ladka jo maa ke pet mein hi aadha chakravyuh seekh gaya — andar ghus gaya, par bahar nikalna kabhi nahi seekha",
+      "query": "young warrior trapped"
+    },
+    {
+      "title": "Submerged Dwarka",
+      "hook": "Krishna ki sone ki nagri Dwarka — Krishna ke jaate hi samandar ne nigal li, aur 2001 mein samandar ke neeche khandahar mil gaye",
+      "query": "underwater city ruins",
+      "weight": 2
+    },
+    {
+      "title": "Ashwatthama ka shraap",
+      "hook": "Mahabharat ka woh yodha jise amar hone ka shraap mila — kehte hain aaj bhi maathe pe ghaav liye bhatak raha hai",
+      "query": "wandering immortal warrior"
+    },
+    {
+      "title": "Bajirao Peshwa",
+      "hook": "41 saal ki zindagi, 41 ladaiyaan — ek bhi nahi haari, par jeet ke baad pyaar ne use tod diya",
+      "query": "maratha cavalry warrior"
+    },
+    {
+      "title": "Meera Bai ka zeher",
+      "hook": "Rani jise Krishna-bhakti ke liye zeher ka pyaala diya gaya — wo pee gayi par usse kuch nahi hua, phir kahan gayab ho gayi",
+      "query": "devotional queen krishna"
+    },
+    {
+      "title": "Suheldev Rajbhar",
+      "hook": "Bhula diya gaya raja jisne Ghaznavi ke bhatije ki poori sena Bahraich mein khatam kar di — itihaas ne naam tak mita diya",
+      "query": "medieval indian king"
+    },
+    {
+      "title": "Gulf of Khambhat lost city",
+      "hook": "Gujarat ke samandar ke neeche 9000 saal purani nagri mili — itni purani ki itihaas ki kitaaben galat sabit ho gayi",
+      "query": "ancient submerged city",
+      "weight": 2
+    },
+    {
+      "title": "Banda Singh Bahadur",
+      "hook": "Jisne Mughal saltanat ko hilakar rakh diya — pakde jaane par bhi farz se digga nahi",
+      "query": "sikh warrior battle"
+    },
+    {
+      "title": "Mahishasur Mardini 9 din",
+      "hook": "9 din ka mahasangram jisme Devi ne har roop badla — har din ek nayi shakti, ant mein asur ka vinash",
+      "query": "goddess warrior battle"
+    },
+    {
+      "title": "Jal Mahal paani mein kaise khada",
+      "hook": "300 saal se jheel ke beech doobi 4 manzilein, par mahal aaj bhi salaamat — paani mein neev kaise tiki?",
+      "query": "jal mahal jaipur lake",
+      "footage": true
+    },
+    {
+      "title": "Hawa Mahal bina neev ke",
+      "hook": "5 manzil, 953 jharokhe, par koi neev nahi — sabse ooncha bina-foundation building, girta kyun nahi?",
+      "query": "hawa mahal jaipur",
+      "footage": true
+    },
+    {
+      "title": "Taj Mahal bina machine ke",
+      "hook": "22 saal, 20,000 mazdoor, 350 ton marble 300km se laaya — bina crane bina machine ye kaise bana?",
+      "query": "taj mahal agra",
+      "footage": true
+    },
+    {
+      "title": "Brihadeeswara ki parchhai",
+      "hook": "80 ton ka kalash 66m ooncha bina crane ke chadhaya, aur dopahar mein parchhai zameen pe girti hi nahi — 1000 saal pehle",
+      "query": "brihadeeswara temple tanjore",
+      "footage": true
+    },
+    {
+      "title": "Delhi ka Iron Pillar",
+      "hook": "1600 saal se khula khada loha, par ek dhabba tak zang nahi — aaj ki science bhi nahi bana paati",
+      "query": "iron pillar delhi",
+      "footage": true
+    },
+    {
+      "title": "Chand Baori ki 3500 seedhiyan",
+      "hook": "13 manzil gehri baoli, 3500 seedhiyan perfect symmetry mein — 1200 saal pehle bina calculator kaise?",
+      "query": "chand baori stepwell",
+      "footage": true
+    },
+    {
+      "title": "Baoli: zameen ke neeche pani-AC",
+      "hook": "Stepwell ke neeche temperature 5-6 degree kam — ancient bharat ka natural fridge aur AC",
+      "query": "ancient stepwell india",
+      "footage": true
+    },
+    {
+      "title": "Dholavira ka 5000 saal purana water system",
+      "hook": "Registan mein basa shahar jisme 16 reservoir aur underground pipes the — Indus valley ki engineering",
+      "query": "ancient ruins excavation india",
+      "footage": true
+    },
+    {
+      "title": "Jantar Mantar: patthar ki ghadi",
+      "hook": "Bina kisi machine ke, sirf patthar se bana yantra jo aaj bhi 2 second tak sahi time batata hai",
+      "query": "jantar mantar observatory",
+      "footage": true
+    },
+    {
+      "title": "Rani ki Vav: ulti banaayi gayi baoli",
+      "hook": "Gujarat ki vav jise mandir ki tarah ulta banaya gaya — UNESCO bhi hairaan, ₹100 ke note pe hai",
+      "query": "rani ki vav stepwell",
+      "footage": true
+    },
+    {
+      "title": "Chittorgarh: 700 ekad ka kila",
+      "hook": "Bharat ka sabse bada kila — itna bada ki andar poora shahar basta tha, 7 darwaze paar karne padte the",
+      "query": "chittorgarh fort rajasthan",
+      "footage": true
+    },
+    {
+      "title": "Jaivana: duniya ki sabse badi toap",
+      "hook": "Jaigarh ki itni badi toap ki ek gola 35km door gira — chalane par paas ki jheel sookh gayi",
+      "query": "old cannon fort india",
+      "footage": true
+    },
+    {
+      "title": "Kolar: India ka KGF gold mine",
+      "hook": "3km gehri sone ki khaan jahan se 121 saal mein 800 ton sona nikla — ab band, par rahasya zinda",
+      "query": "deep mine tunnel",
+      "footage": true
+    },
+    {
+      "title": "Kumbhalgarh: Bharat ki deewar",
+      "hook": "36km lambi deewar jo Great Wall of China ke baad duniya ki doosri sabse lambi hai — ek kile ki",
+      "query": "kumbhalgarh fort wall",
+      "footage": true
+    },
+    {
+      "title": "Bharat ki sabse khatarnak sadak",
+      "hook": "Himalaya ki ye sadak jahan ek galti = seedha 1000 feet neeche khaai — drivers iske naam se kaampte hain",
+      "query": "dangerous mountain road himalaya",
+      "footage": true
+    },
+    {
+      "title": "Pamban: samandar ke upar train",
+      "hook": "100 saal purana pul jo samandar ke beech khulta hai jahaaz ke liye — toofan mein train rok di jaati hai",
+      "query": "pamban bridge sea train",
+      "footage": true
+    },
+    {
+      "title": "Howrah Bridge: bina nut-bolt",
+      "hook": "Kolkata ka pul bina ek bhi nut-bolt ke jod ke khada hai, roz 1 lakh gaadiyan jhelta hai",
+      "query": "howrah bridge kolkata",
+      "footage": true
+    },
+    {
+      "title": "Harihar Fort ki 80-degree seedhiyan",
+      "hook": "Maharashtra ka kila jiski seedhiyan deewar jaisi seedhi — ek phisla to seedha maut",
+      "query": "steep fort steps cliff",
+      "footage": true
+    },
+    {
+      "title": "Kokan Kada: maut wali chhatan",
+      "hook": "Harishchandragad ki ye cliff itni dehshatnak ki ek kadam aage = 1800 feet ka khaali aasman",
+      "query": "cliff edge mountain",
+      "footage": true
+    },
+    {
+      "title": "Kuldhara: raaton-raat khaali gaaon",
+      "hook": "1500 log ek hi raat mein gaaon chhod gaye, shraap aisa ki 200 saal se koi bas nahi paaya",
+      "query": "abandoned desert village ruins",
+      "footage": true
+    },
+    {
+      "title": "Karni Mata: 25000 chuhon ka mandir",
+      "hook": "Yahan chuhon ka joootha prasad log khaate hain par bimar nahi padte — ek safed chuha dikhe to kismat khul jaaye",
+      "query": "rats temple india",
+      "footage": true
+    },
+    {
+      "title": "Kedarnath: 400 saal baraf mein bach gaya",
+      "hook": "400 saal glacier mein dafan rehkar bhi mandir ki eent nahi hili, aur 2013 baadh mein bhi bach gaya",
+      "query": "kedarnath himalayan temple",
+      "footage": true
+    },
+    {
+      "title": "Khatu Shyam: gaay ne bataya rahasya",
+      "hook": "Zameen mein dafan sir se doodh khud ba khud girta tha — gaay roz wahan aati thi, phir sach khula",
+      "query": "krishna temple devotion",
+      "footage": true
+    },
+    {
+      "title": "Mehandipur Balaji ka pret-mukti",
+      "hook": "Yahan log zanjeeron mein bandhe chillaate hain, deewaron pe khoon — science iske aage chup",
+      "query": "haunted temple ritual",
+      "footage": true
+    },
+    {
+      "title": "Antarctica ka behta khoon",
+      "hook": "Baraf se laal khoon jaisa paani behta hai — vaigyanikon ne 100 saal baad iska sach pata lagaya",
+      "query": "antarctica ice red",
+      "footage": true
+    },
+    {
+      "title": "Do samandar jo milte nahi",
+      "hook": "Alaska mein do samandar aamne-saamne hain par paani mix nahi hota — beech mein saaf lakeer",
+      "query": "two oceans meeting",
+      "footage": true
+    },
+    {
+      "title": "Dinosaur raaton-raat kyun gaayab",
+      "hook": "6.6 crore saal pehle 1 din mein sab khatam — ek asteroid ne kaise poori duniya badal di",
+      "query": "asteroid space earth",
+      "footage": true
+    },
+    {
+      "title": "Dharti ka aakhiri chhor",
+      "hook": "Norway mein ek jagah jahan kehte hain 'yahin dharti khatam hoti hai' — saamne sirf khaali samandar",
+      "query": "norway cliff ocean edge",
+      "footage": true
+    },
+    {
+      "title": "Abhimanyu ka Chakravyuh",
+      "hook": "16 saal ka ladka jo maa ke pet mein aadha chakravyuh seekh gaya — andar ghusna aata tha, nikalna kabhi nahi.",
+      "query": "young warrior battlefield"
+    },
+    {
+      "title": "Barbarik ke teen baan",
+      "hook": "Ek baan jo poori sena ko ek minute mein khatam kar deta — isliye Krishna ne yudh se pehle uska sar maang liya.",
+      "query": "ancient archer warrior"
+    },
+    {
+      "title": "Ghatotkacha ki kurbani",
+      "hook": "Bheem ka rakshas beta itna vishaal ki marte waqt uska sharir hi hazaaron sena ko kuchal gaya.",
+      "query": "giant warrior night battle"
+    },
+    {
+      "title": "Karna ka kavach-kundal",
+      "hook": "Janam se laga divya kavach jise koi bhed nahi sakta tha — Indra ne chhal se kyun maanga?",
+      "query": "golden armor warrior"
+    },
+    {
+      "title": "Arjun aur Nagastra",
+      "hook": "Ek baan jiska nishana kabhi nahi chukta — Karna ne ise Arjun ke liye saalon bachaye rakha.",
+      "query": "warrior bow arrow"
+    },
+    {
+      "title": "Bhishma ki pratigya",
+      "hook": "Pita ke liye rajpaat aur vivah dono tyage — aur mrityu ko apni marzi ka gulam bana liya.",
+      "query": "ancient warrior throne"
+    },
+    {
+      "title": "Parshuram ka farsa",
+      "hook": "21 baar dharti ko kshatriyon se khaali kiya — phir bhi Karna aur Bhishma ke guru bane.",
+      "query": "warrior axe mountain"
+    },
+    {
+      "title": "Ravan ka pushpak viman",
+      "hook": "Apne hi bhai se cheena udne wala rath — jo soch se chalta tha, raaste khud dhoondhta tha.",
+      "query": "ancient flying chariot"
+    },
+    {
+      "title": "Meghnad: Indrajeet",
+      "hook": "Devon ke raja Indra ko bandi banaya — isliye naam pada Indrajeet, aur usne suraj tak rok diya.",
+      "query": "warrior storm clouds"
+    },
+    {
+      "title": "Kumbhakaran ka rahasya",
+      "hook": "Sirf so nahi raha tha — uske 6 mahine ki neend ke peeche ek shraap aur ek bhool thi.",
+      "query": "sleeping giant cave"
+    },
+    {
+      "title": "Ahiravan: Patal ka raja",
+      "hook": "Ram-Lakshman ko patal le gaya — aur Hanuman ko ek saath 5 deepak bujhakar usse maarna pada.",
+      "query": "underworld dark cave"
+    },
+    {
+      "title": "Mandodari ki buddhi",
+      "hook": "Ravan ki patni jisne use baar-baar samjhaya — agar woh maan jaata to Lanka bach jaati.",
+      "query": "ancient queen palace"
+    },
+    {
+      "title": "Shravan Kumar ka shraap",
+      "hook": "Andhe maa-baap ko kandhe pe teerth ghumaya — uski maut ne hi Dashrath ko Ram-viyog ka shraap diya.",
+      "query": "forest river pilgrimage"
+    },
+    {
+      "title": "Chyavan rishi ki jawani",
+      "hook": "Boodha rishi jo ek raat mein jawan ho gaya — Ashwini kumaron ne aisa kya banaya?",
+      "query": "ancient sage ashram"
+    },
+    {
+      "title": "Dadhichi ki haddiyan",
+      "hook": "Devon ke liye apni reedh ki haddi daan kar di — usi se bana Indra ka Vajra.",
+      "query": "sage meditation glow"
+    },
+    {
+      "title": "Markandey: mrityu ko jeeta",
+      "hook": "16 saal ki umar mein Yamraj aaye — par ladke ne Shiv ko pakad liya aur amar ho gaya.",
+      "query": "shiva temple devotion"
+    },
+    {
+      "title": "Hiranyakashyap ka vardan",
+      "hook": "Na din na raat, na ghar na bahar, na astra na shastra — phir Narasimha ne use kaise maara?",
+      "query": "fierce deity pillar"
+    },
+    {
+      "title": "Vaman ka teen pag",
+      "hook": "Ek bauna jisne teen kadam mein teeno lok naap liye — aur Bali ko patal bhej diya.",
+      "query": "cosmic deity sky"
+    },
+    {
+      "title": "Bhasmasur ka anth",
+      "hook": "Jise chhuye wahi raakh — Shiv se vardan paake Shiv ko hi maarne daudaa, phir Mohini ne nachaya.",
+      "query": "dancing celestial maiden"
+    },
+    {
+      "title": "Shani aur Hanuman",
+      "hook": "Shani ne Hanuman ko pakda, Hanuman ne use parvat aur apne beech daba diya — phir jo deal hui...",
+      "query": "dark planet shadow"
+    },
+    {
+      "title": "Nachiketa aur Yamraj",
+      "hook": "Ek bachcha jo Yamraj ke ghar 3 din ruka — aur mrityu se hi jeevan ka sabse bada raaz nikalwa liya.",
+      "query": "ancient boy sage"
+    },
+    {
+      "title": "Savitri ne pati bachaya",
+      "hook": "Yamraj khud aaye pati ke praan lene — Savitri itne peeche chali ki Yam ko haar maan kar laut-na pada.",
+      "query": "devoted wife forest"
+    },
+    {
+      "title": "Vidur ki neeti",
+      "hook": "Daasi ka beta jo Hastinapur ka sabse buddhimaan tha — uski chetawni maani jaati to mahabharat na hota.",
+      "query": "ancient minister court"
+    },
+    {
+      "title": "Karna vs Arjun ka aakhri yudh",
+      "hook": "Pehiya dhasa, shraap yaad aaya, astra bhool gaya — Karna ki maut ka woh ek pal.",
+      "query": "chariot wheel battlefield"
+    },
+    {
+      "title": "Gandhari ka shraap",
+      "hook": "Aankhon pe patti baandhne wali rani ne Krishna ko shraap diya — aur poora Yadav vansh mit gaya.",
+      "query": "blindfold queen grief"
+    },
+    {
+      "title": "Chitrangada: Arjun ki yodha patni",
+      "hook": "Manipur ki rajkumari jo ladai mein Arjun se kam nahi thi — uska beta hi aage Arjun se bhid gaya.",
+      "query": "warrior princess sword"
+    },
+    {
+      "title": "Iravan ki bali",
+      "hook": "Arjun ka beta jise jeet ke liye bali chadhna tha — shaadi ke ek raat baad sar kat gaya.",
+      "query": "warrior sacrifice ritual"
+    },
+    {
+      "title": "Tanaji aur Sinhagad",
+      "hook": "'Gad aala, pan Sinh gela' — kile ke liye apni jaan di, par jeet ke baad hi dam toda.",
+      "query": "fort night battle"
+    },
+    {
+      "title": "Baji Prabhu ka aakhri morcha",
+      "hook": "Ek ghaati mein 300 ke saath hazaaron ko roka — jab tak top ki awaz na aayi, gira nahi.",
+      "query": "mountain pass warriors"
+    },
+    {
+      "title": "Sambhaji ka balidan",
+      "hook": "41 din yatna sahi par dharm nahi chhoda — Aurangzeb bhi uski himmat se kaanp gaya.",
+      "query": "maratha warrior fort"
+    },
+    {
+      "title": "Hari Singh Nalwa: Afghano ka kaal",
+      "hook": "Jiske naam se Khyber ke aage maaein bachchon ko sulaati thi — akele ek sher maara.",
+      "query": "sikh warrior mountains"
+    },
+    {
+      "title": "Rani Durgavati ka aakhri teer",
+      "hook": "Akbar ki sena se ladte hue ghaayal hui — par bandi banne se pehle khud khanjar utaar liya.",
+      "query": "queen war elephant"
+    },
+    {
+      "title": "Velu Nachiyar: pehli vidrohi rani",
+      "hook": "Angrezon se 80 saal pehle ladi — aur duniya ka pehla human bomb usne taiyaar karwaya.",
+      "query": "tamil queen fortress"
+    },
+    {
+      "title": "Rani Tarabai ka jhanjhavat",
+      "hook": "25 saal ki vidhwa ne Aurangzeb ko maut tak hila diya — Maratha rajya akele kandhon pe utha liya.",
+      "query": "maratha queen horse"
+    },
+    {
+      "title": "Prithviraj ka aakhri teer",
+      "hook": "Andha hone par bhi sirf awaz se Ghori ko maara — 'chaar baans chaubis gaj' wala woh nishana.",
+      "query": "blind archer arrow"
+    },
+    {
+      "title": "Suheldev ka bhula yudh",
+      "hook": "Ghazni ke bhatije ki poori sena Bahraich mein khatam kar di — itihaas ne uska naam tak mita diya.",
+      "query": "medieval indian battle"
+    },
+    {
+      "title": "Lalitaditya: Kashmir ka vishwajeet",
+      "hook": "Kashmir ka samrat jisne Central Asia tak jeeta — par kitaaben uska naam bhool gayin.",
+      "query": "ancient himalayan king"
+    }
   ]
 }
