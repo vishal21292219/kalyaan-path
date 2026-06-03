@@ -336,10 +336,12 @@ def pick_viral(seed_offset: int = 0) -> dict:
 
     rng = random.Random(_seed_for_today(seed_offset))
     if avail:
-        # Weighted pick: footage topics (proven 9M monument/mystery pattern) get
-        # 3x default weight; any topic can override with an explicit "weight"
-        # field. Pushes the winning pattern up while figures still rotate in.
-        weights = [t.get("weight", 3 if t.get("footage") else 1) for t in avail]
+        # Weighted pick. DATA-DRIVEN (Itihaasvani analytics): mythology FIGURE
+        # topics (warriors/gods/legends — non-footage) crush monument/footage
+        # ones for this audience (350-550 views vs 13-140). So figures get 3x
+        # the default weight; monuments (footage) still rotate in occasionally.
+        # Any topic can override with an explicit "weight" field.
+        weights = [t.get("weight", 1 if t.get("footage") else 3) for t in avail]
         chosen = rng.choices(avail, weights=weights, k=1)[0]
     else:
         # Pool exhausted (every topic used within 30 days). Instead of a random
