@@ -1,0 +1,9 @@
+{
+  "channel": "TimeDecoders",
+  "niche": "ancient",
+  "master_image": "data/characters/timedecoders_master.jpg",
+  "seed": 33,
+  "model": "fal-ai/flux/schnell",
+  "prompt": "Photorealistic portrait of a rugged charismatic Western man around 32, short tousled brown hair, fuller stubble beard, intrigued curious intense expression, weathered explorer adventurer jacket, dramatic cinematic lighting, plain dark background, documentary field-investigator vibe, looking at camera, ultra detailed sharp 8k, youtube thumbnail character",
+  "use": "Consistent reaction/host face for thumbnails + intros. For new expressions/scenes, regenerate with this seed and/or pass master_image as reference (fal nano-banana edit) so the same face stays consistent."
+}
