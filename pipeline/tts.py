@@ -538,10 +538,20 @@ def synthesize(script: dict, out_path: Path, seed_offset: int = 0) -> Path:
     provider = v.get("provider", "edge").lower()
     is_shloka = script.get("kind") == "shloka_episode"
 
-    # Voice rotation: if a pool is defined, pick by (date + seed) so the same
-    # slot uses the same voice on a given day, but different slots use different.
+    # Gender-driven voice (TimeDecoders): the script's narrator_gender, chosen by
+    # the LLM per story tone, maps to a specific voice. Takes PRECEDENCE over
+    # voice_pool rotation. Missing/unknown gender -> male (default).
+    vbg = v.get("voice_by_gender") or {}
     pool = v.get("voice_pool") or []
-    if pool and not is_shloka:
+    if vbg and not is_shloka:
+        gender = str(script.get("narrator_gender", "male")).strip().lower()
+        if gender not in vbg:
+            gender = "male" if "male" in vbg else next(iter(vbg))
+        v["voice"] = vbg[gender]
+        print(f"[tts] narrator_gender={gender} -> voice={v['voice']}")
+    # Voice rotation: if a pool is defined (and no gender map), pick by (date +
+    # seed) so the same slot uses the same voice on a given day.
+    elif pool and not is_shloka:
         from datetime import date as _date_t
         idx = (int(_date_t.today().toordinal()) + seed_offset) % len(pool)
         chosen = pool[idx]

@@ -197,21 +197,19 @@ voice:
   provider: edge
   fallback_to_edge: true
 
-  # Default voice for narration (used when voice_pool empty or for shloka mode)
-  voice: en-US-GuyNeural          # Deep narrator male
-  rate: -2%
-  pitch: -5Hz
+  # Default voice (used when script has no narrator_gender). HD multilingual
+  # US voices are natural — keep pitch at 0, only a slight slow-down.
+  voice: en-US-BrianMultilingualNeural   # male storyteller (default)
+  rate: -5%
+  pitch: +0Hz
 
-  # Voice rotation pool — pipeline picks (date + seed_offset) % len.
-  # CRITICAL anti-flag for ancient-mystery niche (en-US-GuyNeural is the
-  # exact voice signature of 1000s of "AI ancient aliens" channels — YT
-  # algo has learned to deprioritize that pattern). Rotation across less-
-  # common voices makes the channel feel like multiple human creators.
-  voice_pool:
-    - en-US-AndrewMultilingualNeural  # natural conversational US male
-    - en-US-BrianMultilingualNeural   # warm baritone US male
-    - en-US-EricNeural                # confident US male
-    - en-US-RogerNeural               # mature authoritative US narrator (was en-GB-Thomas — British diluted US fit)
+  # narrator_gender (LLM picks per story tone in script_writer) maps to these:
+  #   warrior/mystery/serious  -> male (Brian: approachable, sincere)
+  #   goddess/nature/emotional -> female (Ava: expressive, caring)
+  # This REPLACES the old voice_pool rotation — only Brian/Ava are used now.
+  voice_by_gender:
+    male: en-US-BrianMultilingualNeural
+    female: en-US-AvaMultilingualNeural
 
   # For dramatic intro mode (not used yet)
   shloka_voice: en-GB-RyanNeural  # British gravitas

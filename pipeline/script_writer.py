@@ -307,13 +307,28 @@ GOAL: This video MUST be the most shareable, replayable, finish-rate video
 in our channel. Pretend your salary depends on retention curve being flat.
 """
 
+    # TimeDecoders (ancient) only: LLM picks the narrator's gender from the
+    # story's tone so tts.py can map it to the right voice (Brian / Ava).
+    narrator_block = ""
+    if cfg.get("niche", "") == "ancient":
+        narrator_block = (
+            "\n\nNARRATOR VOICE (REQUIRED — include in your JSON output):\n"
+            '- Add a top-level field "narrator_gender": "male" OR "female".\n'
+            "- Choose it from the STORY's tone/protagonist, NOT at random:\n"
+            '  * "male"  -> warrior, war, battle, conquest, weapons, dark mystery,\n'
+            "    conspiracy, lost/forbidden tech, serious or ominous, male central figure.\n"
+            '  * "female" -> goddess, queen, a woman\'s legend, nature, emotional or\n'
+            "    tragic tale, beauty/wonder, sacred or devotional.\n"
+            '- If genuinely unsure, default to "male".'
+        )
+
     return f"""{persona}
 
 {schema}
 
 {VIRAL_PLAYBOOK}
 
-{lang_block}{long_form_block}
+{lang_block}{long_form_block}{narrator_block}
 
 IMAGE STYLE GUIDANCE:
 {image_guide}
