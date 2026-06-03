@@ -332,14 +332,23 @@ def pick_viral(seed_offset: int = 0) -> dict:
     state = json.loads(sp.read_text()) if sp.exists() else {"history": []}
     cutoff = date.today() - timedelta(days=30)
     recent = {h["title"] for h in state["history"] if date.fromisoformat(h["date"]) >= cutoff}
-    avail = [t for t in pool if t["title"] not in recent] or pool
+    avail = [t for t in pool if t["title"] not in recent]
 
     rng = random.Random(_seed_for_today(seed_offset))
-    # Weighted pick: footage topics (proven 9M monument/mystery pattern) get 3x
-    # default weight; any topic can override with an explicit "weight" field.
-    # This pushes the winning pattern to the front while figures still rotate in.
-    weights = [t.get("weight", 3 if t.get("footage") else 1) for t in avail]
-    chosen = rng.choices(avail, weights=weights, k=1)[0]
+    if avail:
+        # Weighted pick: footage topics (proven 9M monument/mystery pattern) get
+        # 3x default weight; any topic can override with an explicit "weight"
+        # field. Pushes the winning pattern up while figures still rotate in.
+        weights = [t.get("weight", 3 if t.get("footage") else 1) for t in avail]
+        chosen = rng.choices(avail, weights=weights, k=1)[0]
+    else:
+        # Pool exhausted (every topic used within 30 days). Instead of a random
+        # pick from the full pool (which can repeat yesterday's → duplicate
+        # uploads), choose the LEAST-recently-used topic so spacing is maximal.
+        last_used: dict[str, str] = {}
+        for h in state["history"]:
+            last_used[h["title"]] = h["date"]  # later entries win → most recent date
+        chosen = min(pool, key=lambda t: last_used.get(t["title"], "0000-00-00"))
     state["history"].append({"title": chosen["title"], "date": date.today().isoformat()})
     state["history"] = state["history"][-500:]
     sp.write_text(json.dumps(state, indent=2, ensure_ascii=False))
