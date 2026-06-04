@@ -169,7 +169,7 @@ voice:
   # voice library once subscribed.
   elevenlabs_voice_id: JBFqnCBsd6RMkjVDRZzb        # George — warm captivating storyteller
   elevenlabs_voice_id_female: EXAVITQu4vr4xnSDxMaL  # Sarah — mature, reassuring
-  elevenlabs_model: eleven_turbo_v2_5
+  elevenlabs_model: eleven_multilingual_v2          # BEST quality (flagship). v3 available if preferred.
   elevenlabs_settings:
     stability: 0.55
     similarity_boost: 0.80
