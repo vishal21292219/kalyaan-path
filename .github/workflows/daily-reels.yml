@@ -45,7 +45,7 @@ on:
         required: true
         default: "itihaas"
         type: choice
-        options: [bhakti, itihaas, ancient, bhajan]
+        options: [bhakti, itihaas, ancient, bhajan, godmind]
       kind:
         description: "Which kind"
         required: true
