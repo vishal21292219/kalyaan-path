@@ -58,7 +58,7 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--niche", default="bhakti",
-        choices=["bhakti", "itihaas", "bhajan", "ancient"],
+        choices=["bhakti", "itihaas", "bhajan", "ancient", "godmind"],
         help="Which niche to run (bhakti = KalyaanPath; itihaas = Itihaasvani; bhajan = Flow Music MP3; ancient = Ancient World Decoded English)",
     )
     ap.add_argument(
