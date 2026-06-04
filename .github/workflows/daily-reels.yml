@@ -169,12 +169,11 @@ jobs:
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
-            # Night prime drop = Mandir Rahasya SERIES (temple episodes).
-            # TELEGRAM review (manual) — temple visuals being moved to authentic
-            # Wikimedia photos; flip mode=publish only after user confirms quality.
+            # Night prime drop = SERIES (Mahabharat Villains active). AUTO-publish
+            # to YouTube; go-live ~20:00 IST next day via publishAt (14:30 UTC).
             echo "niche=itihaas" >> $GITHUB_OUTPUT
             echo "kind=series"   >> $GITHUB_OUTPUT
-            echo "mode=telegram" >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 21 * * *" ]; then
