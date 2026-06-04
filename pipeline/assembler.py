@@ -307,6 +307,21 @@ _MED_EMPHASIS = {
     "कौन", "क्या", "कब", "कैसे", "क्यों", "कहाँ", "कोई",
     "kaun", "kya", "kab", "kaise", "kyun", "kahan",
 }
+# English key-word highlighting (TimeDecoders + the English god-psychology
+# channel) — without these, English captions render ALL white (no yellow). These
+# get the strongest treatment (yellow + golden halo); _EN_KEY gets plain yellow.
+_EN_GLOW = {
+    "real", "hidden", "secret", "truth", "meaning", "never", "everything",
+    "nothing", "impossible", "mind", "psychology", "consciousness", "god",
+    "gods", "death", "eternal", "forbidden", "cursed", "vanished", "proof",
+    "soul", "immortal", "mystery",
+}
+_EN_KEY = {
+    "power", "ancient", "sacred", "divine", "energy", "dark", "fear", "desire",
+    "ego", "war", "blood", "killed", "dead", "destroyed", "why", "what", "how",
+    "who", "sealed", "unknown", "lost", "alive", "dangerous", "every", "shocking",
+    "deepest", "darkest", "biggest", "first", "only", "before", "wrong", "truth",
+}
 
 
 def _clean_word(word: str) -> str:
@@ -325,6 +340,7 @@ def _word_style(word: str) -> tuple[tuple, int, bool]:
       5. default      → white
     """
     w = _clean_word(word)
+    wl = w.lower()
     if w in SHOCK_WORDS:
         return ((255, 60, 60), 12, False)
     if w in GLOW_WORDS:
@@ -332,6 +348,11 @@ def _word_style(word: str) -> tuple[tuple, int, bool]:
     if w in _HIGH_EMPHASIS:
         return ((255, 60, 60), 9, False)
     if w in _MED_EMPHASIS:
+        return ((255, 220, 0), 9, False)
+    # English key-words + any number → yellow (white base, important words pop)
+    if wl in _EN_GLOW:
+        return ((255, 230, 120), 9, True)
+    if wl in _EN_KEY or any(ch.isdigit() for ch in w):
         return ((255, 220, 0), 9, False)
     return ((255, 255, 255), 9, False)
 
