@@ -386,11 +386,15 @@ def _synth_elevenlabs(text: str, out_path: Path, v: dict, is_shloka: bool) -> li
             "Get one at https://elevenlabs.io → Profile → API Keys."
         )
 
-    voice_id = (
-        v.get("elevenlabs_shloka_voice_id", v.get("elevenlabs_voice_id"))
-        if is_shloka
-        else v.get("elevenlabs_voice_id")
-    )
+    # Gender-aware voice pick (narrator_gender stashed by synthesize()): male →
+    # elevenlabs_voice_id, female → elevenlabs_voice_id_female.
+    gender = str(v.get("_narrator_gender", "male")).lower()
+    if is_shloka:
+        voice_id = v.get("elevenlabs_shloka_voice_id") or v.get("elevenlabs_voice_id")
+    elif gender == "female" and v.get("elevenlabs_voice_id_female"):
+        voice_id = v.get("elevenlabs_voice_id_female")
+    else:
+        voice_id = v.get("elevenlabs_voice_id")
     if not voice_id:
         raise RuntimeError("voice.elevenlabs_voice_id not set in config.")
 
@@ -547,7 +551,8 @@ def synthesize(script: dict, out_path: Path, seed_offset: int = 0) -> Path:
         gender = str(script.get("narrator_gender", "male")).strip().lower()
         if gender not in vbg:
             gender = "male" if "male" in vbg else next(iter(vbg))
-        v["voice"] = vbg[gender]
+        v["voice"] = vbg[gender]            # edge voice
+        v["_narrator_gender"] = gender      # ElevenLabs voice-id picker uses this
         print(f"[tts] narrator_gender={gender} -> voice={v['voice']}")
     # Voice rotation: if a pool is defined (and no gender map), pick by (date +
     # seed) so the same slot uses the same voice on a given day.

@@ -167,8 +167,8 @@ voice:
   # ElevenLabs (premium) — Turbo model = half the credits (~2x mileage).
   # Replace voice IDs with your chosen deep-calm male + warm female from the
   # voice library once subscribed.
-  elevenlabs_voice_id: onwK4e9ZLuTAKqWW03F9       # Daniel — deep, calm, authoritative
-  elevenlabs_voice_id_female: XB0fDUnXU5powFXDhCwa # Charlotte — warm, soothing
+  elevenlabs_voice_id: JBFqnCBsd6RMkjVDRZzb        # George — warm captivating storyteller
+  elevenlabs_voice_id_female: EXAVITQu4vr4xnSDxMaL  # Sarah — mature, reassuring
   elevenlabs_model: eleven_turbo_v2_5
   elevenlabs_settings:
     stability: 0.55

@@ -194,8 +194,9 @@ video:
   width: 1080
 
 voice:
-  # Edge TTS English voices — choose dramatic narrator
-  provider: edge
+  # PREMIUM: ElevenLabs (Turbo) dramatic narrator; falls back to edge Brian/Ava
+  # if the ElevenLabs key/quota fails, so TD never stops publishing.
+  provider: elevenlabs
   fallback_to_edge: true
 
   # Default voice (used when script has no narrator_gender). HD multilingual
@@ -217,10 +218,11 @@ voice:
   shloka_rate: -8%
   shloka_pitch: -8Hz
 
-  # ElevenLabs (premium English voices — when paid)
-  elevenlabs_voice_id: pNInz6obpgDQGcFmaJgB
-  elevenlabs_shloka_voice_id: nPczCjzI2devNBz1zQrb
-  elevenlabs_model: eleven_multilingual_v2
+  # ElevenLabs (premium). gender-driven: male=Charlie (deep), female=Matilda.
+  elevenlabs_voice_id: IKne3meq5aSn9XLyUdCD        # Charlie — deep, confident
+  elevenlabs_voice_id_female: XrExE9yKIg1WjnnlVkGX  # Matilda — knowledgeable, professional
+  elevenlabs_shloka_voice_id: IKne3meq5aSn9XLyUdCD
+  elevenlabs_model: eleven_turbo_v2_5
   elevenlabs_settings:
     stability: 0.50
     similarity_boost: 0.82
