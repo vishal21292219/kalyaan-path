@@ -454,11 +454,32 @@ above — a tight reel keeps retention; a long slow one gets swiped):
   mini-cliffhanger ("...par asli sach aage hai") every 2-3 lines.
 - Short punchy sentences (≤12 words). Mobile viewer, thumb hovering.
 """
+    # TimeDecoders: rotate the OPENING STYLE per topic so videos stop feeling
+    # like the same template (user feedback: "saari stories ek jaisi lagti hain").
+    variety_block = ""
+    if niche == "ancient" and not long_form:
+        import hashlib as _hl
+        _styles = [
+            "IN MEDIA RES — open mid-scene at the most dramatic second, no setup ('The torch went out. Then they saw it.').",
+            "SHOCKING NUMBER — lead with one hard stat that breaks the brain ('11,000 years old. Built before the wheel, before writing.').",
+            "DIRECT CHALLENGE — attack the viewer's assumption ('Everything you were taught about this is a lie.').",
+            "AUTHORITY BLINDSIDED — experts who couldn't explain it ('They scanned beneath it. What came back made no sense.').",
+            "EERIE QUESTION — one unsettling question, no answer yet ('What if an entire city vanished in a single night?').",
+            "SENSORY COLD-OPEN — drop them into the place ('Pitch black, 200 feet down, a door sealed for 1,500 years.').",
+            "REVERSE REVEAL — state the bizarre result first, explain how second ('This 2,000-year-old metal still hasn't rusted. Nobody can copy it.').",
+        ]
+        _i = int(_hl.md5(str(topic.get("title", "")).encode()).hexdigest(), 16) % len(_styles)
+        variety_block = (
+            f"\nOPENING STYLE for THIS video (MANDATORY — vary structure so no two "
+            f"reels feel templated): {_styles[_i]}\n"
+            "Vary the fact-reveal order and sentence rhythm vs a typical video too.\n"
+        )
+
     return f"""Topic: {topic['title']}
 Kind: {topic.get('kind', 'general')}
 Tags: {', '.join(topic.get('tags', []))}
 Niche: {niche}
-{hook_block}{series_block}
+{hook_block}{series_block}{variety_block}
 Reference facts (from Wikipedia, may be long — distill the essentials):
 \"\"\"
 {context}

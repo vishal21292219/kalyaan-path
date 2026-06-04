@@ -30,16 +30,23 @@ load_dotenv(override=True)
 PEXELS_VIDEO_SEARCH = "https://api.pexels.com/videos/search"
 PIXABAY_VIDEO_SEARCH = "https://pixabay.com/api/videos/"
 
+ROOT = Path(__file__).resolve().parent.parent
+_FOOTAGE_HISTORY = ROOT / "data" / "state" / "footage_history.json"
+
 # Broad evergreen fallbacks if a specific scene query returns nothing usable.
-# STRICTLY period-safe — every term must reliably return ancient/historical or
-# pure-nature footage with NO modern objects (cars, people, cities). Generic
-# terms like "desert landscape" or "starry night" were pulling modern Jeeps /
-# campers and breaking the ancient illusion, so they're banned here.
+# STRICTLY period-safe. EXPANDED + rotated so the same fallback clip doesn't
+# recur across videos (a big source of the "every video looks the same" feel).
 GENERIC_FALLBACKS = [
     "ancient stone ruins", "ancient temple columns", "weathered hieroglyphs",
     "old stone statue", "ancient ruins aerial", "torch lit cave wall",
     "sand dunes wind", "old manuscript pages", "crumbling stone wall",
-    "ancient carved relief",
+    "ancient carved relief", "ancient pyramid desert", "stone temple jungle",
+    "ancient fortress walls", "carved cave temple", "old ruined amphitheatre",
+    "ancient mosaic floor", "weathered stone columns", "misty mountain peaks",
+    "stormy ocean waves", "ancient cemetery tombs", "desert canyon rocks",
+    "ancient stone archway", "old castle ruins", "flowing lava rock",
+    "starlit night sky desert", "frozen glacier ice", "ancient buddha statue",
+    "overgrown jungle temple", "ancient roman ruins", "old shipwreck underwater",
 ]
 
 # Appended to every search query to bias results away from modern footage.
@@ -149,11 +156,40 @@ def _is_modern(video: dict) -> bool:
     return any(b in slug for b in _MODERN_BLOCK)
 
 
-def _pexels_search(query: str, api_key: str, per_page: int = 10) -> list[dict]:
+def _load_footage_history(days: int = 30):
+    """Return (full_dict, recent_id_set). Clips used in the last `days` are
+    'recent' and get skipped so videos don't reuse the same stock clip."""
+    import json as _json
+    from datetime import date as _date, timedelta as _td
+    try:
+        d = _json.loads(_FOOTAGE_HISTORY.read_text())
+    except Exception:
+        return {}, set()
+    cutoff = (_date.today() - _td(days=days)).isoformat()
+    return d, {cid for cid, dt in d.items() if str(dt) >= cutoff}
+
+
+def _save_footage_history(d: dict) -> None:
+    import json as _json
+    try:
+        items = sorted(d.items(), key=lambda kv: kv[1])[-600:]  # prune old
+        _FOOTAGE_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        _FOOTAGE_HISTORY.write_text(_json.dumps(dict(items)))
+    except Exception as e:
+        print(f"[stock] history save skipped: {e}")
+
+
+def _record_clip(d: dict, cid: str) -> None:
+    from datetime import date as _date
+    d[str(cid)] = _date.today().isoformat()
+
+
+def _pexels_search(query: str, api_key: str, per_page: int = 20, page: int = 1) -> list[dict]:
     r = requests.get(
         PEXELS_VIDEO_SEARCH,
         headers={"Authorization": api_key},
-        params={"query": query, "orientation": "portrait", "size": "medium", "per_page": per_page},
+        params={"query": query, "orientation": "portrait", "size": "medium",
+                "per_page": per_page, "page": page},
         timeout=30,
     )
     if r.status_code != 200:
@@ -209,18 +245,40 @@ def _download(url: str, dest: Path) -> bool:
         return False
 
 
-def _find_clip(query: str, dest: Path, pexels_key: str | None, pixabay_key: str | None) -> bool:
-    """Search providers for `query`, download first usable vertical clip to dest."""
+def _find_clip(query: str, dest: Path, pexels_key: str | None, pixabay_key: str | None,
+               recent: set | None = None, run_used: set | None = None,
+               used_d: dict | None = None, page: int = 1) -> bool:
+    """Search providers for `query`, download the first usable vertical clip that
+    was NOT used recently (across videos) or already in THIS video — so the same
+    stock clip stops appearing in every reel. `page` is varied per day so even an
+    identical query returns a different result set."""
+    recent = recent if recent is not None else set()
+    run_used = run_used if run_used is not None else set()
+
+    def _take(cid: str, link: str | None, allow_recent: bool) -> bool:
+        if not link or cid in run_used:
+            return False
+        if not allow_recent and cid in recent:
+            return False
+        if _download(link, dest):
+            run_used.add(cid)
+            if used_d is not None:
+                _record_clip(used_d, cid)
+            return True
+        return False
+
     if pexels_key:
-        for vid in _pexels_search(query, pexels_key):
-            link = _pexels_best_file(vid)
-            if link and _download(link, dest):
-                return True
+        # pass 1: skip recently-used clips; pass 2: allow reuse if nothing fresh
+        for allow_recent in (False, True):
+            for pg in (page, page + 1):
+                for vid in _pexels_search(query, pexels_key, page=pg):
+                    if _take(f"px:{vid.get('id')}", _pexels_best_file(vid), allow_recent):
+                        return True
     if pixabay_key:
-        for hit in _pixabay_search(query, pixabay_key):
-            url = _pixabay_best_url(hit)
-            if url and _download(url, dest):
-                return True
+        for allow_recent in (False, True):
+            for hit in _pixabay_search(query, pixabay_key):
+                if _take(f"pb:{hit.get('id')}", _pixabay_best_url(hit), allow_recent):
+                    return True
     return False
 
 
@@ -240,6 +298,20 @@ def fetch_clips(queries: list[str], out_dir: Path) -> list[Path]:
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Cross-video recency (skip clips used in the last 30 days) + per-run dedup
+    # (never the same clip twice in one reel). Page is rotated by date so even an
+    # identical query pulls a different result set each day → no more "same clip
+    # in every video".
+    import hashlib
+    from datetime import date as _date
+    used_d, recent = _load_footage_history(days=30)
+    run_used: set = set()
+    base_page = (int(hashlib.md5(_date.today().isoformat().encode()).hexdigest(), 16) % 4) + 1
+
+    # rotate the fallback list start by date so fallbacks differ across videos too
+    fb_start = int(hashlib.md5(_date.today().isoformat().encode()).hexdigest(), 16) % len(GENERIC_FALLBACKS)
+
     clips: list[Path] = []
     fb_i = 0
     for i, q in enumerate(queries):
@@ -247,14 +319,15 @@ def fetch_clips(queries: list[str], out_dir: Path) -> list[Path]:
         if dest.exists() and dest.stat().st_size > 20000:
             clips.append(dest)
             continue
-        ok = _find_clip(q, dest, pexels_key, pixabay_key)
-        # Specific query failed → walk generic fallbacks (cycled)
+        page = base_page + (i % 3)  # vary page per scene too
+        ok = _find_clip(q, dest, pexels_key, pixabay_key, recent, run_used, used_d, page=page)
+        # Specific query failed → walk generic fallbacks (date-rotated start)
         tries = 0
         while not ok and tries < len(GENERIC_FALLBACKS):
-            fq = GENERIC_FALLBACKS[fb_i % len(GENERIC_FALLBACKS)]
+            fq = GENERIC_FALLBACKS[(fb_start + fb_i) % len(GENERIC_FALLBACKS)]
             fb_i += 1
             tries += 1
-            ok = _find_clip(fq, dest, pexels_key, pixabay_key)
+            ok = _find_clip(fq, dest, pexels_key, pixabay_key, recent, run_used, used_d, page=page)
             if ok:
                 print(f"[stock] scene {i}: '{q}' empty → fallback '{fq}'")
         if ok:
@@ -262,9 +335,11 @@ def fetch_clips(queries: list[str], out_dir: Path) -> list[Path]:
             clips.append(dest)
         else:
             print(f"[stock] scene {i}: ✗ no clip for '{q}' (and fallbacks)")
+
+    _save_footage_history(used_d)
     if not clips:
         raise RuntimeError("Stock footage: could not fetch ANY clip")
-    print(f"[stock] {len(clips)}/{len(queries)} scenes have footage")
+    print(f"[stock] {len(clips)}/{len(queries)} scenes have footage ({len(run_used)} unique clips)")
     return clips
 
 
