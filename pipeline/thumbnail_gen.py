@@ -431,6 +431,64 @@ def _draw_text_block(draw, text: str, W: int, y: int, fill, font, stroke_w: int)
     return th
 
 
+# Words that POP yellow on thumbnails (rest white) — like top viral channels.
+_THUMB_KEY = {
+    "real", "hidden", "secret", "truth", "mind", "god", "gods", "death", "power",
+    "why", "shocking", "forbidden", "cursed", "proof", "never", "psychology",
+    "dark", "soul", "meaning", "lost", "ancient", "mystery", "sealed",
+    "रहस्य", "सच", "असली", "मौत", "श्राप", "अमर", "चमत्कार", "खौफनाक", "गुप्त",
+    "कैसे", "क्यों", "सबसे", "रहस्यमयी", "खतरनाक",
+}
+
+
+def _is_key_word(w: str) -> bool:
+    wl = w.strip(",.!?।॥-:;'\"").lower()
+    return wl in _THUMB_KEY or any(c.isdigit() for c in w)
+
+
+def _draw_words_colored(draw, text: str, W: int, y: int, font, stroke_w: int,
+                        key_color=(255, 215, 0), base_color=(255, 255, 255)) -> int:
+    """Draw text word-by-word: KEY words in yellow, rest white, thick black
+    stroke, wrapped + centered per line (matches the viral thumbnail look)."""
+    max_w = int(W * MAX_WIDTH_RATIO)
+
+    def wlen(s):
+        b = draw.textbbox((0, 0), s, font=font, stroke_width=stroke_w)
+        return b[2] - b[0]
+
+    space = wlen(" ")
+    # greedy wrap into lines
+    lines, cur, cur_w = [], [], 0
+    for w in text.split():
+        ww = wlen(w)
+        if cur and cur_w + space + ww > max_w:
+            lines.append(cur)
+            cur, cur_w = [w], ww
+        else:
+            cur_w += (space + ww) if cur else ww
+            cur.append(w)
+    if cur:
+        lines.append(cur)
+
+    asc, desc = font.getmetrics()
+    line_h = asc + desc + stroke_w * 2 + 12
+    total_h = 0
+    for li, words in enumerate(lines):
+        # if no key word on this line, force the longest word yellow (always a pop)
+        has_key = any(_is_key_word(w) for w in words)
+        longest = max(words, key=len) if words and not has_key else None
+        line_w = sum(wlen(w) for w in words) + space * (len(words) - 1)
+        x = (W - line_w) // 2
+        ly = y + li * line_h
+        for w in words:
+            col = key_color if (_is_key_word(w) or w is longest) else base_color
+            draw.text((x, ly), w, fill=col, stroke_width=stroke_w,
+                      stroke_fill=(0, 0, 0), font=font)
+            x += wlen(w) + space
+        total_h = (li + 1) * line_h
+    return total_h
+
+
 def make_thumbnail(script: dict, niche: str, out_path: Path, long_form: bool = False,
                    img_dir: Path | None = None) -> Path:
     """Generate thumbnail. Shorts mode = 1080x1920 vertical. Long-form mode =
@@ -472,7 +530,11 @@ def make_thumbnail(script: dict, niche: str, out_path: Path, long_form: bool = F
     max_w = int(W * MAX_WIDTH_RATIO)
     if top_text:
         font_big = _fit_font(draw, top_text, max_w, start_size=220, min_size=130, stroke_w=16)
-        th = _draw_text_block(draw, top_text, W, y=120, fill=(255, 215, 0), font=font_big, stroke_w=16)
+        try:
+            th = _draw_words_colored(draw, top_text, W, y=120, font=font_big, stroke_w=16)
+        except Exception as e:
+            print(f"[thumbnail] per-word color failed ({e}) — solid yellow fallback")
+            th = _draw_text_block(draw, top_text, W, y=120, fill=(255, 215, 0), font=font_big, stroke_w=16)
         sub_y = 120 + th + 40
     else:
         sub_y = 320
