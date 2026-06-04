@@ -1,0 +1,77 @@
+[
+  {
+    "slug": "krishna_as_envoy",
+    "file": "data/library_raviverma/krishna_as_envoy.jpg",
+    "wiki_title": "File:Sri Krishna as Envoy.jpg",
+    "wiki_source": "https://commons.wikimedia.org/wiki/File:Sri_Krishna_as_Envoy.jpg",
+    "deity": "krishna",
+    "tags": [
+      "krishna",
+      "mahabharat",
+      "envoy"
+    ],
+    "width": 800,
+    "height": 1105,
+    "size_kb": 156
+  },
+  {
+    "slug": "yashoda_krishna",
+    "file": "data/library_raviverma/yashoda_krishna.jpg",
+    "wiki_title": "File:Raja Ravi Varma, Yasoda Adorning Krishna.jpg",
+    "wiki_source": "https://commons.wikimedia.org/wiki/File:Raja_Ravi_Varma,_Yasoda_Adorning_Krishna.jpg",
+    "deity": "krishna",
+    "tags": [
+      "krishna",
+      "yashoda",
+      "child"
+    ],
+    "width": 486,
+    "height": 696,
+    "size_kb": 65
+  },
+  {
+    "slug": "radha_moonlight",
+    "file": "data/library_raviverma/radha_moonlight.jpg",
+    "wiki_title": "File:Radha in the Moonlight.jpg",
+    "wiki_source": "https://commons.wikimedia.org/wiki/File:Radha_in_the_Moonlight.jpg",
+    "deity": "krishna",
+    "tags": [
+      "krishna",
+      "radha",
+      "love"
+    ],
+    "width": 3000,
+    "height": 4178,
+    "size_kb": 9635
+  },
+  {
+    "slug": "krishna_yashoda_milk",
+    "file": "data/library_raviverma/krishna_yashoda_milk.jpg",
+    "wiki_title": "File:Yashoda with Krishna, Raja Ravi Varma.jpg",
+    "wiki_source": "https://commons.wikimedia.org/wiki/File:Yashoda_with_Krishna,_Raja_Ravi_Varma.jpg",
+    "deity": "krishna",
+    "tags": [
+      "krishna",
+      "yashoda",
+      "milk"
+    ],
+    "width": 972,
+    "height": 1200,
+    "size_kb": 319
+  },
+  {
+    "slug": "rama_conquers_varuna",
+    "file": "data/library_raviverma/rama_conquers_varuna.jpg",
+    "wiki_title": "File:Rama-Varuna.jpg",
+    "wiki_source": "https://commons.wikimedia.org/wiki/File:Rama-Varuna.jpg",
+    "deity": "rama",
+    "tags": [
+      "rama",
+      "varuna",
+      "ocean"
+    ],
+    "width": 790,
+    "height": 1065,
+    "size_kb": 270
+  }
+]

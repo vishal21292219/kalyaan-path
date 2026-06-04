@@ -7,3 +7,5 @@ output/
 data/cache/
 logs/
 .DS_Store
+
+telegram/node_modules/

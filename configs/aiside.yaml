@@ -1,0 +1,37 @@
+niche: aiside
+
+branding:
+  channel_handle: '@AISideDoor'
+  cta: "AI is here. The middle class isn't ready. Subscribe @AISideDoor"
+  hashtags:
+    - '#AISideDoor'
+    - '#SystemHangHoGaya'
+    - '#AIvsJobs'
+    - '#LayoffSong'
+    - '#TechLayoffs'
+    - '#HindiRap'
+    - '#IndianRap'
+    - '#TrapMusic'
+    - '#MiddleClass'
+    - '#AIRevolution'
+    - '#shorts'
+    - '#youtubeshorts'
+    - '#reels'
+
+paths:
+  audio: data/music_aiside/System Hang Ho Gaya.mp3
+  images_dir: output/images/aiside_system_hang
+  video_out: output/videos/aiside_system_hang.mp4
+
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  bitrate: 8M
+  font: assets/fonts/Khand-Bold.ttf
+  caption_font: assets/fonts/MuktaVaani-Bold.ttf
+
+images:
+  model: gemini-3.1-flash-image-preview
+  style_suffix: ". Cinematic dark moody atmosphere, modern trap aesthetic, dystopian cyberpunk meets Indian middle-class realism. Deep blacks with red and blue neon accents, sodium lamp warm pools of light, volumetric haze, 35mm film grain, shallow depth of field, anamorphic lens flares. Photorealistic ultra-detailed editorial photography, 8K, vertical 9:16 portrait composition 1080x1920, dramatic rim lighting, melancholic mood. Single clear subject, rule of thirds composition."
+  negative: "text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, blurry, low quality, cartoon, anime, chibi, oversaturated, kitsch, stock photo cliche"
