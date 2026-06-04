@@ -31,13 +31,14 @@ secrets:
   youtube_token: secrets/ancient_youtube_token.json
 
 images:
-  # B-ROLL MODE: TimeDecoders uses REAL stock footage (Pexels/Pixabay) instead
-  # of AI stills — the "slideshow" format was parked for this English ancient
-  # niche. One stock clip per scene is spliced over the narration.
-  # Set mode: image to fall back to AI stills.
-  mode: footage
-  provider: gemini
-  model: gemini-3.1-flash-image-preview
+  # AI SCENE-MATCHED stills (2026-06-05): switched off Pexels footage — it kept
+  # repeating the same clips and felt irrelevant (user feedback, stuck at 700-800
+  # views). Now every scene gets a UNIQUE, relevant, cinematic AI image (fal FLUX)
+  # via the National-Geographic style_suffix below, animated with Ken Burns motion
+  # in the assembler. Set mode: footage to revert to stock clips.
+  mode: image
+  provider: fal
+  model: fal-ai/flux/schnell
   num_per_reel: 10
   negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars, dark gloomy mood, underexposed, muddy colors, washed out
   style_suffix: ', ULTRA REALISTIC cinematic photography style, photorealistic 8K, National Geographic documentary realism, period-accurate ancient setting with photorealistic textures (weathered stone, bronze patina, eroded carvings), dramatic cinematic lighting (golden hour rays, atmospheric volumetric fog, glowing torches, stormy dramatic skies), authentic archaeological detail, looks like a real photograph from an expedition, vertical 9:16 portrait composition, single dominant focal subject sharp in focus with atmospheric depth-of-field background, color graded cinematic teal-and-orange palette, no text no watermark no modern objects, no cartoon style'
