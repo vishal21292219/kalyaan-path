@@ -36,6 +36,8 @@ on:
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
     - cron: "0 14 * * *"    # generate ~14:00 UTC → scheduled go-live 18:00 UTC (2 PM ET, US afternoon)
     - cron: "0 20 * * *"    # generate ~20:00 UTC → scheduled go-live 00:00 UTC (8 PM ET, US evening PRIME)
+    # GodsOfTheMind (English god-psychology): 1/day, auto-publish.
+    - cron: "0 13 * * *"    # generate ~13:00 UTC → scheduled go-live 14:30 UTC (10 AM ET / 8 PM IST)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
   workflow_dispatch:
@@ -113,6 +115,8 @@ jobs:
           YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
           YT_ITIHAAS_TOKEN_JSON: ${{ secrets.YT_ITIHAAS_TOKEN_JSON }}
           YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
+          YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
+          YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -132,6 +136,8 @@ jobs:
           [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
           [ -n "$YT_ITIHAAS_TOKEN_JSON" ] && echo "$YT_ITIHAAS_TOKEN_JSON" > secrets/itihaas_youtube_token.json
           [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
+          [ -n "$YT_GODMIND_TOKEN_JSON" ] && echo "$YT_GODMIND_TOKEN_JSON" > secrets/godmind_youtube_token.json
+          [ -n "$YT_GODMIND_CLIENT_SECRET_JSON" ] && echo "$YT_GODMIND_CLIENT_SECRET_JSON" > secrets/godmind_youtube_client_secret.json
           cat > .env <<EOF
           ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
           FAL_KEY=$FAL_KEY
@@ -203,6 +209,13 @@ jobs:
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 13 * * *" ]; then
+            # GodsOfTheMind — English god-psychology, auto-publish ~14:30 UTC.
+            echo "niche=godmind"  >> $GITHUB_OUTPUT
+            echo "kind=trending"  >> $GITHUB_OUTPUT
+            echo "mode=publish"   >> $GITHUB_OUTPUT
+            echo "seed=1"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 11 * * 6" ]; then
             # Itihaasvani long-form: TG drop (user has no OAuth for this channel).
