@@ -1,0 +1,125 @@
+# Telegram-driven control (EXTRA feature — fully isolated).
+# Triggered ONLY by repository_dispatch from the Cloudflare Worker
+# (telegram/worker.js). NEVER runs on a schedule, so it cannot affect the
+# auto-post crons in daily-reels.yml. Commands carry a channel (niche) chosen
+# via inline buttons in Telegram.
+name: Telegram Control (on-demand)
+
+on:
+  repository_dispatch:
+    types: [tg_control]
+
+permissions:
+  contents: write
+
+jobs:
+  control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse command
+        id: p
+        run: |
+          CMD='${{ github.event.client_payload.command }}'
+          CH='${{ github.event.client_payload.channel }}'
+          echo "cmd=$CMD" >> $GITHUB_OUTPUT
+          echo "channel=$CH" >> $GITHUB_OUTPUT
+          # channel(niche) -> default kind/seed for that channel's main slot
+          case "$CH" in
+            bhakti)  echo "niche=bhakti"  >> $GITHUB_OUTPUT; echo "kind=mantra"   >> $GITHUB_OUTPUT; echo "seed=0" >> $GITHUB_OUTPUT ;;
+            itihaas) echo "niche=itihaas" >> $GITHUB_OUTPUT; echo "kind=series"   >> $GITHUB_OUTPUT; echo "seed=3" >> $GITHUB_OUTPUT ;;
+            ancient) echo "niche=ancient" >> $GITHUB_OUTPUT; echo "kind=trending" >> $GITHUB_OUTPUT; echo "seed=1" >> $GITHUB_OUTPUT ;;
+            *)       echo "niche="        >> $GITHUB_OUTPUT; echo "kind="         >> $GITHUB_OUTPUT; echo "seed=0" >> $GITHUB_OUTPUT ;;
+          esac
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps (only for generate/approve)
+        if: steps.p.outputs.cmd == 'generate' || steps.p.outputs.cmd == 'approve'
+        run: |
+          pip install -r requirements.txt
+          sudo apt-get update -q && sudo apt-get install -y ffmpeg fonts-noto-core fonts-noto-cjk
+
+      - name: Install minimal deps (status/skip)
+        if: steps.p.outputs.cmd == 'status' || steps.p.outputs.cmd == 'skip'
+        run: pip install requests python-dotenv pyyaml
+
+      - name: Restore secrets to .env + secrets/
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
+          YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
+          YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
+          YT_ITIHAAS_TOKEN_JSON: ${{ secrets.YT_ITIHAAS_TOKEN_JSON }}
+          YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          mkdir -p secrets
+          [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
+          [ -n "$YT_CLIENT_SECRET_JSON" ] && echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
+          [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
+          [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
+          [ -n "$YT_ITIHAAS_TOKEN_JSON" ] && echo "$YT_ITIHAAS_TOKEN_JSON" > secrets/itihaas_youtube_token.json
+          [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
+          cat > .env <<EOF
+          ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
+          FAL_KEY=$FAL_KEY
+          GEMINI_API_KEY=$GEMINI_API_KEY
+          GROQ_API_KEY=$GROQ_API_KEY
+          HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN
+          TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
+          TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
+          PEXELS_API_KEY=$PEXELS_API_KEY
+          EOF
+
+      - name: Acknowledge to Telegram
+        run: |
+          python scripts/tg_action.py ack --text "🤖 <b>${{ steps.p.outputs.cmd }}</b> for <b>${{ steps.p.outputs.channel }}</b> — working..."
+
+      - name: STATUS
+        if: steps.p.outputs.cmd == 'status'
+        run: python scripts/tg_action.py status --channel "${{ steps.p.outputs.channel }}"
+
+      - name: SKIP
+        if: steps.p.outputs.cmd == 'skip'
+        run: |
+          python scripts/tg_action.py skip --niche "${{ steps.p.outputs.niche }}" --kind "${{ steps.p.outputs.kind }}" --seed "${{ steps.p.outputs.seed }}"
+          git config user.name "tg-control"; git config user.email "bot@local"
+          git pull --rebase --autostash || true
+          git add data/state/ && git commit -m "tg: skip ${{ steps.p.outputs.channel }} [skip ci]" || true
+          git push || true
+
+      - name: GENERATE (on-demand → Telegram review)
+        if: steps.p.outputs.cmd == 'generate'
+        env:
+          ACTIVE_NICHE: ${{ steps.p.outputs.niche }}
+        run: |
+          python -u run.py --niche ${{ steps.p.outputs.niche }} --kind ${{ steps.p.outputs.kind }} \
+            --seed-offset ${{ steps.p.outputs.seed }} --notify-telegram --auto-thumb \
+            || python scripts/tg_action.py ack --text "⚠️ generate failed for ${{ steps.p.outputs.channel }}"
+
+      - name: APPROVE (publish to YouTube)
+        if: steps.p.outputs.cmd == 'approve'
+        env:
+          ACTIVE_NICHE: ${{ steps.p.outputs.niche }}
+        run: |
+          python -u run.py --niche ${{ steps.p.outputs.niche }} --kind ${{ steps.p.outputs.kind }} \
+            --seed-offset ${{ steps.p.outputs.seed }} --publish --auto-thumb \
+            && python scripts/tg_action.py ack --text "✅ Published to YouTube — ${{ steps.p.outputs.channel }}" \
+            || python scripts/tg_action.py ack --text "⚠️ approve/publish failed for ${{ steps.p.outputs.channel }}"
+
+      - name: HELP
+        if: steps.p.outputs.cmd == 'help'
+        run: |
+          python scripts/tg_action.py ack --text "🤖 <b>Commands</b>%0A/status — kya post hua%0A/generate — abhi ek video banao (Telegram review)%0A/skip — aaj ka topic skip%0A/approve — YouTube pe publish%0A%0AHar command ke baad channel chuno (button)."
