@@ -22,7 +22,7 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
   "hook_roman": "Roman transliteration of the hook line",
   "body": [
      "Devanagari Hindi line for voiceover",
-     "..."   // 15-22 lines, each one breath, ~10-15 words (target 2:30-3:00 total)
+     "..."   // 10-14 SHORT lines, ~9-13 words each (target 60-85s spoken; NEVER over 100s — must stay a Short)
   ],
   "body_roman": [
      "Roman transliteration line for captions",
@@ -47,12 +47,17 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
 }
 
 Rules:
-- Total spoken duration ~2:30-3:00 (150-180 seconds) when read calmly.
-  THIS IS THE NEW SWEET SPOT — verified from top viral Shorts data:
-  - Priyansh Shukla 7M-view Hanuman = 2:29 duration
-  - Kaliyug 29M-view "sharir ka rahasya" = 1:22 (some go shorter)
-  - Most viral mythology Shorts: 2:30-3:00
-  NOT 45-60 sec anymore — that's outdated 2022-2023 pattern.
+- LENGTH (CRITICAL): keep the WHOLE body SHORT. Narration runs slow (~1.4
+  words/sec for dramatic Hindi), so control length by WORD COUNT, not by
+  guessing seconds:
+  * TOTAL words across ALL body[] lines = 90-120 words. HARD MAX = 140 words.
+  * That lands the video around 65-90 seconds.
+  WHY THIS IS NON-NEGOTIABLE: a YouTube Short is capped at 180 seconds. Go over
+  and YouTube stops treating it as a Short — it loses ALL Shorts-feed reach
+  (one 196s video on our channel got 2 views). 140 words keeps a safe margin.
+  Data agrees: our best performer (Namah Shivaya 67s) and top competitor hits
+  (Jal Mahal 86s = 9M, fridge 79s, ghati road 39s) are all SHORT. Shorter +
+  tighter = higher retention = more reach.
 - LANGUAGE: hook / body / cta MUST be in the channel's primary language
   (see "LANGUAGE INSTRUCTION" section below). For Hindi channels use
   Devanagari script. For English channels write directly in English (in
@@ -571,9 +576,9 @@ def write_script(topic: dict, context: str, long_form: bool = False,
         n_images = 30
     else:
         # Shorts mode: visuals = 1 per body line for tight script-image sync.
-        # Body is 15-22 lines (target 2:30-3:00), so n_images ≈ 18 on average.
-        # We pass a hint to the LLM but enforce in post-process.
-        n_images = cfg["images"].get("num_per_reel", 18)
+        # Body is now 10-14 lines (target 60-85s, must stay under the 180s Shorts
+        # cap). Post-process truncates visuals to the real body count.
+        n_images = cfg["images"].get("num_per_reel", 13)
     niche = cfg.get("niche", "bhakti")
 
     system = _build_system_prompt(cfg, n_images, long_form=long_form)
@@ -680,6 +685,32 @@ def write_script(topic: dict, context: str, long_form: bool = False,
             # Truncate excess
             visuals = visuals[:len(body)]
             script["visuals"] = visuals
+
+        # HARD SAFETY NET: a Short MUST stay under 180s or it loses Shorts reach.
+        # Dramatic narration ≈ 1.4 words/sec, so cap total body words at ~170
+        # (≈120s, safe margin). The cta is a separate field, so trimming trailing
+        # body lines never drops the closing call-to-action. Rarely triggers
+        # (the prompt already targets 90-120 words) — pure backstop.
+        MAX_WORDS = 170
+        body = script.get("body") or []
+
+        def _wc(lines):
+            return sum(len(str(l).split()) for l in lines)
+
+        if _wc(body) > MAX_WORDS:
+            kept = []
+            for line in body:
+                if kept and _wc(kept) + len(str(line).split()) > MAX_WORDS:
+                    break
+                kept.append(line)
+            n = max(3, len(kept))
+            if n < len(body):
+                print(f"[script_writer] body {_wc(body)}w > {MAX_WORDS}w → trimmed {len(body)}→{n} lines (keep Short <180s)")
+                script["body"] = body[:n]
+                if script.get("body_roman"):
+                    script["body_roman"] = script["body_roman"][:n]
+                if script.get("visuals"):
+                    script["visuals"] = script["visuals"][:n]
     return script
 
 
