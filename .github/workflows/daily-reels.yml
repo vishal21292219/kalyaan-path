@@ -23,7 +23,7 @@ on:
   schedule:
     # Itihaasvani: 2/day (cut from 3 — quality > quantity per review data).
     # Morning history/temple drop + night-prime SERIES binge drop.
-    - cron: "30 15 * * *"   # fire 21:00 IST → Itihaasvani drop #1 for TOMORROW 08:30 IST upload
+    # - cron: "30 15 * * *"   # Itihaasvani AM trending — DISABLED 2026-06-05 per user (only PM series now)
     - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #2 (SERIES) for TOMORROW 22:30 IST upload
     # KalyaanPath: DAILY morning mantra. GENERATE early (21:30 UTC); YouTube
     # schedules go-live at 01:30 UTC (~7 AM IST) via publishAt — exact, on time.
