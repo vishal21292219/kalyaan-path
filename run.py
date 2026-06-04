@@ -27,7 +27,8 @@ PUBLISH_TIMES = {
     ("bhajan",  "trending", 0): "13:30",  # ~7:00 PM IST Sunday
     ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
     ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST next evening prime (PM series)
-    ("godmind", "trending", 1): "14:30",  # GodsOfTheMind: 10 AM ET / 8 PM IST
+    ("godmind", "trending", 1): "13:00",  # GodsOfTheMind drop 1: 9 AM ET + 6:30 PM IST
+    ("godmind", "trending", 2): "23:00",  # GodsOfTheMind drop 2: 7 PM ET (US prime)
 }
 
 

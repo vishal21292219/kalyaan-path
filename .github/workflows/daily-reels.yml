@@ -36,8 +36,10 @@ on:
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
     - cron: "0 14 * * *"    # generate ~14:00 UTC → scheduled go-live 18:00 UTC (2 PM ET, US afternoon)
     - cron: "0 20 * * *"    # generate ~20:00 UTC → scheduled go-live 00:00 UTC (8 PM ET, US evening PRIME)
-    # GodsOfTheMind (English god-psychology): 1/day, auto-publish.
-    - cron: "0 13 * * *"    # generate ~13:00 UTC → scheduled go-live 14:30 UTC (10 AM ET / 8 PM IST)
+    # GodsOfTheMind (English god-psychology): 2/day, generate-ahead + publishAt
+    # so each video LANDS at the exact reach window.
+    - cron: "30 11 * * *"   # gen 11:30 UTC → go-live 13:00 UTC (9 AM ET + 6:30 PM IST: US morning + India evening)
+    - cron: "0 21 * * *"    # gen 21:00 UTC → go-live 23:00 UTC (7 PM ET: US evening prime)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
   workflow_dispatch:
@@ -210,12 +212,19 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 13 * * *" ]; then
-            # GodsOfTheMind — English god-psychology, auto-publish ~14:30 UTC.
+          elif [ "${{ github.event.schedule }}" = "30 11 * * *" ]; then
+            # GodsOfTheMind drop #1 → go-live 13:00 UTC (US morning + India evening).
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=1"         >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 21 * * *" ]; then
+            # GodsOfTheMind drop #2 → go-live 23:00 UTC (US evening prime).
+            echo "niche=godmind"  >> $GITHUB_OUTPUT
+            echo "kind=trending"  >> $GITHUB_OUTPUT
+            echo "mode=publish"   >> $GITHUB_OUTPUT
+            echo "seed=2"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 11 * * 6" ]; then
             # Itihaasvani long-form: TG drop (user has no OAuth for this channel).
