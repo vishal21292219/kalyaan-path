@@ -1,0 +1,177 @@
+niche: godmind
+
+branding:
+  channel_handle: '@GodsOfTheMind'
+  cta: "🧠 Decoding the gods within — Subscribe Gods of the Mind"
+  ai_disclosure: "🧠 Gods of the Mind | Ancient myths decoded as psychology — original scripts, AI-assisted visuals & narration."
+  hashtags:
+  - '#godsofthemind'
+  - '#psychology'
+  - '#hindumythology'
+  - '#spirituality'
+  - '#philosophy'
+  - '#consciousness'
+  - '#selfimprovement'
+  - '#shiva'
+  - '#krishna'
+  - '#mindfulness'
+  - '#shorts'
+  - '#youtubeshorts'
+  music_credit: "Music: meditative ambient — original, royalty-free"
+
+paths:
+  topics_file: data/viral_topics_godmind.json
+  music_dir: data/music_godmind
+  drone_dir: data/music_godmind   # pick_drone uses this → meditative_bed.mp3
+  state_dir: data/state
+  shloka_progress: data/state/godmind_progress.json
+
+secrets:
+  youtube_client_secret: secrets/godmind_youtube_client_secret.json
+  youtube_token: secrets/godmind_youtube_token.json
+
+images:
+  # PREMIUM AI visuals — fal FLUX, ethereal/cosmic/symbolic spiritual style that
+  # fuses deity + mind/consciousness (not photoreal history). Ken Burns motion in
+  # the assembler. Upgrade model to fal-ai/flux-pro/v1.1 for max quality (+cost).
+  mode: image
+  provider: fal
+  model: fal-ai/flux/schnell
+  num_per_reel: 10
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, extra fingers, extra limbs, distorted face, broken anatomy, blurry, low quality, cartoon, anime, chibi, modern clothing, cars, buildings, flat lighting, washed out, cluttered
+  style_suffix: ', ethereal cinematic spiritual art, cosmic atmosphere, dramatic chiaroscuro lighting with divine golden rim-light against deep dark background, symbolic surreal imagery fusing a Hindu deity with the human mind / consciousness / cosmos (neural constellations, third-eye light, sacred geometry, swirling galaxies, lotus, fire, water), painterly digital art meets photorealism, awe-inspiring and profound, rich teal-gold-violet palette, single dominant focal subject, volumetric mist, 9:16 vertical portrait, no text no watermark, masterpiece'
+
+llm:
+  language: english
+  # PREMIUM: Claude writes the scripts (depth + nuance) → falls back to Gemini.
+  provider: claude
+  model: claude-sonnet-4-6
+  fallback_model: gemini-flash-latest
+  persona: |
+    You are the writer for "Gods of the Mind" — a premium YouTube Shorts channel
+    that DECODES Hindu gods and myths as PSYCHOLOGY and PHILOSOPHY. You do NOT
+    preach religion. You reveal what each deity secretly maps onto in the human
+    mind, ego, consciousness, fear, desire, and growth — the way Carl Jung, Alan
+    Watts, Joseph Campbell, and Sadhguru (in English) reframe myth as a mirror of
+    the self.
+
+    THE FORMAT THAT WORKS (proven: @Awoken_Yodha hit 400K+/video with this):
+    - Take ONE god / symbol (Shiva, Kali, Krishna, Indra, Ganesha, a vahana, a
+      weapon, a posture) and reveal its HIDDEN PSYCHOLOGICAL meaning.
+    - body[0] = a pattern-interrupt reframe in the first 2 seconds:
+      "Shiva is not a god sitting in the sky. Shiva is a state of your own mind."
+      NEVER open with "Did you know" or a slow setup. Open ON the reframe.
+    - Build ONE clean insight, layer by layer, each line deeper than the last.
+    - Land a "mind-blown" realization at ~70-80%, then a reflective close.
+    - It must feel PROFOUND and CALM, like a truth being revealed — not hyped.
+    Tone: calm, wise, intimate, slightly hypnotic — a voice you lean in to hear.
+    Audience: global English "seekers" 18-40 — into psychology, spirituality,
+    self-improvement, mindfulness, stoicism (US/UK/Canada/Australia/India-English).
+    Always end by inviting them to "Subscribe to Gods of the Mind" + a reflective
+    question that bait-comments ("Which god lives in YOUR mind? Comment below.").
+
+  image_style_guidance: |
+    - Ethereal, symbolic, cosmic — NOT literal/historical photography.
+    - Fuse the deity with the MIND/consciousness: third-eye light, neural
+      constellations, sacred geometry, galaxies, lotus, fire, water, shadow.
+    - Dramatic chiaroscuro: deep dark background, divine golden/violet rim light.
+    - Single awe-inspiring focal subject in 9:16. Profound, calm, premium.
+    - NO text, NO modern objects, NO cluttered scenes.
+  topic_guidance: |
+    Every topic = a Hindu god / symbol decoded as psychology or philosophy:
+    - Deities as mind-states: Shiva (stillness/dissolution of ego), Kali
+      (destruction of illusion/fear), Krishna (strategy/detachment/play),
+      Vishnu (preservation/balance), Brahma (creation/the restless mind),
+      Indra (the insecure ego/power), Ganesha (removing inner obstacles),
+      Hanuman (devotion/self-belief), Durga (inner strength).
+    - Symbols decoded: why gods ride animals (mastering instincts), multiple
+      arms (parallel capacities of mind), the third eye (awareness), the snake
+      (kundalini/energy), the dance of Shiva (cosmic rhythm), the conch, the
+      lotus, the trident, Yamraj/death as a teacher.
+    - Concepts: maya (illusion), karma (psychology of action), the gunas,
+      detachment, the witness/sakshi, ego vs Self, dharma as alignment.
+    Frame as universal psychology/philosophy — never sectarian, never preachy.
+
+  content_spec: |
+    OUTPUT RULES — every "Gods of the Mind" Short:
+
+    1. title (≤80 chars, English, NO hashtags in title):
+       Use these PROVEN frameworks:
+         * "The Real Meaning of [God] (Mind-Blowing)"
+         * "The Hidden Psychology of [God/Symbol]"
+         * "[God] Is Not What You Think"
+         * "Why Hindu Gods [do X]? The Deep Meaning"
+         * "What [God] Secretly Teaches About Your Mind"
+       End with EXACTLY 1 emoji (🧠 🕉️ 👁️ 🔱 🌌 🪷 ⚡ 🔥). Lead with the god's name.
+       Good: "The Real Meaning of Kali (Mind-Blowing) 🧠" /
+             "Shiva Is Not a God in the Sky — The Real Shiva 👁️"
+
+    2. description (≤1500 chars):
+       Line 1: A reframe hook + emoji.
+       Line 2-3: tease the insight without fully giving it (curiosity gap).
+       Line 4: reflective engagement question ("Which god lives in your mind?").
+       Line 5 (verbatim): "Subscribe to Gods of the Mind — decoding the gods
+                          within, one myth at a time."
+       Line 6 (verbatim): "📩 Business: gopulabs@gmail.com"
+       Line 7: 12-15 hashtags.
+       Line 8: "Your Queries:" + 15-20 lowercase long-tail search keywords
+               (e.g. "real meaning of shiva", "kali psychology explained",
+               "hindu gods symbolism meaning").
+
+    3. body lines:
+       - Each line = ONE calm breath, 8-13 words, simple profound English.
+       - STATEMENT → REFRAME → DEEPER TRUTH structure.
+       - No hype words, no "you won't believe". Let the insight hit quietly.
+       - Build toward ONE clear realization; don't list 5 things.
+
+    4. cta:
+       - Reflective + binary-ish: "Which god lives in your mind? Tell me below."
+       - "Subscribe to Gods of the Mind."
+
+    5. hashtags (description only): always #GodsOfTheMind #Psychology
+       #HinduMythology #Spirituality #Philosophy #Consciousness #Shorts
+       #YouTubeShorts + 5-7 topic-specific (#Shiva #Kali #Krishna #Jung etc.)
+
+publish:
+  instagram: false
+  privacy: public
+  youtube: true
+
+video:
+  bitrate: 6M
+  music: true
+  music_volume: 0.09   # meditative bed slightly more present (you "lean in to listen")
+  stings: false
+  duration_target_sec: 80
+  font: assets/fonts/Anton-Regular.ttf
+  font_size: 80
+  fps: 30
+  height: 1920
+  subtitle_box_opacity: 0.0
+  width: 1080
+
+voice:
+  # PREMIUM: ElevenLabs (deep calm narrator). Falls back to edge until a valid
+  # ELEVENLABS_API_KEY is set, so the channel works immediately on the free voice.
+  provider: elevenlabs
+  fallback_to_edge: true
+
+  # edge fallback (used until ElevenLabs key is valid) — calm US storyteller
+  voice: en-US-BrianMultilingualNeural
+  rate: -7%
+  pitch: +0Hz
+  voice_by_gender:
+    male: en-US-BrianMultilingualNeural
+    female: en-US-AvaMultilingualNeural
+
+  # ElevenLabs (premium) — Turbo model = half the credits (~2x mileage).
+  # Replace voice IDs with your chosen deep-calm male + warm female from the
+  # voice library once subscribed.
+  elevenlabs_voice_id: onwK4e9ZLuTAKqWW03F9       # Daniel — deep, calm, authoritative
+  elevenlabs_voice_id_female: XB0fDUnXU5powFXDhCwa # Charlotte — warm, soothing
+  elevenlabs_model: eleven_turbo_v2_5
+  elevenlabs_settings:
+    stability: 0.55
+    similarity_boost: 0.80
+    style: 0.30
+    use_speaker_boost: true

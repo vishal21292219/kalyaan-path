@@ -18,17 +18,17 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
 
 {
   "title": "YouTube-Shorts viral title, <=70 chars (Hinglish or Roman). MUST be a STOP-SCROLL hook — curiosity gap, dramatic claim, or specific number. Examples: 'Karna ka woh raaz jo Mahabharat ne chupaya 🔥', 'Hanuman aaj bhi zinda hain? 👁️ 5000 saal ka sach', 'Ravana ke 10 sir ka asli matlab 😱'. Add 1-2 power emojis (🔥 👁️ 😱 🔱 ⚔️ 📜).",
-  "hook": "Devanagari Hindi opening line, <=16 words. MUST start with curiosity trigger like 'क्या आप जानते हैं', 'इतिहास का वो रहस्य', 'पुराणों में लिखा है कि', or a SHOCKING claim. Used for VOICEOVER + first 2 sec of captions.",
-  "hook_roman": "Roman transliteration of the hook line",
+  "hook": "Opening line in the CHANNEL'S PRIMARY LANGUAGE (see the LANGUAGE INSTRUCTION below — Hindi channels=Devanagari, English channels=English), <=16 words. MUST start with a curiosity trigger or a bold reframe/shocking claim. Used for VOICEOVER + first 2 sec of captions.",
+  "hook_roman": "Roman transliteration of the hook (for English channels, identical to hook)",
   "body": [
-     "Devanagari Hindi line for voiceover",
+     "Voiceover line in the channel's primary language (Devanagari for Hindi, English for English channels)",
      "..."   // 10-14 SHORT lines, ~9-13 words each (target 60-85s spoken; NEVER over 100s — must stay a Short)
   ],
   "body_roman": [
-     "Roman transliteration line for captions",
+     "Roman transliteration line for captions (for English channels, identical to body)",
      "..."   // EXACTLY same count as body[], 1:1 mapping per line
   ],
-  "cta": "Devanagari Hindi closing line — MUST ask a specific question for engagement (e.g. 'आप क्या मानते हैं — कमेंट में बताएं') AND mention the channel name to subscribe.",
+  "cta": "Closing line in the channel's primary language — MUST ask a specific engagement question AND mention the channel name to subscribe.",
   "cta_roman": "Roman transliteration of the cta",
   "visuals": [
      "vivid image prompt 1 (in English) — depicts EXACTLY what body[0] narrates",
