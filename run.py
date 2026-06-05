@@ -14,7 +14,7 @@ from pipeline.scraper import gather_context
 from pipeline.script_writer import write_script
 from pipeline.topic_generator import pick_mantra, pick_series, pick_shloka_episode, pick_topic, pick_trending
 from pipeline.tts import synthesize
-from pipeline.utils import load_config, out_path, set_active_niche, slugify, today_stamp
+from pipeline.utils import dedupe_script_narration, load_config, out_path, set_active_niche, slugify, today_stamp
 
 
 # Exact YouTube go-live time (UTC HH:MM) per auto-publish slot, keyed by
@@ -215,6 +215,10 @@ def main(argv: list[str]) -> int:
             if key in topic and key not in script:
                 script[key] = topic[key]
         print(f"[script] title: {script.get('title')}")
+    # Guard against the hook being repeated as body[0] (some personas instruct
+    # body[0] to be the same opener as the hook → first sentence spoken twice).
+    # Runs for BOTH fresh and pregen-cached scripts, before TTS + captions.
+    dedupe_script_narration(script)
     script_path = out_path("scripts", f"{base}.json")
     script_path.write_text(json.dumps(script, indent=2, ensure_ascii=False))
 
