@@ -58,9 +58,13 @@ llm:
     THE FORMAT THAT WORKS (proven: @Awoken_Yodha hit 400K+/video with this):
     - Take ONE god / symbol (Shiva, Kali, Krishna, Indra, Ganesha, a vahana, a
       weapon, a posture) and reveal its HIDDEN PSYCHOLOGICAL meaning.
-    - body[0] = a pattern-interrupt reframe in the first 2 seconds:
+    - hook = a pattern-interrupt reframe in the first 2 seconds:
       "Shiva is not a god sitting in the sky. Shiva is a state of your own mind."
       NEVER open with "Did you know" or a slow setup. Open ON the reframe.
+    - CRITICAL: the hook is spoken FIRST. body[0] must CONTINUE from the hook and
+      go DEEPER — do NOT repeat, restate, or paraphrase the hook line in body[0]
+      (the viewer already heard it, so repeating it makes the voiceover say the
+      same sentence twice).
     - Build ONE clean insight, layer by layer, each line deeper than the last.
     - Land a "mind-blown" realization at ~70-80%, then a reflective close.
     - It must feel PROFOUND and CALM, like a truth being revealed — not hyped.

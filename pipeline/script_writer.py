@@ -7,7 +7,7 @@ import re
 
 from dotenv import load_dotenv
 
-from .utils import load_config
+from .utils import dedupe_script_narration, load_config
 
 # override=True so .env always wins over shell-exported empty strings
 # (some shells export ANTHROPIC_API_KEY="" which silently blocks loading).
@@ -732,6 +732,11 @@ def write_script(topic: dict, context: str, long_form: bool = False,
                     script["body_roman"] = script["body_roman"][:n]
                 if script.get("visuals"):
                     script["visuals"] = script["visuals"][:n]
+
+    # Drop a body[0] (and its 1:1 body_roman/visuals) that merely restates the
+    # hook — otherwise the opening sentence is spoken/captioned twice. Runs after
+    # the visual-sync repair so counts stay aligned.
+    dedupe_script_narration(script)
     return script
 
 
