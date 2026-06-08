@@ -197,6 +197,7 @@ publish:
   instagram: false
   privacy: public
   youtube: true
+  facebook: true   # also auto-post each video as a Facebook Page Reel (Itihaasvani)
 
 video:
   bitrate: 6M

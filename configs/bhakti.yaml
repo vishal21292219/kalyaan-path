@@ -158,6 +158,7 @@ publish:
   instagram: true
   privacy: public
   youtube: true
+  facebook: true   # also auto-post each video as a Facebook Page Reel (Kalyaan Path)
 
 video:
   bitrate: 6M
