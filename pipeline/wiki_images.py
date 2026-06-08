@@ -22,6 +22,16 @@ from PIL import Image
 
 API = "https://en.wikipedia.org/w/api.php"
 COMMONS = "https://commons.wikimedia.org/w/api.php"
+
+# Real-PERSON subjects → pin the recognizable free-licensed FACE photo(s) first
+# (Commons category order tends to surface temples/statues before the portrait).
+# Key is matched as a lowercase substring of the search query.
+_PINNED_FILES = {
+    "neem karoli baba": [
+        "File:Neemkaroli 14.jpg",       # iconic plaid-blanket portrait (Public Domain)
+        "File:Neem Karoli baba.jpg",    # garlanded altar portrait (CC0)
+    ],
+}
 HEADERS = {"User-Agent": "BhaktiReels/1.0 (educational reels; gopulabs@gmail.com)"}
 
 # Commercial-safe licenses (attribution may be required → we add credits).
@@ -152,8 +162,19 @@ def fetch_wiki_images(
         if v:
             queries.append(str(v).replace("_", " "))
 
-    # Collect candidate files: Commons category (richest) + Wikipedia article.
+    # PINNED files — for real-PERSON subjects (saints/gurus) the recognizable
+    # FACE must lead, but Commons category order often surfaces temples/statues
+    # first. Pin the known free-licensed portrait(s) so slot 0 = the actual face.
     files: list[str] = []
+    for q in queries:
+        for pin_key, pin_files in _PINNED_FILES.items():
+            if pin_key in q.strip().lower():
+                files = list(pin_files)
+                break
+        if files:
+            break
+
+    # Collect candidate files: Commons category (richest) + Wikipedia article.
     seen_q = set()
     for q in queries:
         if q in seen_q:
