@@ -274,7 +274,7 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=5"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-            echo "topic=Neem Karoli Baba (Kainchi Dham wale Maharaj ji) — unke chamatkar, rahasya aur asli parichay, unke janmotsav (15 June) ke avsar par" >> $GITHUB_OUTPUT
+            echo "topic=Neem Karoli Baba — wo Indian sant jinke darshan ke liye Steve Jobs, Mark Zuckerberg aur Julia Roberts Kainchi Dham (Himalaya) tak aaye, par aaj bhi 99% Indians inhe theek se nahi jaante. HOOK pehli line me YEHI celebrity-Kainchi Dham connection ho. Phir unke chamatkar, Hanuman bhakti aur asli parichay. KalyaanPath janmotsav (15 June) special." >> $GITHUB_OUTPUT
             echo "real_photos=Neem Karoli Baba" >> $GITHUB_OUTPUT
           else
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
