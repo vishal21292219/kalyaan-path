@@ -42,6 +42,8 @@ on:
     - cron: "0 21 * * *"    # gen 21:00 UTC → go-live 23:00 UTC (7 PM ET: US evening prime)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
+    # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — special KalyaanPath devotional drop.
+    - cron: "0 1 15 6 *"    # 01:00 UTC 15-Jun → generate → publish ~6:50 AM IST on his birthday
   workflow_dispatch:
     inputs:
       niche:
@@ -195,10 +197,13 @@ jobs:
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
-            # Night prime drop = SERIES (Mahabharat Villains active). AUTO-publish
-            # to YouTube; go-live ~20:00 IST next day via publishAt (14:30 UTC).
+            # Night prime drop = standalone VIRAL RAHASYA topic (data-driven 2026-06-08:
+            # Mahabharat Villains series flopped 51→19→2→0; standalone mythology
+            # "rahasya/chamatkar" topics like Kamadhenu/Tripurasur won 246-482 views).
+            # kind=trending → pick_viral (mythology FIGURE topics weighted 3x).
+            # AUTO-publish; go-live ~20:00 IST next day via publishAt (14:30 UTC).
             echo "niche=itihaas" >> $GITHUB_OUTPUT
-            echo "kind=series"   >> $GITHUB_OUTPUT
+            echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
@@ -256,6 +261,15 @@ jobs:
             echo "mode=telegram"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=true" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 1 15 6 *" ]; then
+            # Neem Karoli Baba Jayanti (15 June) — special KalyaanPath devotional
+            # drop, forced topic, AUTO-publish immediately on his birthday morning.
+            echo "niche=bhakti"  >> $GITHUB_OUTPUT
+            echo "kind=trending" >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
+            echo "seed=5"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+            echo "topic=Neem Karoli Baba (Kainchi Dham wale Maharaj ji) — unke chamatkar, rahasya aur asli parichay, unke janmotsav (15 June) ke avsar par" >> $GITHUB_OUTPUT
           else
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
@@ -277,12 +291,22 @@ jobs:
       - name: Run pipeline (publish mode)
         if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form != 'true'
         run: |
-          python -u run.py \
-            --niche ${{ steps.route.outputs.niche }} \
-            --kind ${{ steps.route.outputs.kind }} \
-            --publish --auto-thumb \
-            ${{ steps.route.outputs.niche == 'godmind' && '--notify-telegram' || '' }} \
-            --seed-offset ${{ steps.route.outputs.seed }}
+          NOTIFY="${{ steps.route.outputs.niche == 'godmind' && '--notify-telegram' || '' }}"
+          TOPIC="${{ steps.route.outputs.topic }}"
+          if [ -n "$TOPIC" ]; then
+            python -u run.py \
+              --niche ${{ steps.route.outputs.niche }} \
+              --kind ${{ steps.route.outputs.kind }} \
+              --topic "$TOPIC" \
+              --publish --auto-thumb $NOTIFY \
+              --seed-offset ${{ steps.route.outputs.seed }}
+          else
+            python -u run.py \
+              --niche ${{ steps.route.outputs.niche }} \
+              --kind ${{ steps.route.outputs.kind }} \
+              --publish --auto-thumb $NOTIFY \
+              --seed-offset ${{ steps.route.outputs.seed }}
+          fi
 
       - name: Run pipeline (LONG-FORM publish mode, 20-25 min)
         if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form == 'true'
