@@ -281,12 +281,23 @@ jobs:
       - name: Run pipeline (telegram mode)
         if: steps.route.outputs.mode == 'telegram'
         run: |
-          python -u run.py \
-            --niche ${{ steps.route.outputs.niche }} \
-            --kind ${{ steps.route.outputs.kind }} \
-            --auto-thumb \
-            --notify-telegram \
-            --seed-offset ${{ steps.route.outputs.seed }}
+          TOPIC="${{ steps.route.outputs.topic }}"
+          if [ -n "$TOPIC" ]; then
+            python -u run.py \
+              --niche ${{ steps.route.outputs.niche }} \
+              --kind ${{ steps.route.outputs.kind }} \
+              --topic "$TOPIC" \
+              --auto-thumb \
+              --notify-telegram \
+              --seed-offset ${{ steps.route.outputs.seed }}
+          else
+            python -u run.py \
+              --niche ${{ steps.route.outputs.niche }} \
+              --kind ${{ steps.route.outputs.kind }} \
+              --auto-thumb \
+              --notify-telegram \
+              --seed-offset ${{ steps.route.outputs.seed }}
+          fi
 
       - name: Run pipeline (publish mode)
         if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form != 'true'
