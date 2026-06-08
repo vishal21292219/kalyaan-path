@@ -6,10 +6,13 @@ Uses the Page Reels API (3-phase resumable upload):
   3. finish  -> POST /{page_id}/video_reels  (upload_phase=finish, video_state=PUBLISHED)
 
 Credentials (GitHub secrets / .env), NO app review needed for your own Page in
-Development mode because you're a Page admin with the CREATE_CONTENT task:
-  FB_PAGE_ID     - numeric Page id (e.g. 1113214471881336)
-  FB_PAGE_TOKEN  - long-lived (non-expiring) Page access token with
-                   pages_manage_posts + pages_read_engagement + pages_show_list
+Development mode because you're a Page admin with the CREATE_CONTENT task.
+Per-niche secrets (preferred), with a generic fallback so old configs keep working:
+  FB_PAGE_ID_<NICHE>    e.g. FB_PAGE_ID_GODMIND, FB_PAGE_ID_ANCIENT
+  FB_PAGE_TOKEN_<NICHE> e.g. FB_PAGE_TOKEN_GODMIND, FB_PAGE_TOKEN_ANCIENT
+  FB_PAGE_ID / FB_PAGE_TOKEN   (generic fallback — currently the GodsOfTheMind page)
+The token is a long-lived (non-expiring) Page access token with
+pages_manage_posts + pages_read_engagement + pages_show_list.
 
 Returns the reel URL on success, or None on any failure (never raises — Facebook
 is a bonus channel and must never break the YouTube publish).
@@ -38,12 +41,19 @@ def _caption(script: dict, cfg: dict) -> str:
     return "\n\n".join(parts)[:2200]
 
 
+def _creds(cfg: dict):
+    """Per-niche FB page creds with generic fallback. Returns (page_id, token)."""
+    niche = (cfg.get("niche") or "").upper()
+    token = os.environ.get(f"FB_PAGE_TOKEN_{niche}") or os.environ.get("FB_PAGE_TOKEN")
+    page_id = os.environ.get(f"FB_PAGE_ID_{niche}") or os.environ.get("FB_PAGE_ID")
+    return page_id, token
+
+
 def upload(video_path, script: dict, cfg: dict | None = None) -> str | None:
     cfg = cfg or load_config()
-    token = os.environ.get("FB_PAGE_TOKEN")
-    page_id = os.environ.get("FB_PAGE_ID")
+    page_id, token = _creds(cfg)
     if not token or not page_id:
-        print("[facebook] FB_PAGE_TOKEN/FB_PAGE_ID not set — skipping Facebook")
+        print("[facebook] FB_PAGE_TOKEN/FB_PAGE_ID not set for this niche — skipping Facebook")
         return None
 
     video_path = Path(video_path)

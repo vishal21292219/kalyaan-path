@@ -129,6 +129,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          FB_PAGE_ID_ANCIENT: ${{ secrets.FB_PAGE_ID_ANCIENT }}
+          FB_PAGE_TOKEN_ANCIENT: ${{ secrets.FB_PAGE_TOKEN_ANCIENT }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -153,6 +155,8 @@ jobs:
           TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
           FB_PAGE_ID=$FB_PAGE_ID
           FB_PAGE_TOKEN=$FB_PAGE_TOKEN
+          FB_PAGE_ID_ANCIENT=$FB_PAGE_ID_ANCIENT
+          FB_PAGE_TOKEN_ANCIENT=$FB_PAGE_TOKEN_ANCIENT
           IG_USER_ID=$IG_USER_ID
           IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
           PEXELS_API_KEY=$PEXELS_API_KEY
