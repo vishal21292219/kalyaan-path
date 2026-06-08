@@ -242,7 +242,14 @@ def main(argv: list[str]) -> int:
     # → it returned FOREIGN clips (authenticity killer). Use authentic real photos
     # from Wikimedia Commons instead (Ken Burns motion animates them), with fal AI
     # India-images as fallback. Other niches (TimeDecoders) keep Pexels footage.
-    wiki_mode = footage_mode and args.niche == "itihaas"
+    # Real-person subjects (saints/gurus like Neem Karoli Baba) can't be AI-faked —
+    # FORCE_REAL_PHOTOS="<Commons search term>" routes the run through the Wikimedia
+    # real-photo hybrid (CC0/CC face photos spliced into AI ambiance, auto-credited),
+    # exactly like Itihaasvani monuments. Works on ANY niche.
+    _real_q = os.environ.get("FORCE_REAL_PHOTOS", "").strip()
+    if _real_q:
+        topic["query"] = _real_q   # clean English search term for Commons
+    wiki_mode = (footage_mode and args.niche == "itihaas") or (bool(_real_q) and not args.long_form)
     if wiki_mode:
         footage_mode = False
     footage_clips: dict[int, Path] = {}
