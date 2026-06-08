@@ -483,6 +483,19 @@ def main(argv: list[str]) -> int:
         else:
             print("[publish] skipped youtube (disabled in config)")
 
+        # Facebook Page Reel (bonus channel — never blocks YouTube). Enable per
+        # niche with `publish.facebook: true` + FB_PAGE_ID / FB_PAGE_TOKEN secrets.
+        if publish_cfg.get("facebook", False):
+            try:
+                from pipeline.uploader_facebook import upload as fb_upload
+                fb_url = fb_upload(video_path, script, cfg=cfg)
+                if fb_url:
+                    print(f"[publish] facebook: {fb_url}")
+                    _delivered = True
+            except Exception:
+                traceback.print_exc()
+                print("[publish] facebook failed — see traceback above")
+
         if publish_cfg.get("instagram", False):
             if args.public_url:
                 try:
