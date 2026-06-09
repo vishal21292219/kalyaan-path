@@ -50,15 +50,17 @@ def _creds(cfg: dict):
 
 
 def _scheduled_ts(publish_at_iso: str | None) -> int | None:
-    """If publish_at_iso is a FAR-future timestamp (>6h ahead), return its unix ts so
-    the reel can be SCHEDULED on Facebook to match YouTube's go-live (e.g. a 15-Jun
-    Jayanti drop). Near-future daily slots (<6h) keep posting immediately — unchanged."""
+    """Return the unix ts to SCHEDULE the reel so its Facebook go-live MATCHES
+    YouTube's go-live (instead of posting at generation time, which is 1.5–4h early
+    and can land at bad hours — e.g. KalyaanPath's 3 AM IST). Facebook requires the
+    scheduled time to be ≥10 min out; if the slot is <20 min away (or has passed),
+    we post immediately as a safe fallback."""
     if not publish_at_iso:
         return None
     try:
         from datetime import datetime, timezone
         dt = datetime.fromisoformat(publish_at_iso.replace("Z", "+00:00"))
-        if (dt - datetime.now(timezone.utc)).total_seconds() > 6 * 3600:
+        if (dt - datetime.now(timezone.utc)).total_seconds() > 20 * 60:
             return int(dt.timestamp())
     except Exception as e:
         print(f"[facebook] bad publish_at {publish_at_iso!r} ({e}) — posting immediately")
