@@ -244,10 +244,27 @@ Each scene must:
 Output ONLY a JSON array of {n_scenes} prompt strings (no markdown fences):
 ["prompt 1", "prompt 2", "prompt 3", ...]"""
 
-    model = genai.GenerativeModel("gemini-flash-latest", system_instruction=persona)
-    resp = model.generate_content(user, generation_config={"temperature": 0.92})
-    text = resp.text.strip()
-    text = re.sub(r"^```(?:json)?\s*", "", text)
+    # LLM call with a fallback chain — Gemini (free) → Claude → Groq — so the
+    # storyboard survives Gemini's daily quota (critical for date-locked drops
+    # like the 15-Jun Neem Karoli bhajan).
+    text = None
+    try:
+        model = genai.GenerativeModel("gemini-flash-latest", system_instruction=persona)
+        resp = model.generate_content(user, generation_config={"temperature": 0.92})
+        text = resp.text.strip()
+    except Exception as e:
+        print(f"[bhajan] Gemini storyboard failed ({type(e).__name__}) — trying Claude/Groq")
+        from pipeline.script_writer import _claude, _groq
+        for fn, mdl in ((_claude, "claude-sonnet-4-6"), (_groq, "llama-3.3-70b-versatile")):
+            try:
+                text = fn(persona, user, mdl)
+                print(f"[bhajan] storyboard via {fn.__name__} fallback")
+                break
+            except Exception as e2:
+                print(f"[bhajan] {fn.__name__} fallback failed ({type(e2).__name__})")
+    if not text:
+        raise RuntimeError("all LLM providers failed for bhajan storyboard")
+    text = re.sub(r"^```(?:json)?\s*", "", text.strip())
     text = re.sub(r"\s*```$", "", text)
     s, e = text.find("["), text.rfind("]")
     if s == -1 or e == -1:
