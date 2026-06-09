@@ -506,7 +506,8 @@ def main(argv: list[str]) -> int:
         if publish_cfg.get("facebook", False):
             try:
                 from pipeline.uploader_facebook import upload as fb_upload
-                fb_url = fb_upload(video_path, script, cfg=cfg)
+                fb_url = fb_upload(video_path, script, cfg=cfg,
+                                   publish_at_iso=_publish_at_iso(_slot_publish_at(args)))
                 if fb_url:
                     print(f"[publish] facebook: {fb_url}")
                     _delivered = True

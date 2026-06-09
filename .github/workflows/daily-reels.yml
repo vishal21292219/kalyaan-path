@@ -42,8 +42,11 @@ on:
     - cron: "0 21 * * *"    # gen 21:00 UTC → go-live 23:00 UTC (7 PM ET: US evening prime)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
-    # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — special KalyaanPath devotional drop.
-    - cron: "0 1 15 6 *"    # 01:00 UTC 15-Jun → generate → publish ~6:50 AM IST on his birthday
+    # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — DISABLED 2026-06-09: the katha
+    # is PRE-SCHEDULED instead (uploaded private now with publishAt=15-Jun 01:30 UTC
+    # / 7 AM IST) so it can't be missed even if CI hiccups that day. Re-enabling this
+    # cron would create a DUPLICATE — keep it commented.
+    # - cron: "0 1 15 6 *"
   workflow_dispatch:
     inputs:
       niche:

@@ -49,7 +49,24 @@ def _creds(cfg: dict):
     return page_id, token
 
 
-def upload(video_path, script: dict, cfg: dict | None = None) -> str | None:
+def _scheduled_ts(publish_at_iso: str | None) -> int | None:
+    """If publish_at_iso is a FAR-future timestamp (>6h ahead), return its unix ts so
+    the reel can be SCHEDULED on Facebook to match YouTube's go-live (e.g. a 15-Jun
+    Jayanti drop). Near-future daily slots (<6h) keep posting immediately — unchanged."""
+    if not publish_at_iso:
+        return None
+    try:
+        from datetime import datetime, timezone
+        dt = datetime.fromisoformat(publish_at_iso.replace("Z", "+00:00"))
+        if (dt - datetime.now(timezone.utc)).total_seconds() > 6 * 3600:
+            return int(dt.timestamp())
+    except Exception as e:
+        print(f"[facebook] bad publish_at {publish_at_iso!r} ({e}) — posting immediately")
+    return None
+
+
+def upload(video_path, script: dict, cfg: dict | None = None,
+           publish_at_iso: str | None = None) -> str | None:
     cfg = cfg or load_config()
     page_id, token = _creds(cfg)
     if not token or not page_id:
@@ -61,6 +78,7 @@ def upload(video_path, script: dict, cfg: dict | None = None) -> str | None:
         print(f"[facebook] video missing: {video_path} — skipping")
         return None
     size = video_path.stat().st_size
+    sched_ts = _scheduled_ts(publish_at_iso)
 
     try:
         # 1. START — reserve a video container + get the rupload URL.
@@ -91,17 +109,21 @@ def upload(video_path, script: dict, cfg: dict | None = None) -> str | None:
             print(f"[facebook] binary upload failed: {resp.status_code} {resp.text[:300]}")
             return None
 
-        # 3. FINISH — publish the reel with its caption.
+        # 3. FINISH — publish now, or SCHEDULE for a far-future go-live (matches YT).
+        finish_data = {
+            "upload_phase": "finish",
+            "video_id": vid,
+            "description": _caption(script, cfg),
+            "access_token": token,
+        }
+        if sched_ts:
+            finish_data["video_state"] = "SCHEDULED"
+            finish_data["scheduled_publish_time"] = sched_ts
+            print(f"[facebook] scheduling reel go-live at unix {sched_ts}")
+        else:
+            finish_data["video_state"] = "PUBLISHED"
         finish = requests.post(
-            f"{GRAPH}/{page_id}/video_reels",
-            data={
-                "upload_phase": "finish",
-                "video_id": vid,
-                "video_state": "PUBLISHED",
-                "description": _caption(script, cfg),
-                "access_token": token,
-            },
-            timeout=120,
+            f"{GRAPH}/{page_id}/video_reels", data=finish_data, timeout=120,
         ).json()
         if not finish.get("success"):
             # Some accounts return {"success":true} only after processing; treat a
