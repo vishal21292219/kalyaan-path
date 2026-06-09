@@ -212,13 +212,11 @@ jobs:
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 16 * * *" ]; then
-            # Night prime drop = standalone VIRAL RAHASYA topic (data-driven 2026-06-08:
-            # Mahabharat Villains series flopped 51→19→2→0; standalone mythology
-            # "rahasya/chamatkar" topics like Kamadhenu/Tripurasur won 246-482 views).
-            # kind=trending → pick_viral (mythology FIGURE topics weighted 3x).
-            # AUTO-publish; go-live ~20:00 IST next day via publishAt (14:30 UTC).
+            # Night prime drop = SERIES (Mahabharat ke Villains). Per user 2026-06-09:
+            # keep the series running a few more days to test (despite the early
+            # 51→19→2→0 dip). AUTO-publish; go-live ~20:00 IST next day (14:30 UTC).
             echo "niche=itihaas" >> $GITHUB_OUTPUT
-            echo "kind=trending" >> $GITHUB_OUTPUT
+            echo "kind=series"   >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
