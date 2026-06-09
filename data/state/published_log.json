@@ -67,5 +67,8 @@
     "itihaas_series_s3": true,
     "ancient_trending_s2": true,
     "godmind_trending_s2": true
+  },
+  "2026-06-09": {
+    "bhajan_trending_s0": true
   }
 }
