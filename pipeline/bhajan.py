@@ -27,7 +27,12 @@ from .utils import ROOT, load_config
 
 load_dotenv()
 
-VALID_DEITIES = {"hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "khatu_shyam", "general"}
+VALID_DEITIES = {"hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "khatu_shyam", "neem_karoli", "general"}
+# Deities that must NEVER be auto-picked by the round-robin (deity=None). These are
+# one-off / date-specific specials (e.g. Neem Karoli Baba for his 15-Jun Jayanti) —
+# they only run when their deity is named explicitly, so the weekly Sunday bhajan
+# cron never accidentally posts them.
+_ROUNDROBIN_EXCLUDE = {"neem_karoli"}
 
 
 def _audio_duration(audio_path: Path) -> float:
@@ -86,7 +91,7 @@ def pick_bhajan_audio(deity: str | None = None) -> tuple[Path, str] | None:
         print(f"[bhajan] no folder: {root}")
         return None
 
-    deities_to_check = [deity] if deity else sorted(VALID_DEITIES)
+    deities_to_check = [deity] if deity else sorted(VALID_DEITIES - _ROUNDROBIN_EXCLUDE)
     candidates: list[tuple[Path, str, float]] = []
     for d in deities_to_check:
         folder = root / d
@@ -158,6 +163,19 @@ DEITY_STYLE_GUIDE = {
         "sitting on stone, with dog/cat/devotees, dhuni fire, Shirdi mosque, "
         "wooden plank bed, simple peaceful expression, blessing pose, walking stick."
     ),
+    "neem_karoli": (
+        "Neem Karoli Baba (Maharaj-ji) was a REAL 20th-century saint — his ACTUAL "
+        "face is supplied by real photos spliced into the video, so DO NOT generate "
+        "any close-up human face of him. Generate ONLY ambiance + devotional scenes: "
+        "Kainchi Dham temple in the Kumaon Himalayas with its river and pine hills, "
+        "Hanuman murti and Hanuman imagery (he was a supreme Hanuman bhakt), oil-lamp "
+        "aarti, marigold garlands, temple bells and diyas, a lone devotee praying with "
+        "folded hands and tears in the eyes, a figure wrapped in a checkered plaid "
+        "blanket seen from BEHIND or as a soft silhouette (NEVER a clear face), an "
+        "empty asan/seat awaiting the guru, Himalayan sunrise and mist, devotees doing "
+        "seva/bhandara. Warm, emotional, peaceful, deeply devotional. ABSOLUTELY no "
+        "clear human face of the saint, no text, no modern objects."
+    ),
     "khatu_shyam": (
         "Focus on Khatu Shyam Ji (Barbarik, grandson of Bhima blessed by Krishna). "
         "Iconic imagery: young warrior with three glowing arrows (teen baan), "
@@ -170,9 +188,13 @@ DEITY_STYLE_GUIDE = {
 }
 
 
-def generate_scene_prompts(deity: str, n_scenes: int = 25) -> list[str]:
+def generate_scene_prompts(deity: str, n_scenes: int = 25, lyrics: str | None = None) -> list[str]:
     """Use Gemini LLM to generate cinematic scene storyboard for a deity bhajan.
     Now with deity-specific style guidance to ensure scene relevance.
+
+    If `lyrics` is given, the scenes STORYBOARD THE SONG IN ORDER — scene 1 matches
+    the opening line, the last scene matches the closing line — so the visuals stay
+    in sync with the verses as they play (scenes are timed evenly across the song).
     """
     import google.generativeai as genai
     api_key = os.getenv("GEMINI_API_KEY")
@@ -184,11 +206,26 @@ def generate_scene_prompts(deity: str, n_scenes: int = 25) -> list[str]:
     persona = cfg["llm"]["persona"]
     deity_guide = DEITY_STYLE_GUIDE.get(deity, "")
 
-    user = f"""Generate {n_scenes} cinematic visual scene prompts for a devotional bhajan video about Lord {deity.upper()}.
+    lyric_block = ""
+    if lyrics:
+        lyric_block = f"""
+
+LYRIC-SYNC MODE (CRITICAL): Storyboard THESE EXACT LYRICS as they play, IN ORDER.
+Split the song into {n_scenes} equal emotional beats from start to finish and give
+ONE scene per beat that visually matches the meaning of that part of the lyrics.
+Scene 1 = the very first lines, the final scene = the closing lines (the jaikara).
+Match each verse's emotion (longing, loneliness, surrender, Hanuman devotion, tears,
+final celebration). The visuals MUST follow the song's narrative arc, not random.
+
+LYRICS:
+{lyrics}
+"""
+
+    user = f"""Generate {n_scenes} cinematic visual scene prompts for a devotional bhajan video about {deity.upper()}.
 
 DEITY-SPECIFIC GUIDANCE (CRITICAL — follow strictly):
 {deity_guide}
-
+{lyric_block}
 Each scene must:
 - Be a vivid English image prompt (2-3 sentences)
 - Be HIGHLY RELEVANT to the deity-specific guidance above

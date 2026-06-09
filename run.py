@@ -44,6 +44,10 @@ def _publish_at_iso(hhmm: str | None) -> str | None:
     given or malformed (→ caller publishes immediately)."""
     if not hhmm:
         return None
+    # Full RFC3339 timestamp (date-specific schedule, e.g. "2026-06-15T01:00:00Z")
+    # passes through as-is — used for one-off date drops like Neem Karoli Jayanti.
+    if "T" in hhmm or "-" in hhmm:
+        return hhmm
     try:
         from datetime import datetime, timedelta, timezone
         h, m = (int(x) for x in hhmm.split(":"))
@@ -66,8 +70,8 @@ def main(argv: list[str]) -> int:
     )
     ap.add_argument(
         "--deity",
-        choices=["hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "general"],
-        help="For --niche bhajan: pick MP3 from data/music_bhajan/[deity]/. If omitted, scans all deity folders.",
+        choices=["hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "khatu_shyam", "neem_karoli", "general"],
+        help="For --niche bhajan: pick MP3 from data/music_bhajan/[deity]/. If omitted, scans all deity folders (excludes one-off specials like neem_karoli). Falls back to env BHAJAN_DEITY.",
     )
     ap.add_argument(
         "--bhajan-audio",
@@ -125,6 +129,12 @@ def main(argv: list[str]) -> int:
     args = ap.parse_args(argv)
     if args.notify_telegram:
         args.auto_thumb = True
+    # Env fallbacks for workflow-driven one-offs (keeps the run steps clean; empty
+    # env on normal runs → no effect).
+    if not args.deity:
+        args.deity = os.environ.get("BHAJAN_DEITY", "").strip() or None
+    if not args.publish_at:
+        args.publish_at = os.environ.get("PUBLISH_AT_ISO", "").strip() or None
 
     set_active_niche(args.niche)
     print(f"== Reels pipeline ({args.niche}) ==")
@@ -582,6 +592,13 @@ def main(argv: list[str]) -> int:
 
 
 # ─── Bhajan mode ─────────────────────────────────────────────────────────
+def _load_bhajan_lyrics(deity: str) -> str | None:
+    """Lyrics for a lyric-synced bhajan (data/bhajan_lyrics_<deity>.txt), or None."""
+    from pipeline.utils import ROOT
+    p = ROOT / f"data/bhajan_lyrics_{deity}.txt"
+    return p.read_text(encoding="utf-8").strip() if p.exists() else None
+
+
 def _run_bhajan(args) -> int:
     """Flow Music MP3 → bhajan video pipeline (vertical 9:16 Short)."""
     from pipeline.bhajan import (
@@ -598,7 +615,8 @@ def _run_bhajan(args) -> int:
             return 1
         # Try to infer deity from parent folder name
         deity = mp3.parent.name.lower() if mp3.parent.name.lower() in {
-            "hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "general"
+            "hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai",
+            "khatu_shyam", "neem_karoli", "general"
         } else "general"
     else:
         picked = pick_bhajan_audio(args.deity)
@@ -617,7 +635,12 @@ def _run_bhajan(args) -> int:
     from pipeline.utils import load_config
     cfg = load_config()
     n_scenes = cfg["images"]["num_per_bhajan"]
-    scene_prompts = generate_scene_prompts(deity, n_scenes)
+    # One-off real-saint bhajans (e.g. Neem Karoli Baba): storyboard the ACTUAL
+    # lyrics in order (visuals sync to the verses) and splice his REAL free-licensed
+    # photos in (AI never fakes a real person's face).
+    _lyrics = _load_bhajan_lyrics(deity) if deity == "neem_karoli" else None
+    _real_photo_q = "Neem Karoli Baba" if deity == "neem_karoli" else None
+    scene_prompts = generate_scene_prompts(deity, n_scenes, lyrics=_lyrics)
 
     # 3. Generate images
     img_dir = out_path("images", base)
@@ -627,12 +650,40 @@ def _run_bhajan(args) -> int:
         return 1
     print(f"[bhajan] {len(images)} scene images ready")
 
+    # 3b. Real-photo splice for real-person saints — pin the iconic face at the
+    # opening + a couple more spots (his actual likeness, free-licensed, auto-credit).
+    _real_credit_block = ""
+    if _real_photo_q and images:
+        try:
+            import shutil as _sh
+            from pipeline.wiki_images import fetch_wiki_images, build_credit_block
+            real_dir = out_path("images", base + "_real")
+            real_imgs, real_credits = fetch_wiki_images({"query": _real_photo_q}, real_dir, want=6)
+            if real_imgs:
+                n = len(images)
+                slots = [0] + ([n // 3, (2 * n) // 3] if n >= 6 else [])
+                used = []
+                for k, (slot, rp) in enumerate(zip(slots, real_imgs)):
+                    try:
+                        _sh.copy2(rp, images[slot])
+                        used.append(real_credits[k])
+                    except Exception:
+                        pass
+                print(f"[bhajan] spliced {len(used)} real photos into slots {slots[:len(used)]}")
+                _real_credit_block = build_credit_block(used)
+            else:
+                print("[bhajan] no real photos found — using AI ambiance only")
+        except Exception as e:
+            print(f"[bhajan] real-photo splice failed (non-fatal): {type(e).__name__}: {e}")
+
     # 4. Assemble video
     video_path = out_path("videos", f"{base}.mp4")
     assemble_bhajan_video(mp3, images, video_path)
 
     # 5. Build script-like metadata for thumbnail/telegram/upload
     script = build_bhajan_metadata(deity, mp3.stem)
+    if _real_credit_block:
+        script["description"] = (script.get("description", "") + "\n\n" + _real_credit_block).strip()
     # Save script JSON (used by uploader)
     script_path = out_path("scripts", f"{base}.json")
     script_path.write_text(json.dumps({**script, "visuals": scene_prompts}, indent=2, ensure_ascii=False))

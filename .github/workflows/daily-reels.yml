@@ -78,6 +78,14 @@ on:
         description: "Commons search term for a real-person subject (e.g. 'Neem Karoli Baba') → uses real Wikimedia photos instead of AI. Leave empty for AI."
         required: false
         default: ""
+      deity:
+        description: "For niche=bhajan: force a specific deity folder (e.g. 'neem_karoli'). Leave empty for auto round-robin."
+        required: false
+        default: ""
+      publish_at:
+        description: "Full RFC3339 go-live timestamp for a date-specific schedule (e.g. 2026-06-15T01:00:00Z). Leave empty for the slot default."
+        required: false
+        default: ""
       seed_offset:
         description: "Topic variation offset"
         required: false
@@ -187,6 +195,8 @@ jobs:
             echo "long_form=${{ inputs.long_form }}"   >> $GITHUB_OUTPUT
             echo "topic=${{ inputs.topic }}"           >> $GITHUB_OUTPUT
             echo "real_photos=${{ inputs.real_photos }}" >> $GITHUB_OUTPUT
+            echo "deity=${{ inputs.deity }}"           >> $GITHUB_OUTPUT
+            echo "publish_at=${{ inputs.publish_at }}"  >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "30 15 * * *" ]; then
             # AM drop = trending (monuments/forts/tech — NON-temple). AUTO-publish
             # to YouTube; go-live ~08:30 IST next day via publishAt.
@@ -288,6 +298,8 @@ jobs:
         if: steps.route.outputs.mode == 'telegram'
         env:
           FORCE_REAL_PHOTOS: ${{ steps.route.outputs.real_photos }}
+          BHAJAN_DEITY: ${{ steps.route.outputs.deity }}
+          PUBLISH_AT_ISO: ${{ steps.route.outputs.publish_at }}
         run: |
           TOPIC="${{ steps.route.outputs.topic }}"
           if [ -n "$TOPIC" ]; then
@@ -311,6 +323,8 @@ jobs:
         if: steps.route.outputs.mode == 'publish' && steps.route.outputs.long_form != 'true'
         env:
           FORCE_REAL_PHOTOS: ${{ steps.route.outputs.real_photos }}
+          BHAJAN_DEITY: ${{ steps.route.outputs.deity }}
+          PUBLISH_AT_ISO: ${{ steps.route.outputs.publish_at }}
         run: |
           NOTIFY="${{ steps.route.outputs.niche == 'godmind' && '--notify-telegram' || '' }}"
           TOPIC="${{ steps.route.outputs.topic }}"
