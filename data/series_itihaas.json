@@ -5,13 +5,69 @@
       "name": "Mahabharat ke Villains",
       "english_tail": "Mahabharat",
       "episodes": [
-        {"title": "Duryodhan", "angle": "Bachpan se Bheem ne use maara, sabha me apmaan hua — kya Duryodhan asli villain tha, ya Mahabharat ka sabse bada anyay USKE saath hua? Ek yoddha jo doston (Karna) ke liye jaan de deta tha, par ek jalan ne use kha liya."},
-        {"title": "Shakuni", "angle": "Jis paase se poora Mahabharat bicha, wo Shakuni ke MARE HUE pita aur 99 bhaiyon ki haddiyon se bane the. Har ek chaal ek hi badle ke liye thi — poora Kuru vansh jad se mitana."},
-        {"title": "Dushasan", "angle": "Bhari sabha me Draupadi ke baal kheenche, cheer-haran kiya — usi pal Bheem ne kasam khayi: uska seena cheer ke garam khoon piyega. 18 saal baad ye bhayanak pratigya kaise poori hui?"},
-        {"title": "Jayadrath", "angle": "Ek vardaan jisne use sirf EK din ke liye Pandavon se ajey bana diya — aur usi ek din 16 saal ka Abhimanyu chakravyuh me akela ghir ke maara gaya. Phir Jayadrath ka kata hua sar uske hi pita ki god me kaise gira?"},
-        {"title": "Ashwatthama", "angle": "Raat ke andhere me sote hue poore Pandav-shivir ka katleaam kiya — Krishna ne use amar hone ka shraap de diya. 5000 saal se maathe pe risti ghaav aur akelapan liye, kya wo aaj bhi bhatak raha hai?"},
-        {"title": "Jarasandha", "angle": "Do aadhe-aadhe bachchon ko jod ke paida hua samrat, jise koi astra-shastra maar nahi sakta tha. Bheem ne use cheer ke do tukde kiye, par wo phir se jud gaya — phir Krishna ne ek tinka utha ke jo ishaara kiya..."},
-        {"title": "Kichaka", "angle": "Virat ke darbaar ka sabse taaqatwar senapati jisne chhupi Draupadi pe buri nazar daali. Us raat Bheem ne stree ka bhes badal ke usse aisa kuchla ki subah uska sharir pehchaanna namumkin ho gaya."}
+        {
+          "title": "Duryodhan",
+          "angle": "Bachpan se Bheem ne use maara, sabha me apmaan hua — kya Duryodhan asli villain tha, ya Mahabharat ka sabse bada anyay USKE saath hua? Ek yoddha jo doston (Karna) ke liye jaan de deta tha, par ek jalan ne use kha liya."
+        },
+        {
+          "title": "Shakuni",
+          "angle": "Jis paase se poora Mahabharat bicha, wo Shakuni ke MARE HUE pita aur 99 bhaiyon ki haddiyon se bane the. Har ek chaal ek hi badle ke liye thi — poora Kuru vansh jad se mitana."
+        },
+        {
+          "title": "Dushasan",
+          "angle": "Bhari sabha me Draupadi ke baal kheenche, cheer-haran kiya — usi pal Bheem ne kasam khayi: uska seena cheer ke garam khoon piyega. 18 saal baad ye bhayanak pratigya kaise poori hui?"
+        },
+        {
+          "title": "Jayadrath",
+          "angle": "Ek vardaan jisne use sirf EK din ke liye Pandavon se ajey bana diya — aur usi ek din 16 saal ka Abhimanyu chakravyuh me akela ghir ke maara gaya. Phir Jayadrath ka kata hua sar uske hi pita ki god me kaise gira?"
+        },
+        {
+          "title": "Ashwatthama",
+          "angle": "Raat ke andhere me sote hue poore Pandav-shivir ka katleaam kiya — Krishna ne use amar hone ka shraap de diya. 5000 saal se maathe pe risti ghaav aur akelapan liye, kya wo aaj bhi bhatak raha hai?"
+        },
+        {
+          "title": "Jarasandha",
+          "angle": "Do aadhe-aadhe bachchon ko jod ke paida hua samrat, jise koi astra-shastra maar nahi sakta tha. Bheem ne use cheer ke do tukde kiye, par wo phir se jud gaya — phir Krishna ne ek tinka utha ke jo ishaara kiya..."
+        },
+        {
+          "title": "Kichaka",
+          "angle": "Virat ke darbaar ka sabse taaqatwar senapati jisne chhupi Draupadi pe buri nazar daali. Us raat Bheem ne stree ka bhes badal ke usse aisa kuchla ki subah uska sharir pehchaanna namumkin ho gaya."
+        }
+      ]
+    },
+    {
+      "id": "mahabharat_mahayoddha_debate",
+      "name": "Mahabharat ke Mahayoddha: Kaun Bada?",
+      "english_tail": "Mahabharat",
+      "episodes": [
+        {
+          "title": "Karna vs Arjun",
+          "angle": "Asli mahayoddha kaun? Karna: kavach-kundal, daanveer, par 3 shraap. Arjun: Gandiv, Pashupatastra, saarthi Krishna + dhwaj pe Hanuman. DONO ki taqat aur kamzori balanced do. Ant me: 'Karna ya Arjun? Comment me batao.' Respectful — sirf veerta ki tulna, bhakti pe sawal nahi."
+        },
+        {
+          "title": "Bhishma vs Drona",
+          "angle": "Guru aur yoddha — kaun shreshth? Bhishma: ichha-mrityu, pratigya ke pakke. Drona: astra-vidya ke param guru par paksh-paati. Dono side. Ant: 'Bhishma ya Drona? Comment.'"
+        },
+        {
+          "title": "Eklavya vs Arjun",
+          "angle": "Sachcha dhanurdhar kaun? Eklavya: bina guru, angootha de ke bhi mahान — talent. Arjun: Drona ka priय, chidiya ki aankh — training. Talent vs training ki behes. Ant: comment bait."
+        },
+        {
+          "title": "Bhim vs Hanuman",
+          "angle": "Dono Vayu-putra — zyada balwan kaun? Bhim: 10,000 haathiyon ka bal, Jarasandh ko cheera. Hanuman: parvat uthaya, samandar laangha. Bhai-bhai ki taqat. Ant: comment."
+        },
+        {
+          "title": "Ravan vs Duryodhan",
+          "angle": "Bada villain kaun? Ravan: param-gyani, Shiv-bhakt, par ahankaar. Duryodhan: mitra-premi, veer, par jalan. Dono ke achhe-bure pehlu balanced. Ant: comment."
+        },
+        {
+          "title": "Karna vs Bhishma",
+          "angle": "Kiska tyag aur pratigya badi? Karna: kavach-kundal tak daan kar diya. Bhishma: rajya aur vivah tyag, ajeevan brahmacharya. Dono ka balidan. Ant: comment."
+        },
+        {
+          "title": "Abhimanyu vs Ghatotkach",
+          "angle": "Pandavon ka sabse bahaadur putra kaun? Abhimanyu: chakravyuh me akela lada. Ghatotkach: maya-yuddh, Karna ka Indra-astra khench liya. Dono ki veerता. Ant: comment."
+        }
       ]
     },
     {
@@ -19,13 +75,34 @@
       "name": "Ramayan ke Anokhe Patra",
       "english_tail": "Ramayan",
       "episodes": [
-        {"title": "Urmila", "angle": "14 saal soyi rahi taaki Lakshman jaag sakein — Urmila ki tapasya"},
-        {"title": "Mandavi", "angle": "Bharat ki patni jisne 14 saal pati ka virah jhela"},
-        {"title": "Tara", "angle": "Vanar rani jiski buddhi se Sugriv bach gaya"},
-        {"title": "Trijata", "angle": "Lanka ki rakshasi jisne Sita ki raksha ki"},
-        {"title": "Kumbhakaran", "angle": "Sirf so nahi raha tha — uske jagne ka asli rahasya"},
-        {"title": "Vibhishan", "angle": "Bhai ke khilaaf — gaddaar ya dharma ka rakshak?"},
-        {"title": "Lakshman Rekha ka sach", "angle": "Kya wo sach me ek lakeer thi?"}
+        {
+          "title": "Urmila",
+          "angle": "14 saal soyi rahi taaki Lakshman jaag sakein — Urmila ki tapasya"
+        },
+        {
+          "title": "Mandavi",
+          "angle": "Bharat ki patni jisne 14 saal pati ka virah jhela"
+        },
+        {
+          "title": "Tara",
+          "angle": "Vanar rani jiski buddhi se Sugriv bach gaya"
+        },
+        {
+          "title": "Trijata",
+          "angle": "Lanka ki rakshasi jisne Sita ki raksha ki"
+        },
+        {
+          "title": "Kumbhakaran",
+          "angle": "Sirf so nahi raha tha — uske jagne ka asli rahasya"
+        },
+        {
+          "title": "Vibhishan",
+          "angle": "Bhai ke khilaaf — gaddaar ya dharma ka rakshak?"
+        },
+        {
+          "title": "Lakshman Rekha ka sach",
+          "angle": "Kya wo sach me ek lakeer thi?"
+        }
       ]
     },
     {
@@ -33,13 +110,34 @@
       "name": "Bharat ke Bhulaye Veer",
       "english_tail": "Indian History",
       "episodes": [
-        {"title": "Lachit Borphukan", "angle": "Jisne Mughalon ko Assam me dhool chatai"},
-        {"title": "Rani Abbakka", "angle": "Portugaliyon se ladne wali pehli rani"},
-        {"title": "Suheldev", "angle": "Jisne Ghazni ke bhatije ko maar bhagaya"},
-        {"title": "Bappa Rawal", "angle": "Mewar ka sansthapak jisse Arab kaamp gaye"},
-        {"title": "Lalitaditya Muktapida", "angle": "Kashmir ka samrat jisne Central Asia jeeta"},
-        {"title": "Rajaraja Chola", "angle": "Jiski navy ne samundar paar saamrajya banaya"},
-        {"title": "Ahilyabai Holkar", "angle": "Rani jisne poore Bharat ke mandir banwaye"}
+        {
+          "title": "Lachit Borphukan",
+          "angle": "Jisne Mughalon ko Assam me dhool chatai"
+        },
+        {
+          "title": "Rani Abbakka",
+          "angle": "Portugaliyon se ladne wali pehli rani"
+        },
+        {
+          "title": "Suheldev",
+          "angle": "Jisne Ghazni ke bhatije ko maar bhagaya"
+        },
+        {
+          "title": "Bappa Rawal",
+          "angle": "Mewar ka sansthapak jisse Arab kaamp gaye"
+        },
+        {
+          "title": "Lalitaditya Muktapida",
+          "angle": "Kashmir ka samrat jisne Central Asia jeeta"
+        },
+        {
+          "title": "Rajaraja Chola",
+          "angle": "Jiski navy ne samundar paar saamrajya banaya"
+        },
+        {
+          "title": "Ahilyabai Holkar",
+          "angle": "Rani jisne poore Bharat ke mandir banwaye"
+        }
       ]
     },
     {
@@ -48,13 +146,41 @@
       "english_tail": "Temple Mystery",
       "footage": true,
       "episodes": [
-        {"title": "Konark ka 52-ton magnet", "wiki": "Konark Sun Temple", "angle": "Shikhar pe aisa magnet ki samandar ke jahaaz bhatak jaate the — angrezon ne kyun nikaal phenka?"},
-        {"title": "Kailasa: ek chattan ka mandir", "wiki": "Kailasa Temple, Ellora", "angle": "Ek hi pahaad ko upar se neeche kaat ke banaya — 2 lakh ton patthar, sirf chheni-hathauda se"},
-        {"title": "Jagannath Puri ke teen rahasya", "wiki": "Jagannath Temple, Puri", "angle": "Ulta jhanda, parchhai-rahit mandir, har taraf mudta Sudarshan chakra — science teenon pe chup"},
-        {"title": "Kamakhya Devi ka rahasya", "wiki": "Kamakhya Temple", "angle": "Koi murti nahi — har monsoon Devi rajaswala hoti hain aur Brahmaputra ka paani 3 din laal ho jaata hai"},
-        {"title": "Lepakshi ka latakta khambha", "wiki": "Veerabhadra Temple, Lepakshi", "angle": "Khambha zameen ko chhuta hi nahi — neeche se kapda paar nikal jaata hai, angrej engineer bhi haar gaya"},
-        {"title": "Stambheshwar: gayab hone wala mandir", "wiki": "Stambheshwar Mahadev Temple", "angle": "Din me do baar samandar poora Shiv mandir nigal leta hai, phir wapas ubhaar deta hai"},
-        {"title": "Padmanabhaswamy Vault B", "wiki": "Padmanabhaswamy Temple", "angle": "5 vault khule par Vault B aaj tak band — do naag wale darwaze ke peeche kya dafan hai?"}
+        {
+          "title": "Konark ka 52-ton magnet",
+          "wiki": "Konark Sun Temple",
+          "angle": "Shikhar pe aisa magnet ki samandar ke jahaaz bhatak jaate the — angrezon ne kyun nikaal phenka?"
+        },
+        {
+          "title": "Kailasa: ek chattan ka mandir",
+          "wiki": "Kailasa Temple, Ellora",
+          "angle": "Ek hi pahaad ko upar se neeche kaat ke banaya — 2 lakh ton patthar, sirf chheni-hathauda se"
+        },
+        {
+          "title": "Jagannath Puri ke teen rahasya",
+          "wiki": "Jagannath Temple, Puri",
+          "angle": "Ulta jhanda, parchhai-rahit mandir, har taraf mudta Sudarshan chakra — science teenon pe chup"
+        },
+        {
+          "title": "Kamakhya Devi ka rahasya",
+          "wiki": "Kamakhya Temple",
+          "angle": "Koi murti nahi — har monsoon Devi rajaswala hoti hain aur Brahmaputra ka paani 3 din laal ho jaata hai"
+        },
+        {
+          "title": "Lepakshi ka latakta khambha",
+          "wiki": "Veerabhadra Temple, Lepakshi",
+          "angle": "Khambha zameen ko chhuta hi nahi — neeche se kapda paar nikal jaata hai, angrej engineer bhi haar gaya"
+        },
+        {
+          "title": "Stambheshwar: gayab hone wala mandir",
+          "wiki": "Stambheshwar Mahadev Temple",
+          "angle": "Din me do baar samandar poora Shiv mandir nigal leta hai, phir wapas ubhaar deta hai"
+        },
+        {
+          "title": "Padmanabhaswamy Vault B",
+          "wiki": "Padmanabhaswamy Temple",
+          "angle": "5 vault khule par Vault B aaj tak band — do naag wale darwaze ke peeche kya dafan hai?"
+        }
       ]
     }
   ]
