@@ -210,13 +210,14 @@ voice:
     - hi-IN-SwaraNeural   # female, peaceful (evening katha)
     - hi-IN-MadhurNeural  # male, devotional
 
-  # ElevenLabs (premium) — Ranga: "Authoritative and Deep Hindi Voice" (narrative)
-  # → deep, dramatic, dharmik storyteller (matches the Mahabharat-narration feel).
-  elevenlabs_voice_id: d0grukerEzs069eKIauC        # Ranga (deep authoritative Hindi)
-  elevenlabs_shloka_voice_id: d0grukerEzs069eKIauC # same deep voice for shloka
-  elevenlabs_model: eleven_multilingual_v2
+  # ElevenLabs (premium) — Chem: "Deep, Expressive & Cinematic" on the eleven_v3
+  # model (most expressive) → dramatic dharmik storyteller. v3 is the key: v2 sounded
+  # flat/boring; v3 gives the alive, emotional Mahabharat-narration feel.
+  elevenlabs_voice_id: g66sJwhqbl8rk5CtPVKH        # Chem (deep expressive cinematic)
+  elevenlabs_shloka_voice_id: g66sJwhqbl8rk5CtPVKH # same for shloka
+  elevenlabs_model: eleven_v3
   elevenlabs_settings:
-    stability: 0.45        # lower = more emotion/drama (dharmik narration)
-    similarity_boost: 0.80
-    style: 0.35
+    stability: 0.30        # low = expressive/dramatic
+    similarity_boost: 0.75
+    style: 0.60            # high = characterful, cinematic
     use_speaker_boost: true

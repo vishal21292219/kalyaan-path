@@ -237,11 +237,13 @@ voice:
     - hi-IN-MadhurNeural  # male, deepest — pinned for long-form drama
 
   # ElevenLabs (premium) — Adam = deep dramatic male, perfect for storytelling
-  elevenlabs_voice_id: P1bg08DkjqiVEzOn76yG        # Viraj — suspenseful, engaging Hindi narrator
-  elevenlabs_shloka_voice_id: P1bg08DkjqiVEzOn76yG
-  elevenlabs_model: eleven_multilingual_v2
+  # Aakash Aryan — "Mystery & Thriller" (intense) on eleven_v3 (most expressive)
+  # → perfect for rahasya/suspense history. v3 is the key — v2 sounded flat.
+  elevenlabs_voice_id: ogCFP29Q71Wj6WHkN69b        # Aakash (intense mystery/thriller)
+  elevenlabs_shloka_voice_id: ogCFP29Q71Wj6WHkN69b
+  elevenlabs_model: eleven_v3
   elevenlabs_settings:
-    stability: 0.45        # lower = more emotion/drama
-    similarity_boost: 0.85
-    style: 0.45            # higher = more characterful, dramatic
+    stability: 0.30        # low = intense, dramatic
+    similarity_boost: 0.75
+    style: 0.60            # high = characterful, suspenseful
     use_speaker_boost: true
