@@ -217,10 +217,9 @@ video:
 
 voice:
   # provider: "edge" (free) or "elevenlabs" (premium — recommended for itihaas drama)
-  # NOTE: elevenlabs free tier flagged this account (401 detected_unusual_activity);
-  # using edge with slowed cadence + deeper pitch for storyteller feel.
-  provider: edge
-  fallback_to_edge: true
+  # UPGRADED 2026-06-10: now on paid ElevenLabs → premium suspenseful Hindi narration (Viraj).
+  provider: elevenlabs
+  fallback_to_edge: true   # if ElevenLabs credits run out → falls back to edge (no failure)
 
   # Edge TTS (free) — tuned for storyteller drama (slow + deep, but safe values)
   pitch: -8Hz
@@ -238,8 +237,8 @@ voice:
     - hi-IN-MadhurNeural  # male, deepest — pinned for long-form drama
 
   # ElevenLabs (premium) — Adam = deep dramatic male, perfect for storytelling
-  elevenlabs_voice_id: pNInz6obpgDQGcFmaJgB
-  elevenlabs_shloka_voice_id: pNInz6obpgDQGcFmaJgB
+  elevenlabs_voice_id: P1bg08DkjqiVEzOn76yG        # Viraj — suspenseful, engaging Hindi narrator
+  elevenlabs_shloka_voice_id: P1bg08DkjqiVEzOn76yG
   elevenlabs_model: eleven_multilingual_v2
   elevenlabs_settings:
     stability: 0.45        # lower = more emotion/drama
