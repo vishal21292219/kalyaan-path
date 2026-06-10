@@ -24,22 +24,24 @@ on:
     # Itihaasvani: 2/day (cut from 3 — quality > quantity per review data).
     # Morning history/temple drop + night-prime SERIES binge drop.
     # - cron: "30 15 * * *"   # Itihaasvani AM trending — DISABLED 2026-06-05 per user (only PM series now)
-    - cron: "0 16 * * *"    # fire 21:30 IST → Itihaasvani drop #2 (SERIES) for TOMORROW 22:30 IST upload
-    # KalyaanPath: DAILY morning mantra. GENERATE early (21:30 UTC); YouTube
-    # schedules go-live at 01:30 UTC (~7 AM IST) via publishAt — exact, on time.
-    - cron: "30 21 * * *"      # generate ~21:30 UTC → scheduled go-live 01:30 UTC
+    # NIGHT BATCH (2026-06-10 per user): all daily generation clustered into a
+    # 9:00-9:30 PM IST window (15:32-16:00 UTC) so every video lands on Telegram
+    # together that night — user schedules all the FB posts in one sitting. Each
+    # video's YouTube go-live (publishAt) stays at its own optimal slot.
+    - cron: "0 16 * * *"    # 9:30 PM IST → Itihaasvani SERIES (go-live ~8 PM IST next day)
+    - cron: "32 15 * * *"   # 9:02 PM IST → KalyaanPath mantra (go-live 7 AM IST next day)
     # KalyaanPath SUNDAY BHAJAN — its top-performing format (Vrindavan Bhajan =
     # 843 views, channel best). Music-heavy MP3 → video, auto-pick next unused
     # bhajan from data/music_bhajan/. Sunday evening prime.
     - cron: "0 10 * * 0"        # Sun: generate ~10:00 UTC → scheduled go-live 13:30 UTC (~7 PM IST)
     # REVIVED 2026-05-31: B-roll pivot (real Pexels stock footage, not AI slideshow).
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
-    - cron: "0 14 * * *"    # generate ~14:00 UTC → scheduled go-live 18:00 UTC (2 PM ET, US afternoon)
-    - cron: "0 20 * * *"    # generate ~20:00 UTC → scheduled go-live 00:00 UTC (8 PM ET, US evening PRIME)
+    - cron: "37 15 * * *"   # 9:07 PM IST → TimeDecoders #1 (go-live 18:00 UTC / 2 PM ET)
+    - cron: "42 15 * * *"   # 9:12 PM IST → TimeDecoders #2 (go-live 00:00 UTC / 8 PM ET PRIME)
     # GodsOfTheMind (English god-psychology): 2/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
-    - cron: "30 11 * * *"   # gen 11:30 UTC → go-live 13:00 UTC (9 AM ET + 6:30 PM IST: US morning + India evening)
-    - cron: "0 21 * * *"    # gen 21:00 UTC → go-live 23:00 UTC (7 PM ET: US evening prime)
+    - cron: "47 15 * * *"   # 9:17 PM IST → GodsOfTheMind #1 (go-live 13:00 UTC / 9 AM ET)
+    - cron: "52 15 * * *"   # 9:22 PM IST → GodsOfTheMind #2 (go-live 23:00 UTC / 7 PM ET prime)
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
     # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — DISABLED 2026-06-09: the katha
@@ -223,7 +225,7 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "30 21 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "32 15 * * *" ]; then
             # KalyaanPath morning mantra, DAILY, AUTO-publish to YouTube.
             echo "niche=bhakti"  >> $GITHUB_OUTPUT
             echo "kind=mantra"   >> $GITHUB_OUTPUT
@@ -237,26 +239,26 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=0"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 14 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "37 15 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 20 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "42 15 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "30 11 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "47 15 * * *" ]; then
             # GodsOfTheMind drop #1 → go-live 13:00 UTC (US morning + India evening).
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=1"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 21 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "52 15 * * *" ]; then
             # GodsOfTheMind drop #2 → go-live 23:00 UTC (US evening prime).
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
