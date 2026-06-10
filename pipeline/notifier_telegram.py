@@ -51,7 +51,7 @@ def _send_code_block(token: str, chat_id: str, header: str, content: str) -> Non
 
 
 def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: str,
-           seed_offset: int = 0) -> None:
+           seed_offset: int = 0, note: str | None = None) -> None:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not (token and chat_id):
@@ -69,6 +69,7 @@ def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: s
         "bhakti": "@KalyaanPath",
         "itihaas": "@Itihaasvani",
         "ancient": "@TimeDecoders",
+        "godmind": "@GodsOfTheMind",
     }.get(niche, niche.title())
 
     schedule_map = {
@@ -91,6 +92,8 @@ def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: s
         f"⏰ Schedule for: {slot_hint}\n\n"
         f"📋 Title:\n{title}"
     )
+    if note:
+        header = f"{note}\n\n{header}"
     _send_text(token, chat_id, header)
 
     # 2. Video file — Telegram Bot API caps BOTH sendVideo AND sendDocument

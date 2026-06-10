@@ -197,6 +197,7 @@ publish:
   instagram: false
   privacy: public
   youtube: true
+  facebook_manual: true   # FB auto paused → drop each published video to Telegram for MANUAL FB posting
   facebook: false  # PAUSED 2026-06-10: FB token failing ("cannot call API on behalf of user")
                    # — Meta flagged the dev account; failing calls worsen the flag. Re-enable
                    # after the account is confirmed + token re-generated (Itihaasvani).

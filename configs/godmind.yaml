@@ -140,6 +140,7 @@ publish:
   instagram: false
   privacy: public
   youtube: true
+  facebook_manual: true   # FB auto paused → drop each published video to Telegram for MANUAL FB posting
   facebook: false  # PAUSED 2026-06-10: Meta's account flag spread to ALL pages — even this
                    # token now fails ("cannot call API on behalf of user"). All 4 channels' FB
                    # paused to let the dev account recover. Re-enable after account confirmed.

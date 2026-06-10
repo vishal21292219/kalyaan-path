@@ -170,6 +170,7 @@ publish:
   instagram: true
   privacy: public
   youtube: true
+  facebook_manual: true   # FB auto paused → drop each published video to Telegram for MANUAL FB posting
   facebook: false  # PAUSED 2026-06-10: FB token now also failing ("cannot call API on behalf
                    # of user") as Meta's account flag spread. Re-enable after account confirmed
                    # + token re-generated (Kalyaan Path). 15-Jun Neem Karoli reel already scheduled

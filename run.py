@@ -473,11 +473,20 @@ def main(argv: list[str]) -> int:
     # Track successful delivery so the catch-up safety net knows this slot is done.
     _delivered = False
 
-    # 6d. notify Telegram (optional)
-    if args.notify_telegram:
+    # 6d. notify Telegram (optional). Also fires when facebook_manual is set — while
+    # FB auto-posting is paused (Meta account flag), each published video is dropped
+    # to Telegram with a reminder to post it to Facebook BY HAND (manual posting goes
+    # through the FB app, not the flagged developer API, so it's safe).
+    _fb_manual = load_config().get("publish", {}).get("facebook_manual", False)
+    _tg_note = None
+    if _fb_manual:
+        _tg_note = ("📘➡️ *FB pe MANUALLY post kar do* (auto-FB abhi paused hai).\n"
+                    "Neeche wali video download karke Facebook page pe Reel daal do.")
+    if args.notify_telegram or _fb_manual:
         try:
             from pipeline.notifier_telegram import notify as tg_notify
-            tg_notify(video_path, thumb_path, script, args.niche, seed_offset=args.seed_offset)
+            tg_notify(video_path, thumb_path, script, args.niche,
+                      seed_offset=args.seed_offset, note=_tg_note)
             _delivered = True
         except Exception:
             traceback.print_exc()
