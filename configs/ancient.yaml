@@ -174,7 +174,9 @@ publish:
   instagram: false
   privacy: public
   youtube: true
-  facebook: true   # also auto-post each video as a Facebook Page Reel (Time Decoders)
+  facebook: false  # PAUSED 2026-06-10: FB token failing ("cannot call API on behalf of user")
+                   # — Meta flagged the dev account; failing calls worsen the flag. Re-enable
+                   # after the account is confirmed + token re-generated (Time Decoders).
 
 video:
   bitrate: 6M
