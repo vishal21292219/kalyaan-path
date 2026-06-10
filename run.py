@@ -486,7 +486,8 @@ def main(argv: list[str]) -> int:
         try:
             from pipeline.notifier_telegram import notify as tg_notify
             tg_notify(video_path, thumb_path, script, args.niche,
-                      seed_offset=args.seed_offset, note=_tg_note)
+                      seed_offset=args.seed_offset, note=_tg_note,
+                      schedule_iso=_publish_at_iso(_slot_publish_at(args)))
             _delivered = True
         except Exception:
             traceback.print_exc()

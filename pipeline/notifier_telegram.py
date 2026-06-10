@@ -51,7 +51,8 @@ def _send_code_block(token: str, chat_id: str, header: str, content: str) -> Non
 
 
 def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: str,
-           seed_offset: int = 0, note: str | None = None) -> None:
+           seed_offset: int = 0, note: str | None = None,
+           schedule_iso: str | None = None) -> None:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not (token and chat_id):
@@ -84,6 +85,16 @@ def notify(video_path: Path, thumbnail_path: Path | None, script: dict, niche: s
         (niche, seed_offset),
         "Best slot: 7-9 PM IST (peak)"
     )
+    # If the exact go-live timestamp is known, show it in IST so FB can be scheduled
+    # to the SAME minute as YouTube (overrides the generic hint above).
+    if schedule_iso:
+        try:
+            from datetime import datetime, timezone, timedelta
+            dt = datetime.fromisoformat(schedule_iso.replace("Z", "+00:00"))
+            ist = dt.astimezone(timezone(timedelta(hours=5, minutes=30)))
+            slot_hint = ist.strftime("%d %b %Y, %I:%M %p IST") + "  (same as YouTube go-live)"
+        except Exception:
+            pass
 
     # 1. Header — clear YT channel + scheduled upload time so user can use YT Studio scheduler
     header = (
