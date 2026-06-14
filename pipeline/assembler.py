@@ -324,6 +324,84 @@ _EN_KEY = {
 }
 
 
+def _render_phrase_png_colored(text: str, width: int, font_size: int, out: "Path") -> "Path":
+    """Render a caption phrase with PER-WORD colour: white base, yellow for key
+    words / numbers (same rules as _word_style), bold black stroke. Gives the
+    'white and yellow' look in long-form phrase captions."""
+    from PIL import Image, ImageDraw
+    font = _find_font(font_size)
+    stroke_w = 6
+    space = max(8, font_size // 4)
+    max_w = width - 160
+    d0 = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
+
+    def wlen(s: str) -> int:
+        return int(d0.textlength(s, font=font))
+
+    # greedy wrap into lines of (word, color, width)
+    lines, cur, cur_w = [], [], 0
+    for w in text.split():
+        color = _word_style(w)[0]
+        ww = wlen(w)
+        add = ww + (space if cur else 0)
+        if cur and cur_w + add > max_w:
+            lines.append(cur); cur, cur_w = [], 0; add = ww
+        cur.append((w, color, ww)); cur_w += add
+    if cur:
+        lines.append(cur)
+
+    asc, desc = font.getmetrics()
+    line_h = asc + desc + 12
+    line_widths = [sum(ww for _, _, ww in ln) + space * (len(ln) - 1) for ln in lines]
+    box_w = int(min(max_w, max(line_widths) if line_widths else 10) + stroke_w * 2 + 24)
+    box_h = int(line_h * len(lines) + stroke_w * 2 + 16)
+
+    img = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    y = stroke_w + 8
+    for ln, lw in zip(lines, line_widths):
+        x = (box_w - lw) / 2
+        for w, color, ww in ln:
+            draw.text((x, y), w, font=font,
+                      fill=(int(color[0]), int(color[1]), int(color[2]), 255),
+                      stroke_width=stroke_w, stroke_fill=(0, 0, 0, 255))
+            x += ww + space
+        y += line_h
+    img.save(out)
+    return out
+
+
+def _apply_caption_batches(base: "Path", entries: list, work: "Path", BR: str,
+                           batch: int = 30) -> "Path":
+    """Overlay many timed caption PNGs onto `base` in BATCHES. A single ffmpeg
+    filter_complex with 100+ PNG overlays silently drops them; chunking into
+    <=`batch`-overlay passes is reliable. Intermediates use crf 16 (near-lossless)
+    so multi-pass quality loss is negligible. Returns the final captioned mp4."""
+    cur, n = base, 0
+    for i in range(0, len(entries), batch):
+        chunk = entries[i:i + batch]
+        ins, chain, prev = ["-i", str(cur)], [], "0:v"
+        for j, (png, s, e) in enumerate(chunk):
+            ins += ["-i", str(png)]
+            lbl = f"c{j}"
+            chain.append(
+                f"[{prev}][{j+1}:v]overlay=x=(W-w)/2:y=H*0.66:"
+                f"enable='between(t\\,{s:.3f}\\,{e:.3f})'[{lbl}]"
+            )
+            prev = lbl
+        out = work / f"capbatch_{n:02d}.mp4"
+        _run([
+            "ffmpeg", "-y", *ins,
+            "-filter_complex", ";".join(chain),
+            "-map", f"[{prev}]",
+            "-c:v", "libx264", "-preset", "veryfast",
+            "-crf", "16", "-pix_fmt", "yuv420p",
+            str(out),
+        ])
+        cur, n = out, n + 1
+    return cur
+
+
 def _clean_word(word: str) -> str:
     """Strip punctuation for set-membership lookups."""
     return word.strip(",.!?।॥;:\"'()[]")
@@ -619,6 +697,7 @@ def assemble(
     chain_parts = []
     prev = "0:v"
     overlay_idx = 0
+    phrase_batch_entries = []   # long-form captions applied in ffmpeg-safe batches
 
     if script.get("kind") == "shloka_episode":
         ep_num = script.get("episode_number")
@@ -710,24 +789,26 @@ def assemble(
                         "end": buf[-1]["end"],
                     })
                 print(f"[captions] grouped {len(boundaries)} words → {len(phrases)} phrases (~{PHRASE_WORDS_TARGET}-word chunks, audio-synced)")
+                # Collect phrase overlays as (png, start, end). Long-form has many
+                # phrases (100+); a single ffmpeg filter_complex with that many PNG
+                # overlays SILENTLY drops them (captions vanish). So we render each
+                # phrase white+yellow and apply them later in ffmpeg-safe BATCHES
+                # (see _apply_caption_batches). Timing comes from real word
+                # boundaries, so captions stay perfectly in sync.
                 for i, p in enumerate(phrases):
                     png = work / f"phrase_{i:04d}.png"
-                    _render_caption_png(p["text"], W, int(font_size * 1.25), box_opacity, png)
+                    _render_phrase_png_colored(p["text"], W, int(font_size * 1.25), png)
                     p_start = max(0.0, p["start"] - 0.05)
-                    p_end = p["end"] + 0.05
+                    # Persist each caption until the NEXT phrase begins, so captions
+                    # stay on screen THROUGH speech pauses (no blank gaps — the
+                    # narration has ~29% pause time where captions used to vanish).
                     if i + 1 < len(phrases):
-                        p_end = min(p_end, phrases[i + 1]["start"] - 0.005)
+                        p_end = phrases[i + 1]["start"] - 0.02
+                    else:
+                        p_end = p["end"] + 0.6
                     if p_end - p_start < 0.4:
                         p_end = p_start + 0.4
-                    inputs += ["-i", str(png)]
-                    overlay_idx += 1
-                    out_lbl = f"v{overlay_idx}"
-                    chain_parts.append(
-                        f"[{prev}][{overlay_idx}:v]overlay="
-                        f"x=(W-w)/2:y=H*0.65:"
-                        f"enable='between(t\\,{p_start:.3f}\\,{p_end:.3f})'[{out_lbl}]"
-                    )
-                    prev = out_lbl
+                    phrase_batch_entries.append((png, p_start, p_end))
                 used_words = True
                 boundaries = []  # skip the word-by-word branch below
 
@@ -809,8 +890,19 @@ def assemble(
             "-b:v", BR, "-pix_fmt", "yuv420p",
             str(slides_subbed),
         ])
+        base_for_phrases = slides_subbed
     else:
-        # no overlays — just copy slides
+        base_for_phrases = slides
+
+    # Long-form caption overlays applied in ffmpeg-safe batches (too many for one
+    # filter_complex). Runs AFTER any badge/shloka overlays above.
+    if phrase_batch_entries:
+        print(f"[captions] applying {len(phrase_batch_entries)} phrase overlays in batches")
+        captioned = _apply_caption_batches(base_for_phrases, phrase_batch_entries, work, BR)
+        if captioned != slides_subbed:
+            shutil.copy(captioned, slides_subbed)
+    elif not filter_complex:
+        # no overlays at all — just copy slides
         shutil.copy(slides, slides_subbed)
 
     # 4. Mix audio with optional bg music (ducked). Re-encode video to

@@ -395,20 +395,20 @@ jobs:
           if git diff --cached --quiet; then
             echo "no state changes to commit"
           else
-            git commit -m "auto: state update [skip ci]"
-            # Concurrent daily crons push to main at the same time; a plain
-            # `git push || true` silently drops the rejected push and LOSES the
-            # delivery marker → catch-up then re-runs the slot = duplicate post.
-            # Retry with rebase until the marker actually lands.
+            git commit -m "auto: state update [skip ci]" || true
+            # Concurrent daily crons push to main at once. Rebase+retry so the
+            # marker lands. CRITICAL: abort any conflicted rebase between tries
+            # (else "unmerged files" wedges every retry) and keep this NON-FATAL —
+            # the video is already published, so a state-push miss must NOT fail
+            # the run (a failed run triggers Retry-Failed → DUPLICATE uploads).
             pushed=0
             for i in 1 2 3 4 5 6; do
-              git pull --rebase --autostash origin main || true
-              if git push; then pushed=1; break; fi
-              echo "state push attempt $i rejected (concurrent run) — retrying in 5s…"
+              if git pull --rebase --autostash origin main && git push; then pushed=1; break; fi
+              git rebase --abort 2>/dev/null || true
+              echo "state push attempt $i failed (concurrent run) — retrying in 5s…"
               sleep 5
             done
             if [ "$pushed" != 1 ]; then
-              echo "::error::state push FAILED after retries — marker may be lost, catch-up could double-post"
-              exit 1
+              echo "::warning::state push skipped after retries (non-fatal — video already published)"
             fi
           fi

@@ -375,10 +375,41 @@ def _estimate_word_boundaries(text: str, audio_path: Path) -> list[dict]:
 
 
 # ─── ElevenLabs (premium) ────────────────────────────────────────────────
+def _words_from_char_alignment(align: dict) -> list[dict]:
+    """Convert ElevenLabs char-level alignment into accurate word boundaries.
+
+    The /with-timestamps endpoint returns per-character start/end times. Grouping
+    characters into words (split on whitespace) gives EXACT word timing — fixes
+    the caption drift that uniform estimation caused, worst at the start of long
+    narration."""
+    chars = align.get("characters") or []
+    starts = align.get("character_start_times_seconds") or []
+    ends = align.get("character_end_times_seconds") or []
+    if not (chars and starts and ends) or not (len(chars) == len(starts) == len(ends)):
+        return []
+    words: list[dict] = []
+    cur, w_start, w_end = "", None, None
+    for ch, s, e in zip(chars, starts, ends):
+        if ch.isspace():
+            if cur:
+                words.append({"text": cur, "start": round(w_start, 3), "end": round(w_end, 3)})
+                cur, w_start, w_end = "", None, None
+            continue
+        if w_start is None:
+            w_start = s
+        cur += ch
+        w_end = e
+    if cur:
+        words.append({"text": cur, "start": round(w_start, 3), "end": round(w_end, 3)})
+    return words
+
+
 def _synth_elevenlabs(text: str, out_path: Path, v: dict, is_shloka: bool) -> list[dict]:
-    """ElevenLabs doesn't give word timings via standard endpoint.
-    We synthesize audio + estimate uniform word distribution from audio duration."""
+    """Synthesize via ElevenLabs using the /with-timestamps endpoint so captions
+    get EXACT per-word timing (stay in sync). Falls back to plain TTS + uniform
+    estimate only if the timestamps endpoint is unavailable."""
     import requests
+    import base64
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not api_key:
         raise RuntimeError(
@@ -401,31 +432,49 @@ def _synth_elevenlabs(text: str, out_path: Path, v: dict, is_shloka: bool) -> li
     model = v.get("elevenlabs_model", "eleven_multilingual_v2")
     settings = v.get("elevenlabs_settings", {}) or {}
 
-    r = requests.post(
-        f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
-        headers={
-            "xi-api-key": api_key,
-            "Content-Type": "application/json",
-            "Accept": "audio/mpeg",
+    payload = {
+        "text": text,
+        "model_id": model,
+        "voice_settings": {
+            "stability": settings.get("stability", 0.55),
+            "similarity_boost": settings.get("similarity_boost", 0.80),
+            "style": settings.get("style", 0.35),
+            "use_speaker_boost": settings.get("use_speaker_boost", True),
         },
-        json={
-            "text": text,
-            "model_id": model,
-            "voice_settings": {
-                "stability": settings.get("stability", 0.55),
-                "similarity_boost": settings.get("similarity_boost", 0.80),
-                "style": settings.get("style", 0.35),
-                "use_speaker_boost": settings.get("use_speaker_boost", True),
-            },
-        },
-        timeout=120,
-    )
-    if r.status_code != 200:
-        raise RuntimeError(f"ElevenLabs API error {r.status_code}: {r.text[:300]}")
+    }
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_bytes(r.content)
 
-    # Estimate word boundaries by uniform distribution across audio duration
+    # PRIMARY: /with-timestamps → audio (base64) + exact per-character alignment.
+    try:
+        r = requests.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps",
+            headers={"xi-api-key": api_key, "Content-Type": "application/json",
+                     "Accept": "application/json"},
+            json=payload, timeout=180,
+        )
+        if r.status_code != 200:
+            raise RuntimeError(f"timestamps API {r.status_code}: {r.text[:200]}")
+        data = r.json()
+        out_path.write_bytes(base64.b64decode(data["audio_base64"]))
+        align = data.get("alignment") or data.get("normalized_alignment") or {}
+        boundaries = _words_from_char_alignment(align)
+        if boundaries:
+            print(f"[tts] elevenlabs /with-timestamps → {len(boundaries)} exact word boundaries")
+            return boundaries
+        print("[tts] elevenlabs alignment empty — falling back to uniform estimate")
+    except Exception as e:
+        print(f"[tts] /with-timestamps failed ({e}); falling back to plain TTS + uniform estimate")
+        r = requests.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            headers={"xi-api-key": api_key, "Content-Type": "application/json",
+                     "Accept": "audio/mpeg"},
+            json=payload, timeout=120,
+        )
+        if r.status_code != 200:
+            raise RuntimeError(f"ElevenLabs API error {r.status_code}: {r.text[:300]}")
+        out_path.write_bytes(r.content)
+
+    # FALLBACK ONLY: uniform distribution (used when alignment unavailable)
     duration = _audio_duration_seconds(out_path)
     words = text.split()
     boundaries = []

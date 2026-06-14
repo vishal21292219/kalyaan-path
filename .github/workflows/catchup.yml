@@ -96,18 +96,18 @@ jobs:
           if git diff --cached --quiet; then
             echo "no state changes to commit"
           else
-            git commit -m "auto: catch-up state update [skip ci]"
-            # Retry with rebase so a concurrent push can't drop the marker
-            # (a lost marker is exactly what causes duplicate re-runs).
+            git commit -m "auto: catch-up state update [skip ci]" || true
+            # Rebase+retry; abort conflicted rebase between tries (avoid the
+            # "unmerged files" wedge) and stay NON-FATAL so a state-push miss
+            # never fails the run (failed run → Retry-Failed → duplicate uploads).
             pushed=0
             for i in 1 2 3 4 5 6; do
-              git pull --rebase --autostash origin main || true
-              if git push; then pushed=1; break; fi
-              echo "state push attempt $i rejected (concurrent run) — retrying in 5s…"
+              if git pull --rebase --autostash origin main && git push; then pushed=1; break; fi
+              git rebase --abort 2>/dev/null || true
+              echo "state push attempt $i failed (concurrent run) — retrying in 5s…"
               sleep 5
             done
             if [ "$pushed" != 1 ]; then
-              echo "::error::catch-up state push FAILED after retries"
-              exit 1
+              echo "::warning::catch-up state push skipped after retries (non-fatal)"
             fi
           fi
