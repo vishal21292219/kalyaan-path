@@ -52,9 +52,10 @@ def _cloudinary_upload(video_path: Path, cloud: str, key: str, secret: str) -> s
     return r.json().get("secure_url")
 
 
-def upload(video_path, script: dict, channel: str) -> bool:
-    """Upload video to Cloudinary + trigger the Make reel webhook. channel routes
-    the Make scenario (e.g. 'gom' → Gods of the Mind FB page)."""
+def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None) -> bool:
+    """Upload video to Cloudinary + trigger the Make reel webhook.
+    fb_page_id (when given) tells the Make scenario which Facebook Page to post to
+    (bhakti-family route). Without it, the scenario posts to the Lakeerein IG+FB."""
     cloud = os.getenv("CLOUDINARY_CLOUD_NAME")
     key = os.getenv("CLOUDINARY_API_KEY")
     secret = os.getenv("CLOUDINARY_API_SECRET")
@@ -62,15 +63,21 @@ def upload(video_path, script: dict, channel: str) -> bool:
     if not all([cloud, key, secret, webhook]):
         print("[make-reel] missing CLOUDINARY_* or MAKE_REEL_WEBHOOK — skipping")
         return False
+    if fb_page_id is not None and not str(fb_page_id).strip():
+        print(f"[make-reel] no FB page id for channel '{channel}' — skipping (set FB_PAGE_ID_<NICHE>)")
+        return False
     video_path = Path(video_path)
     try:
         url = _cloudinary_upload(video_path, cloud, key, secret)
         if not url:
             return False
         print(f"[make-reel] cloudinary: {url}")
-        r = requests.post(webhook, json={"video_url": url, "caption": _caption(script), "channel": channel}, timeout=120)
+        payload = {"video_url": url, "caption": _caption(script), "channel": channel}
+        if fb_page_id:
+            payload["fb_page_id"] = str(fb_page_id).strip()
+        r = requests.post(webhook, json=payload, timeout=120)
         ok = r.status_code in (200, 202)
-        print(f"[make-reel] webhook ({channel}): {r.status_code} {r.text[:120]}")
+        print(f"[make-reel] webhook ({channel}, page={fb_page_id}): {r.status_code} {r.text[:120]}")
         return ok
     except Exception as e:
         print(f"[make-reel] error: {type(e).__name__}: {e}")

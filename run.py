@@ -544,9 +544,17 @@ def main(argv: list[str]) -> int:
         if publish_cfg.get("facebook_make", False):
             try:
                 from pipeline.uploader_make_reel import upload as make_upload
-                _ch = {"godmind": "gom"}.get(args.niche, args.niche)
-                if make_upload(video_path, script, channel=_ch):
-                    print(f"[publish] make-reel queued ({_ch})")
+                # Resolve this channel's FB page id. GoM has no FB_PAGE_ID secret →
+                # use its known page id; others use their proven FB_PAGE_ID_<NICHE>
+                # secret (bhajan shares the bhakti/KalyaanPath page).
+                _GOM_PAGE = "1113214471881336"
+                if args.niche == "godmind":
+                    _pg = _GOM_PAGE
+                else:
+                    _k = "BHAKTI" if args.niche in ("bhakti", "bhajan") else args.niche.upper()
+                    _pg = (os.getenv(f"FB_PAGE_ID_{_k}") or os.getenv("FB_PAGE_ID") or "").strip()
+                if make_upload(video_path, script, channel=args.niche, fb_page_id=_pg):
+                    print(f"[publish] make-reel queued ({args.niche} → FB page {_pg})")
                     _delivered = True
             except Exception:
                 traceback.print_exc()
