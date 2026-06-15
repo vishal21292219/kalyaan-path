@@ -43,7 +43,7 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
      // ONLY the 1-4 RECURRING named characters/deities who appear in MULTIPLE scenes. Skip one-off crowds, landscapes, objects. [] if no recurring character.
   ],
   "description": "Long-form YouTube description (Hindi/Devanagari, 5-8 lines). Structure: 1) Hook in 1-2 lines (re-state the question/claim). 2) Tease the answer in 2-3 lines without fully revealing (curiosity gap). 3) Engagement question — 'comments mein bataiye'. 4) Subscribe CTA mentioning channel name. 5) 10-15 relevant hashtags at the end including #Shorts and #YouTubeShorts. NO English-only descriptions — use Devanagari for the body text and Roman for hashtags.",
-  "hashtags": ["#tag1", "#tag2", ...]   // 10-15 relevant — mix English mythology tags + Hindi transliterated tags
+  "hashtags": ["#tag1", "#tag2", ...]   // 10-15 relevant — mix English Sanatan/Hindu-culture tags + Hindi transliterated tags. NEVER use #mythology or #hindumythology (devotees find "mythology" disrespectful); use #SanatanDharma #HinduDharma #Spirituality instead.
 }
 
 Rules:
@@ -404,7 +404,7 @@ CRITICAL: Generate a 20-25 minute documentary-style script.
 - Structure: hook → setup → 5-7 major revelations → climax → CTA
 - description: long-form style, include "इस वीडियो में हम जानेंगे:" with 7-9 sub-topics
 - title: 3-hook chained format like "[Topic] रहस्य | [question] | [sub-curiosity]"
-- visuals: {n_images} prompts (one per ~45 sec of narration), cinematic mythology art
+- visuals: {n_images} prompts (one per ~45 sec of narration), cinematic Indian epic art
 - hashtags: 12-15 mix
 
 Return ONLY the JSON object."""
@@ -701,7 +701,7 @@ def write_script(topic: dict, context: str, long_form: bool = False,
                     print(f"[script_writer] repaired: now {len(visuals)} visuals")
                 except Exception as e:
                     print(f"[script_writer] repair call failed ({e}) — padding by repeating last visual")
-                    last = visuals[-1] if visuals else "Cinematic 9:16 vertical frame: " + (body[0] if body else "Indian mythology scene")
+                    last = visuals[-1] if visuals else "Cinematic 9:16 vertical frame: " + (body[0] if body else "Indian epic devotional scene")
                     visuals = visuals + [last] * (len(body) - len(visuals))
             # Truncate excess
             visuals = visuals[:len(body)]

@@ -163,7 +163,7 @@ llm:
     - Lighting + mood: "golden hour sunrise", "soft divine glow".
     - NO text, watermarks, or words in image.
   topic_guidance: |
-    Topics include Hindu deities, Gita shlokas, mythological stories, sacred temples, and Hindu festivals.
+    Topics include Hindu deities, Gita shlokas, Pauranik stories, sacred temples, and Hindu festivals.
     Avoid political content, modern figures, or controversial claims.
 
 publish:

@@ -3,14 +3,14 @@ niche: itihaas
 branding:
   channel_handle: '@Itihaasvani'
   cta: "\U0001F4DC Itihaas ki awaaz suno — Subscribe Itihaasvani"
-  ai_disclosure: "📜 Itihaasvani | Hand-researched stories, AI-assisted visuals, human-curated narration for authentic Indian history & mythology."
+  ai_disclosure: "📜 Itihaasvani | Hand-researched stories, AI-assisted visuals, human-curated narration for authentic Indian history & Sanatan heritage."
   hashtags:
   - '#itihaasvani'
   - '#itihaas'
-  - '#mythology'
+  - '#sanatandharma'
   - '#mahabharata'
   - '#ramayana'
-  - '#hindumythology'
+  - '#hindudharma'
   - '#sanatan'
   - '#bharatkahistory'
   - '#shorts'
@@ -42,7 +42,7 @@ images:
   consistency_max_scenes: 3   # cost guard: only the top N hero scenes conditioned (0 = all)
   negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars, dark gloomy mood, underexposed, muddy colors, washed out
   num_per_reel: 10
-  style_suffix: ', cinematic Indian mythology art, ultra realistic 3D rendering, anatomically correct (two arms, one head, five fingers per hand), single focal subject sharply in focus, BRIGHT vibrant warm lighting with golden volumetric rays, well-illuminated faces with clear expressions, rich saturated orange-saffron-gold color palette, polished masterpiece quality, Raja Ravi Varma painting style fused with modern cinematic concept art, period-accurate ornaments and clothing, vertical 9:16 portrait composition, ultra detailed 8K rendering, no text no watermark'
+  style_suffix: ', cinematic Indian epic art, ultra realistic 3D rendering, anatomically correct (two arms, one head, five fingers per hand), single focal subject sharply in focus, BRIGHT vibrant warm lighting with golden volumetric rays, well-illuminated faces with clear expressions, rich saturated orange-saffron-gold color palette, polished masterpiece quality, Raja Ravi Varma painting style fused with modern cinematic concept art, period-accurate ornaments and clothing, vertical 9:16 portrait composition, ultra detailed 8K rendering, no text no watermark'
 
 llm:
   language: hindi
@@ -51,12 +51,12 @@ llm:
   fallback_model: llama-3.3-70b-versatile
   persona: |
     You are a content writer for "Itihaasvani" (@Itihaasvani), a Hindi-first YouTube Shorts
-    channel about Indian history, mythology, and Pauranik secrets. The target audience is
+    channel about Indian history, Sanatan dharma, and Pauranik secrets. The target audience is
     Indians on mobile (primarily India, Hindi-speaking).
 
     CHANNEL NICHE:
     Mahabharata, Ramayana, Puranas, Vedic texts, lost kingdoms, forgotten warriors,
-    mythological mysteries, and untold Indian history.
+    Pauranik mysteries, and untold Indian history.
 
     TONE:
     - Hinglish throughout (Hindi meaning written in Roman script — NOT pure English,
@@ -180,7 +180,7 @@ llm:
 
     Other topic veins:
     - Lost kingdoms (Vijayanagara, Chola, Maurya, Maratha)
-    - Mythological mysteries (Saraswati river, Dwarka submergence, Ram Setu, Kailasa temple)
+    - Pauranik mysteries (Saraswati river, Dwarka submergence, Ram Setu, Kailasa temple)
     - Forgotten warriors and rulers (Lalitaditya, Rani Abbakka)
 
     WINNING HOOK TEMPLATE (use for the hook / body[0] of most videos):
@@ -191,7 +191,7 @@ llm:
     (that weak opener is why bottom videos got swiped in the first 3 seconds).
 
     Avoid: religious controversy, political bias, modern politics, claims that disrespect any community.
-    Frame as historical/mythological education, never devotional preaching.
+    Frame as historical/Pauranik education with respect for Sanatan beliefs; never devotional preaching, and never call sacred beliefs "myths".
 
 publish:
   instagram: false
