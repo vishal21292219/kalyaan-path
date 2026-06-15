@@ -539,6 +539,19 @@ def main(argv: list[str]) -> int:
                 traceback.print_exc()
                 print("[publish] facebook failed — see traceback above")
 
+        # Facebook/IG Reel via Make.com (Cloudinary + webhook). Bypasses the
+        # flagged Meta dev-app token. Enable per niche with publish.facebook_make: true.
+        if publish_cfg.get("facebook_make", False):
+            try:
+                from pipeline.uploader_make_reel import upload as make_upload
+                _ch = {"godmind": "gom"}.get(args.niche, args.niche)
+                if make_upload(video_path, script, channel=_ch):
+                    print(f"[publish] make-reel queued ({_ch})")
+                    _delivered = True
+            except Exception:
+                traceback.print_exc()
+                print("[publish] make-reel failed — see traceback above")
+
         if publish_cfg.get("instagram", False):
             if args.public_url:
                 try:

@@ -157,6 +157,10 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
         run: |
           mkdir -p secrets
           [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
@@ -187,6 +191,10 @@ jobs:
           IG_USER_ID=$IG_USER_ID
           IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
           PEXELS_API_KEY=$PEXELS_API_KEY
+          CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
+          CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
+          CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
+          MAKE_REEL_WEBHOOK=$MAKE_REEL_WEBHOOK
           EOF
 
       - name: Route this run (cron → niche/kind/mode/seed/long_form)
