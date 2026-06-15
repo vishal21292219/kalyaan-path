@@ -1,0 +1,10 @@
+# Credentials (written from GitHub secrets at runtime — NEVER commit)
+yt_token_lakeerein.json
+yt_client_secret.json
+# Generated at runtime (don't commit; only scripts + music + topics are tracked)
+auto_*
+final_*.mp4
+sil_*.mp4
+story_*.json
+*.log
+lakeerein_state.json
