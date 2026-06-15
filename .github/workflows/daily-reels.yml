@@ -37,7 +37,7 @@ on:
     # REVIVED 2026-05-31: B-roll pivot (real Pexels stock footage, not AI slideshow).
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
     - cron: "37 15 * * *"   # 9:07 PM IST → TimeDecoders #1 (go-live 18:00 UTC / 2 PM ET)
-    - cron: "42 15 * * *"   # 9:12 PM IST → TimeDecoders #2 (go-live 00:00 UTC / 8 PM ET PRIME)
+    - cron: "42 16 * * *"   # 10:12 PM IST → TimeDecoders #2 (1h after #1 so #1's dedup/topic state persists first → no repeat/dup; go-live 00:00 UTC / 8 PM ET PRIME)
     # GodsOfTheMind (English god-psychology): 2/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
     - cron: "47 15 * * *"   # 9:17 PM IST → GodsOfTheMind #1 (go-live 13:00 UTC / 9 AM ET)
@@ -245,7 +245,7 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "42 15 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "42 16 * * *" ]; then
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT

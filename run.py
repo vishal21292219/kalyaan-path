@@ -92,6 +92,7 @@ def main(argv: list[str]) -> int:
         help="Public HTTPS URL for the video (required for Instagram upload)",
     )
     ap.add_argument("--skip-images", action="store_true", help="Reuse existing images if present (debug)")
+    ap.add_argument("--force", action="store_true", help="Bypass the already-published-today dedup guard (intentional re-runs).")
     ap.add_argument(
         "--no-music", action="store_true",
         help="Skip background music — produces voice-only mp4. Use for YouTube Shorts so you can add trending audio at upload time (algorithm boost).",
@@ -138,6 +139,19 @@ def main(argv: list[str]) -> int:
 
     set_active_niche(args.niche)
     print(f"== Reels pipeline ({args.niche}) ==")
+
+    # Dedup guard: skip if this exact slot (niche/kind/seed) was ALREADY
+    # delivered today. Prevents duplicate uploads from catch-up / retry /
+    # concurrent re-runs landing on the SAME publishAt slot — the #1 cause of
+    # same-minute double videos that YouTube buries at 1-12 views. --force bypasses.
+    if (args.publish or args.notify_telegram) and not args.force:
+        try:
+            from pipeline.publish_log import was_published_today
+            if was_published_today(args.niche, args.kind, args.seed_offset):
+                print(f"[dedup] {args.niche}/{args.kind} s{args.seed_offset} already delivered today — skipping (use --force to override)")
+                return 0
+        except Exception:
+            traceback.print_exc()
 
     # Bhajan mode: MP3 → bhajan video (separate flow, no script/TTS)
     if args.niche == "bhajan":
