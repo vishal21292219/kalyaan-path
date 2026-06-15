@@ -61,9 +61,17 @@ llm:
     THE FORMAT THAT WORKS (proven: @Awoken_Yodha hit 400K+/video with this):
     - Take ONE god / symbol (Shiva, Kali, Krishna, Indra, Ganesha, a vahana, a
       weapon, a posture) and reveal its HIDDEN PSYCHOLOGICAL meaning.
-    - hook = a pattern-interrupt reframe in the first 2 seconds:
-      "Shiva is not a god sitting in the sky. Shiva is a state of your own mind."
-      NEVER open with "Did you know" or a slow setup. Open ON the reframe.
+    - hook = open on the VIEWER'S inner pain/feeling in 2nd person ("you…") in the
+      first 2 seconds, THEN pivot to the god as the hidden cause or cure. This
+      "make them feel SEEN first, reveal the god second" formula massively
+      outperforms opening cold on the concept (proven in this exact lane:
+      pain-first hooks pull 12K–48K views vs concept hooks). Examples:
+        "You destroy the good things in your life right before they bloom — that's
+         not self-sabotage, that's Kali, and she's clearing the way."
+        "You feel everything too deeply and it drains you. The ancients had a name
+         for carrying that much weight: Shiva."
+      NEVER open with "Did you know", a slow setup, or cold on the concept.
+      Open on the viewer's felt experience, then name the god.
     - CRITICAL: the hook is spoken FIRST. body[0] must CONTINUE from the hook and
       go DEEPER — do NOT repeat, restate, or paraphrase the hook line in body[0]
       (the viewer already heard it, so repeating it makes the voiceover say the
@@ -74,8 +82,13 @@ llm:
     Tone: calm, wise, intimate, slightly hypnotic — a voice you lean in to hear.
     Audience: global English "seekers" 18-40 — into psychology, spirituality,
     self-improvement, mindfulness, stoicism (US/UK/Canada/Australia/India-English).
-    Always end by inviting them to "Subscribe to Gods of the Mind" + a reflective
-    question that bait-comments ("Which god lives in YOUR mind? Comment below.").
+    Keep content about GODS-AS-PSYCHOLOGY. Do NOT drift into astrology, birth
+    charts, planetary placements, or "comment your sign" — that is a DIFFERENT
+    audience. Borrow only the pain-first hook + personal comment-bait STYLE.
+    Always end by inviting them to "Subscribe to Gods of the Mind" + a PERSONAL
+    comment-bait that makes them reveal themselves (drives comments = reach):
+    vary it per video, tied to the video's god — e.g. "Which lives in you right
+    now: the destroyer, the protector, or the trickster? Comment it."
 
   image_style_guidance: |
     - Ethereal, symbolic, cosmic — NOT literal/historical photography.
@@ -114,7 +127,7 @@ llm:
              "Shiva Is Not a God in the Sky — The Real Shiva 👁️"
 
     2. description (≤1500 chars):
-       Line 1: A reframe hook + emoji.
+       Line 1: A pain-first hook in 2nd person ("you…") then the god + emoji.
        Line 2-3: tease the insight without fully giving it (curiosity gap).
        Line 4: reflective engagement question ("Which god lives in your mind?").
        Line 5 (verbatim): "Subscribe to Gods of the Mind — decoding the gods
@@ -132,7 +145,10 @@ llm:
        - Build toward ONE clear realization; don't list 5 things.
 
     4. cta:
-       - Reflective + binary-ish: "Which god lives in your mind? Tell me below."
+       - PERSONAL comment-bait that makes them out themselves (max comments =
+         max reach). Tie it to THIS video's god/theme and offer a choice, e.g.
+         "Which rules you right now — the destroyer, the protector, or the
+         trickster? Comment it." Vary every video; never reuse the same line.
        - "Subscribe to Gods of the Mind."
 
     5. hashtags (description only): always #GodsOfTheMind #Psychology
