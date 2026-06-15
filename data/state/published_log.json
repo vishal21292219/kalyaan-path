@@ -1,13 +1,4 @@
 {
-  "2026-06-04": {
-    "ancient_trending_s1": true,
-    "itihaas_trending_s1": true,
-    "itihaas_series_s3": true,
-    "godmind_trending_s1": true,
-    "ancient_trending_s2": true,
-    "godmind_trending_s2": true,
-    "bhakti_mantra_s0": true
-  },
   "2026-06-05": {
     "godmind_trending_s1": true,
     "ancient_trending_s1": true,
@@ -86,6 +77,9 @@
     "bhakti_mantra_s0": true,
     "itihaas_series_s3": true,
     "itihaas_trending_s1": true,
+    "ancient_trending_s1": true
+  },
+  "2026-06-15": {
     "ancient_trending_s1": true
   }
 }
