@@ -244,17 +244,30 @@ def tg_send(text):
     tok = os.getenv("TELEGRAM_BOT_TOKEN"); chat = os.getenv("TELEGRAM_CHAT_ID")
     if not (tok and chat):
         print("[eval] no telegram creds"); print(text); return
-    # chunk to <4000 chars on line boundaries
+    # 1) Full report as a .txt document — ALWAYS opens regardless of length/format.
+    try:
+        rd = requests.post(f"https://api.telegram.org/bot{tok}/sendDocument",
+                           data={"chat_id": chat, "caption": "📊 Weekly Eval Report (full — open file)"},
+                           files={"document": ("eval_report.txt", text.encode("utf-8"))}, timeout=60)
+        print(f"[eval] tg document: {rd.status_code} ok={rd.json().get('ok')}")
+    except Exception as e:
+        print("[eval] tg document failed:", e)
+    # 2) Inline copy, chunked small (2500) + response-checked so failures are visible.
     chunks, cur = [], ""
     for line in text.split("\n"):
-        if len(cur) + len(line) + 1 > 3800:
+        if len(cur) + len(line) + 1 > 2500:
             chunks.append(cur); cur = ""
         cur += line + "\n"
     if cur:
         chunks.append(cur)
-    for c in chunks:
-        requests.post(f"https://api.telegram.org/bot{tok}/sendMessage",
-                      data={"chat_id": chat, "text": c, "disable_web_page_preview": True}, timeout=60)
+    for i, c in enumerate(chunks):
+        try:
+            r = requests.post(f"https://api.telegram.org/bot{tok}/sendMessage",
+                              data={"chat_id": chat, "text": c, "disable_web_page_preview": True}, timeout=60)
+            if not r.json().get("ok"):
+                print(f"[eval] tg chunk {i} FAILED: {r.status_code} {r.text[:160]}")
+        except Exception as e:
+            print(f"[eval] tg chunk {i} error: {e}")
 
 
 def main():
@@ -301,7 +314,7 @@ def main():
         if d is None: return "(baseline)"
         return f"▲ +{d}" if d > 0 else (f"▼ {d}" if d < 0 else "= 0")
     for name, b in blocks.items():
-        L.append(f"━━━ {name} ━━━")
+        L.append(f"🔸 {name}")
         if "error" in b:
             L.append(f"  ⚠️ data error: {b['error'][:80]}"); L.append(""); continue
         src_tag = " (Apify)" if b.get("src") == "apify" else ""
