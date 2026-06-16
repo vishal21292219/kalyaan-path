@@ -34,6 +34,36 @@ def _caption(script: dict) -> str:
     return "\n\n".join(parts)[:2000]
 
 
+def _prune_old(cloud: str, key: str, secret: str, prefix: str = "reels/", days: int = 2) -> None:
+    """Delete Cloudinary video assets older than `days` (FB/IG already ingested
+    them within minutes). Keeps the free tier from filling. Best-effort/non-fatal."""
+    import datetime
+    try:
+        r = requests.get(
+            f"https://api.cloudinary.com/v1_1/{cloud}/resources/video/upload",
+            params={"prefix": prefix, "max_results": 100}, auth=(key, secret), timeout=30,
+        )
+        if r.status_code != 200:
+            return
+        cutoff = time.time() - days * 86400
+        old = []
+        for res in r.json().get("resources", []):
+            try:
+                t = datetime.datetime.fromisoformat(res.get("created_at", "").replace("Z", "+00:00")).timestamp()
+            except Exception:
+                continue
+            if t < cutoff:
+                old.append(res["public_id"])
+        if old:
+            requests.delete(
+                f"https://api.cloudinary.com/v1_1/{cloud}/resources/video/upload",
+                params=[("public_ids[]", p) for p in old], auth=(key, secret), timeout=60,
+            )
+            print(f"[make-reel] pruned {len(old)} Cloudinary reels older than {days}d")
+    except Exception as e:
+        print(f"[make-reel] prune skipped: {e}")
+
+
 def _cloudinary_upload(video_path: Path, cloud: str, key: str, secret: str) -> str | None:
     ts = str(int(time.time()))
     folder = "reels"
@@ -68,6 +98,7 @@ def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None
         return False
     video_path = Path(video_path)
     try:
+        _prune_old(cloud, key, secret, prefix="reels/", days=2)
         url = _cloudinary_upload(video_path, cloud, key, secret)
         if not url:
             return False

@@ -32,11 +32,31 @@ def cloudinary_upload(path):
     print("CLOUDINARY URL:",url)
     return url
 
+def prune_old(prefix="lakeerein/",days=2):
+    """Delete Cloudinary reels older than `days` (FB/IG already ingested). Non-fatal."""
+    import datetime
+    try:
+        r=requests.get(f"https://api.cloudinary.com/v1_1/{CLOUD}/resources/video/upload",
+            params={"prefix":prefix,"max_results":100},auth=(KEY,SEC),timeout=30)
+        if r.status_code!=200: return
+        cutoff=time.time()-days*86400; old=[]
+        for res in r.json().get("resources",[]):
+            try: t=datetime.datetime.fromisoformat(res.get("created_at","").replace("Z","+00:00")).timestamp()
+            except: continue
+            if t<cutoff: old.append(res["public_id"])
+        if old:
+            requests.delete(f"https://api.cloudinary.com/v1_1/{CLOUD}/resources/video/upload",
+                params=[("public_ids[]",p) for p in old],auth=(KEY,SEC),timeout=60)
+            print(f"pruned {len(old)} old Cloudinary reels")
+    except Exception as e:
+        print("prune skipped:",e)
+
 def trigger(url,caption):
     r=requests.post(WEBHOOK,json={"video_url":url,"caption":caption},timeout=120)
     print("WEBHOOK:",r.status_code,r.text[:200])
 
 def main(video,caption):
+    prune_old()
     url=cloudinary_upload(video)
     trigger(url,caption)
     print("DONE — Make will create the reel on @lakeereinstories")
