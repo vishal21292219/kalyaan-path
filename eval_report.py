@@ -26,14 +26,79 @@ load_dotenv()
 ROOT = Path(__file__).resolve().parent
 SNAP = ROOT / "data/state/eval_snapshot.json"
 
-# channel → YT token/secret env, FB page id, optimal go-live slots (UTC HH:MM)
+# channel → YT token/secret env, YT handle (Apify fallback), FB page id, optimal slots (UTC)
 CHANNELS = {
-    "KalyaanPath":   {"tok": "YT_TOKEN_JSON",          "cs": "YT_CLIENT_SECRET_JSON",          "fb": "1169999016195266", "slots": ["01:30"]},
-    "TimeDecoders":  {"tok": "YT_ANCIENT_TOKEN_JSON",  "cs": "YT_ANCIENT_CLIENT_SECRET_JSON",  "fb": "1249630111558028", "slots": ["18:00", "00:00"]},
-    "Itihaasvani":   {"tok": "YT_ITIHAAS_TOKEN_JSON",  "cs": "YT_ITIHAAS_CLIENT_SECRET_JSON",  "fb": "1063760053496823", "slots": ["03:00", "14:30"]},
-    "GodsOfTheMind": {"tok": "YT_GODMIND_TOKEN_JSON",  "cs": "YT_GODMIND_CLIENT_SECRET_JSON",  "fb": "1113214471881336", "slots": ["17:00", "23:00", "01:00"]},
-    "Lakeerein":     {"tok": "YT_LAKEEREIN_TOKEN_JSON","cs": "YT_LAKEEREIN_CLIENT_SECRET_JSON","fb": "1143850345480290", "slots": ["15:00"]},
+    "KalyaanPath":   {"tok": "YT_TOKEN_JSON",          "cs": "YT_CLIENT_SECRET_JSON",          "yt": "@KalyaanPath",    "fb": "1169999016195266", "slots": ["01:30"]},
+    "TimeDecoders":  {"tok": "YT_ANCIENT_TOKEN_JSON",  "cs": "YT_ANCIENT_CLIENT_SECRET_JSON",  "yt": "@TimeDecoders",   "fb": "1249630111558028", "slots": ["18:00", "00:00"]},
+    "Itihaasvani":   {"tok": "YT_ITIHAAS_TOKEN_JSON",  "cs": "YT_ITIHAAS_CLIENT_SECRET_JSON",  "yt": "@Itihaasvani",    "fb": "1063760053496823", "slots": ["03:00", "14:30"]},
+    "GodsOfTheMind": {"tok": "YT_GODMIND_TOKEN_JSON",  "cs": "YT_GODMIND_CLIENT_SECRET_JSON",  "yt": "@GodsOfTheMind",  "fb": "1113214471881336", "slots": ["17:00", "23:00", "01:00"]},
+    "Lakeerein":     {"tok": "YT_LAKEEREIN_TOKEN_JSON","cs": "YT_LAKEEREIN_CLIENT_SECRET_JSON","yt": "@LakeereinStories","fb": "1143850345480290","slots": ["15:00"]},
 }
+APIFY = os.getenv("APIFY_TOKEN")
+
+
+def _apify(actor, payload, timeout=300):
+    """Run an Apify actor synchronously and return its dataset items (or [])."""
+    if not APIFY:
+        return []
+    try:
+        r = requests.post(
+            f"https://api.apify.com/v2/acts/{actor}/run-sync-get-dataset-items",
+            params={"token": APIFY, "timeout": timeout}, json=payload, timeout=timeout + 30)
+        if r.status_code in (200, 201):
+            return r.json()
+        print(f"[eval] apify {actor} HTTP {r.status_code}: {r.text[:150]}")
+    except Exception as e:
+        print(f"[eval] apify {actor} err: {e}")
+    return []
+
+
+def yt_apify(handle):
+    """Public YT channel scrape (no OAuth) → same shape as yt_channel."""
+    items = _apify("streamers~youtube-scraper", {
+        "startUrls": [{"url": f"https://www.youtube.com/{handle}/videos"}],
+        "maxResults": 20, "maxResultsShorts": 20, "maxResultStreams": 0, "sortVideosBy": "NEWEST"})
+    vids, subs, ctitle = [], None, handle
+    for it in items:
+        subs = subs or it.get("numberOfSubscribers") or it.get("channelSubscriberCount")
+        ctitle = it.get("channelName") or ctitle
+        d = it.get("date") or it.get("publishedAt") or ""
+        vids.append({"title": it.get("title", ""), "publishedAt": d,
+                     "views": int(it.get("viewCount") or 0), "likes": 0, "comments": 0})
+    return {"title": ctitle, "subs": int(subs) if subs else None,
+            "views": None, "videoCount": None, "videos": vids, "src": "apify"}
+
+
+def fb_apify(page_id):
+    """Public FB page posts scrape → recent {title, views, time}."""
+    items = _apify("apify~facebook-posts-scraper",
+                   {"startUrls": [{"url": f"https://www.facebook.com/{page_id}"}], "resultsLimit": 12})
+    posts = []
+    for it in items:
+        posts.append({"title": (it.get("text") or "")[:45], "time": it.get("time", ""),
+                      "views": int(it.get("viewsCount") or 0)})
+    return posts
+
+
+def fb_analyze(posts):
+    n = _now(); wk = n - datetime.timedelta(days=7)
+    recent = []
+    for p in posts:
+        try:
+            t = datetime.datetime.fromisoformat(str(p["time"]).replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if t >= wk:
+            recent.append(p)
+    seen, dups = {}, []
+    for p in posts[:15]:
+        k = _norm(p["title"])
+        if k and k in seen:
+            dups.append(p["title"][:30])
+        elif k:
+            seen[k] = 1
+    rv = sorted(recent, key=lambda x: x["views"], reverse=True)
+    return {"posts_7d": len(recent), "top": (rv[0]["views"] if rv else 0), "dups": dups}
 
 
 def _now():
@@ -107,10 +172,14 @@ def analyze(name, data, prev, cfg):
         v["_pub"] = pub
         if pub >= wk:
             recent.append(v)
-    # deltas vs last snapshot
-    d_subs = data["subs"] - prev.get("subs", data["subs"]) if prev else None
-    d_views = data["views"] - prev.get("views", data["views"]) if prev else None
-    d_vids = data["videoCount"] - prev.get("videoCount", data["videoCount"]) if prev else None
+    # deltas vs last snapshot (None-safe — Apify-scraped channels may lack subs/views)
+    def _delta(cur, key):
+        if cur is None or not prev or prev.get(key) is None:
+            return None
+        return cur - prev[key]
+    d_subs = _delta(data.get("subs"), "subs")
+    d_views = _delta(data.get("views"), "views")
+    d_vids = _delta(data.get("videoCount"), "videoCount")
     # schedule check: publish hour vs nearest optimal slot (±60 min)
     slots = [int(s[:2]) * 60 + int(s[3:]) for s in cfg["slots"]]
     off_sched = []
@@ -201,9 +270,24 @@ def main():
     blocks, new_snap = {}, {}
     for name, cfg in CHANNELS.items():
         try:
-            data = yt_channel(name, cfg)
-            blocks[name] = analyze(name, data, prev_chan.get(name, {}), cfg)
-            new_snap[name] = {"subs": data["subs"], "views": data["views"], "videoCount": data["videoCount"]}
+            try:
+                data = yt_channel(name, cfg)
+                data["src"] = "oauth"
+            except Exception as e:
+                if APIFY:
+                    print(f"[eval] {name} OAuth failed ({str(e)[:60]}); falling back to Apify")
+                    data = yt_apify(cfg["yt"])
+                else:
+                    raise
+            b = analyze(name, data, prev_chan.get(name, {}), cfg)
+            b["src"] = data.get("src", "oauth")
+            if APIFY:
+                try:
+                    b["fb"] = fb_analyze(fb_apify(cfg["fb"]))
+                except Exception as e:
+                    print(f"[eval] {name} FB scrape failed: {e}")
+            blocks[name] = b
+            new_snap[name] = {"subs": data.get("subs"), "views": data.get("views"), "videoCount": data.get("videoCount")}
         except Exception as e:
             print(f"[eval] {name} failed: {type(e).__name__}: {e}")
             blocks[name] = {"error": str(e)}
@@ -220,19 +304,31 @@ def main():
         L.append(f"━━━ {name} ━━━")
         if "error" in b:
             L.append(f"  ⚠️ data error: {b['error'][:80]}"); L.append(""); continue
-        L.append(f"  👥 Subs: {b['subs']}  ({arrow(b['d_subs'])}/wk)")
-        L.append(f"  👁 Views: {b['views']}  ({arrow(b['d_views'])}/wk)")
-        L.append(f"  🎬 Uploads (7d): {b['uploads_7d']}   total: {b['videoCount']}")
+        src_tag = " (Apify)" if b.get("src") == "apify" else ""
+        subs_str = b["subs"] if b["subs"] is not None else "n/a"
+        L.append(f"  👥 Subs: {subs_str}  ({arrow(b['d_subs'])}/wk){src_tag}")
+        if b["views"] is not None:
+            L.append(f"  👁 Views: {b['views']}  ({arrow(b['d_views'])}/wk)")
+        up = f"  🎬 YT uploads (7d): {b['uploads_7d']}"
+        if b["videoCount"] is not None:
+            up += f"   total: {b['videoCount']}"
+        L.append(up)
         if b["top"]:
             L.append(f"  🏆 Top: {b['top'][1]} — {b['top'][0]}")
         if b["flop"] and b["uploads_7d"] > 1:
             L.append(f"  📉 Flop: {b['flop'][1]} — {b['flop'][0]}")
         if b["duplicates"]:
-            L.append(f"  🔁 DUPLICATES: {', '.join(b['duplicates'][:3])}")
+            L.append(f"  🔁 YT DUPLICATES: {', '.join(b['duplicates'][:3])}")
         if b["off_schedule"]:
             L.append(f"  ⏰ Off-schedule: {len(b['off_schedule'])} (e.g. {b['off_schedule'][0][1]})")
         else:
             L.append("  ⏰ Schedule: on-time ✅")
+        fb = b.get("fb")
+        if fb:
+            fl = f"  📘 FB (7d): {fb['posts_7d']} posts, top {fb['top']} views"
+            if fb["dups"]:
+                fl += f" | 🔁 {len(fb['dups'])} dup"
+            L.append(fl)
         for item in reco.get(name, []):
             L.append(f"  → {item}")
         L.append("")
