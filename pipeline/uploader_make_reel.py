@@ -31,10 +31,6 @@ CHANNEL_NAME = {
     "ancient": "Time Decoders", "bhakti": "Kalyaan Path",
     "bhajan": "Kalyaan Path", "itihaas": "Itihaasvani",
 }
-# Originality/AI label (FB demonetizes "unoriginal" content; labeling AI helps).
-_AI_DISCLOSURE = "🎬 Original script • AI-assisted visuals & narration."
-
-
 def _caption(script: dict, channel: str = "") -> str:
     hook = (script.get("hook") or "").strip()
     cta = (script.get("cta") or "").strip()
@@ -42,7 +38,7 @@ def _caption(script: dict, channel: str = "") -> str:
     follow = f"👉 Follow {name} for more." if name else ""
     tags = script.get("hashtags") or []
     tagline = " ".join(t if t.startswith("#") else f"#{t}" for t in tags)[:600]
-    parts = [p for p in (hook, cta, follow, tagline, _AI_DISCLOSURE) if p]
+    parts = [p for p in (hook, cta, follow, tagline) if p]
     return "\n\n".join(parts)[:2000]
 
 
