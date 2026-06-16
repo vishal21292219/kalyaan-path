@@ -28,9 +28,10 @@ PUBLISH_TIMES = {
     ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
     ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST — PM series (Mahabharat Villains, ACTIVE)
     ("itihaas", "trending", 3): "14:30",  # ~8:00 PM IST — PM standalone rahasya (fallback mapping)
-    ("godmind", "trending", 1): "13:00",  # GodsOfTheMind drop 1: 9 AM ET + 6:30 PM IST
-    ("godmind", "trending", 2): "23:00",  # GodsOfTheMind drop 2: 7 PM ET (US prime)
-    ("godmind", "trending", 3): "17:00",  # GodsOfTheMind drop 3: 1 PM ET midday (3/day for growth)
+    # GoM audience = US 60% (India 17%), age 35-54. US-peak proven (1 PM & 9 PM ET = biggest hits).
+    ("godmind", "trending", 1): "17:00",  # GoM drop 1: 1 PM ET (US lunch — proven 10.6k)
+    ("godmind", "trending", 2): "23:00",  # GoM drop 2: 7 PM ET (US evening prime)
+    ("godmind", "trending", 3): "01:00",  # GoM drop 3: 9 PM ET (US night — proven 9.3k)
 }
 
 
