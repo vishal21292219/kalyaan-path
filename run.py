@@ -30,6 +30,7 @@ PUBLISH_TIMES = {
     ("itihaas", "trending", 3): "14:30",  # ~8:00 PM IST — PM standalone rahasya (fallback mapping)
     ("godmind", "trending", 1): "13:00",  # GodsOfTheMind drop 1: 9 AM ET + 6:30 PM IST
     ("godmind", "trending", 2): "23:00",  # GodsOfTheMind drop 2: 7 PM ET (US prime)
+    ("godmind", "trending", 3): "17:00",  # GodsOfTheMind drop 3: 1 PM ET midday (3/day for growth)
 }
 
 

@@ -41,7 +41,8 @@ on:
     # GodsOfTheMind (English god-psychology): 2/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
     - cron: "47 15 * * *"   # 9:17 PM IST → GodsOfTheMind #1 (go-live 13:00 UTC / 9 AM ET)
-    - cron: "52 15 * * *"   # 9:22 PM IST → GodsOfTheMind #2 (go-live 23:00 UTC / 7 PM ET prime)
+    - cron: "17 16 * * *"   # 9:47 PM IST → GodsOfTheMind #2 (30min after #1 so dedup/topic state persists → no repeat; go-live 23:00 UTC / 7 PM ET prime)
+    - cron: "47 16 * * *"   # 10:17 PM IST → GodsOfTheMind #3 (go-live 17:00 UTC / 1 PM ET midday) — 3/day for follower+watch-time growth toward FB monetization
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
     # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — DISABLED 2026-06-09: the katha
@@ -266,12 +267,19 @@ jobs:
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=1"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "52 15 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "17 16 * * *" ]; then
             # GodsOfTheMind drop #2 → go-live 23:00 UTC (US evening prime).
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=2"         >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "47 16 * * *" ]; then
+            # GodsOfTheMind drop #3 → go-live 17:00 UTC (1 PM ET midday). 3/day for growth.
+            echo "niche=godmind"  >> $GITHUB_OUTPUT
+            echo "kind=trending"  >> $GITHUB_OUTPUT
+            echo "mode=publish"   >> $GITHUB_OUTPUT
+            echo "seed=3"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 11 * * 6" ]; then
             # Itihaasvani long-form: TG drop (user has no OAuth for this channel).

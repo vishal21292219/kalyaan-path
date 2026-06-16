@@ -25,12 +25,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def _caption(script: dict) -> str:
+# Page display name per channel (for the "Follow X for more" CTA on FB/IG).
+CHANNEL_NAME = {
+    "godmind": "Gods of the Mind", "gom": "Gods of the Mind",
+    "ancient": "Time Decoders", "bhakti": "Kalyaan Path",
+    "bhajan": "Kalyaan Path", "itihaas": "Itihaasvani",
+}
+# Originality/AI label (FB demonetizes "unoriginal" content; labeling AI helps).
+_AI_DISCLOSURE = "🎬 Original script • AI-assisted visuals & narration."
+
+
+def _caption(script: dict, channel: str = "") -> str:
     hook = (script.get("hook") or "").strip()
     cta = (script.get("cta") or "").strip()
+    name = CHANNEL_NAME.get(channel, "")
+    follow = f"👉 Follow {name} for more." if name else ""
     tags = script.get("hashtags") or []
     tagline = " ".join(t if t.startswith("#") else f"#{t}" for t in tags)[:600]
-    parts = [p for p in (hook, cta, tagline) if p]
+    parts = [p for p in (hook, cta, follow, tagline, _AI_DISCLOSURE) if p]
     return "\n\n".join(parts)[:2000]
 
 
@@ -103,7 +115,7 @@ def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None
         if not url:
             return False
         print(f"[make-reel] cloudinary: {url}")
-        payload = {"video_url": url, "caption": _caption(script), "channel": channel}
+        payload = {"video_url": url, "caption": _caption(script, channel), "channel": channel}
         if fb_page_id:
             payload["fb_page_id"] = str(fb_page_id).strip()
         r = requests.post(webhook, json=payload, timeout=120)
