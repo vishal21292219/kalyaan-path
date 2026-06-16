@@ -28,10 +28,10 @@ PUBLISH_TIMES = {
     ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
     ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST — PM series (Mahabharat Villains, ACTIVE)
     ("itihaas", "trending", 3): "14:30",  # ~8:00 PM IST — PM standalone rahasya (fallback mapping)
-    # GoM audience = US 60% (India 17%), age 35-54. US-peak proven (1 PM & 9 PM ET = biggest hits).
-    ("godmind", "trending", 1): "17:00",  # GoM drop 1: 1 PM ET (US lunch — proven 10.6k)
-    ("godmind", "trending", 2): "23:00",  # GoM drop 2: 7 PM ET (US evening prime)
-    ("godmind", "trending", 3): "01:00",  # GoM drop 3: 9 PM ET (US night — proven 9.3k)
+    # GoM: NO scheduled publishAt — its generation crons fire AT the US peaks
+    # (16:48/22:48/00:48 UTC), so YT publishes immediately at gen-time = the peak,
+    # matching FB/IG (which post immediately via Make). All 3 platforms land together
+    # at 1 PM / 7 PM / 9 PM ET. (audience US 60%, proven winners 1 PM & 9 PM ET.)
 }
 
 

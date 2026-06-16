@@ -40,9 +40,11 @@ on:
     - cron: "42 16 * * *"   # 10:12 PM IST → TimeDecoders #2 (1h after #1 so #1's dedup/topic state persists first → no repeat/dup; go-live 00:00 UTC / 8 PM ET PRIME)
     # GodsOfTheMind (English god-psychology): 2/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
-    - cron: "47 15 * * *"   # 9:17 PM IST → GodsOfTheMind #1 (go-live 17:00 UTC / 1 PM ET — US lunch, proven 10.6k)
-    - cron: "17 16 * * *"   # 9:47 PM IST → GodsOfTheMind #2 (30min after #1 so dedup/topic state persists → no repeat; go-live 23:00 UTC / 7 PM ET prime)
-    - cron: "47 16 * * *"   # 10:17 PM IST → GodsOfTheMind #3 (go-live 01:00 UTC / 9 PM ET — US night, proven 9.3k). Audience is US 60% → 3/day at US peaks for growth toward FB monetization
+    # GoM gen-time IS post-time (FB/IG via Make post immediately; YT publishes now too) →
+    # generate AT US peaks so all 3 platforms land at the right hour. ~12min before peak.
+    - cron: "48 16 * * *"   # → posts ~17:00 UTC / 1 PM ET (US lunch, proven 10.6k)  [GoM #1]
+    - cron: "48 22 * * *"   # → posts ~23:00 UTC / 7 PM ET (US evening prime)        [GoM #2]
+    - cron: "48 0 * * *"    # → posts ~01:00 UTC / 9 PM ET (US night, proven 9.3k)   [GoM #3]
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
     # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — DISABLED 2026-06-09: the katha
@@ -260,22 +262,22 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "47 15 * * *" ]; then
-            # GodsOfTheMind drop #1 → go-live 13:00 UTC (US morning + India evening).
+          elif [ "${{ github.event.schedule }}" = "48 16 * * *" ]; then
+            # GoM #1 — generate AT US lunch peak (~1 PM ET); posts immediately on FB/IG/YT.
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=1"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "17 16 * * *" ]; then
-            # GodsOfTheMind drop #2 → go-live 23:00 UTC (US evening prime).
+          elif [ "${{ github.event.schedule }}" = "48 22 * * *" ]; then
+            # GoM #2 — generate AT US evening prime (~7 PM ET).
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=2"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "47 16 * * *" ]; then
-            # GodsOfTheMind drop #3 → go-live 17:00 UTC (1 PM ET midday). 3/day for growth.
+          elif [ "${{ github.event.schedule }}" = "48 0 * * *" ]; then
+            # GoM #3 — generate AT US night peak (~9 PM ET).
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
