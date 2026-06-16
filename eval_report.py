@@ -60,9 +60,12 @@ def _norm(title):
 def yt_channel(name, cfg):
     at = _refresh(cfg["tok"], cfg["cs"])
     H = {"Authorization": f"Bearer {at}"}
-    ch = requests.get("https://www.googleapis.com/youtube/v3/channels",
-                      params={"part": "snippet,statistics,contentDetails", "mine": "true"},
-                      headers=H, timeout=60).json()["items"][0]
+    chr_ = requests.get("https://www.googleapis.com/youtube/v3/channels",
+                        params={"part": "snippet,statistics,contentDetails", "mine": "true"},
+                        headers=H, timeout=60).json()
+    if not chr_.get("items"):
+        raise RuntimeError(f"channels.list empty: {json.dumps(chr_)[:200]}")
+    ch = chr_["items"][0]
     st = ch["statistics"]
     up = ch["contentDetails"]["relatedPlaylists"]["uploads"]
     pl = requests.get("https://www.googleapis.com/youtube/v3/playlistItems",
@@ -156,7 +159,11 @@ def claude_reco(blocks):
             headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"},
             json={"model": "claude-opus-4-8", "max_tokens": 1500, "system": sys,
                   "messages": [{"role": "user", "content": json.dumps(compact, default=str)}]}, timeout=120)
-        txt = r.json()["content"][0]["text"]
+        resp = r.json()
+        if "content" not in resp:
+            print("[eval] claude error resp:", json.dumps(resp)[:300])
+            return {}
+        txt = resp["content"][0]["text"]
         m = re.search(r"\{.*\}", txt, re.S)
         return json.loads(m.group(0)) if m else {}
     except Exception as e:
