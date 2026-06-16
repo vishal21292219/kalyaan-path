@@ -9,8 +9,7 @@ name: Catch-up (recover missed posts)
 on:
   schedule:
     - cron: "0 9 * * *"    # 09:00 UTC — recover morning slots (mantra)
-    - cron: "0 19 * * *"   # 19:00 UTC — recover the 15:30-17:30 cluster + bhajan
-    - cron: "50 23 * * *"  # 23:50 UTC — end-of-day sweep (catches the 22:30 TD slot)
+    - cron: "50 23 * * *"  # 23:50 UTC — end-of-day sweep (recovers the whole day incl. the 15:30-17:30 cluster + bhajan + TD). Dropped the 19:00 run — dedup guard makes idle catch-ups cheap and the 23:50 sweep covers the same slots.
   workflow_dispatch:
     inputs:
       dry_run:

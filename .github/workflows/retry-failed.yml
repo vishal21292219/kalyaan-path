@@ -7,7 +7,7 @@ name: Retry Failed Runs (hourly)
 
 on:
   schedule:
-    - cron: "0 * * * *"   # every hour at :00
+    - cron: "0 */6 * * *"   # every 6h (was hourly — saved ~840 Actions min/mo; retries are a rare safety net)
   workflow_dispatch:       # also runnable manually
 
 jobs:
