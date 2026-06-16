@@ -28,10 +28,13 @@ PUBLISH_TIMES = {
     ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
     ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST — PM series (Mahabharat Villains, ACTIVE)
     ("itihaas", "trending", 3): "14:30",  # ~8:00 PM IST — PM standalone rahasya (fallback mapping)
-    # GoM: NO scheduled publishAt — its generation crons fire AT the US peaks
-    # (16:48/22:48/00:48 UTC), so YT publishes immediately at gen-time = the peak,
-    # matching FB/IG (which post immediately via Make). All 3 platforms land together
-    # at 1 PM / 7 PM / 9 PM ET. (audience US 60%, proven winners 1 PM & 9 PM ET.)
+    # GoM (audience US 60%, proven peaks 1 PM & 9 PM ET): generate EARLY (peak-2h),
+    # then YT native-schedules to these exact times AND FB/IG are queued for them
+    # (facebook_make_scheduled) → posted by the reel-poster cron at the exact peak.
+    # Render time no longer matters — zero drift on any platform.
+    ("godmind", "trending", 1): "17:00",  # 1 PM ET (US lunch — proven 10.6k)
+    ("godmind", "trending", 2): "23:00",  # 7 PM ET (US evening prime)
+    ("godmind", "trending", 3): "01:00",  # 9 PM ET (US night — proven 9.3k)
 }
 
 
@@ -555,8 +558,12 @@ def main(argv: list[str]) -> int:
                 else:
                     _k = "BHAKTI" if args.niche in ("bhakti", "bhajan") else args.niche.upper()
                     _pg = (os.getenv(f"FB_PAGE_ID_{_k}") or os.getenv("FB_PAGE_ID") or "").strip()
-                if make_upload(video_path, script, channel=args.niche, fb_page_id=_pg):
-                    print(f"[publish] make-reel queued ({args.niche} → FB page {_pg})")
+                # If the niche schedules FB (facebook_make_scheduled), queue the reel
+                # for its exact peak (poster cron fires it → no render-time drift).
+                # Else post immediately.
+                _fb_at = _publish_at_iso(_slot_publish_at(args)) if publish_cfg.get("facebook_make_scheduled") else None
+                if make_upload(video_path, script, channel=args.niche, fb_page_id=_pg, post_at=_fb_at):
+                    print(f"[publish] make-reel {('queued for ' + _fb_at) if _fb_at else 'posted'} ({args.niche} → FB page {_pg})")
                     _delivered = True
             except Exception:
                 traceback.print_exc()

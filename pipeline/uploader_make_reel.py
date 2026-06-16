@@ -94,10 +94,33 @@ def _cloudinary_upload(video_path: Path, cloud: str, key: str, secret: str) -> s
     return r.json().get("secure_url")
 
 
-def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None) -> bool:
-    """Upload video to Cloudinary + trigger the Make reel webhook.
-    fb_page_id (when given) tells the Make scenario which Facebook Page to post to
-    (bhakti-family route). Without it, the scenario posts to the Lakeerein IG+FB."""
+_PENDING = Path(__file__).resolve().parent.parent / "data/state/pending_reels.json"
+
+
+def _enqueue(video_url: str, script: dict, channel: str, fb_page_id: str, post_at: str) -> bool:
+    """Queue the reel to be posted at post_at by post_pending_reels.py (the poster
+    cron). Keyed by channel+date so a re-generation overwrites (no duplicates)."""
+    import json
+    _PENDING.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        recs = json.loads(_PENDING.read_text()) if _PENDING.exists() else []
+    except Exception:
+        recs = []
+    rid = f"{channel}_{post_at[:10]}"
+    recs = [r for r in recs if r.get("id") != rid]  # dedup → one per channel per day
+    recs.append({"id": rid, "video_url": video_url, "caption": _caption(script, channel),
+                 "channel": channel, "fb_page_id": (fb_page_id or "").strip(), "post_at": post_at})
+    _PENDING.write_text(json.dumps(recs, ensure_ascii=False, indent=1))
+    print(f"[make-reel] QUEUED {rid} for {post_at} → pending_reels.json")
+    return True
+
+
+def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None,
+           post_at: str | None = None) -> bool:
+    """Upload video to Cloudinary, then either POST the Make webhook now (post_at
+    None) or QUEUE it for post_at (the poster cron fires it at that exact time —
+    decouples posting from render time). fb_page_id selects the bhakti-family FB
+    page; without it the scenario posts to Lakeerein IG+FB."""
     cloud = os.getenv("CLOUDINARY_CLOUD_NAME")
     key = os.getenv("CLOUDINARY_API_KEY")
     secret = os.getenv("CLOUDINARY_API_SECRET")
@@ -115,6 +138,8 @@ def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None
         if not url:
             return False
         print(f"[make-reel] cloudinary: {url}")
+        if post_at:                       # scheduled → queue for the poster cron
+            return _enqueue(url, script, channel, fb_page_id, post_at)
         payload = {"video_url": url, "caption": _caption(script, channel), "channel": channel}
         if fb_page_id:
             payload["fb_page_id"] = str(fb_page_id).strip()

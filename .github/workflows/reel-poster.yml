@@ -1,0 +1,45 @@
+name: Reel Poster (scheduled FB/IG)
+
+# Fires queued FB/IG reels at their exact target time (decoupled from generation,
+# so slow renders never push a post off its peak). Tiny job (~1 min). Reads
+# data/state/pending_reels.json, posts due records via the Make webhook, removes
+# posted + stale ones. Times are GoM US peaks (UTC) + a safety sweep.
+on:
+  schedule:
+    - cron: "0 17 * * *"   # 1 PM ET  — GoM #1 peak
+    - cron: "0 23 * * *"   # 7 PM ET  — GoM #2 peak
+    - cron: "0 1 * * *"    # 9 PM ET  — GoM #3 peak
+    - cron: "30 3 * * *"   # safety sweep — catch anything missed
+  workflow_dispatch:
+
+concurrency:
+  group: reel-poster
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests python-dotenv
+      - name: Post due reels
+        env:
+          MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
+        run: python post_pending_reels.py
+      - name: Commit updated queue
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/state/pending_reels.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "auto: reel queue update [skip ci]" || true
+            for i in 1 2 3; do
+              if git pull --rebase --autostash origin main && git push; then break; fi
+              echo "push retry $i…"; sleep 5
+            done
+          else
+            echo "no queue changes"
+          fi
