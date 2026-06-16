@@ -373,20 +373,24 @@ def pick_trending(seed_offset: int = 0) -> dict:
     """
     topics = load_topics()
     today = date.today()
-    # festival in next 5 days wins (festival overrides any offset — same fest all day)
-    for fest in topics.get("festivals_calendar", []):
-        try:
-            f_date = date(today.year, fest["month"], fest["approx_day"])
-        except ValueError:
-            continue
-        delta = (f_date - today).days
-        if 0 <= delta <= 5:
-            return {
-                "kind": "festival",
-                "title": fest["name"],
-                "wiki": fest["name"].replace(" ", "_"),
-                "tags": ["festival", fest["name"].lower().replace(" ", "")],
-            }
+    # Festival in next 5 days wins — but ONLY for the FIRST drop of the day
+    # (seed_offset <= 1). Otherwise every drop in a multi-drop niche returns the
+    # SAME festival → duplicate videos (e.g. 2x "Summer Solstice Stonehenge").
+    # Later drops (seed 2, 3) fall through to the fresh viral pool instead.
+    if seed_offset <= 1:
+        for fest in topics.get("festivals_calendar", []):
+            try:
+                f_date = date(today.year, fest["month"], fest["approx_day"])
+            except ValueError:
+                continue
+            delta = (f_date - today).days
+            if 0 <= delta <= 5:
+                return {
+                    "kind": "festival",
+                    "title": fest["name"],
+                    "wiki": fest["name"].replace(" ", "_"),
+                    "tags": ["festival", fest["name"].lower().replace(" ", "")],
+                }
     # FRESH viral pool (researched, 30-day recency) — the anti-repetition engine.
     viral = pick_viral(seed_offset)
     if viral:
