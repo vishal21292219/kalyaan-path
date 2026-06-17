@@ -95,15 +95,17 @@ _PENDING = Path(__file__).resolve().parent.parent / "data/state/pending_reels.js
 
 def _enqueue(video_url: str, script: dict, channel: str, fb_page_id: str, post_at: str) -> bool:
     """Queue the reel to be posted at post_at by post_pending_reels.py (the poster
-    cron). Keyed by channel+date so a re-generation overwrites (no duplicates)."""
+    cron). Keyed by channel+post_at so each daily drop is a DISTINCT record (a
+    multi-drop channel like GoM has 3 different post_at times) — only a re-gen of
+    the SAME slot overwrites (dedup), never a different drop."""
     import json
     _PENDING.parent.mkdir(parents=True, exist_ok=True)
     try:
         recs = json.loads(_PENDING.read_text()) if _PENDING.exists() else []
     except Exception:
         recs = []
-    rid = f"{channel}_{post_at[:10]}"
-    recs = [r for r in recs if r.get("id") != rid]  # dedup → one per channel per day
+    rid = f"{channel}_{post_at}"
+    recs = [r for r in recs if r.get("id") != rid]  # dedup → one per slot (channel+time)
     recs.append({"id": rid, "video_url": video_url, "caption": _caption(script, channel),
                  "channel": channel, "fb_page_id": (fb_page_id or "").strip(), "post_at": post_at})
     _PENDING.write_text(json.dumps(recs, ensure_ascii=False, indent=1))
