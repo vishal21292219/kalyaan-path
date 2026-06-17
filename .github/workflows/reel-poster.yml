@@ -33,7 +33,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/state/pending_reels.json || true
+          git add data/state/pending_reels.json data/state/posted_reels_log.json || true
           if ! git diff --cached --quiet; then
             git commit -m "auto: reel queue update [skip ci]" || true
             for i in 1 2 3; do
