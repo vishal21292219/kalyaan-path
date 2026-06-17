@@ -33,7 +33,7 @@ PUBLISH_TIMES = {
     # (facebook_make_scheduled) → posted by the reel-poster cron at the exact peak.
     # Render time no longer matters — zero drift on any platform.
     ("godmind", "trending", 1): "17:00",  # 1 PM ET (US lunch — proven 10.6k)
-    ("godmind", "trending", 2): "23:00",  # 7 PM ET (US evening prime)
+    ("godmind", "trending", 2): "21:00",  # 5 PM ET (US afternoon — spread between the 1 PM & 9 PM proven peaks)
     ("godmind", "trending", 3): "01:00",  # 9 PM ET (US night — proven 9.3k)
 }
 

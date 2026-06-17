@@ -7,7 +7,7 @@ name: Reel Poster (scheduled FB/IG)
 on:
   schedule:
     - cron: "0 17 * * *"   # 1 PM ET  — GoM #1 peak
-    - cron: "0 23 * * *"   # 7 PM ET  — GoM #2 peak
+    - cron: "0 21 * * *"   # 5 PM ET  — GoM #2 peak
     - cron: "0 1 * * *"    # 9 PM ET  — GoM #3 peak
     - cron: "30 3 * * *"   # safety sweep — catch anything missed
   workflow_dispatch:

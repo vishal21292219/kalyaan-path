@@ -44,7 +44,7 @@ on:
     # queued (facebook_make_scheduled) → reel-poster.yml fires both at the EXACT peak,
     # so even a 45-min render never drifts off the peak.
     - cron: "0 15 * * *"    # gen 15:00 UTC → peak 17:00 UTC / 1 PM ET (US lunch)   [GoM #1]
-    - cron: "0 21 * * *"    # gen 21:00 UTC → peak 23:00 UTC / 7 PM ET (prime)      [GoM #2]
+    - cron: "0 19 * * *"    # gen 19:00 UTC → peak 21:00 UTC / 5 PM ET (spread)      [GoM #2]
     - cron: "0 23 * * *"    # gen 23:00 UTC → peak 01:00 UTC / 9 PM ET (US night)   [GoM #3]
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
@@ -270,8 +270,8 @@ jobs:
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=1"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 21 * * *" ]; then
-            # GoM #2 — gen early (21:00 UTC); peak 23:00 UTC / 7 PM ET.
+          elif [ "${{ github.event.schedule }}" = "0 19 * * *" ]; then
+            # GoM #2 — gen early (19:00 UTC); peak 21:00 UTC / 5 PM ET.
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
