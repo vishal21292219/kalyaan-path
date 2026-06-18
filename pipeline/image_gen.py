@@ -249,8 +249,15 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     style = cfg["images"]["style_suffix"]
     negative = cfg["images"]["negative"]
     cfg_model = cfg["images"].get("model", "gemini-3.1-flash-image-preview")
-    # The fal model (e.g. fal-ai/flux/schnell). Falls back to flux-pro default.
+    # The fal model (e.g. fal-ai/flux/schnell) used for BULK scene images. Falls
+    # back to flux-pro default.
     fal_model = cfg_model if str(cfg_model).startswith("fal-ai/") else FAL_FLUX_PRO
+    # Cost-smart quality: the master portrait defines the deity FACE that the
+    # consistency mechanism propagates to every hero scene. Render the master with
+    # a STRONGER model (images.master_model, e.g. fal-ai/flux/dev) while keeping
+    # bulk scenes on the cheap base model. Defaults to the base model if unset.
+    _mm = cfg["images"].get("master_model")
+    master_model = _mm if (_mm and str(_mm).startswith("fal-ai/")) else fal_model
     # The Gemini last-resort needs a real Gemini image model — never the fal id.
     gemini_model = cfg["images"].get("gemini_image_model", "gemini-3.1-flash-image-preview")
     model = gemini_model if (str(cfg_model).startswith("fal-ai/") or "flux" in str(cfg_model).lower()) else cfg_model
@@ -298,7 +305,7 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     max_ref = int(cfg["images"].get("consistency_max_scenes", 3))
     ref_used = 0
     if consistency_on:
-        masters = _build_character_masters(bible, out_dir, style, negative, target_w, target_h, fal_model=fal_model)
+        masters = _build_character_masters(bible, out_dir, style, negative, target_w, target_h, fal_model=master_model)
         if masters:
             cap = f"first {max_ref}" if max_ref else "all"
             print(f"[consistency] {len(masters)} character master(s) — reference-conditioning {cap} recurring scene(s)")
