@@ -1,0 +1,36 @@
+name: Explore Channel (Apify scrape)
+
+# Manually scrape ANY YouTube channel's videos+shorts via the Apify YouTube
+# scraper and print the metrics JSON (top/bottom performers, views, engagement,
+# posting cadence) to the job log. Read-only competitor research — nothing is
+# published. Reuses scripts/channel_review_agent.py (--no-llm = metrics only).
+on:
+  workflow_dispatch:
+    inputs:
+      handle:
+        description: "Channel handle to scrape (e.g. @Devotionalmagic1)"
+        required: true
+        default: "@Devotionalmagic1"
+      max:
+        description: "Max videos+shorts to sample"
+        required: false
+        default: "40"
+
+jobs:
+  explore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install "apify-client>=1.12.0"
+      - name: Scrape + metrics
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: |
+          python scripts/channel_review_agent.py \
+            --channels "${{ inputs.handle }}" \
+            --max "${{ inputs.max }}" \
+            --no-llm
