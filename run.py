@@ -463,9 +463,12 @@ def main(argv: list[str]) -> int:
     assemble(script, voice_path, images, video_path, skip_music=_skip_music, skip_captions=args.skip_captions, long_form=args.long_form, hero_clips=hero_clips)
     print(f"[video] FINAL → {video_path}{' (no-music)' if _skip_music else ''}")
 
-    # 6b. thumbnail — pregen cache wins, else realtime gen
+    # 6b. thumbnail — pregen cache wins, else realtime gen.
+    # Per-channel opt-out (config `thumbnail: false`): e.g. GoM Shorts — a custom
+    # thumbnail isn't shown in the Shorts feed, and the endcard isn't wanted.
     thumb_path = None
-    if args.auto_thumb:
+    _thumb_enabled = load_config().get("thumbnail", True)
+    if args.auto_thumb and _thumb_enabled:
         thumb_path = out_path("thumbnails", f"{base}.jpg")
         if pregen_active and cached_thumb and Path(cached_thumb).exists():
             import shutil as _shutil

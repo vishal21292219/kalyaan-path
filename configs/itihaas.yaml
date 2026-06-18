@@ -34,13 +34,14 @@ images:
   # HF/Gemini stay as automatic fallbacks if fal ever errors.
   provider: fal
   model: fal-ai/flux/schnell
+  master_model: fal-ai/flux/dev   # hero character/subject portrait = premium 28-step (was schnell → soft/weak); propagated via consistency
   gemini_image_model: gemini-3.1-flash-image-preview
   fallback_model: black-forest-labs/FLUX.1-schnell
   # Character consistency: 1 master portrait per recurring character → same
   # face/design across hero scenes (the pro look). Needs fal.
   consistency: true
   consistency_max_scenes: 3   # cost guard: only the top N hero scenes conditioned (0 = all)
-  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars, dark gloomy mood, underexposed, muddy colors, washed out
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, cartoon, anime, chibi, modern clothing, modern buildings, cars, dark gloomy mood, underexposed, muddy colors, washed out, child, baby, infant, childlike face, feminine man, effeminate, androgynous, soft weak features, doll-like, flat lighting
   num_per_reel: 10
   style_suffix: ', cinematic Indian epic art, ultra realistic 3D rendering, anatomically correct (two arms, one head, five fingers per hand), single focal subject sharply in focus, BRIGHT vibrant warm lighting with golden volumetric rays, well-illuminated faces with clear expressions, rich saturated orange-saffron-gold color palette, polished masterpiece quality, Raja Ravi Varma painting style fused with modern cinematic concept art, period-accurate ornaments and clothing, vertical 9:16 portrait composition, ultra detailed 8K rendering, no text no watermark'
 

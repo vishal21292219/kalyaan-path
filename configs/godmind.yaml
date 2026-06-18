@@ -30,6 +30,11 @@ secrets:
   youtube_client_secret: secrets/godmind_youtube_client_secret.json
   youtube_token: secrets/godmind_youtube_token.json
 
+# No custom thumbnail for GoM: it's a Shorts channel — a custom thumbnail isn't
+# shown in the Shorts feed, and the appended endcard isn't wanted. Skips thumbnail
+# generation + endcard entirely (saves a fal image too).
+thumbnail: false
+
 images:
   # PREMIUM AI visuals — fal FLUX, ethereal/cosmic/symbolic spiritual style that
   # fuses deity + mind/consciousness (not photoreal history). Ken Burns motion in
