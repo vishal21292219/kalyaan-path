@@ -6,10 +6,18 @@ name: Reel Poster (scheduled FB/IG)
 # posted + stale ones. Times are GoM US peaks (UTC) + a safety sweep.
 on:
   schedule:
-    - cron: "0 17 * * *"   # 1 PM ET  — GoM #1 peak
-    - cron: "0 21 * * *"   # 5 PM ET  — GoM #2 peak
-    - cron: "0 1 * * *"    # 9 PM ET  — GoM #3 peak
-    - cron: "30 3 * * *"   # safety sweep — catch anything missed
+    # Fire every 2h across the active window (17:00–07:00 UTC) so GitHub cron lag/
+    # skips can't strand a queued reel — peaks 17/21/01 are included, and the
+    # in-between runs (19/23/03/05/07) catch any missed peak within ~2h. A reel
+    # posts at most once (posted-ledger), so extra runs are cheap no-ops.
+    - cron: "0 17 * * *"   # 1 PM ET — GoM #1 peak
+    - cron: "0 19 * * *"   # backstop
+    - cron: "0 21 * * *"   # 5 PM ET — GoM #2 peak
+    - cron: "0 23 * * *"   # backstop
+    - cron: "0 1 * * *"    # 9 PM ET — GoM #3 peak
+    - cron: "0 3 * * *"    # backstop
+    - cron: "0 5 * * *"    # backstop
+    - cron: "0 7 * * *"    # final sweep
   workflow_dispatch:
 
 concurrency:
