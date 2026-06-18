@@ -106,7 +106,7 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 75  # bumped from 45 — Gemini fallback (HF depleted) takes 40-50 min to give buffer for slow Gemini fallback
+    timeout-minutes: 110  # 75 was killing runs mid-final-commit (flux/dev 28-step images + slow apt push gen past 75m). 110 = safe buffer so the run finishes AND commits state.
     permissions:
       contents: write
     steps:
