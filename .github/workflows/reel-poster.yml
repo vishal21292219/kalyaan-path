@@ -36,6 +36,8 @@ jobs:
       - name: Post due reels
         env:
           MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python post_pending_reels.py
       - name: Commit updated queue
         run: |

@@ -2,14 +2,20 @@
 # crons dropped/delayed. Runs run_catchup.py, which re-runs any of today's slots
 # not yet marked delivered in data/state/published_log.json.
 #
-# Runs 3x/day (UTC). The 23:50 sweep is the workhorse — it catches EVERYTHING
-# still missed before the UTC day rolls over (incl. the 22:30 TimeDecoders slot).
+# Runs 3x/day (UTC), each AFTER a generation cluster, so every slot — including
+# all 3 GodsOfTheMind slots — is recovered within a few hours if its primary cron
+# lagged/skipped. The sweep is day-boundary safe (run_catchup uses last_published
+# timestamps), so the 02:00 run correctly recovers the 23:00 GoM slot.
+#   17:30 → mantra(15:32) + ancient(15:37) + itihaas(16:00) + GoM#1(15:00) + bhajan(Sun 10:00)
+#   22:00 → ancient(16:42) + GoM#2(19:00)
+#   02:00 → GoM#3(23:00, prev UTC day)
 name: Catch-up (recover missed posts)
 
 on:
   schedule:
-    - cron: "0 9 * * *"    # 09:00 UTC — recover morning slots (mantra)
-    - cron: "50 23 * * *"  # 23:50 UTC — end-of-day sweep (recovers the whole day incl. the 15:30-17:30 cluster + bhajan + TD). Dropped the 19:00 run — dedup guard makes idle catch-ups cheap and the 23:50 sweep covers the same slots.
+    - cron: "30 17 * * *"  # after the 15:00-16:42 UTC cluster
+    - cron: "0 22 * * *"   # after GoM #2 (19:00 UTC)
+    - cron: "0 2 * * *"    # after GoM #3 (23:00 UTC prev day) — day-boundary safe
   workflow_dispatch:
     inputs:
       dry_run:
@@ -46,11 +52,19 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Restore OAuth + secrets to .env
+        # Mirrors daily-reels.yml EXACTLY so a recovered slot publishes to every
+        # channel the primary run would have (all YT channels + FB/IG via Make +
+        # Cloudinary). Previously catch-up only had YT_TOKEN + ancient → a
+        # recovered GoM/ancient slot silently dropped its FB/IG reel.
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
           YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
           YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
+          YT_ITIHAAS_TOKEN_JSON: ${{ secrets.YT_ITIHAAS_TOKEN_JSON }}
+          YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
+          YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
+          YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -59,13 +73,31 @@ jobs:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          FB_PAGE_ID_ANCIENT: ${{ secrets.FB_PAGE_ID_ANCIENT }}
+          FB_PAGE_TOKEN_ANCIENT: ${{ secrets.FB_PAGE_TOKEN_ANCIENT }}
+          FB_PAGE_ID_BHAKTI: ${{ secrets.FB_PAGE_ID_BHAKTI }}
+          FB_PAGE_TOKEN_BHAKTI: ${{ secrets.FB_PAGE_TOKEN_BHAKTI }}
+          FB_PAGE_ID_ITIHAAS: ${{ secrets.FB_PAGE_ID_ITIHAAS }}
+          FB_PAGE_TOKEN_ITIHAAS: ${{ secrets.FB_PAGE_TOKEN_ITIHAAS }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
         run: |
           mkdir -p secrets
           [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
           [ -n "$YT_CLIENT_SECRET_JSON" ] && echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
           [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
           [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
+          [ -n "$YT_ITIHAAS_TOKEN_JSON" ] && echo "$YT_ITIHAAS_TOKEN_JSON" > secrets/itihaas_youtube_token.json
+          [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
+          [ -n "$YT_GODMIND_TOKEN_JSON" ] && echo "$YT_GODMIND_TOKEN_JSON" > secrets/godmind_youtube_token.json
+          [ -n "$YT_GODMIND_CLIENT_SECRET_JSON" ] && echo "$YT_GODMIND_CLIENT_SECRET_JSON" > secrets/godmind_youtube_client_secret.json
           cat > .env <<EOF
           ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
           FAL_KEY=$FAL_KEY
@@ -75,7 +107,21 @@ jobs:
           ELEVENLABS_API_KEY=$ELEVENLABS_API_KEY
           TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
           TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
+          FB_PAGE_ID=$FB_PAGE_ID
+          FB_PAGE_TOKEN=$FB_PAGE_TOKEN
+          FB_PAGE_ID_ANCIENT=$FB_PAGE_ID_ANCIENT
+          FB_PAGE_TOKEN_ANCIENT=$FB_PAGE_TOKEN_ANCIENT
+          FB_PAGE_ID_BHAKTI=$FB_PAGE_ID_BHAKTI
+          FB_PAGE_TOKEN_BHAKTI=$FB_PAGE_TOKEN_BHAKTI
+          FB_PAGE_ID_ITIHAAS=$FB_PAGE_ID_ITIHAAS
+          FB_PAGE_TOKEN_ITIHAAS=$FB_PAGE_TOKEN_ITIHAAS
+          IG_USER_ID=$IG_USER_ID
+          IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
           PEXELS_API_KEY=$PEXELS_API_KEY
+          CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
+          CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
+          CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
+          MAKE_REEL_WEBHOOK=$MAKE_REEL_WEBHOOK
           EOF
 
       - name: Run catch-up sweep

@@ -539,7 +539,11 @@ def main(argv: list[str]) -> int:
                                    publish_at_iso=_publish_at_iso(_slot_publish_at(args)))
                 if fb_url:
                     print(f"[publish] facebook: {fb_url}")
-                    _delivered = True
+                    # Bonus channel: only counts as "slot delivered" (which
+                    # suppresses catch-up) when YouTube isn't the primary. Else a
+                    # YT failure would be masked and never recovered.
+                    if not publish_cfg.get("youtube", True):
+                        _delivered = True
             except Exception:
                 traceback.print_exc()
                 print("[publish] facebook failed — see traceback above")
@@ -564,7 +568,13 @@ def main(argv: list[str]) -> int:
                 _fb_at = _publish_at_iso(_slot_publish_at(args)) if publish_cfg.get("facebook_make_scheduled") else None
                 if make_upload(video_path, script, channel=args.niche, fb_page_id=_pg, post_at=_fb_at):
                     print(f"[publish] make-reel {('queued for ' + _fb_at) if _fb_at else 'posted'} ({args.niche} → FB page {_pg})")
-                    _delivered = True
+                    # Bonus channel: the reel-poster + posted-ledger own FB/IG
+                    # reliability. Only mark the SLOT delivered (which suppresses
+                    # catch-up) when YouTube isn't the primary for this niche —
+                    # otherwise a failed YT upload would look "done" and the
+                    # catch-up sweep would never recover the YouTube video.
+                    if not publish_cfg.get("youtube", True):
+                        _delivered = True
             except Exception:
                 traceback.print_exc()
                 print("[publish] make-reel failed — see traceback above")

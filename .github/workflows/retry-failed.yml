@@ -71,6 +71,7 @@ jobs:
         run: |
           python -c "
           from pipeline.retry_queue import get_pending_due, remove, list_all
+          from pipeline.publish_log import was_published_today
           import subprocess, sys
 
           due = get_pending_due()
@@ -85,6 +86,13 @@ jobs:
               sys.exit(0)
 
           for entry in due:
+              # The catch-up sweep may have already recovered this exact slot.
+              # Retrying it again would publish a DUPLICATE → guard on the
+              # delivery marker and drop the entry instead.
+              if was_published_today(entry['niche'], entry['kind'], entry.get('seed_offset', 0)):
+                  print(f\"  ✓ {entry['id']} already delivered today (catch-up) — removing, no re-run\")
+                  remove(entry['id'])
+                  continue
               print(f'\\n=== Retrying: {entry[\"id\"]} (attempt {entry[\"attempts\"]+1}) ===')
               cmd = [
                   'python', 'run.py',
@@ -112,6 +120,17 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name  "github-actions[bot]"
-          git add data/state/retry_queue.json || true
-          git diff --cached --quiet || git commit -m "auto: update retry queue [skip ci]"
-          git push || true
+          git add data/state/retry_queue.json data/state/published_log.json || true
+          if git diff --cached --quiet; then
+            echo "no retry-queue changes"
+          else
+            git commit -m "auto: update retry queue [skip ci]" || true
+            # Rebase+retry so a concurrent run's push doesn't drop ours (a lost
+            # retry-queue commit = a failed run never recorded, or a succeeded
+            # retry re-run into a duplicate). Non-fatal.
+            for i in 1 2 3 4 5; do
+              if git pull --rebase --autostash origin main && git push; then break; fi
+              git rebase --abort 2>/dev/null || true
+              echo "retry-queue push attempt $i failed — retrying in 5s…"; sleep 5
+            done
+          fi

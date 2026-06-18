@@ -39,6 +39,23 @@ POSTED_KEEP_DAYS = 7
 WEBHOOK = os.getenv("MAKE_REEL_WEBHOOK")
 
 
+def _alert(msg: str) -> None:
+    """Best-effort Telegram ping so a silent failure NEVER goes unnoticed — the
+    owner shouldn't have to manually check whether reels posted. Never raises."""
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat:
+        return
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat, "text": msg, "parse_mode": "Markdown"},
+            timeout=20,
+        )
+    except Exception as e:
+        print(f"[poster] alert failed: {type(e).__name__}: {e}")
+
+
 def _now():
     return datetime.datetime.now(datetime.timezone.utc)
 
@@ -137,6 +154,11 @@ def main():
         else:
             dropped += 1
             print(f"[poster] DROP stale {r.get('id')}")
+            # Stale drop = a reel we never managed to post (>1 day past due).
+            # This is the ONE silent-loss path — alert so it's never missed.
+            _alert(f"⚠️ *Reel LOST* (poster could not post it for >1 day)\n"
+                   f"channel: `{r.get('channel')}`\nid: `{r.get('id')}`\n"
+                   f"due: {r.get('post_at')}\n\nMake/connection check kar lena.")
 
     PENDING.write_text(json.dumps(keep, ensure_ascii=False, indent=1))
     _save_posted(posted_log)
