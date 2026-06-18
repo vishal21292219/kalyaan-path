@@ -27,11 +27,12 @@ secrets:
   youtube_token: secrets/youtube_token.json
 
 images:
-  # PAID fal stack ($20 recharge): fal flux/schnell (cheap, ~$0.003/img, same
-  # quality as the liked Kamadhenu images) + character consistency on hero scenes.
+  # PAID fal stack: fal flux/dev (PREMIUM, 28 steps, ~$0.025/img) for strong,
+  # expressive, gender-correct deity faces — upgraded from schnell (8 steps) which
+  # gave soft/flat/child-like faces. Character consistency on hero scenes.
   # HF/Gemini remain as automatic fallbacks if fal ever errors.
   provider: fal
-  model: fal-ai/flux/schnell
+  model: fal-ai/flux/dev
   gemini_image_model: gemini-3.1-flash-image-preview
   fallback_model: black-forest-labs/FLUX.1-schnell
   # Character consistency: 1 master portrait per recurring deity → same face/
