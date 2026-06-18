@@ -37,6 +37,12 @@ PENDING = ROOT / "data/state/pending_reels.json"
 POSTED_LOG = ROOT / "data/state/posted_reels_log.json"
 POSTED_KEEP_DAYS = 7
 WEBHOOK = os.getenv("MAKE_REEL_WEBHOOK")
+# SOP §1 G2/G3/G5: NO back-to-back posts. Never post two reels to the SAME page
+# within this many hours, and at most ONE post per page per run. This spreads any
+# stranded/recovered reels across runs instead of flushing them together (the bug
+# that posted 2 GoM reels back-to-back). Channel peaks are ≥4h apart so normal
+# scheduled drops are never blocked; only clustering/recovery is throttled.
+MIN_GAP_HOURS = 3
 
 
 def _alert(msg: str) -> None:
@@ -93,6 +99,18 @@ def _save_posted(posted: dict) -> None:
     POSTED_LOG.write_text(json.dumps(posted, ensure_ascii=False, indent=1))
 
 
+def _last_posted_for_channel(posted_log: dict, channel: str):
+    """Most recent posted_at for a page, from the ledger. Drives the G2 spacing
+    guard so we never post two reels to the same page too close together."""
+    best = None
+    for meta in posted_log.values():
+        if isinstance(meta, dict) and meta.get("channel") == channel:
+            ts = _parse(meta.get("posted_at"))
+            if ts is not None and (best is None or ts > best):
+                best = ts
+    return best
+
+
 def main():
     if not WEBHOOK:
         print("[poster] MAKE_REEL_WEBHOOK not set — skipping")
@@ -110,7 +128,13 @@ def main():
     n = _now()
     grace = datetime.timedelta(minutes=2)
     stale_cut = n - datetime.timedelta(days=1)
-    keep, posted, dropped, skipped = [], 0, 0, 0
+    gap = datetime.timedelta(hours=MIN_GAP_HOURS)
+    keep, posted, dropped, skipped, held = [], 0, 0, 0, 0
+
+    # Oldest-due first → the most-overdue reel posts first; the rest wait for a
+    # later run. With the per-page gap guard this spreads stranded reels out
+    # instead of dumping them back-to-back (SOP G2/G5).
+    recs = sorted(recs, key=lambda r: str(r.get("post_at") or ""))
 
     for r in recs:
         pa = _parse(r.get("post_at"))
@@ -118,16 +142,29 @@ def main():
             dropped += 1
             continue  # malformed → drop
         url = r.get("video_url")
+        channel = r.get("channel", "")
         # Already fired this exact video before → never post it again (even if a
         # previous dequeue failed to commit). Drop it from the queue silently.
         if url and url in posted_log:
             skipped += 1
-            print(f"[poster] SKIP already-posted {r.get('id')} ({r.get('channel')})")
+            print(f"[poster] SKIP already-posted {r.get('id')} ({channel})")
             continue
         if pa > n + grace:
             keep.append(r)            # not due yet → keep
             continue
-        # due now → try to post
+        # SOP G2/G3/G5 — NO back-to-back: if this page got a post within the last
+        # MIN_GAP_HOURS (incl. one posted earlier in THIS run, since each post
+        # updates the ledger immediately), hold this reel for a later run/peak
+        # rather than stacking it. Never flush two reels to one page together.
+        last = _last_posted_for_channel(posted_log, channel)
+        if last is not None and (n - last) < gap:
+            held += 1
+            mins = int((n - last).total_seconds() // 60)
+            print(f"[poster] HOLD {r.get('id')} ({channel}) — last post {mins}m ago "
+                  f"< {MIN_GAP_HOURS}h gap; will post at a later run/peak")
+            keep.append(r)
+            continue
+        # due now + spacing ok → try to post
         try:
             payload = {"video_url": url, "caption": r.get("caption", ""),
                        "channel": r.get("channel", "")}
@@ -162,7 +199,8 @@ def main():
 
     PENDING.write_text(json.dumps(keep, ensure_ascii=False, indent=1))
     _save_posted(posted_log)
-    print(f"[poster] posted={posted} skipped={skipped} dropped={dropped} remaining={len(keep)}")
+    print(f"[poster] posted={posted} held={held} skipped={skipped} "
+          f"dropped={dropped} remaining={len(keep)}")
 
 
 if __name__ == "__main__":
