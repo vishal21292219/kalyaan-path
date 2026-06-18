@@ -20,7 +20,7 @@ break them.
 |---|------|----------------|-------------|
 | G1 | **No duplicates.** Never post the same video, or the same topic, twice to a page. | Duplicate = spam signal → reach throttled, looks unprofessional. | posted-ledger (`posted_reels_log.json`, keyed by video_url) + `published_log.json` slot marker + `pick_viral` 30-day topic recency + festival gating. |
 | G2 | **No back-to-back posts.** Never post 2 reels to the SAME page within `MIN_GAP_HOURS` (default 3h). At most **1 post per page per poster run**. | Back-to-back splits the audience, cannibalises views, and the algorithm suppresses the 2nd. THIS is the mistake that just hurt GoM. | `post_pending_reels.py` spacing guard (per-channel gap check against the ledger). |
-| G3 | **Post only at PEAK times.** If a slot is missed, post it at the NEXT peak — never dump it late at a random off-peak hour. A late post at 8 AM is worse than skipping. | Off-peak posts get low initial velocity → algorithm buries them → drags the page's avg. | poster spacing guard reschedules; catch-up uses each slot's `publishAt` peak. |
+| G3 | **Slots must NOT be missed — and must post at their OWN peak.** A missed slot is an INCIDENT, not normal. Generation runs with a 5-6h buffer before its peak so cron lag/render time can't push it past the peak; catch-up runs ~1.5h before each peak as a backstop that recovers a dropped run AT its own peak. Posting late/off-peak or next-day is an absolute last resort and must be flagged. | A late or off-peak post gets low initial velocity → algorithm buries it → drags the page average. Missing entirely wastes the spend. | big gen buffer (`daily-reels.yml` GoM crons 12/15/19 UTC) + pre-peak catch-up (`catchup.yml` 15:30/19:30/23:30) + each slot's `publishAt` peak. |
 | G4 | **Follow each channel's exact schedule + frequency** (see §2). Do not add/skip drops silently. | Consistency trains the algorithm + the audience. | crons + `PUBLISH_TIMES` + catch-up `SLOTS` (must stay in sync — see §4). |
 | G5 | **Recovery must never flood.** A catch-up / poster recovery posts at most 1/page/run, spaced per G2/G3. Multiple stranded reels are spread across runs/peaks, never flushed together. | The exact failure mode that posted 2 GoM reels back-to-back. | poster spacing guard + catch-up per-slot. |
 | G6 | **Never label Hindu beliefs "mythology"/"myth."** Use Sanatan Dharma / Hindu wisdom / Pauranik. | Hurts the core audience's sentiment → comments, unfollows. | `script_writer` + configs wording. |
@@ -34,7 +34,7 @@ are set to US prime.
 
 | Channel | Page | Cadence | Generation (UTC) | Go-live / post peak |
 |---------|------|---------|------------------|---------------------|
-| **GodsOfTheMind** (godmind) | FB+IG+YT | 3/day | 15:00, 19:00, 23:00 | YT publishAt + FB reel: **17:00 / 21:00 / 01:00 UTC** = 1 PM / 5 PM / 9 PM ET. (4h apart — safe vs G2.) |
+| **GodsOfTheMind** (godmind) | FB+IG+YT | 3/day | 12:00, 15:00, 19:00 (5-6h buffer before peak) | YT publishAt + FB reel: **17:00 / 21:00 / 01:00 UTC** = 1 PM / 5 PM / 9 PM ET. (4h apart — safe vs G2.) |
 | **KalyaanPath** (bhakti mantra) | FB+YT | 1/day | 15:32 | YT 01:30 UTC (7 AM IST); FB reel immediate |
 | **KalyaanPath** (bhajan) | FB+YT | Sun only | Sun 10:00 | YT 13:30 UTC (7 PM IST) |
 | **TimeDecoders** (ancient) | FB+YT | 2/day | 15:37, 16:42 | YT 18:00 / 00:00 UTC; FB reel immediate |

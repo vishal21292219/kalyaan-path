@@ -45,9 +45,9 @@ SLOTS = [
     ("itihaas", "series",   3, "telegram", 16,  0, None),  # cron 0 16
     ("ancient", "trending", 1, "publish",  15, 37, None),  # cron 37 15
     ("ancient", "trending", 2, "publish",  16, 42, None),  # cron 42 16
-    ("godmind", "trending", 1, "publish",  15,  0, None),  # cron 0 15  → go-live 17:00 UTC
-    ("godmind", "trending", 2, "publish",  19,  0, None),  # cron 0 19  → go-live 21:00 UTC
-    ("godmind", "trending", 3, "publish",  23,  0, None),  # cron 0 23  → go-live 01:00 UTC (next day)
+    ("godmind", "trending", 1, "publish",  12,  0, None),  # cron 0 12  → go-live 17:00 UTC (5h buffer)
+    ("godmind", "trending", 2, "publish",  15,  0, None),  # cron 0 15  → go-live 21:00 UTC (6h buffer)
+    ("godmind", "trending", 3, "publish",  19,  0, None),  # cron 0 19  → go-live 01:00 UTC next day (6h buffer)
     ("bhajan",  "trending", 0, "publish",  10,  0, 6),     # cron 0 10 Sun only
 ]
 

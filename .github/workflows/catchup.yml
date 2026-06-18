@@ -2,20 +2,23 @@
 # crons dropped/delayed. Runs run_catchup.py, which re-runs any of today's slots
 # not yet marked delivered in data/state/published_log.json.
 #
-# Runs 3x/day (UTC), each AFTER a generation cluster, so every slot — including
-# all 3 GodsOfTheMind slots — is recovered within a few hours if its primary cron
-# lagged/skipped. The sweep is day-boundary safe (run_catchup uses last_published
-# timestamps), so the 02:00 run correctly recovers the 23:00 GoM slot.
-#   17:30 → mantra(15:32) + ancient(15:37) + itihaas(16:00) + GoM#1(15:00) + bhajan(Sun 10:00)
-#   22:00 → ancient(16:42) + GoM#2(19:00)
-#   02:00 → GoM#3(23:00, prev UTC day)
+# Recovers any slot whose primary generation cron lagged/skipped. Each run sits a
+# few hours AFTER its target gen (so it never races a merely-lagged primary) and
+# ~1.5h BEFORE that slot's go-live peak, so a recovered GoM reel still hits its
+# OWN peak (SOP G3 — "no missed slots"). Day-boundary safe (last_published
+# timestamps), so the 23:30 run correctly recovers the 19:00→01:00 GoM slot.
+#   15:30 → GoM#1 (gen 12:00, peak 17:00)
+#   19:30 → GoM#2 (gen 15:00, peak 21:00) + mantra(15:32) + ancient(15:37/16:42) + itihaas(16:00)
+#   23:30 → GoM#3 (gen 19:00, peak 01:00 next day)
+#   12:00 Sun → bhajan (gen 10:00, peak 13:30) — recover before its Sunday go-live
 name: Catch-up (recover missed posts)
 
 on:
   schedule:
-    - cron: "30 17 * * *"  # after the 15:00-16:42 UTC cluster
-    - cron: "0 22 * * *"   # after GoM #2 (19:00 UTC)
-    - cron: "0 2 * * *"    # after GoM #3 (23:00 UTC prev day) — day-boundary safe
+    - cron: "30 15 * * *"  # GoM#1 — before its 17:00 peak
+    - cron: "30 19 * * *"  # GoM#2 + mantra/ancient/itihaas cluster — before 21:00 peak
+    - cron: "30 23 * * *"  # GoM#3 — before its 01:00 (next-day) peak
+    - cron: "0 12 * * 0"   # Sunday bhajan — before its 13:30 go-live
   workflow_dispatch:
     inputs:
       dry_run:

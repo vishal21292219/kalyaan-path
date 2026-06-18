@@ -38,14 +38,17 @@ on:
     # TimeDecoders now auto-publishes to YouTube (OAuth wired).
     - cron: "37 15 * * *"   # 9:07 PM IST → TimeDecoders #1 (go-live 18:00 UTC / 2 PM ET)
     - cron: "42 16 * * *"   # 10:12 PM IST → TimeDecoders #2 (1h after #1 so #1's dedup/topic state persists first → no repeat/dup; go-live 00:00 UTC / 8 PM ET PRIME)
-    # GodsOfTheMind (English god-psychology): 2/day, generate-ahead + publishAt
+    # GodsOfTheMind (English god-psychology): 3/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
-    # GoM generates EARLY (peak-2h, render buffer). YT native-schedules + FB/IG are
-    # queued (facebook_make_scheduled) → reel-poster.yml fires both at the EXACT peak,
-    # so even a 45-min render never drifts off the peak.
-    - cron: "0 15 * * *"    # gen 15:00 UTC → peak 17:00 UTC / 1 PM ET (US lunch)   [GoM #1]
-    - cron: "0 19 * * *"    # gen 19:00 UTC → peak 21:00 UTC / 5 PM ET (spread)      [GoM #2]
-    - cron: "0 23 * * *"    # gen 23:00 UTC → peak 01:00 UTC / 9 PM ET (US night)   [GoM #3]
+    # GoM generates with a BIG 5-6h BUFFER before its peak (SOP G3 — "no missed
+    # slots"): even a multi-hour GitHub cron lag still finishes well before peak,
+    # so the reel is ready, YT native-schedules to the peak, and FB/IG are queued
+    # (facebook_make_scheduled) → reel-poster.yml fires both at the EXACT peak.
+    # Render time + cron lag no longer cause a miss. Catch-up (15:30/19:30/23:30)
+    # is the backstop if a whole gen run is dropped — recovers BEFORE the peak.
+    - cron: "0 12 * * *"    # gen 12:00 UTC → peak 17:00 UTC / 1 PM ET (5h buffer)   [GoM #1]
+    - cron: "0 15 * * *"    # gen 15:00 UTC → peak 21:00 UTC / 5 PM ET (6h buffer)   [GoM #2]
+    - cron: "0 19 * * *"    # gen 19:00 UTC → peak 01:00 UTC / 9 PM ET (6h buffer)   [GoM #3]
     - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
     # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — DISABLED 2026-06-09: the katha
@@ -263,22 +266,22 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 15 * * *" ]; then
-            # GoM #1 — gen early (15:00 UTC); YT+FB scheduled to peak 17:00 UTC / 1 PM ET.
+          elif [ "${{ github.event.schedule }}" = "0 12 * * *" ]; then
+            # GoM #1 — gen 12:00 UTC (5h buffer); YT+FB scheduled to peak 17:00 UTC / 1 PM ET.
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=1"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 19 * * *" ]; then
-            # GoM #2 — gen early (19:00 UTC); peak 21:00 UTC / 5 PM ET.
+          elif [ "${{ github.event.schedule }}" = "0 15 * * *" ]; then
+            # GoM #2 — gen 15:00 UTC (6h buffer); peak 21:00 UTC / 5 PM ET.
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=2"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 23 * * *" ]; then
-            # GoM #3 — gen early (23:00 UTC); peak 01:00 UTC / 9 PM ET.
+          elif [ "${{ github.event.schedule }}" = "0 19 * * *" ]; then
+            # GoM #3 — gen 19:00 UTC (6h buffer); peak 01:00 UTC / 9 PM ET.
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT

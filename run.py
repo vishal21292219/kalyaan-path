@@ -28,10 +28,11 @@ PUBLISH_TIMES = {
     ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
     ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST — PM series (Mahabharat Villains, ACTIVE)
     ("itihaas", "trending", 3): "14:30",  # ~8:00 PM IST — PM standalone rahasya (fallback mapping)
-    # GoM (audience US 60%, proven peaks 1 PM & 9 PM ET): generate EARLY (peak-2h),
-    # then YT native-schedules to these exact times AND FB/IG are queued for them
-    # (facebook_make_scheduled) → posted by the reel-poster cron at the exact peak.
-    # Render time no longer matters — zero drift on any platform.
+    # GoM (audience US 60%, proven peaks 1 PM & 9 PM ET): generate EARLY with a big
+    # 5-6h buffer (gen 12:00/15:00/19:00 UTC), then YT native-schedules to these
+    # exact times AND FB/IG are queued (facebook_make_scheduled) → posted by the
+    # reel-poster cron at the exact peak. Big buffer = even a multi-hour GitHub
+    # cron lag finishes before peak → no missed slot (SOP G3); zero platform drift.
     ("godmind", "trending", 1): "17:00",  # 1 PM ET (US lunch — proven 10.6k)
     ("godmind", "trending", 2): "21:00",  # 5 PM ET (US afternoon — spread between the 1 PM & 9 PM proven peaks)
     ("godmind", "trending", 3): "01:00",  # 9 PM ET (US night — proven 9.3k)
