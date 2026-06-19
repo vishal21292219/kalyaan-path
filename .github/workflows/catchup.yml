@@ -135,30 +135,9 @@ jobs:
             python -u run_catchup.py
           fi
 
-      - name: Commit state (delivery markers + history)
+      - name: Commit state — robust union-merge persister
         if: always()
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name  "github-actions[bot]"
-          git add data/state/*.json || true
-          # CRITICAL: never commit the poster's dedup ledger (reverting it re-fires
-          # already-posted reels). The reel-poster is the only writer of this file.
-          git reset -q data/state/posted_reels_log.json 2>/dev/null || true
-          if git diff --cached --quiet; then
-            echo "no state changes to commit"
-          else
-            git commit -m "auto: catch-up state update [skip ci]" || true
-            # Rebase+retry; abort conflicted rebase between tries (avoid the
-            # "unmerged files" wedge) and stay NON-FATAL so a state-push miss
-            # never fails the run (failed run → Retry-Failed → duplicate uploads).
-            pushed=0
-            for i in 1 2 3 4 5 6; do
-              if git pull --rebase --autostash origin main && git push; then pushed=1; break; fi
-              git rebase --abort 2>/dev/null || true
-              echo "state push attempt $i failed (concurrent run) — retrying in 5s…"
-              sleep 5
-            done
-            if [ "$pushed" != 1 ]; then
-              echo "::warning::catch-up state push skipped after retries (non-fatal)"
-            fi
-          fi
+        # Union-merges dedup files (slot markers + ledger + topic history) with origin so
+        # nothing is lost to a push race, then pushes with retries. A lost "done" marker is
+        # what made catch-up regenerate done slots → duplicate uploads.
+        run: python pipeline/persist_state.py

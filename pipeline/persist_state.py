@@ -1,71 +1,89 @@
 #!/usr/bin/env python3
-"""Robustly persist the reel-poster's state to origin/main.
+"""Robustly persist data/state/*.json to origin/main — the ONE state-committer used
+by every workflow (poster, generation, catch-up, retry).
 
-WHY: the dedup ledger (posted_reels_log.json) lived in a single git commit bundled
-with the queue, and on a busy branch that commit's push kept LOSING the git race →
-the "already posted" record never reached origin → the poster re-fired the same reel
-(caused 45× and a repeat duplicate FB post).
+WHY: state lived in ad-hoc `git add data/state/*.json` commits on a busy branch. Those
+commits kept LOSING the git-push race, so dedup state never reached origin:
+  - posted_reels_log.json lost  → poster re-fired posted reels (45× + repeat FB dup)
+  - published_log.json lost      → catch-up/retry regenerated done slots → duplicate YT uploads
+  - viral_history lost           → same topic re-picked
 
-FIX: persist in two phases.
-  Phase 1 (CRITICAL): the LEDGER. Union-merge origin's ledger into local (so an entry
-    is NEVER lost), commit it ALONE, push with many retries. Because only the poster
-    writes this file (gen/catch-up no longer touch it) and posters are serialized, the
-    union-merge means the push lands cleanly — the dedup guarantee always reaches origin.
-  Phase 2 (best-effort): the QUEUE. Even if this loses the race, the ledger already
-    blocks any re-post, so a stale queue record is harmless (poster SKIPs + drops it).
+FIX: MONOTONIC files (the dedup guarantees — ledger, slot markers, topic history) are
+UNION-merged with origin on every attempt so an entry is NEVER lost, then pushed with many
+retries → they reliably land. MUTABLE files (queue, retry_queue — which legitimately remove
+entries) are pushed best-effort; the poster's url+slot-id dedup makes a stale queue harmless.
 
-Run from repo root after post_pending_reels.py.
+Usage: python pipeline/persist_state.py   (from repo root)
 """
-import json, os, subprocess, time
+import glob, json, os, subprocess, time
 
-LEDGER = "data/state/posted_reels_log.json"
-QUEUE = "data/state/pending_reels.json"
+STATE_DIR = "data/state"
+# Files that must never lose entries (dedup truth). Everything else = best-effort.
+def _is_monotonic(path):
+    b = os.path.basename(path)
+    return b in ("posted_reels_log.json", "published_log.json") or "history" in b
 
 
-def sh(*args):
-    return subprocess.run(args, capture_output=True, text=True)
+def sh(*a):
+    return subprocess.run(a, capture_output=True, text=True)
 
 
 def _jload(s):
     try:
-        return json.loads(s) if s.strip() else {}
+        return json.loads(s) if s and s.strip() else None
     except Exception:
-        return {}
+        return None
 
 
-def _push_one(path, label, tries, merge_ledger=False):
-    for i in range(1, tries + 1):
-        sh("git", "fetch", "origin", "main")
-        if merge_ledger:
-            # union: origin ∪ local — never drop a posted-url entry
-            remote = sh("git", "show", "origin/main:" + path).stdout
-            local = open(path).read() if os.path.exists(path) else "{}"
-            merged = _jload(remote)
-            merged.update(_jload(local))
-            json.dump(merged, open(path, "w"), ensure_ascii=False, indent=1)
-        sh("git", "add", path)
-        if sh("git", "diff", "--cached", "--quiet").returncode == 0:
-            print(f"[{label}] no changes")
-            return True
-        sh("git", "commit", "-m", f"auto: {label} [skip ci]")
-        if (sh("git", "pull", "--rebase", "--autostash", "origin", "main").returncode == 0
-                and sh("git", "push").returncode == 0):
-            print(f"[{label}] pushed (try {i})")
-            return True
-        sh("git", "rebase", "--abort")
-        print(f"[{label}] push race — retry {i}/{tries}")
-        time.sleep(4)
-    print(f"::error::[{label}] push FAILED after {tries} tries")
-    return False
+def _deep_union(remote, local):
+    """Combine so nothing from EITHER side is lost; local wins on leaf conflicts."""
+    if isinstance(remote, dict) and isinstance(local, dict):
+        out = dict(remote)
+        for k, v in local.items():
+            out[k] = _deep_union(remote[k], v) if k in remote else v
+        return out
+    if isinstance(remote, list) and isinstance(local, list):
+        seen, out = set(), []
+        for it in remote + local:
+            key = it.get("title") if isinstance(it, dict) and it.get("title") else json.dumps(it, sort_keys=True, ensure_ascii=False)
+            if key not in seen:
+                seen.add(key); out.append(it)
+        return out
+    return local if local is not None else remote
+
+
+def _merge_monotonic_into_local():
+    """For each monotonic file, rewrite local = origin ∪ local (never drop an entry)."""
+    for path in glob.glob(f"{STATE_DIR}/*.json"):
+        if not _is_monotonic(path):
+            continue
+        remote = _jload(sh("git", "show", f"origin/main:{path}").stdout)
+        local = _jload(open(path).read()) if os.path.exists(path) else None
+        if remote is None:
+            continue
+        merged = _deep_union(remote, local if local is not None else remote)
+        json.dump(merged, open(path, "w"), ensure_ascii=False, indent=1)
 
 
 def main():
     sh("git", "config", "user.email", "actions@github.com")
     sh("git", "config", "user.name", "github-actions[bot]")
-    # Phase 1: ledger MUST land (dedup guarantee).
-    _push_one(LEDGER, "posted-ledger", tries=15, merge_ledger=True)
-    # Phase 2: queue, best-effort.
-    _push_one(QUEUE, "reel-queue", tries=6)
+    for attempt in range(1, 16):
+        sh("git", "fetch", "origin", "main")
+        _merge_monotonic_into_local()          # re-union every attempt → entries never lost
+        sh("git", "add", STATE_DIR)
+        if sh("git", "diff", "--cached", "--quiet").returncode == 0:
+            print("[persist] no state changes")
+            return
+        sh("git", "commit", "-m", "auto: state [skip ci]")
+        if (sh("git", "pull", "--rebase", "--autostash", "origin", "main").returncode == 0
+                and sh("git", "push").returncode == 0):
+            print(f"[persist] state pushed (try {attempt})")
+            return
+        sh("git", "rebase", "--abort")
+        print(f"[persist] push race — retry {attempt}/15")
+        time.sleep(4)
+    print("::error::[persist] state push FAILED after 15 tries")
 
 
 if __name__ == "__main__":
