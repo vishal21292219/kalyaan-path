@@ -125,6 +125,10 @@ def main():
         recs = []
 
     posted_log = _load_posted()
+    # Slot-ids already posted (id = channel_<post_at>). Second dedup layer: if a reel
+    # was regenerated with a NEW url for an already-posted slot, the url won't be in the
+    # ledger but the id will → still skip. So a slot posts at most once.
+    posted_ids = {m.get("id") for m in posted_log.values() if isinstance(m, dict) and m.get("id")}
     n = _now()
     grace = datetime.timedelta(minutes=2)
     stale_cut = n - datetime.timedelta(days=1)
@@ -143,9 +147,10 @@ def main():
             continue  # malformed → drop
         url = r.get("video_url")
         channel = r.get("channel", "")
-        # Already fired this exact video before → never post it again (even if a
-        # previous dequeue failed to commit). Drop it from the queue silently.
-        if url and url in posted_log:
+        # Already posted this video URL, OR this slot-id was already posted → never
+        # post again (even if a previous dequeue failed to commit, or it was
+        # regenerated with a new url). Drop it from the queue silently.
+        if (url and url in posted_log) or (r.get("id") in posted_ids):
             skipped += 1
             print(f"[poster] SKIP already-posted {r.get('id')} ({channel})")
             continue

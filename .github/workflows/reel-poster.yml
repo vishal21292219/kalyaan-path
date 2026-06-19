@@ -39,17 +39,9 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python post_pending_reels.py
-      - name: Commit updated queue
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/state/pending_reels.json data/state/posted_reels_log.json || true
-          if ! git diff --cached --quiet; then
-            git commit -m "auto: reel queue update [skip ci]" || true
-            for i in 1 2 3; do
-              if git pull --rebase --autostash origin main && git push; then break; fi
-              echo "push retry $i…"; sleep 5
-            done
-          else
-            echo "no queue changes"
-          fi
+      - name: Persist state (ledger MUST land — dedup guarantee)
+        # Splits the ledger (critical, union-merged + 15 retries) from the queue
+        # (best-effort). The old single bundled commit kept losing the git-push race,
+        # so the "already posted" record never reached origin → the poster re-fired
+        # the same reel (45× + a repeat dup). Now the ledger reliably lands → no re-post.
+        run: python pipeline/persist_state.py
