@@ -1,88 +1,88 @@
 {
-  "2026-06-08": {
-    "bhakti_mantra_s0": true,
-    "godmind_trending_s1": true,
-    "bhakti_trending_s5": true,
-    "bhakti_trending_s6": true,
-    "bhakti_trending_s7": true,
-    "ancient_trending_s1": true,
-    "itihaas_trending_s3": true,
-    "itihaas_trending_s1": true,
-    "itihaas_series_s3": true,
-    "ancient_trending_s2": true,
-    "godmind_trending_s2": true
-  },
-  "2026-06-09": {
-    "bhajan_trending_s0": true,
-    "bhakti_trending_s8": true,
-    "godmind_trending_s1": true,
-    "ancient_trending_s1": true,
-    "itihaas_series_s3": true,
-    "itihaas_trending_s1": true,
-    "ancient_trending_s2": true,
-    "godmind_trending_s2": true,
-    "bhakti_mantra_s0": true
-  },
-  "2026-06-10": {
-    "ancient_trending_s1": true,
-    "itihaas_series_s3": true,
-    "itihaas_trending_s1": true,
-    "ancient_trending_s2": true
-  },
-  "2026-06-11": {
-    "ancient_trending_s2": true,
-    "itihaas_trending_s1": true,
-    "itihaas_series_s3": true,
-    "ancient_trending_s1": true
-  },
-  "2026-06-12": {
-    "ancient_trending_s1": true,
-    "itihaas_series_s3": true,
-    "itihaas_trending_s1": true,
-    "ancient_trending_s2": true
-  },
-  "2026-06-13": {
-    "itihaas_trending_s0": true,
-    "bhakti_mantra_s0": true,
-    "itihaas_series_s3": true,
-    "itihaas_trending_s1": true,
-    "ancient_trending_s1": true
-  },
-  "2026-06-14": {
-    "bhajan_trending_s0": true,
-    "bhakti_mantra_s0": true,
-    "itihaas_series_s3": true,
-    "itihaas_trending_s1": true,
-    "ancient_trending_s1": true
-  },
-  "2026-06-15": {
-    "ancient_trending_s1": true,
-    "bhakti_mantra_s0": true,
-    "godmind_trending_s2": true,
-    "itihaas_series_s3": true,
-    "itihaas_trending_s1": true,
-    "ancient_trending_s2": true
-  },
-  "2026-06-16": {
-    "ancient_trending_s1": true,
-    "bhakti_mantra_s0": true,
-    "itihaas_series_s3": true,
-    "ancient_trending_s2": true,
-    "godmind_trending_s2": true
-  },
-  "2026-06-17": {
-    "godmind_trending_s3": true,
-    "godmind_trending_s4": true,
-    "godmind_trending_s1": true,
-    "bhakti_mantra_s0": true
-  },
-  "2026-06-18": {
-    "godmind_trending_s3": true,
-    "godmind_trending_s2": "2026-06-18T18:22:12.450479+00:00",
-    "itihaas_series_s3": "2026-06-18T18:51:05.921669+00:00",
-    "ancient_trending_s2": "2026-06-18T20:13:37.057225+00:00",
-    "bhakti_mantra_s0": "2026-06-18T21:44:08.909808+00:00",
-    "ancient_trending_s1": "2026-06-18T21:50:12.248156+00:00",
-    "godmind_trending_s1": "2026-06-18T21:55:20.455157+00:00"
-  }
+ "2026-06-08": {
+  "bhakti_mantra_s0": true,
+  "godmind_trending_s1": true,
+  "bhakti_trending_s5": true,
+  "bhakti_trending_s6": true,
+  "bhakti_trending_s7": true,
+  "ancient_trending_s1": true,
+  "itihaas_trending_s3": true,
+  "itihaas_trending_s1": true,
+  "itihaas_series_s3": true,
+  "ancient_trending_s2": true,
+  "godmind_trending_s2": true
+ },
+ "2026-06-09": {
+  "bhajan_trending_s0": true,
+  "bhakti_trending_s8": true,
+  "godmind_trending_s1": true,
+  "ancient_trending_s1": true,
+  "itihaas_series_s3": true,
+  "itihaas_trending_s1": true,
+  "ancient_trending_s2": true,
+  "godmind_trending_s2": true,
+  "bhakti_mantra_s0": true
+ },
+ "2026-06-10": {
+  "ancient_trending_s1": true,
+  "itihaas_series_s3": true,
+  "itihaas_trending_s1": true,
+  "ancient_trending_s2": true
+ },
+ "2026-06-11": {
+  "ancient_trending_s2": true,
+  "itihaas_trending_s1": true,
+  "itihaas_series_s3": true,
+  "ancient_trending_s1": true
+ },
+ "2026-06-12": {
+  "ancient_trending_s1": true,
+  "itihaas_series_s3": true,
+  "itihaas_trending_s1": true,
+  "ancient_trending_s2": true
+ },
+ "2026-06-13": {
+  "itihaas_trending_s0": true,
+  "bhakti_mantra_s0": true,
+  "itihaas_series_s3": true,
+  "itihaas_trending_s1": true,
+  "ancient_trending_s1": true
+ },
+ "2026-06-14": {
+  "bhajan_trending_s0": true,
+  "bhakti_mantra_s0": true,
+  "itihaas_series_s3": true,
+  "itihaas_trending_s1": true,
+  "ancient_trending_s1": true
+ },
+ "2026-06-15": {
+  "ancient_trending_s1": true,
+  "bhakti_mantra_s0": true,
+  "godmind_trending_s2": true,
+  "itihaas_series_s3": true,
+  "itihaas_trending_s1": true,
+  "ancient_trending_s2": true
+ },
+ "2026-06-16": {
+  "ancient_trending_s1": true,
+  "bhakti_mantra_s0": true,
+  "itihaas_series_s3": true,
+  "ancient_trending_s2": true,
+  "godmind_trending_s2": true
+ },
+ "2026-06-17": {
+  "godmind_trending_s3": true,
+  "godmind_trending_s4": true,
+  "godmind_trending_s1": true,
+  "bhakti_mantra_s0": true
+ },
+ "2026-06-18": {
+  "godmind_trending_s3": true,
+  "godmind_trending_s2": "2026-06-18T18:22:12.450479+00:00",
+  "itihaas_series_s3": "2026-06-18T18:51:05.921669+00:00",
+  "ancient_trending_s2": "2026-06-18T20:13:37.057225+00:00",
+  "bhakti_mantra_s0": "2026-06-18T21:44:08.909808+00:00",
+  "ancient_trending_s1": "2026-06-18T21:50:12.248156+00:00",
+  "godmind_trending_s1": "2026-06-18T21:55:20.455157+00:00"
+ }
 }
