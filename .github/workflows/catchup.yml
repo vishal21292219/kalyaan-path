@@ -141,6 +141,9 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name  "github-actions[bot]"
           git add data/state/*.json || true
+          # CRITICAL: never commit the poster's dedup ledger (reverting it re-fires
+          # already-posted reels). The reel-poster is the only writer of this file.
+          git reset -q data/state/posted_reels_log.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "no state changes to commit"
           else
