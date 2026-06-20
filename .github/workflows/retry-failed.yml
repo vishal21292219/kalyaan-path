@@ -37,34 +37,64 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Restore secrets to .env + secrets/
+        # Mirrors daily-reels.yml so a retried slot publishes to every channel the
+        # primary run would (all YT channels incl godmind+moneurons + FB via Make).
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
           YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
           YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
+          YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
+          YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
+          YT_MONEURONS_TOKEN_JSON: ${{ secrets.YT_MONEURONS_TOKEN_JSON }}
+          YT_MONEURONS_CLIENT_SECRET_JSON: ${{ secrets.YT_MONEURONS_CLIENT_SECRET_JSON }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ID_ANCIENT: ${{ secrets.FB_PAGE_ID_ANCIENT }}
+          FB_PAGE_ID_MONEURONS: ${{ secrets.FB_PAGE_ID_MONEURONS }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
         run: |
           mkdir -p secrets
           [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
           [ -n "$YT_CLIENT_SECRET_JSON" ] && echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
           [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
           [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
+          [ -n "$YT_GODMIND_TOKEN_JSON" ] && echo "$YT_GODMIND_TOKEN_JSON" > secrets/godmind_youtube_token.json
+          [ -n "$YT_GODMIND_CLIENT_SECRET_JSON" ] && echo "$YT_GODMIND_CLIENT_SECRET_JSON" > secrets/godmind_youtube_client_secret.json
+          [ -n "$YT_MONEURONS_TOKEN_JSON" ] && echo "$YT_MONEURONS_TOKEN_JSON" > secrets/moneurons_youtube_token.json
+          [ -n "$YT_MONEURONS_CLIENT_SECRET_JSON" ] && echo "$YT_MONEURONS_CLIENT_SECRET_JSON" > secrets/moneurons_youtube_client_secret.json
           cat > .env <<EOF
+          ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
+          FAL_KEY=$FAL_KEY
           GEMINI_API_KEY=$GEMINI_API_KEY
           HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN
           GROQ_API_KEY=$GROQ_API_KEY
           ELEVENLABS_API_KEY=$ELEVENLABS_API_KEY
           TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
           TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
+          PEXELS_API_KEY=$PEXELS_API_KEY
+          FB_PAGE_ID=$FB_PAGE_ID
+          FB_PAGE_ID_ANCIENT=$FB_PAGE_ID_ANCIENT
+          FB_PAGE_ID_MONEURONS=$FB_PAGE_ID_MONEURONS
           IG_USER_ID=$IG_USER_ID
           IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
+          CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
+          CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
+          CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
+          MAKE_REEL_WEBHOOK=$MAKE_REEL_WEBHOOK
           EOF
 
       - name: Process retry queue

@@ -40,15 +40,20 @@ from pipeline.publish_log import last_published
 # KEEP IN SYNC with the active crons in .github/workflows/daily-reels.yml. The
 # GodsOfTheMind (godmind) slots are the busiest channel and MUST be covered here
 # — a skipped GoM generation cron is otherwise unrecoverable.
+# FOCUS (2026-06-20): only the 3 active channels — TimeDecoders (ancient),
+# GodsOfTheMind (godmind), Money Neurons (moneurons), each x3 daily slots.
+# Itihaasvani / KalyaanPath (mantra) / bhajan are HELD → intentionally NOT
+# recovered (leaving them in would make catch-up resurrect held channels daily).
 SLOTS = [
-    ("bhakti",  "mantra",   0, "publish",  15, 32, None),  # daily-reels.yml cron 32 15
-    ("itihaas", "series",   3, "telegram", 16,  0, None),  # cron 0 16
-    ("ancient", "trending", 1, "publish",  15, 37, None),  # cron 37 15
-    ("ancient", "trending", 2, "publish",  16, 42, None),  # cron 42 16
-    ("godmind", "trending", 1, "publish",  12,  0, None),  # cron 0 12  → go-live 17:00 UTC (5h buffer)
-    ("godmind", "trending", 2, "publish",  15,  0, None),  # cron 0 15  → go-live 21:00 UTC (6h buffer)
-    ("godmind", "trending", 3, "publish",  19,  0, None),  # cron 0 19  → go-live 01:00 UTC next day (6h buffer)
-    ("bhajan",  "trending", 0, "publish",  10,  0, 6),     # cron 0 10 Sun only
+    ("ancient",   "trending", 1, "publish", 15, 37, None),  # cron 37 15 → go-live 18:00 UTC / 2 PM ET
+    ("ancient",   "trending", 2, "publish", 16, 42, None),  # cron 42 16 → go-live 00:00 UTC / 8 PM ET
+    ("ancient",   "trending", 3, "publish", 17, 45, None),  # cron 45 17 → go-live 21:00 UTC / 5 PM ET
+    ("godmind",   "trending", 1, "publish", 12,  0, None),  # cron 0 12  → go-live 17:00 UTC / 1 PM ET
+    ("godmind",   "trending", 2, "publish", 15,  0, None),  # cron 0 15  → go-live 21:00 UTC / 5 PM ET
+    ("godmind",   "trending", 3, "publish", 19,  0, None),  # cron 0 19  → go-live 01:00 UTC / 9 PM ET
+    ("moneurons", "trending", 1, "publish", 12, 25, None),  # cron 25 12 → go-live 17:00 UTC / 1 PM ET
+    ("moneurons", "trending", 2, "publish", 16,  5, None),  # cron 5 16  → go-live 22:00 UTC / 6 PM ET
+    ("moneurons", "trending", 3, "publish", 19, 25, None),  # cron 25 19 → go-live 01:00 UTC / 9 PM ET
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled

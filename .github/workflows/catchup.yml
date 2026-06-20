@@ -68,6 +68,8 @@ jobs:
           YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
           YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
           YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
+          YT_MONEURONS_TOKEN_JSON: ${{ secrets.YT_MONEURONS_TOKEN_JSON }}
+          YT_MONEURONS_CLIENT_SECRET_JSON: ${{ secrets.YT_MONEURONS_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -84,6 +86,7 @@ jobs:
           FB_PAGE_TOKEN_BHAKTI: ${{ secrets.FB_PAGE_TOKEN_BHAKTI }}
           FB_PAGE_ID_ITIHAAS: ${{ secrets.FB_PAGE_ID_ITIHAAS }}
           FB_PAGE_TOKEN_ITIHAAS: ${{ secrets.FB_PAGE_TOKEN_ITIHAAS }}
+          FB_PAGE_ID_MONEURONS: ${{ secrets.FB_PAGE_ID_MONEURONS }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -101,6 +104,8 @@ jobs:
           [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
           [ -n "$YT_GODMIND_TOKEN_JSON" ] && echo "$YT_GODMIND_TOKEN_JSON" > secrets/godmind_youtube_token.json
           [ -n "$YT_GODMIND_CLIENT_SECRET_JSON" ] && echo "$YT_GODMIND_CLIENT_SECRET_JSON" > secrets/godmind_youtube_client_secret.json
+          [ -n "$YT_MONEURONS_TOKEN_JSON" ] && echo "$YT_MONEURONS_TOKEN_JSON" > secrets/moneurons_youtube_token.json
+          [ -n "$YT_MONEURONS_CLIENT_SECRET_JSON" ] && echo "$YT_MONEURONS_CLIENT_SECRET_JSON" > secrets/moneurons_youtube_client_secret.json
           cat > .env <<EOF
           ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
           FAL_KEY=$FAL_KEY
@@ -118,6 +123,7 @@ jobs:
           FB_PAGE_TOKEN_BHAKTI=$FB_PAGE_TOKEN_BHAKTI
           FB_PAGE_ID_ITIHAAS=$FB_PAGE_ID_ITIHAAS
           FB_PAGE_TOKEN_ITIHAAS=$FB_PAGE_TOKEN_ITIHAAS
+          FB_PAGE_ID_MONEURONS=$FB_PAGE_ID_MONEURONS
           IG_USER_ID=$IG_USER_ID
           IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
           PEXELS_API_KEY=$PEXELS_API_KEY
