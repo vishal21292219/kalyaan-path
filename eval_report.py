@@ -32,6 +32,7 @@ CHANNELS = {
     "TimeDecoders":  {"tok": "YT_ANCIENT_TOKEN_JSON",  "cs": "YT_ANCIENT_CLIENT_SECRET_JSON",  "yt": "@TimeDecoders",   "fb": "1249630111558028", "slots": ["18:00", "00:00"]},
     "Itihaasvani":   {"tok": "YT_ITIHAAS_TOKEN_JSON",  "cs": "YT_ITIHAAS_CLIENT_SECRET_JSON",  "yt": "@Itihaasvani",    "fb": "1063760053496823", "slots": ["03:00", "14:30"]},
     "GodsOfTheMind": {"tok": "YT_GODMIND_TOKEN_JSON",  "cs": "YT_GODMIND_CLIENT_SECRET_JSON",  "yt": "@GodsOfTheMind",  "fb": "1113214471881336", "slots": ["17:00", "23:00", "01:00"]},
+    "MoneyNeurons":  {"tok": "YT_MONEURONS_TOKEN_JSON","cs": "YT_MONEURONS_CLIENT_SECRET_JSON","yt": "@moneurons",      "fb": "61590740474028",  "slots": ["17:00", "22:00", "01:00"]},
     "Lakeerein":     {"tok": "YT_LAKEEREIN_TOKEN_JSON","cs": "YT_LAKEEREIN_CLIENT_SECRET_JSON","yt": "@LakeereinStories","fb": "1143850345480290","slots": ["15:00"]},
 }
 APIFY = os.getenv("APIFY_TOKEN")
@@ -270,6 +271,33 @@ def tg_send(text):
             print(f"[eval] tg chunk {i} error: {e}")
 
 
+def discord_send(text):
+    """Deliver the report to Discord (Telegram replacement — banned in India).
+    Full report as a .txt attachment + chunked inline (Discord 2000-char cap)."""
+    hook = (os.getenv("DISCORD_WEBHOOK") or "").strip()
+    if not hook:
+        print("[eval] no DISCORD_WEBHOOK"); return
+    try:
+        requests.post(hook, data={"content": "📊 **Weekly Eval Report** (full — open file)"},
+                      files={"file": ("eval_report.txt", text.encode("utf-8"))}, timeout=60)
+    except Exception as e:
+        print("[eval] discord file failed:", e)
+    chunks, cur = [], ""
+    for line in text.split("\n"):
+        if len(cur) + len(line) + 1 > 1800:
+            chunks.append(cur); cur = ""
+        cur += line + "\n"
+    if cur:
+        chunks.append(cur)
+    for i, c in enumerate(chunks):
+        try:
+            r = requests.post(hook, json={"content": c}, timeout=60)
+            if r.status_code not in (200, 204):
+                print(f"[eval] discord chunk {i} FAILED: {r.status_code} {r.text[:160]}")
+        except Exception as e:
+            print(f"[eval] discord chunk {i} error: {e}")
+
+
 def main():
     prev_all = {}
     if SNAP.exists():
@@ -348,7 +376,9 @@ def main():
     if not os.getenv("APIFY_TOKEN"):
         L.append("ℹ️ FB/IG metrics off — add APIFY_TOKEN secret to enable.")
 
-    tg_send("\n".join(L))
+    report = "\n".join(L)
+    discord_send(report)   # primary (Telegram banned in India)
+    tg_send(report)        # legacy — no-ops if Telegram creds unset
 
     # save snapshot
     SNAP.parent.mkdir(parents=True, exist_ok=True)

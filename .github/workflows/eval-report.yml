@@ -1,4 +1,4 @@
-name: Eval Report (weekly → Telegram)
+name: Eval Report (weekly → Discord)
 
 # Weekly performance review of all YT channels (+ FB if APIFY_TOKEN): subs/views
 # trends, uploads, schedule correctness, duplicate detection, Claude action items.
@@ -30,11 +30,14 @@ jobs:
           YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
           YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
           YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
+          YT_MONEURONS_TOKEN_JSON: ${{ secrets.YT_MONEURONS_TOKEN_JSON }}
+          YT_MONEURONS_CLIENT_SECRET_JSON: ${{ secrets.YT_MONEURONS_CLIENT_SECRET_JSON }}
           YT_LAKEEREIN_TOKEN_JSON: ${{ secrets.YT_LAKEEREIN_TOKEN_JSON }}
           YT_LAKEEREIN_CLIENT_SECRET_JSON: ${{ secrets.YT_LAKEEREIN_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: python eval_report.py
       - name: Commit snapshot
