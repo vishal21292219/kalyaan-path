@@ -66,6 +66,7 @@ jobs:
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           mkdir -p secrets
           [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
@@ -95,6 +96,7 @@ jobs:
           CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
           CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
           MAKE_REEL_WEBHOOK=$MAKE_REEL_WEBHOOK
+          DISCORD_WEBHOOK=$DISCORD_WEBHOOK
           EOF
 
       - name: Process retry queue

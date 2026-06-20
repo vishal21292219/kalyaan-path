@@ -662,6 +662,12 @@ def main(argv: list[str]) -> int:
             print(f"[catchup] marked {args.niche}/{args.kind} s{args.seed_offset} as delivered today")
         except Exception:
             traceback.print_exc()
+        # Discord alert (Telegram replacement) — fire-and-forget, never breaks a run.
+        try:
+            from pipeline.notifier_discord import alert as _dc_alert
+            _dc_alert(f"✅ **{args.niche}** s{args.seed_offset} posted: {script.get('title','')}")
+        except Exception:
+            pass
 
     return 0
 
@@ -820,4 +826,20 @@ def _run_bhajan(args) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    _argv = sys.argv[1:]
+    try:
+        _rc = main(_argv)
+    except Exception as _e:
+        try:
+            from pipeline.notifier_discord import alert as _dc_alert
+            _dc_alert(f"❌ run.py CRASHED: {type(_e).__name__}: {_e}\nargs: {' '.join(_argv)}")
+        except Exception:
+            pass
+        raise
+    if _rc not in (0, None):
+        try:
+            from pipeline.notifier_discord import alert as _dc_alert
+            _dc_alert(f"⚠️ run.py exited rc={_rc} (will be retried/recovered)\nargs: {' '.join(_argv)}")
+        except Exception:
+            pass
+    sys.exit(_rc)
