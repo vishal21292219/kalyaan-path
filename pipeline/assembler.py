@@ -11,6 +11,7 @@ Steps:
 """
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import textwrap
@@ -765,9 +766,14 @@ def assemble(
             PHRASE_WORDS_TARGET = 4   # words per caption chunk
             PHRASE_WORDS_MAX = 6      # hard cap before forced break
             PUNCT_BREAK = set(".!?,;:।")
+            # Per-channel opt-in: video.caption_style: phrase → persistent ~4-word
+            # white+yellow captions (no single-word flicker, no blank gaps during
+            # speech pauses). Recommended for talking/story Shorts (e.g. Money
+            # Neurons). Default (unset) keeps the word-by-word style.
+            _force_phrase = str(cfg.get("video", {}).get("caption_style", "")).lower() == "phrase"
 
-            if boundaries and len(boundaries) > MAX_WORDS_FOR_PER_WORD:
-                print(f"[captions] {len(boundaries)} words > {MAX_WORDS_FOR_PER_WORD} — grouping into phrases (long-form mode)")
+            if boundaries and (_force_phrase or len(boundaries) > MAX_WORDS_FOR_PER_WORD):
+                print(f"[captions] phrase mode ({'forced via config' if _force_phrase else f'{len(boundaries)} words > {MAX_WORDS_FOR_PER_WORD}'}) — grouping into persistent phrases")
                 phrases = []
                 buf, buf_start = [], None
                 for b in boundaries:
@@ -829,28 +835,25 @@ def assemble(
                     _render_word_png(word, word_font_size, color, png,
                                      stroke_w=stroke_w, glow=glow)
 
-                    # Time window: pad slightly on both sides for readability
+                    # Time window: each word stays on screen UNTIL the next word
+                    # begins, so there are NO blank gaps during speech pauses (the
+                    # old `min(end+0.05, next-0.005)` left captions flickering off
+                    # whenever the narrator paused). One word is always visible.
                     word_start = max(0.0, b["start"] - 0.05)
-                    word_end = b["end"] + 0.05
                     if i + 1 < len(boundaries):
-                        word_end = min(word_end, boundaries[i + 1]["start"] - 0.005)
+                        word_end = boundaries[i + 1]["start"] - 0.005
+                    else:
+                        word_end = b["end"] + 0.6
                     if word_end - word_start < 0.18:
                         word_end = word_start + 0.18
 
-                    inputs += ["-i", str(png)]
-                    overlay_idx += 1
-                    out_lbl = f"v{overlay_idx}"
-                    # FIXED Y position — bounce-in animation reverted because user
-                    # reported caption desync. Static position is proven reliable.
-                    # Re-enable bounce only after we have a way to verify it works.
-                    ws = f"{word_start:.3f}"
-                    we = f"{word_end:.3f}"
-                    chain_parts.append(
-                        f"[{prev}][{overlay_idx}:v]overlay="
-                        f"x=(W-w)/2:y=H*0.62-h/2:"
-                        f"enable='between(t\\,{ws}\\,{we})'[{out_lbl}]"
-                    )
-                    prev = out_lbl
+                    # Apply word overlays via the SAME ffmpeg-safe BATCHED applier
+                    # as phrase mode (max 30 overlays per pass). A single
+                    # filter_complex with 130+ word overlays SILENTLY drops ALL
+                    # captions on real ffmpeg builds (observed: 120 words OK, 146
+                    # words → blank). Batching makes captions bulletproof at any
+                    # word count.
+                    phrase_batch_entries.append((png, word_start, word_end))
                 used_words = True
 
         if not used_words:
@@ -998,7 +1001,8 @@ def assemble(
                 "-shortest", str(out_video),
             ])
 
-    shutil.rmtree(work, ignore_errors=True)
+    if not os.environ.get("KEEP_WORK"):
+        shutil.rmtree(work, ignore_errors=True)
     return out_video
 
 

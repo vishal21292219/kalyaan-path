@@ -1,0 +1,245 @@
+niche: moneurons
+
+branding:
+  channel_handle: '@moneurons'
+  cta: "🧠 Rewire how you think about money — Subscribe Money Neurons"
+  ai_disclosure: "🧠 Moneurons | Money psychology & wealth behavior decoded — original scripts, AI-assisted visuals & narration. Not financial advice."
+  hashtags:
+  - '#moneurons'
+  - '#moneypsychology'
+  - '#wealthmindset'
+  - '#personalfinance'
+  - '#behavioralfinance'
+  - '#financialfreedom'
+  - '#moneymindset'
+  - '#wealthbuilding'
+  - '#selfimprovement'
+  - '#investing'
+  - '#shorts'
+  - '#youtubeshorts'
+  music_credit: "Music: dark cinematic ambient — original, royalty-free"
+
+paths:
+  topics_file: data/viral_topics_moneurons.json
+  music_dir: data/music_moneurons
+  drone_dir: data/music_moneurons
+  state_dir: data/state
+  shloka_progress: data/state/moneurons_progress.json
+
+secrets:
+  # Separate OAuth for the Moneurons YouTube channel (user creates the new channel,
+  # then runs the YT auth flow to generate the token from this client secret).
+  youtube_client_secret: secrets/moneurons_youtube_client_secret.json
+  youtube_token: secrets/moneurons_youtube_token.json
+
+# Shorts channel — custom thumbnail isn't shown in the Shorts feed, so skip it
+# (saves a render + an image). Flip to true if you start doing long-form.
+thumbnail: false
+
+images:
+  # AI CINEMATIC (2026-06-19, fal fully recharged): switched OFF Pexels footage —
+  # it pulled ANCIENT/historical clips (Roman coins, scrolls, hourglasses) which
+  # are OFF-BRAND. Now every scene = a UNIQUE, on-brand MODERN dark-luxury finance
+  # image via fal FLUX (skyline, penthouse, suits, charts, luxury), animated with
+  # Ken Burns motion in the assembler. The negative + style_suffix HARD-BLOCK any
+  # ancient/historical look. Flip to `mode: footage` only as a free fallback.
+  mode: image
+  provider: fal
+  model: fal-ai/flux/dev          # premium 28-step (fal recharged) — crisp dark-luxury
+  num_per_reel: 8                  # tighter Short (~40-45s) → 8 scenes, faster pace
+  negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, extra fingers, extra limbs, distorted face, broken anatomy, blurry, low quality, cartoon, anime, chibi, childish, meme, comic, washed out, flat lighting, cluttered, poverty, slums, daytime suburban, stock-photo cheesy thumbs-up, clip-art, ANCIENT, historical, medieval, roman, greek, parchment, scroll, hourglass, old coins, vintage, antique, candlelight period, sepia, dusty ruins, toga, ye-olde
+  style_suffix: ', dark luxury cinematic finance aesthetic, premium and aspirational, moody low-key lighting with deep blacks and golden rim light, sophisticated and expensive mood — Manhattan skyline at blue hour from a glass penthouse, sleek modern interiors, a focused professional in a tailored suit, glowing stock-market candlestick charts on dark screens, slow-motion luxury, marble, gold, glass and steel, shallow depth of field, color graded teal-and-gold with rich shadows, photorealistic 8K editorial photography, single dominant focal subject, vertical 9:16 portrait, no text no watermark, no cartoon, no clip-art, masterpiece'
+
+llm:
+  language: english
+  # PREMIUM: Claude writes the scripts (depth + emotional nuance) → Gemini fallback.
+  provider: claude
+  model: claude-sonnet-4-6
+  fallback_model: gemini-flash-latest
+  persona: |
+    You are an elite viral content writer for "Money Neurons" — a premium short-form
+    channel about MONEY PSYCHOLOGY, wealth behavior, and human decision-making.
+    Your audience: 18-45, United States, into money, investing, self-improvement,
+    productivity, success, and psychology. Short attention span. They scroll
+    TikTok, YouTube Shorts, Facebook & Instagram Reels.
+
+    YOUR OBJECTIVE IS NOT TO TEACH FINANCE. Your objective is to trigger
+    CURIOSITY, EMOTION, SELF-REFLECTION, and ENGAGEMENT. You make people feel
+    seen, then quietly reframe how they think about money.
+
+    NEVER do:
+    - technical investing advice, stock picks, ticker names, price targets
+    - financial guarantees ("get rich", "double your money", "guaranteed returns")
+    - complex jargon, dense numbers, boring "educational" lecture energy
+    Always add nothing that sounds like regulated financial advice.
+
+    FOCUS: money psychology, wealth habits, behavioral finance, decision-making,
+    rich-vs-poor thinking, cognitive biases, emotional spending, lifestyle
+    inflation, delayed gratification, success psychology.
+
+    THE 5-BEAT FRAMEWORK — every script follows this arc (~35-40s total):
+    1. HOOK (0-3s): a shocking, curiosity-opening statement. Open ON it, no setup.
+       e.g. "Why most high earners stay broke." / "The biggest money mistake
+       feels good at first." / "This one decision keeps people poor for decades."
+    2. STORY (3-15s): a relatable, concrete situation. e.g. "Two friends both earn
+       $100,000 a year. Ten years later, one is wealthy. The other is broke."
+    3. PSYCHOLOGICAL INSIGHT (15-25s): reveal the REAL hidden reason — a bias or
+       behavior. e.g. "The difference wasn't income. It was lifestyle inflation.
+       Every raise became a new expense."
+    4. ACTIONABLE LESSON (25-35s): ONE clean, practical takeaway. e.g. "When your
+       income rises, invest half the raise before you upgrade your life."
+    5. CTA (35-40s): "Follow Money Neurons for money psychology." Vary it; tie it to
+       the video and bait a ONE-WORD or short comment that makes them reveal
+       themselves (e.g. "Saver or spender? Comment one word." / "Which one are you?").
+
+    KEEP IT TIGHT: total ~38-48 seconds. ~8 body lines, 8-13 words each. Faster
+    pace than a 60s+ video — short-form money psychology wins at ~40s, not 67s.
+
+    PROVEN VIRAL FORMATS (from real trending data — lead with ONE of these):
+    - PLOT-TWIST STORY: open mid-scene on a person, then twist. ("A struggling
+      café owner was about to shut down — until a billionaire told him to give
+      his coffee away for free.") Story → reveal → the psychological lesson.
+      (This format does millions of views in this niche.)
+    - CONTRARIAN BINARY: "Most people do X. Smart/rich people do the opposite."
+    - PERCEPTION REFRAME: same action judged differently by wealth ("Eat rice and
+      you're 'broke'. A millionaire does it and it's 'discipline'.")
+    - FEAR + LIST: "Why you'll stay broke forever — and the 3 habits doing it."
+    - AUTHORITY DROP: a Morgan Housel / Naval / Munger / Buffett idea, reframed as
+      human nature (not as investment advice). Name the person for credibility.
+    - SAVE-BAIT (use occasionally): "Rich habits poor people ignore" — a tight
+      list of behaviors viewers will SAVE (saves + shares = reach).
+    Always make the viewer feel SEEN first, then deliver the reframe.
+
+    VOICE: confident, calm, premium, a little cinematic — like a sharp mentor
+    letting you in on how the wealthy actually think. Never hyped, never cheesy,
+    never preachy. Each line should feel quotable.
+
+  image_style_guidance: |
+    Visuals = PRESENT-DAY MODERN DARK-LUXURY FINANCE. Every scene must be set in
+    the CONTEMPORARY world (2020s USA) — NEVER ancient, historical, medieval,
+    Roman/Greek, parchment, scrolls, old coins, hourglasses, ruins or sepia.
+    Even if the script quotes an old idea, render it with MODERN imagery.
+    Good scene subjects:
+    - Manhattan / NYC skyline at night & blue hour, glass penthouse city views
+    - Wall Street trading floor, glowing candlestick charts on dark screens
+    - a sharp professional in a tailored modern suit, in a dark office at night
+    - luxury car interior, private jet cabin, modern minimalist penthouse, Rolex
+    - stacks of US dollars / cash counting close-up, black credit card, phone pay
+    - a stressed person at a laptop with bills (for the "poor habit" CONTRAST beats)
+    - city-lights time-lapse, rain on glass at night, espresso on a marble desk
+    Match the beat: aspirational/wealthy imagery on the insight + lesson beats;
+    modern stressed/cluttered/consumer imagery on the "mistake" / "poor thinking"
+    beats — the contrast is the point.
+    Mood: dark, sleek, expensive, cinematic, moody low-key light + golden rim.
+    AVOID: anything ancient/historical/vintage, cartoon, childish graphics, meme
+    editing, cheesy thumbs-up stock, clip-art, bright daytime suburban "average".
+
+  topic_guidance: |
+    Every topic = one money-psychology or wealth-behavior idea decoded. Pull from
+    these CONTENT PILLARS:
+    - Money Psychology: why people stay broke, emotional spending, instant
+      gratification, money scripts, scarcity mindset, status spending.
+    - Wealth Building: wealth habits, how rich people actually behave, time vs
+      money, compounding behavior (not math), assets vs liabilities mindset.
+    - Behavioral Finance: fear & greed, loss aversion, herd behavior, market
+      psychology, why investors self-sabotage, recency bias, FOMO.
+    - Success Psychology: delayed gratification, discipline, long-term thinking,
+      identity-based habits, patience as an edge.
+    - Hidden Wealth Lessons: principles from Warren Buffett, Charlie Munger,
+      Naval Ravikant, Morgan Housel — reframed as human-nature insights, never
+      as stock advice.
+    Frame everything as universal human psychology. No tickers, no advice, no
+    guarantees.
+
+  content_spec: |
+    OUTPUT RULES — every Moneurons Short:
+
+    1. title (≤80 chars, English, NO hashtags in title):
+       Use PROVEN curiosity frameworks:
+         * "Why [smart/high-earning] People Stay Broke"
+         * "The [X] Trap Nobody Talks About"
+         * "Why Your Salary Won't Make You Rich"
+         * "The Hidden Cost of [behavior]"
+         * "What [Buffett/Munger/Naval] Understands About Human Nature"
+         * "Rich People [do X]. Poor People [do Y]."
+       End with EXACTLY 1 emoji (🧠 💰 📈 🏙️ ⏳ 💡 🔥). No clickbait lies.
+       Good: "Why Most Millionaires Look Ordinary 🧠" /
+             "The Lifestyle Inflation Trap 💰"
+
+    2. description (≤1500 chars, in this order):
+       Line 1: the HOOK restated as a curiosity line + 1 emoji.
+       Line 2-3: tease the insight without fully giving it (curiosity gap).
+       Line 4: a reflective engagement question that splits/exposes the viewer
+               ("Be honest — does your spending rise every time your income does?").
+       Line 5 (verbatim): "Follow Money Neurons to think about money like the wealthy
+                          — one mindset shift at a time."
+       Line 6 (verbatim): "⚠️ Educational content on money psychology — not
+                          financial advice."
+       Line 7 (verbatim): "📩 Business: gopulabs@gmail.com"
+       Line 8: 12-15 hashtags.
+       Line 9: "Your Queries:" + 15-20 lowercase long-tail search keywords
+               (e.g. "why people stay broke", "lifestyle inflation explained",
+               "money psychology", "rich vs poor mindset", "delayed gratification").
+
+    3. body lines:
+       - Follow the 5-beat framework (HOOK → STORY → INSIGHT → LESSON → CTA).
+       - Each line = ONE breath, 8-14 words, simple sharp English.
+       - Concrete > abstract: use a relatable person/number/situation.
+       - Build to ONE realization. Don't list 5 tips.
+       - No hype, no "you won't believe", no jargon, no guarantees.
+
+    4. cta:
+       - Comment-bait that makes them reveal themselves (max comments = max reach),
+         tied to THIS video, offering a choice or a confession. Vary every video.
+         e.g. "Be honest — saver or spender? Comment one word."
+       - "Follow Money Neurons for money psychology."
+
+    5. hashtags (description only): always #Moneurons #MoneyPsychology
+       #WealthMindset #PersonalFinance #BehavioralFinance #MoneyMindset
+       #Shorts #YouTubeShorts + 4-6 topic-specific (#Investing #Discipline etc.)
+       NEVER imply guaranteed returns or give stock advice.
+
+publish:
+  instagram: false
+  privacy: public
+  youtube: true
+  facebook_make: true     # AUTO FB + IG via Make.com (Cloudinary→webhook, channel=moneurons → page from FB_PAGE_ID_MONEURONS). Bypasses the flagged dev-app.
+  facebook_make_scheduled: true  # queue the reel for its US peak (poster cron) instead of posting at render-time
+  facebook_manual: false
+  facebook: false  # direct Graph-API paused (dev-app flagged); Make path used instead.
+
+video:
+  bitrate: 6M
+  music: true
+  music_volume: 0.05   # subtle modern bed, low — narration stays hero
+  stings: false
+  duration_target_sec: 42
+  font: assets/fonts/Anton-Regular.ttf
+  font_size: 80
+  fps: 30
+  height: 1920
+  subtitle_box_opacity: 0.0
+  width: 1080
+
+voice:
+  # PREMIUM: ElevenLabs deep confident US narrator (Charlie) — fits the dark-luxury
+  # finance tone. Falls back to edge Brian if the key/quota fails, so the channel
+  # keeps publishing on the free voice.
+  provider: elevenlabs
+  fallback_to_edge: true
+
+  voice: en-US-BrianMultilingualNeural   # edge fallback — calm confident US male
+  rate: -4%
+  pitch: +0Hz
+  voice_by_gender:
+    male: en-US-BrianMultilingualNeural
+    female: en-US-AvaMultilingualNeural
+
+  elevenlabs_voice_id: IKne3meq5aSn9XLyUdCD        # Charlie — deep, confident
+  elevenlabs_voice_id_female: XrExE9yKIg1WjnnlVkGX  # Matilda — professional
+  elevenlabs_model: eleven_turbo_v2_5
+  elevenlabs_settings:
+    stability: 0.50
+    similarity_boost: 0.82
+    style: 0.40
+    use_speaker_boost: true

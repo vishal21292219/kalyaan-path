@@ -28,16 +28,18 @@ on:
     # 9:00-9:30 PM IST window (15:32-16:00 UTC) so every video lands on Telegram
     # together that night — user schedules all the FB posts in one sitting. Each
     # video's YouTube go-live (publishAt) stays at its own optimal slot.
-    - cron: "0 16 * * *"    # 9:30 PM IST → Itihaasvani SERIES (go-live ~8 PM IST next day)
-    - cron: "32 15 * * *"   # 9:02 PM IST → KalyaanPath mantra (go-live 7 AM IST next day)
-    # KalyaanPath SUNDAY BHAJAN — its top-performing format (Vrindavan Bhajan =
-    # 843 views, channel best). Music-heavy MP3 → video, auto-pick next unused
-    # bhajan from data/music_bhajan/. Sunday evening prime.
-    - cron: "0 10 * * 0"        # Sun: generate ~10:00 UTC → scheduled go-live 13:30 UTC (~7 PM IST)
-    # REVIVED 2026-05-31: B-roll pivot (real Pexels stock footage, not AI slideshow).
-    # TimeDecoders now auto-publishes to YouTube (OAuth wired).
-    - cron: "37 15 * * *"   # 9:07 PM IST → TimeDecoders #1 (go-live 18:00 UTC / 2 PM ET)
-    - cron: "42 16 * * *"   # 10:12 PM IST → TimeDecoders #2 (1h after #1 so #1's dedup/topic state persists first → no repeat/dup; go-live 00:00 UTC / 8 PM ET PRIME)
+    # ===== HELD 2026-06-20 (per user — FOCUS on GoM + TD + MN only) =====
+    # Itihaasvani, KalyaanPath (mantra+bhajan), Lakeerein paused. Configs/code
+    # untouched — just re-enable these crons to bring them back.
+    # - cron: "0 16 * * *"    # Itihaasvani SERIES — HELD
+    # - cron: "32 15 * * *"   # KalyaanPath mantra — HELD
+    # - cron: "0 10 * * 0"    # KalyaanPath Sunday Bhajan — HELD
+    # ===================================================================
+    # TimeDecoders (English ancient mysteries): 3/day. Each gen ~1h apart so the
+    # prior run's dedup/topic state persists first → NO duplicate topics.
+    - cron: "37 15 * * *"   # TimeDecoders #1 (seed1, go-live 18:00 UTC / 2 PM ET)
+    - cron: "42 16 * * *"   # TimeDecoders #2 (seed2, go-live 00:00 UTC / 8 PM ET PRIME)
+    - cron: "45 17 * * *"   # TimeDecoders #3 (seed3, go-live 21:00 UTC / 5 PM ET)
     # GodsOfTheMind (English god-psychology): 3/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
     # GoM generates with a BIG 5-6h BUFFER before its peak (SOP G3 — "no missed
@@ -49,7 +51,12 @@ on:
     - cron: "0 12 * * *"    # gen 12:00 UTC → peak 17:00 UTC / 1 PM ET (5h buffer)   [GoM #1]
     - cron: "0 15 * * *"    # gen 15:00 UTC → peak 21:00 UTC / 5 PM ET (6h buffer)   [GoM #2]
     - cron: "0 19 * * *"    # gen 19:00 UTC → peak 01:00 UTC / 9 PM ET (6h buffer)   [GoM #3]
-    - cron: "0 11 * * 6"    # fire 16:30 IST Sat = 11:00 UTC Sat → ITIHAASVANI LONG-FORM TG drop ~18:00 IST Sat → user schedules YT for Sat 22:00 IST (Hindi long-form prime time)
+    # Money Neurons (MN — US money-psychology): 3/day, big buffer → publishAt peaks.
+    # Gens staggered from GoM minutes + ≥3h apart same-niche → no collision / no dup.
+    - cron: "25 12 * * *"   # gen 12:25 UTC → peak 17:00 UTC / 1 PM ET   [MN #1 seed1]
+    - cron: "5 16 * * *"    # gen 16:05 UTC → peak 22:00 UTC / 6 PM ET   [MN #2 seed2]
+    - cron: "25 19 * * *"   # gen 19:25 UTC → peak 01:00 UTC / 9 PM ET   [MN #3 seed3]
+    # - cron: "0 11 * * 6"    # Itihaasvani Saturday LONG-FORM — HELD 2026-06-20
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
     # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — DISABLED 2026-06-09: the katha
     # is PRE-SCHEDULED instead (uploaded private now with publishAt=15-Jun 01:30 UTC
@@ -63,7 +70,7 @@ on:
         required: true
         default: "itihaas"
         type: choice
-        options: [bhakti, itihaas, ancient, bhajan, godmind]
+        options: [bhakti, itihaas, ancient, bhajan, godmind, moneurons]
       kind:
         description: "Which kind"
         required: true
@@ -145,6 +152,8 @@ jobs:
           YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
           YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
           YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
+          YT_MONEURONS_TOKEN_JSON: ${{ secrets.YT_MONEURONS_TOKEN_JSON }}
+          YT_MONEURONS_CLIENT_SECRET_JSON: ${{ secrets.YT_MONEURONS_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -161,6 +170,7 @@ jobs:
           FB_PAGE_TOKEN_BHAKTI: ${{ secrets.FB_PAGE_TOKEN_BHAKTI }}
           FB_PAGE_ID_ITIHAAS: ${{ secrets.FB_PAGE_ID_ITIHAAS }}
           FB_PAGE_TOKEN_ITIHAAS: ${{ secrets.FB_PAGE_TOKEN_ITIHAAS }}
+          FB_PAGE_ID_MONEURONS: ${{ secrets.FB_PAGE_ID_MONEURONS }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -178,6 +188,8 @@ jobs:
           [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
           [ -n "$YT_GODMIND_TOKEN_JSON" ] && echo "$YT_GODMIND_TOKEN_JSON" > secrets/godmind_youtube_token.json
           [ -n "$YT_GODMIND_CLIENT_SECRET_JSON" ] && echo "$YT_GODMIND_CLIENT_SECRET_JSON" > secrets/godmind_youtube_client_secret.json
+          [ -n "$YT_MONEURONS_TOKEN_JSON" ] && echo "$YT_MONEURONS_TOKEN_JSON" > secrets/moneurons_youtube_token.json
+          [ -n "$YT_MONEURONS_CLIENT_SECRET_JSON" ] && echo "$YT_MONEURONS_CLIENT_SECRET_JSON" > secrets/moneurons_youtube_client_secret.json
           cat > .env <<EOF
           ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
           FAL_KEY=$FAL_KEY
@@ -195,6 +207,7 @@ jobs:
           FB_PAGE_TOKEN_BHAKTI=$FB_PAGE_TOKEN_BHAKTI
           FB_PAGE_ID_ITIHAAS=$FB_PAGE_ID_ITIHAAS
           FB_PAGE_TOKEN_ITIHAAS=$FB_PAGE_TOKEN_ITIHAAS
+          FB_PAGE_ID_MONEURONS=$FB_PAGE_ID_MONEURONS
           IG_USER_ID=$IG_USER_ID
           IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN
           PEXELS_API_KEY=$PEXELS_API_KEY
@@ -266,6 +279,13 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=2"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "45 17 * * *" ]; then
+            # TimeDecoders #3 — gen 17:45 UTC; peak 21:00 UTC / 5 PM ET.
+            echo "niche=ancient" >> $GITHUB_OUTPUT
+            echo "kind=trending" >> $GITHUB_OUTPUT
+            echo "mode=publish"  >> $GITHUB_OUTPUT
+            echo "seed=3"        >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 12 * * *" ]; then
             # GoM #1 — gen 12:00 UTC (5h buffer); YT+FB scheduled to peak 17:00 UTC / 1 PM ET.
             echo "niche=godmind"  >> $GITHUB_OUTPUT
@@ -286,6 +306,27 @@ jobs:
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=3"         >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "25 12 * * *" ]; then
+            # Money Neurons #1 — gen 12:25 UTC; peak 17:00 UTC / 1 PM ET.
+            echo "niche=moneurons" >> $GITHUB_OUTPUT
+            echo "kind=trending"   >> $GITHUB_OUTPUT
+            echo "mode=publish"    >> $GITHUB_OUTPUT
+            echo "seed=1"          >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "5 16 * * *" ]; then
+            # Money Neurons #2 — gen 16:05 UTC; peak 22:00 UTC / 6 PM ET.
+            echo "niche=moneurons" >> $GITHUB_OUTPUT
+            echo "kind=trending"   >> $GITHUB_OUTPUT
+            echo "mode=publish"    >> $GITHUB_OUTPUT
+            echo "seed=2"          >> $GITHUB_OUTPUT
+            echo "long_form=false" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "25 19 * * *" ]; then
+            # Money Neurons #3 — gen 19:25 UTC; peak 01:00 UTC / 9 PM ET.
+            echo "niche=moneurons" >> $GITHUB_OUTPUT
+            echo "kind=trending"   >> $GITHUB_OUTPUT
+            echo "mode=publish"    >> $GITHUB_OUTPUT
+            echo "seed=3"          >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.schedule }}" = "0 11 * * 6" ]; then
             # Itihaasvani long-form: TG drop (user has no OAuth for this channel).

@@ -11,6 +11,8 @@ One-time OAuth setup:
 Quota cost per upload: ~1600 units of the daily 10,000 unit quota
 (6 uploads/day free).
 """
+from __future__ import annotations
+
 import os
 from pathlib import Path
 

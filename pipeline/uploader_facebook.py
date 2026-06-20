@@ -17,6 +17,8 @@ pages_manage_posts + pages_read_engagement + pages_show_list.
 Returns the reel URL on success, or None on any failure (never raises — Facebook
 is a bonus channel and must never break the YouTube publish).
 """
+from __future__ import annotations
+
 import os
 from pathlib import Path
 

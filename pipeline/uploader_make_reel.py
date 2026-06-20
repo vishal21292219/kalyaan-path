@@ -30,6 +30,7 @@ CHANNEL_NAME = {
     "godmind": "Gods of the Mind", "gom": "Gods of the Mind",
     "ancient": "Time Decoders", "bhakti": "Kalyaan Path",
     "bhajan": "Kalyaan Path", "itihaas": "Itihaasvani",
+    "moneurons": "Money Neurons",
 }
 def _caption(script: dict, channel: str = "") -> str:
     hook = (script.get("hook") or "").strip()

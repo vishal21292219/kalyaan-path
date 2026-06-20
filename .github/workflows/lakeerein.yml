@@ -5,9 +5,11 @@
 name: Lakeerein Daily
 
 on:
-  schedule:
-    - cron: "30 4 * * *"   # 04:30 UTC = 10:00 AM IST → generate, schedule go-live 8:30 PM IST
-  workflow_dispatch:        # manual run button
+  # HELD 2026-06-20 (per user — focus GoM + TD + MN). Re-enable the schedule
+  # block below to resume Lakeerein daily auto-posting.
+  # schedule:
+  #   - cron: "30 4 * * *"   # 10:00 AM IST → Lakeerein daily — HELD
+  workflow_dispatch:        # manual run button (still available)
 
 jobs:
   lakeerein:

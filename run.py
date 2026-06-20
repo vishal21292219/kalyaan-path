@@ -24,6 +24,7 @@ PUBLISH_TIMES = {
     ("bhakti",  "mantra",   0): "01:30",  # ~7:00 AM IST
     ("ancient", "trending", 1): "18:00",  # 2:00 PM ET (US afternoon)
     ("ancient", "trending", 2): "00:00",  # 8:00 PM ET (US evening prime)
+    ("ancient", "trending", 3): "21:00",  # 5:00 PM ET (US afternoon — 3rd daily TD slot)
     ("bhajan",  "trending", 0): "13:30",  # ~7:00 PM IST Sunday
     ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
     ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST — PM series (Mahabharat Villains, ACTIVE)
@@ -36,6 +37,11 @@ PUBLISH_TIMES = {
     ("godmind", "trending", 1): "17:00",  # 1 PM ET (US lunch — proven 10.6k)
     ("godmind", "trending", 2): "21:00",  # 5 PM ET (US afternoon — spread between the 1 PM & 9 PM proven peaks)
     ("godmind", "trending", 3): "01:00",  # 9 PM ET (US night — proven 9.3k)
+    # Money Neurons (MN) — US money-psychology, same proven US windows. Generate
+    # EARLY (big buffer) → YT native-schedules to peak + FB queued via Make poster.
+    ("moneurons", "trending", 1): "17:00",  # 1 PM ET (US lunch scroll)
+    ("moneurons", "trending", 2): "22:00",  # 6 PM ET (after-work finance scroll)
+    ("moneurons", "trending", 3): "01:00",  # 9 PM ET (US night prime)
 }
 
 
@@ -71,8 +77,8 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--niche", default="bhakti",
-        choices=["bhakti", "itihaas", "bhajan", "ancient", "godmind"],
-        help="Which niche to run (bhakti = KalyaanPath; itihaas = Itihaasvani; bhajan = Flow Music MP3; ancient = Ancient World Decoded English)",
+        choices=["bhakti", "itihaas", "bhajan", "ancient", "godmind", "moneurons"],
+        help="Which niche to run (bhakti = KalyaanPath; itihaas = Itihaasvani; bhajan = Flow Music MP3; ancient = Ancient World Decoded English; godmind = Gods of the Mind; moneurons = Moneurons US money-psychology)",
     )
     ap.add_argument(
         "--deity",
