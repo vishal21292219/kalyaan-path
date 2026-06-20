@@ -46,20 +46,29 @@ MIN_GAP_HOURS = 3
 
 
 def _alert(msg: str) -> None:
-    """Best-effort Telegram ping so a silent failure NEVER goes unnoticed — the
-    owner shouldn't have to manually check whether reels posted. Never raises."""
+    """Best-effort failure ping so a silent loss NEVER goes unnoticed — the owner
+    shouldn't have to manually check whether reels posted. Primary channel is
+    Discord (Telegram is banned in India / no longer configured); Telegram is kept
+    as a fallback only if its secrets still exist. Never raises."""
+    sent = False
+    # Discord first — this is the live alert channel.
+    try:
+        from pipeline.notifier_discord import alert as _dc_alert
+        sent = bool(_dc_alert(msg))
+    except Exception as e:
+        print(f"[poster] discord alert failed: {type(e).__name__}: {e}")
+    # Telegram fallback (no-op unless the old secrets are still set).
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat = os.getenv("TELEGRAM_CHAT_ID")
-    if not token or not chat:
-        return
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{token}/sendMessage",
-            json={"chat_id": chat, "text": msg, "parse_mode": "Markdown"},
-            timeout=20,
-        )
-    except Exception as e:
-        print(f"[poster] alert failed: {type(e).__name__}: {e}")
+    if not sent and token and chat:
+        try:
+            requests.post(
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                json={"chat_id": chat, "text": msg, "parse_mode": "Markdown"},
+                timeout=20,
+            )
+        except Exception as e:
+            print(f"[poster] telegram alert failed: {type(e).__name__}: {e}")
 
 
 def _now():

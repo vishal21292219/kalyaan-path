@@ -65,25 +65,43 @@ def _merge_monotonic_into_local():
         json.dump(merged, open(path, "w"), ensure_ascii=False, indent=1)
 
 
+def _ahead_of_origin():
+    """True if HEAD has commit(s) not yet on origin/main (an un-pushed state commit
+    from a previous attempt whose push lost the race)."""
+    n = sh("git", "rev-list", "--count", "origin/main..HEAD").stdout.strip()
+    return n.isdigit() and int(n) > 0
+
+
 def main():
     sh("git", "config", "user.email", "actions@github.com")
     sh("git", "config", "user.name", "github-actions[bot]")
     for attempt in range(1, 16):
         sh("git", "fetch", "origin", "main")
+        # Re-base any commit from a PREVIOUS failed-push attempt back onto the
+        # freshly-fetched origin/main, keeping its changes in the working tree.
+        # WITHOUT this, a lost push left the state change in a local commit; the
+        # next attempt then saw a clean working tree, printed "no state changes"
+        # and returned — silently DROPPING the posted-ledger/queue update, so the
+        # poster re-fired the same reel every run and the queue never cleared.
+        if _ahead_of_origin():
+            sh("git", "reset", "--soft", "origin/main")
+            sh("git", "reset")                 # unstage → back to plain working-tree edits
         _merge_monotonic_into_local()          # re-union every attempt → entries never lost
         sh("git", "add", STATE_DIR)
         if sh("git", "diff", "--cached", "--quiet").returncode == 0:
             print("[persist] no state changes")
             return
         sh("git", "commit", "-m", "auto: state [skip ci]")
-        if (sh("git", "pull", "--rebase", "--autostash", "origin", "main").returncode == 0
-                and sh("git", "push").returncode == 0):
+        # Our commit already sits on the just-fetched origin/main, so a plain push
+        # fast-forwards unless someone pushed in the race window → then we loop,
+        # re-fetch, reset our commit onto the new tip and retry (never dropped).
+        if sh("git", "push").returncode == 0:
             print(f"[persist] state pushed (try {attempt})")
             return
-        sh("git", "rebase", "--abort")
         print(f"[persist] push race — retry {attempt}/15")
         time.sleep(4)
-    print("::error::[persist] state push FAILED after 15 tries")
+    print("::error::[persist] state push FAILED after 15 tries — local commit kept, "
+          "next workflow run will re-push it")
 
 
 if __name__ == "__main__":
