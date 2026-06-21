@@ -20,6 +20,14 @@ on:
     - cron: "0 7 * * *"    # final sweep
   workflow_dispatch:
 
+# The persist step commits the posted-ledger/queue back to main. Without write
+# permission the push is REJECTED every run (the repo's default token is
+# read-only), so the ledger froze → the poster re-fired already-posted reels
+# forever and HELD every new one → FB got nothing for ~a day. Grant write so
+# state actually lands.
+permissions:
+  contents: write
+
 concurrency:
   group: reel-poster
   cancel-in-progress: false
