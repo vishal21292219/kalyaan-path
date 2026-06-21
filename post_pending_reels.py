@@ -42,7 +42,7 @@ WEBHOOK = os.getenv("MAKE_REEL_WEBHOOK")
 # stranded/recovered reels across runs instead of flushing them together (the bug
 # that posted 2 GoM reels back-to-back). Channel peaks are ≥4h apart so normal
 # scheduled drops are never blocked; only clustering/recovery is throttled.
-MIN_GAP_HOURS = 3
+MIN_GAP_HOURS = 0  # flush-backlog branch only: post the late catch-up reels back-to-back. main stays 3.
 
 
 def _alert(msg: str) -> None:
