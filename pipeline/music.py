@@ -157,6 +157,45 @@ def _pick_mood_bed(d: Path, script: dict | None,
     return a if a.exists() else None
 
 
+# Gods of the Mind — 3 cinematic beds, all on-brand CALM (the bed sits at ~0.09
+# vol UNDER the narration; mood = a subtle texture, never hype). power_bed for
+# fierce/destroyer themes, shadow_bed for fear/ego/death/illusion, else the
+# default meditative_bed for the calm/witness/stillness lane.
+_GODMIND_POWER_KWS = [
+    "destroy", "destroyer", "destruction", "rage", "fury", "fierce", "wrath",
+    "anger", "war", "warrior", "battle", "strength", "power", "powerful",
+    "kali", "durga", "tandav", "rudra", "bhairav", "shakti", "fire", "burn",
+    "conquer", "force", "weapon", "trident", "slay", "fight", "indra",
+]
+_GODMIND_SHADOW_KWS = [
+    "fear", "death", "die", "dying", "dark", "darkness", "shadow", "ego",
+    "illusion", "maya", "anxiety", "suffering", "pain", "loss", "grief",
+    "lonely", "loneliness", "doubt", "mystery", "hidden", "secret", "unknown",
+    "void", "dissolve", "dissolution", "yama", "yamraj", "kaal", "snake",
+    "serpent", "demon", "shani", "attachment",
+]
+
+
+def _pick_godmind_bed(d: Path, script: dict | None) -> Path | None:
+    """3-mood bed for Gods of the Mind. power_bed if the script reads fierce,
+    shadow_bed if it reads dark/inner, else the default meditative_bed. Always
+    returns an existing track (falls back to any mp3 present)."""
+    text = (_script_text(script) or "").lower()
+    sp = sum(1 for k in _GODMIND_POWER_KWS if k in text)
+    ss = sum(1 for k in _GODMIND_SHADOW_KWS if k in text)
+    power = d / "power_bed.mp3"
+    shadow = d / "shadow_bed.mp3"
+    calm = d / "meditative_bed.mp3"
+    if sp > 0 and sp >= ss and power.exists():
+        return power
+    if ss > 0 and shadow.exists():
+        return shadow
+    if calm.exists():
+        return calm
+    tracks = sorted(d.glob("*.mp3") )
+    return tracks[0] if tracks else None
+
+
 def pick_drone(niche: str | None = None, script: dict | None = None) -> Path | None:
     """Return the background bed track for the cinematic mix.
 
@@ -201,6 +240,10 @@ def pick_drone(niche: str | None = None, script: dict | None = None) -> Path | N
         if d.name == "music_ancient":
             bed = _pick_mood_bed(d, script, "epic_bed.mp3", _ANCIENT_EPIC_KWS,
                                  "mystery_bed.mp3", _ANCIENT_MYSTERY_KWS)
+            if bed:
+                return bed
+        if d.name == "music_godmind":
+            bed = _pick_godmind_bed(d, script)
             if bed:
                 return bed
         tracks = sorted(
