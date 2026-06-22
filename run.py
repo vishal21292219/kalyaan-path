@@ -51,9 +51,9 @@ def _slot_publish_at(args) -> str | None:
 
 
 def _publish_at_iso(hhmm: str | None) -> str | None:
-    """Turn a 'HH:MM' UTC time-of-day into an RFC3339 timestamp for the NEXT
-    future occurrence (today if still ahead, else tomorrow). Returns None if not
-    given or malformed (→ caller publishes immediately)."""
+    """Turn a 'HH:MM' UTC time-of-day into an RFC3339 timestamp: today's peak if
+    it's still ahead, else NOW (so a late-generated reel is queued for the poster
+    immediately, not deferred 24h). Returns None only if not given/malformed."""
     if not hhmm:
         return None
     # Full RFC3339 timestamp (date-specific schedule, e.g. "2026-06-15T01:00:00Z")
@@ -65,8 +65,13 @@ def _publish_at_iso(hhmm: str | None) -> str | None:
         h, m = (int(x) for x in hhmm.split(":"))
         now = datetime.now(timezone.utc)
         target = now.replace(hour=h, minute=m, second=0, microsecond=0)
-        if target <= now + timedelta(minutes=5):  # already passed / too soon
-            target += timedelta(days=1)
+        # If today's peak already passed, DON'T defer to tomorrow — that stranded
+        # late-generated reels for ~24h and confused catch-up/retry into making
+        # duplicates. Queue for NOW; the reel-poster fires it next run and its
+        # per-page gap guard spaces it, while the poster's ">6h past peak → drop"
+        # rule still prevents posting at a bad off-peak hour.
+        if target <= now:
+            target = now + timedelta(minutes=1)
         return target.strftime("%Y-%m-%dT%H:%M:%SZ")
     except Exception as e:
         print(f"[publish-at] bad value {hhmm!r} ({e}) — publishing immediately")
@@ -576,6 +581,14 @@ def main(argv: list[str]) -> int:
                 # for its exact peak (poster cron fires it → no render-time drift).
                 # Else post immediately.
                 _fb_at = _publish_at_iso(_slot_publish_at(args)) if publish_cfg.get("facebook_make_scheduled") else None
+                # A scheduled channel must NEVER post directly — if no time
+                # resolved (slot missing from PUBLISH_TIMES), still QUEUE (now+1m)
+                # so the poster's per-page gap guard stays the single posting
+                # authority. A render-time direct post bypassed that guard and was
+                # the back-to-back clustering bug (3 GoM reels within minutes).
+                if publish_cfg.get("facebook_make_scheduled") and not _fb_at:
+                    from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+                    _fb_at = (_dt.now(_tz.utc) + _td(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
                 if make_upload(video_path, script, channel=args.niche, fb_page_id=_pg, post_at=_fb_at):
                     print(f"[publish] make-reel {('queued for ' + _fb_at) if _fb_at else 'posted'} ({args.niche} → FB page {_pg})")
                     # Bonus channel: the reel-poster + posted-ledger own FB/IG
