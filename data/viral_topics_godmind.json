@@ -1,45 +1,411 @@
 {
   "_note": "Gods of the Mind — Hindu gods/symbols decoded as psychology. pick_viral() rotates with 30-day recency. Each hook is a profound REFRAME (open ON it, no setup). Images are AI scene-matched from the script.",
   "topics": [
-    {"title": "The Real Meaning of Shiva", "hook": "Shiva is not a god sitting in the sky. Shiva is the part of you that stays still when everything else collapses.", "query": "shiva consciousness cosmic"},
-    {"title": "The Real Meaning of Kali", "hook": "Kali is not a goddess of death. She is the force inside you that destroys every comforting lie you tell yourself.", "query": "kali darkness fire"},
-    {"title": "The Psychology of Krishna", "hook": "Krishna smiles in the middle of a war. Because he mastered the one thing that kills all anxiety — detachment.", "query": "krishna calm battlefield"},
-    {"title": "The Dark Psychology of Indra", "hook": "Indra is king of the gods, and the most insecure of them all. He is your ego — terrified of losing its throne.", "query": "indra throne storm"},
-    {"title": "The Hidden Psychology of Ganesha", "hook": "Ganesha removes obstacles. But the obstacle was never outside — it was the elephant-sized fear sitting in your head.", "query": "ganesha mind obstacle"},
-    {"title": "Why Hindu Gods Ride Animals", "hook": "Every god rides a beast. Because the goal was never to kill your instincts — it was to learn to ride them.", "query": "deity riding animal symbolic"},
-    {"title": "Why Gods Have Many Arms", "hook": "Gods have many arms not to look powerful — but to show a mind that can hold opposite forces at the same time.", "query": "many armed deity cosmic"},
-    {"title": "The Real Meaning of the Third Eye", "hook": "Shiva's third eye doesn't see the future. It sees what is actually happening — before your stories rewrite it.", "query": "third eye light awareness"},
-    {"title": "The Hidden Meaning of Vishnu and Lakshmi", "hook": "Lakshmi only stays where Vishnu rests. Wealth follows a calm mind and quietly flees a restless one.", "query": "vishnu lakshmi serene"},
-    {"title": "The Psychology of Brahma", "hook": "Brahma creates endlessly and is barely worshipped. That is the restless mind — always producing, never at peace.", "query": "brahma creation cosmos"},
-    {"title": "The Real Meaning of Shiva's Dance", "hook": "Shiva dances on a tiny demon. The demon is forgetfulness — and the dance is the universe waking you up.", "query": "nataraja cosmic dance fire"},
-    {"title": "The Hidden Psychology of Hanuman", "hook": "Hanuman could fly across oceans, but he forgot his own power until someone reminded him. So have you.", "query": "hanuman power devotion"},
-    {"title": "The Real Strength of Durga", "hook": "Durga rides a lion into battle, smiling. Real strength is not tension — it is staying calm inside the chaos.", "query": "durga lion battle serene"},
-    {"title": "Why Hindus Made Death a God", "hook": "They turned death into a god you can actually talk to. Because the thing you fear most is also your greatest teacher.", "query": "yama death symbolic"},
-    {"title": "The Real Meaning of the Serpent", "hook": "The snake coiled at the base of your spine isn't a fairytale. It's energy waiting for you to stop wasting it.", "query": "kundalini serpent spine energy"},
-    {"title": "What Maya Really Means", "hook": "Maya is not the world being fake. Maya is you mistaking your own thoughts for reality.", "query": "illusion veil cosmic"},
-    {"title": "The Real Psychology of Karma", "hook": "Karma is not cosmic punishment. It is simply this — every action quietly rewires who you are becoming.", "query": "karma action ripple cosmic"},
-    {"title": "The Witness Inside You", "hook": "Something in you is watching your thoughts right now. That silent watcher is the only 'you' that never changes.", "query": "witness awareness inner light"},
-    {"title": "The Real Meaning of Ravana's Ten Heads", "hook": "Ravana had ten heads, full of knowledge. But intelligence without awareness is just a louder, smarter ego.", "query": "ravana ten heads shadow"},
-    {"title": "The Secret of Ardhanarishvara", "hook": "Half Shiva, half Shakti, one body. This sacred image is telling you wholeness isn't found outside — it is a marriage within.", "query": "ardhanarishvara half male female divine"},
-    {"title": "Why Kaal Bhairav Is Terrifying", "hook": "Bhairav is frightening on purpose. He is the part of you that has to destroy your comfort to finally set you free.", "query": "bhairav fierce dark divine"},
-    {"title": "The Lesson of Narasimha", "hook": "God appears as half-man, half-lion, at dusk — neither day nor night. Your biggest breakthroughs come in the in-between.", "query": "narasimha twilight fierce"},
-    {"title": "The Real Meaning of the Ocean Churning", "hook": "To get the nectar, gods and demons churned the same ocean together. Your best and worst impulses pull the very same rope.", "query": "samudra manthan ocean churning"},
-    {"title": "Why Shiva Holds the Poison", "hook": "Shiva held the poison in his throat — didn't swallow it, didn't spit it out. With pain, that is the master move.", "query": "neelkanth blue throat shiva"},
-    {"title": "Why Krishna Stole Butter", "hook": "The god who stole butter teaches the one thing serious people forget — joy is allowed, even on the path.", "query": "child krishna butter joy"},
-    {"title": "The Meaning of the Conch", "hook": "The conch is blown before a war and before a prayer. The same breath that fights can also surrender.", "query": "conch shankh divine"},
-    {"title": "Why Saraswati Holds a Veena", "hook": "Saraswati holds a book and a veena. Knowledge without art is noise — art without knowledge is empty.", "query": "saraswati veena book serene"},
-    {"title": "The Real Meaning of the Lotus", "hook": "The gods sit on a lotus that grows straight out of the mud. You don't rise despite your mess — you rise because of it.", "query": "lotus mud divine bloom"},
-    {"title": "The Secret of Vishnu's Sleep", "hook": "Vishnu sleeps on a serpent in a cosmic ocean. Even the one holding the universe knows exactly when to let go.", "query": "vishnu yoga nidra cosmic ocean"},
-    {"title": "The Three Forces Running Your Mind", "hook": "Three forces run your mind every second — inertia, restlessness, and clarity. The gods are just these three, dramatized.", "query": "three gunas cosmic balance"},
-    {"title": "How Parvati Won Shiva", "hook": "Parvati didn't chase Shiva. She became so still that he had no choice but to notice. Power is never in the pursuit.", "query": "parvati tapasya stillness"},
-    {"title": "The Meaning of the Trident", "hook": "Shiva's trident has three points — the three forces that run you, and the one steady hand that holds them all.", "query": "trishul trident divine"},
-    {"title": "The Demon Every God Kills", "hook": "Every god slays a demon, and it's always the same one — the version of you that believes it is the center of everything.", "query": "deity slaying demon ego"},
-    {"title": "Why Shiva Sits in a Graveyard", "hook": "Shiva meditates in the cremation ground. Real peace begins exactly where you stop running from endings.", "query": "shiva cremation ground ash meditation"},
-    {"title": "Why Hanuman Tore Open His Chest", "hook": "Hanuman tore open his chest to show Ram living inside. What you love the most is already alive within you.", "query": "hanuman chest ram heart"},
-    {"title": "Who Really Drives Your Chariot", "hook": "Krishna drives the chariot, Arjuna fights. Your awareness should hold the reins — never your panic.", "query": "krishna arjuna chariot battlefield"},
-    {"title": "What Krishna Showed Arjuna", "hook": "Krishna revealed the entire universe inside his mouth. One glimpse of the bigger picture ends every small fear.", "query": "vishvarupa cosmic form universe"},
-    {"title": "Why People Fear Shani", "hook": "Everyone fears Shani, the planet of delay. But delay is just the universe teaching you patience the hard way.", "query": "shani saturn dark planet"},
-    {"title": "The Lesson of Nandi the Bull", "hook": "Nandi waits outside Shiva's temple, perfectly still, forever. Devotion isn't doing more — it's learning to wait well.", "query": "nandi bull temple stillness"},
-    {"title": "How Desire Was Burned to Ash", "hook": "The god of desire was burned to ash by a single glance from Shiva. Desire dies the instant awareness truly looks at it.", "query": "kamadeva ash shiva glance fire"}
+    {
+      "title": "The Real Meaning of Shiva",
+      "hook": "Shiva is not a god sitting in the sky. Shiva is the part of you that stays still when everything else collapses.",
+      "query": "shiva consciousness cosmic",
+      "seq": 9
+    },
+    {
+      "title": "The Real Meaning of Kali",
+      "hook": "Kali is not a goddess of death. She is the force inside you that destroys every comforting lie you tell yourself.",
+      "query": "kali darkness fire"
+    },
+    {
+      "title": "The Psychology of Krishna",
+      "hook": "Krishna smiles in the middle of a war. Because he mastered the one thing that kills all anxiety — detachment.",
+      "query": "krishna calm battlefield"
+    },
+    {
+      "title": "The Dark Psychology of Indra",
+      "hook": "Indra is king of the gods, and the most insecure of them all. He is your ego — terrified of losing its throne.",
+      "query": "indra throne storm"
+    },
+    {
+      "title": "The Hidden Psychology of Ganesha",
+      "hook": "Ganesha removes obstacles. But the obstacle was never outside — it was the elephant-sized fear sitting in your head.",
+      "query": "ganesha mind obstacle"
+    },
+    {
+      "title": "Why Hindu Gods Ride Animals",
+      "hook": "Every god rides a beast. Because the goal was never to kill your instincts — it was to learn to ride them.",
+      "query": "deity riding animal symbolic",
+      "seq": 24
+    },
+    {
+      "title": "Why Gods Have Many Arms",
+      "hook": "Gods have many arms not to look powerful — but to show a mind that can hold opposite forces at the same time.",
+      "query": "many armed deity cosmic"
+    },
+    {
+      "title": "The Real Meaning of the Third Eye",
+      "hook": "Shiva's third eye doesn't see the future. It sees what is actually happening — before your stories rewrite it.",
+      "query": "third eye light awareness"
+    },
+    {
+      "title": "The Hidden Meaning of Vishnu and Lakshmi",
+      "hook": "Lakshmi only stays where Vishnu rests. Wealth follows a calm mind and quietly flees a restless one.",
+      "query": "vishnu lakshmi serene"
+    },
+    {
+      "title": "The Psychology of Brahma",
+      "hook": "Brahma creates endlessly and is barely worshipped. That is the restless mind — always producing, never at peace.",
+      "query": "brahma creation cosmos",
+      "seq": 27
+    },
+    {
+      "title": "The Real Meaning of Shiva's Dance",
+      "hook": "Shiva dances on a tiny demon. The demon is forgetfulness — and the dance is the universe waking you up.",
+      "query": "nataraja cosmic dance fire"
+    },
+    {
+      "title": "The Hidden Psychology of Hanuman",
+      "hook": "Hanuman could fly across oceans, but he forgot his own power until someone reminded him. So have you.",
+      "query": "hanuman power devotion",
+      "seq": 15
+    },
+    {
+      "title": "The Real Strength of Durga",
+      "hook": "Durga rides a lion into battle, smiling. Real strength is not tension — it is staying calm inside the chaos.",
+      "query": "durga lion battle serene"
+    },
+    {
+      "title": "Why Hindus Made Death a God",
+      "hook": "They turned death into a god you can actually talk to. Because the thing you fear most is also your greatest teacher.",
+      "query": "yama death symbolic"
+    },
+    {
+      "title": "The Real Meaning of the Serpent",
+      "hook": "The snake coiled at the base of your spine isn't a fairytale. It's energy waiting for you to stop wasting it.",
+      "query": "kundalini serpent spine energy"
+    },
+    {
+      "title": "What Maya Really Means",
+      "hook": "Maya is not the world being fake. Maya is you mistaking your own thoughts for reality.",
+      "query": "illusion veil cosmic"
+    },
+    {
+      "title": "The Real Psychology of Karma",
+      "hook": "Karma is not cosmic punishment. It is simply this — every action quietly rewires who you are becoming.",
+      "query": "karma action ripple cosmic"
+    },
+    {
+      "title": "The Witness Inside You",
+      "hook": "Something in you is watching your thoughts right now. That silent watcher is the only 'you' that never changes.",
+      "query": "witness awareness inner light"
+    },
+    {
+      "title": "The Real Meaning of Ravana's Ten Heads",
+      "hook": "Ravana had ten heads, full of knowledge. But intelligence without awareness is just a louder, smarter ego.",
+      "query": "ravana ten heads shadow"
+    },
+    {
+      "title": "The Secret of Ardhanarishvara",
+      "hook": "Half Shiva, half Shakti, one body. This sacred image is telling you wholeness isn't found outside — it is a marriage within.",
+      "query": "ardhanarishvara half male female divine"
+    },
+    {
+      "title": "Why Kaal Bhairav Is Terrifying",
+      "hook": "Bhairav is frightening on purpose. He is the part of you that has to destroy your comfort to finally set you free.",
+      "query": "bhairav fierce dark divine"
+    },
+    {
+      "title": "The Lesson of Narasimha",
+      "hook": "God appears as half-man, half-lion, at dusk — neither day nor night. Your biggest breakthroughs come in the in-between.",
+      "query": "narasimha twilight fierce"
+    },
+    {
+      "title": "The Real Meaning of the Ocean Churning",
+      "hook": "To get the nectar, gods and demons churned the same ocean together. Your best and worst impulses pull the very same rope.",
+      "query": "samudra manthan ocean churning"
+    },
+    {
+      "title": "Why Shiva Holds the Poison",
+      "hook": "Shiva held the poison in his throat — didn't swallow it, didn't spit it out. With pain, that is the master move.",
+      "query": "neelkanth blue throat shiva"
+    },
+    {
+      "title": "Why Krishna Stole Butter",
+      "hook": "The god who stole butter teaches the one thing serious people forget — joy is allowed, even on the path.",
+      "query": "child krishna butter joy",
+      "seq": 18
+    },
+    {
+      "title": "The Meaning of the Conch",
+      "hook": "The conch is blown before a war and before a prayer. The same breath that fights can also surrender.",
+      "query": "conch shankh divine"
+    },
+    {
+      "title": "Why Saraswati Holds a Veena",
+      "hook": "Saraswati holds a book and a veena. Knowledge without art is noise — art without knowledge is empty.",
+      "query": "saraswati veena book serene",
+      "seq": 30
+    },
+    {
+      "title": "The Real Meaning of the Lotus",
+      "hook": "The gods sit on a lotus that grows straight out of the mud. You don't rise despite your mess — you rise because of it.",
+      "query": "lotus mud divine bloom",
+      "seq": 3
+    },
+    {
+      "title": "The Secret of Vishnu's Sleep",
+      "hook": "Vishnu sleeps on a serpent in a cosmic ocean. Even the one holding the universe knows exactly when to let go.",
+      "query": "vishnu yoga nidra cosmic ocean"
+    },
+    {
+      "title": "The Three Forces Running Your Mind",
+      "hook": "Three forces run your mind every second — inertia, restlessness, and clarity. The gods are just these three, dramatized.",
+      "query": "three gunas cosmic balance"
+    },
+    {
+      "title": "How Parvati Won Shiva",
+      "hook": "Parvati didn't chase Shiva. She became so still that he had no choice but to notice. Power is never in the pursuit.",
+      "query": "parvati tapasya stillness",
+      "seq": 6
+    },
+    {
+      "title": "The Meaning of the Trident",
+      "hook": "Shiva's trident has three points — the three forces that run you, and the one steady hand that holds them all.",
+      "query": "trishul trident divine",
+      "seq": 21
+    },
+    {
+      "title": "The Demon Every God Kills",
+      "hook": "Every god slays a demon, and it's always the same one — the version of you that believes it is the center of everything.",
+      "query": "deity slaying demon ego"
+    },
+    {
+      "title": "Why Shiva Sits in a Graveyard",
+      "hook": "Shiva meditates in the cremation ground. Real peace begins exactly where you stop running from endings.",
+      "query": "shiva cremation ground ash meditation"
+    },
+    {
+      "title": "Why Hanuman Tore Open His Chest",
+      "hook": "Hanuman tore open his chest to show Ram living inside. What you love the most is already alive within you.",
+      "query": "hanuman chest ram heart"
+    },
+    {
+      "title": "Who Really Drives Your Chariot",
+      "hook": "Krishna drives the chariot, Arjuna fights. Your awareness should hold the reins — never your panic.",
+      "query": "krishna arjuna chariot battlefield"
+    },
+    {
+      "title": "What Krishna Showed Arjuna",
+      "hook": "Krishna revealed the entire universe inside his mouth. One glimpse of the bigger picture ends every small fear.",
+      "query": "vishvarupa cosmic form universe"
+    },
+    {
+      "title": "Why People Fear Shani",
+      "hook": "Everyone fears Shani, the planet of delay. But delay is just the universe teaching you patience the hard way.",
+      "query": "shani saturn dark planet"
+    },
+    {
+      "title": "The Lesson of Nandi the Bull",
+      "hook": "Nandi waits outside Shiva's temple, perfectly still, forever. Devotion isn't doing more — it's learning to wait well.",
+      "query": "nandi bull temple stillness"
+    },
+    {
+      "title": "How Desire Was Burned to Ash",
+      "hook": "The god of desire was burned to ash by a single glance from Shiva. Desire dies the instant awareness truly looks at it.",
+      "query": "kamadeva ash shiva glance fire",
+      "seq": 12
+    },
+    {
+      "title": "Why You Can't Stop Overthinking",
+      "hook": "Your mind loops one thought for hours. Vishnu's chakra cuts in a single spin. Decision is the cure for thought.",
+      "seq": 2
+    },
+    {
+      "title": "Why You're Always Bracing for the Worst",
+      "hook": "You rehearse disasters that never come. Markandeya wrapped himself around the still point and even death couldn't pull him loose.",
+      "seq": 20
+    },
+    {
+      "title": "Why You Avoid Thinking About Death",
+      "hook": "You push the thought away every time. Nachiketa walked up to death and asked it to teach him — only then did he learn to live."
+    },
+    {
+      "title": "Why You're So Afraid to Start",
+      "hook": "You wait for the perfect moment that never comes. When the world flooded, Vishnu didn't fight the water — he became a fish. Adapt, don't control."
+    },
+    {
+      "title": "Why Rejection Breaks You So Easily",
+      "hook": "One 'no' and you feel worthless. Shabari tasted every berry first and a god ate her leftovers gladly. Your worth was never theirs to approve.",
+      "seq": 14
+    },
+    {
+      "title": "Why You Can't Stand Being Wrong",
+      "hook": "Your ego treats correction like an attack. Daksha refused to bow once and lost his head for a goat's. Pride is the costliest thing you'll guard."
+    },
+    {
+      "title": "Why You Can't Handle Someone Disliking You",
+      "hook": "One cold reply tilts your whole day. Krishna walked away from a war, earned the name 'deserter' — and never dimmed. Being good isn't being liked.",
+      "seq": 38
+    },
+    {
+      "title": "Why You Don't Trust Your Own Voice",
+      "hook": "You drown your gut in everyone's opinions. Om was never made by anyone — it's the hum under all the noise. Get quiet enough to hear yours.",
+      "seq": 33
+    },
+    {
+      "title": "Why Being Alone Terrifies You",
+      "hook": "You fill every silence with noise. Shiva sits alone on a frozen peak — not abandoned, but full. Solitude is only lonely when you've left yourself too.",
+      "seq": 17
+    },
+    {
+      "title": "Why You Can't Get Over Someone",
+      "hook": "You still hold someone who left. Radha loved Krishna and never owned him — and became the name spoken before his. Love expands you; it doesn't belong to you.",
+      "seq": 5
+    },
+    {
+      "title": "Why You Can't Let Go of Control",
+      "hook": "You grip everything so it won't fall apart. A river fell hard enough to shatter the earth — Shiva caught it in his hair and let it flow. Channel, don't clench.",
+      "seq": 39
+    },
+    {
+      "title": "Why Holding the Grudge Is Killing You",
+      "hook": "You won't forgive — it feels like losing. Ashwatthama got his revenge and was cursed to wander forever, wound never healing. Some victories are the punishment."
+    },
+    {
+      "title": "Why Your Anger Scares Even You",
+      "hook": "You swallow it till it explodes. Parashurama carried an axe for righteous rage — and learned the hardest discipline is knowing when NOT to swing."
+    },
+    {
+      "title": "Why Discipline Never Lasts for You",
+      "hook": "You start strong and quit by Thursday. Bhishma could choose the very moment of his death — master your urges, master your fate."
+    },
+    {
+      "title": "Why You Shrink Yourself for Others",
+      "hook": "You stay small so no one feels threatened. Vishnu came as a dwarf, asked for three steps — then crossed the universe. Humility isn't weakness in disguise.",
+      "seq": 35
+    },
+    {
+      "title": "Why Getting Everything You Wanted Felt Empty",
+      "hook": "You hit the goal and felt nothing. Kubera owns every treasure and still guards it in fear. A full vault is not a full life.",
+      "seq": 11
+    },
+    {
+      "title": "Why Nothing Feels Worth the Effort",
+      "hook": "You won't start unless you'll win. Jatayu fought a demon he could never beat — and died doing right. Purpose isn't winning, it's showing up.",
+      "seq": 41
+    },
+    {
+      "title": "Why Nothing Is Ever Enough for You",
+      "hook": "You get it, then want the next thing. They say a tree grants every wish — and the people under it are the most restless of all. Desire feeds on being fed."
+    },
+    {
+      "title": "Why You Feel So Behind in Life",
+      "hook": "Everyone seems ahead while you crawl. The nectar took the gods a thousand years of churning to surface. What you want most is never on a deadline.",
+      "seq": 8
+    },
+    {
+      "title": "Why You Don't Know Who You Really Are",
+      "hook": "Strip your job, name, followers — and you panic. Shiva smears ash to remember: everything you call 'you' will burn. What's left is the real one."
+    },
+    {
+      "title": "Why You Feel Disconnected From Yourself",
+      "hook": "You go through the motions but feel far away. The river Saraswati vanished underground and still feeds the rest unseen. What you lost isn't gone — it went quiet.",
+      "seq": 36
+    },
+    {
+      "title": "Why You Can't Forgive Yourself",
+      "hook": "One mistake and you turned to stone inside. Ahalya waited as rock for years until a single touch freed her. Guilt freezes; grace moves again.",
+      "seq": 26
+    },
+    {
+      "title": "Why Other People's Wins Hurt You",
+      "hook": "Their good news ruins your day. Shiva wears the waning moon as a crown — even what's fading deserves one. You're not behind, you're in a phase.",
+      "seq": 23
+    },
+    {
+      "title": "Why Rest Makes You Feel Guilty",
+      "hook": "You treat stillness like failure. Even Vishnu sleeps on the cosmic ocean while the universe runs itself. Rest isn't quitting — it's trusting.",
+      "seq": 29
+    },
+    {
+      "title": "Why You Feel Like You're Failing at Everything",
+      "hook": "Mother, worker, friend, dreamer — sure you're failing all of them. Durga is worshipped as nine women across nine nights. You're not meant to be one thing at once.",
+      "seq": 32
+    },
+    {
+      "title": "Why Time Feels Like It's Running Out",
+      "hook": "You feel the clock eating your life. Hindus didn't fear time — they made it Shiva himself: Mahakaal. The thing devouring you is also the thing that frees you.",
+      "seq": 10
+    },
+    {
+      "title": "What Happens the Moment You Die — Decoded",
+      "hook": "You're terrified of the unknown after. Yama doesn't judge you — he just reads the life you already wrote. Death isn't punishment. It's a mirror.",
+      "seq": 4
+    },
+    {
+      "title": "Why You Give Up Right Before the Breakthrough",
+      "hook": "You quit the moment it gets hard. Savitri followed death itself, argued with it, and walked back with her husband's life. Relentlessness even death respects.",
+      "seq": 34
+    },
+    {
+      "title": "Why Facing the Worst Sets You Free",
+      "hook": "You spend life avoiding what disgusts and scares you. The Aghori sits in the cremation ground and eats there — the moment nothing can horrify you, nothing can control you.",
+      "seq": 25
+    },
+    {
+      "title": "Why You Can Never Feel Satisfied",
+      "hook": "No matter what you get, the hunger returns. Ancient texts describe the preta — a huge belly, a needle-thin throat. That endless craving is a state of mind, not a place.",
+      "seq": 40
+    },
+    {
+      "title": "The Story That Proves Hindus Knew About the Multiverse",
+      "hook": "You think your life is the center of everything. An ancient text shows Indra a line of ants — each one a king of a universe in a past life. Your ego is one ant in the parade.",
+      "seq": 1
+    },
+    {
+      "title": "Why Your Problems Are Smaller Than You Think",
+      "hook": "Today's disaster feels like the end of the world. Hindus measured ONE day of Brahma as 4.32 billion years. On that clock, your worst week doesn't even register.",
+      "seq": 19
+    },
+    {
+      "title": "What If Reality Isn't Real?",
+      "hook": "Some nights none of this feels solid. Thousands of years ago they named it — Maya. Not a lie, a render. The question was never 'is it real,' it's 'who's watching it.'",
+      "seq": 13
+    },
+    {
+      "title": "You Are One Breath of the Universe",
+      "hook": "You think you're permanent, so every loss feels final. Ancient cosmology says universes bloom and vanish with each breath of Vishnu. You're not the breath — you're the awareness watching it move.",
+      "seq": 28
+    },
+    {
+      "title": "Why You're Taking Life Way Too Seriously",
+      "hook": "You grip every outcome like life or death. The oldest wisdom calls all of this Lila — divine play. It's not a test you're failing. It's a game you forgot you're playing.",
+      "seq": 37
+    },
+    {
+      "title": "Why You're Scared of Your Own Darkness",
+      "hook": "You keep a part of yourself locked away — the anger, the hunger, the one you'd never show anyone. Hindus didn't lock that part up — they worshipped it as Kali. What you hide controls you; what you face bows to you.",
+      "seq": 7
+    },
+    {
+      "title": "Why You Keep Self-Destructing",
+      "hook": "You sabotage the very things you build and can't explain why. There's a fierce truth in it: the ego must lose its head before the real you gets fed. You're not destroying yourself — you're outgrowing a self.",
+      "seq": 16
+    },
+    {
+      "title": "Why the Emptiness Won't Leave You",
+      "hook": "Some days you feel hollow, grey, like the colour drained out of everything. Hindus didn't call that failure — they gave that exact feeling a form and bowed to her. Even your emptiness is teaching you something.",
+      "seq": 22
+    },
+    {
+      "title": "Why Your Anger Feels Like It Could Burn Everything Down",
+      "hook": "When you finally snap, the force scares even you. That's Bhairava — the form even Shiva took. The goal was never to kill that fire. It was to become the one who can hold it.",
+      "seq": 31
+    },
+    {
+      "title": "Why Silence Makes You So Uncomfortable",
+      "hook": "The moment it goes quiet, you reach for your phone — the emptiness feels unbearable. But before any god, any universe, there was only that void, and everything was born from it. What you run from is the source."
+    },
+    {
+      "title": "Why You're Afraid to Walk Away",
+      "hook": "You stay in rooms that drain you, scared of being called a traitor. Vibhishana left his own brother Ravana to stand with what was right — and history calls him wise, not disloyal. Leaving can be the loyal move — to yourself.",
+      "seq": 42
+    }
   ]
 }

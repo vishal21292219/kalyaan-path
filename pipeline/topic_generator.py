@@ -335,7 +335,17 @@ def pick_viral(seed_offset: int = 0) -> dict:
     avail = [t for t in pool if t["title"] not in recent]
 
     rng = random.Random(_seed_for_today(seed_offset))
-    if avail:
+    # STRICT planned sequence (launch ramp): if any available topic carries an
+    # integer 'seq', air the LOWEST-seq one first — a deterministic order instead
+    # of weighted random. Multi-slot days resolve naturally: each run appends to
+    # history, so the next run's lowest *unused* seq advances (seq1→seq2→seq3…).
+    # A failed/un-posted slot stays unused → it's simply picked next (order kept).
+    # Once the planned seq topics are exhausted (or none defined), it falls back
+    # to the weighted random pick below. Other niches (no 'seq') are unaffected.
+    seq_avail = [t for t in avail if isinstance(t.get("seq"), int)]
+    if seq_avail:
+        chosen = min(seq_avail, key=lambda t: t["seq"])
+    elif avail:
         # Weighted pick. DATA-DRIVEN (Itihaasvani analytics): mythology FIGURE
         # topics (warriors/gods/legends — non-footage) crush monument/footage
         # ones for this audience (350-550 views vs 13-140). So figures get 3x
