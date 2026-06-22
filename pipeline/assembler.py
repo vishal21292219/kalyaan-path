@@ -406,26 +406,19 @@ def _apply_caption_batches(base: "Path", entries: list, work: "Path", BR: str,
 def _apply_brand_overlays(base: "Path", work: "Path", BR: str, cfg: dict,
                           script: dict, W: int, H: int, duration: float) -> "Path":
     """OPTIONAL on-screen brand + retention overlays, gated by `video.brand_overlays`
-    and FULLY guarded. Adds:
-      1. a big opening HOOK CARD (first ~3s) — wins the 3-second retention battle
-         that decides Reel distribution, and
-      2. a small persistent channel WORDMARK (brand recall → follows).
+    and FULLY guarded. Adds a small persistent channel WORDMARK (brand recall →
+    follows) in the top-left corner.
     Runs as its OWN isolated pass AFTER captions, so any failure here can never
     break the caption batches or the render: on ANY error it returns `base`
-    unchanged and the reel still ships normally."""
+    unchanged and the reel still ships normally.
+    NOTE: the opening HOOK CARD was removed — on a centred-deity composition it
+    covered the deity's face, and the word-by-word captions already show the
+    spoken hook, so it was redundant and ugly."""
     if not cfg.get("video", {}).get("brand_overlays"):
         return base
     try:
         entries = []  # (png, x_expr, y_expr, start, end)
-        # 1) Opening hook card — the strongest pain line, big, upper third, 0–3s.
-        body = script.get("body") or []
-        hook = (script.get("hook") or script.get("title")
-                or (body[0] if isinstance(body, list) and body else "")).strip()
-        if hook:
-            hp = work / "brand_hook.png"
-            _render_caption_png(hook[:90], W, max(72, int(W * 0.075)), 0.55, hp)
-            entries.append((hp, "(W-w)/2", "H*0.10", 0.0, 3.0))
-        # 2) Persistent wordmark (brand "bug"), small, top-left, whole video.
+        # Persistent wordmark (brand "bug"), small, top-left, whole video.
         mark = ((cfg.get("branding", {}) or {}).get("channel_handle") or "").strip()
         if mark:
             mp = work / "brand_mark.png"
