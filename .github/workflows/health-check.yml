@@ -1,0 +1,43 @@
+# Self-healing watchdog. Runs OFFSET (:30) from the poster (:00) so a skipped
+# GitHub cron can't strand reels for long. Each run: posts any stuck reel
+# (auto-fix), audits delivered/queue/failed-runs, and sends ONE clean Discord
+# status (🟢/🟡/🔴) — so a status check returns a verdict, not "X failed".
+name: Health Check (watchdog + auto-fix)
+
+on:
+  schedule:
+    - cron: "30 */2 * * *"   # every 2h at :30, offset from the poster's :00
+  workflow_dispatch:
+
+permissions:
+  contents: write   # persist the posted-ledger after auto-posting
+  actions: read     # list recent workflow runs to detect failures
+
+concurrency:
+  group: reel-poster      # SHARE the poster's group → never post concurrently with the poster
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests python-dotenv
+      - name: Watchdog — auto-fix stuck reels + audit + report
+        env:
+          MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python pipeline/health_check.py
+      - name: Persist state (ledger MUST land after any auto-post)
+        if: always()
+        run: python pipeline/persist_state.py
