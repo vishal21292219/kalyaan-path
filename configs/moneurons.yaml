@@ -210,6 +210,10 @@ publish:
 
 video:
   bitrate: 6M
+  # On-screen brand + retention overlays (assembler._apply_brand_overlays):
+  # opening HOOK CARD (0–3s, wins the 3-sec retention battle + becomes the FB
+  # reel cover) + a small persistent @moneurons wordmark. Gated + fully guarded.
+  brand_overlays: true
   music: true
   music_volume: 0.05   # subtle modern bed, low — narration stays hero
   stings: false

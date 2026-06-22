@@ -1,25 +1,267 @@
 {
   "_note": "Moneurons / Money Neurons — money-psychology Shorts for US 18-45. Hooks rebuilt 2026-06-19 from real TikTok/YouTube trending data: plot-twist STORY, contrarian BINARY, perception REFRAME, FEAR+LIST, AUTHORITY drop, SAVE-BAIT. Open ON the hook, no setup. ~40s, 8 body lines. query = MODERN dark-luxury finance scene (never ancient).",
   "topics": [
-    {"title": "The Coffee That Built an Empire", "hook": "A struggling cafe owner was about to shut down. Then a billionaire told him to give his coffee away for free.", "query": "modern minimalist coffee shop night city lights"},
-    {"title": "Why Smart People Stay Poor", "hook": "The smartest person you know is probably broke. And intelligence has nothing to do with it.", "query": "sharp businessman tailored suit dark office night skyline"},
-    {"title": "Most People vs Rich People", "hook": "Most people spend to look rich. Rich people spend to never work again. That's the whole game.", "query": "luxury penthouse interior manhattan night view"},
-    {"title": "Same Action, Different Judgement", "hook": "Eat plain rice and you're broke. A millionaire eats it and it's called discipline. Money changes the filter, not the act.", "query": "wealthy man simple meal marble kitchen luxury apartment"},
-    {"title": "Why You'll Stay Broke Forever", "hook": "Three quiet habits keep people broke for life, and the first one feels responsible.", "query": "stressed person laptop bills dark room night"},
-    {"title": "The Lifestyle Inflation Trap", "hook": "Every raise made you feel richer and kept you exactly as broke as before. Here's the trap.", "query": "luxury car showroom shopping bags consumer spending"},
-    {"title": "What Morgan Housel Knows About You", "hook": "Morgan Housel said spending money to show people you have money is the fastest way to have less of it.", "query": "expensive watch luxury store glass display gold"},
-    {"title": "Rich Habits Poor People Ignore", "hook": "Rich people pay themselves first. Everyone else pays themselves last, then wonders where it all went.", "query": "modern banking app phone transfer money desk night"},
-    {"title": "Your Salary Is the Trap", "hook": "A salary won't make you rich. Neither will a business. Real wealth is built at one moment most people never reach.", "query": "corporate office tower night businessman window city"},
-    {"title": "Rich People Buy Time", "hook": "Poor people buy things. Rich people buy back their own time. Once you see it, you can't unsee it.", "query": "luxury watch close up time clock dark gold"},
-    {"title": "The Millionaire Next Door", "hook": "The richest person on your street drives an old car and you'd never suspect them. That's not an accident.", "query": "ordinary modern house quiet street evening understated"},
-    {"title": "Why Most Investors Lose", "hook": "The market doesn't take your money. Your own fear and greed quietly hand it over.", "query": "stock market candlestick chart screen red green dark"},
-    {"title": "Naval's Rule of Wealth", "hook": "Naval Ravikant said you won't get rich renting out your time. The rich own things that earn while they sleep.", "query": "modern luxury bedroom city skyline night dim light"},
-    {"title": "The $5 Latte Lie", "hook": "It was never about the latte. The latte is just where your money leaks finally become visible.", "query": "espresso coffee marble desk laptop morning luxury"},
-    {"title": "Delayed Gratification Is a Cheat Code", "hook": "The most underrated money skill isn't earning or investing. It's the ability to wait when everyone else can't.", "query": "calm man window rain night city lights reflection"},
-    {"title": "The Emotion Behind Every Purchase", "hook": "You don't buy products. You buy a feeling. Every empire is built on someone's quiet desire.", "query": "luxury shopping mall night neon designer store"},
-    {"title": "Why Looking Rich Keeps You Poor", "hook": "Looking rich and being rich are opposite strategies. Most people pick the one that bankrupts them.", "query": "designer fashion luxury boutique gold mannequin"},
-    {"title": "Charlie Munger's Brutal Truth", "hook": "Charlie Munger said the first rule of compounding is to never interrupt it. Almost nobody can resist.", "query": "chess board strategy dark moody close up gold light"},
-    {"title": "Money Habits That Made Me Wealthy", "hook": "Five quiet habits separate the wealthy from everyone else, and none of them are about income.", "query": "modern luxury home office night laptop city view"},
-    {"title": "The High-Income Poverty Trap", "hook": "You can earn six figures and still feel broke every single month. This is why.", "query": "young professional luxury apartment stressed phone night"}
+    {
+      "title": "The Coffee That Built an Empire",
+      "hook": "A struggling cafe owner was about to shut down. Then a billionaire told him to give his coffee away for free.",
+      "query": "modern minimalist coffee shop night city lights"
+    },
+    {
+      "title": "Why Smart People Stay Poor",
+      "hook": "The smartest person you know is probably broke. And intelligence has nothing to do with it.",
+      "query": "sharp businessman tailored suit dark office night skyline",
+      "seq": 3
+    },
+    {
+      "title": "Most People vs Rich People",
+      "hook": "Most people spend to look rich. Rich people spend to never work again. That's the whole game.",
+      "query": "luxury penthouse interior manhattan night view"
+    },
+    {
+      "title": "Same Action, Different Judgement",
+      "hook": "Eat plain rice and you're broke. A millionaire eats it and it's called discipline. Money changes the filter, not the act.",
+      "query": "wealthy man simple meal marble kitchen luxury apartment"
+    },
+    {
+      "title": "Why You'll Stay Broke Forever",
+      "hook": "Three quiet habits keep people broke for life, and the first one feels responsible.",
+      "query": "stressed person laptop bills dark room night"
+    },
+    {
+      "title": "The Lifestyle Inflation Trap",
+      "hook": "Every raise made you feel richer and kept you exactly as broke as before. Here's the trap.",
+      "query": "luxury car showroom shopping bags consumer spending",
+      "seq": 27
+    },
+    {
+      "title": "What Morgan Housel Knows About You",
+      "hook": "Morgan Housel said spending money to show people you have money is the fastest way to have less of it.",
+      "query": "expensive watch luxury store glass display gold",
+      "seq": 24
+    },
+    {
+      "title": "Rich Habits Poor People Ignore",
+      "hook": "Rich people pay themselves first. Everyone else pays themselves last, then wonders where it all went.",
+      "query": "modern banking app phone transfer money desk night",
+      "seq": 30
+    },
+    {
+      "title": "Your Salary Is the Trap",
+      "hook": "A salary won't make you rich. Neither will a business. Real wealth is built at one moment most people never reach.",
+      "query": "corporate office tower night businessman window city"
+    },
+    {
+      "title": "Rich People Buy Time",
+      "hook": "Poor people buy things. Rich people buy back their own time. Once you see it, you can't unsee it.",
+      "query": "luxury watch close up time clock dark gold",
+      "seq": 6
+    },
+    {
+      "title": "The Millionaire Next Door",
+      "hook": "The richest person on your street drives an old car and you'd never suspect them. That's not an accident.",
+      "query": "ordinary modern house quiet street evening understated",
+      "seq": 9
+    },
+    {
+      "title": "Why Most Investors Lose",
+      "hook": "The market doesn't take your money. Your own fear and greed quietly hand it over.",
+      "query": "stock market candlestick chart screen red green dark",
+      "seq": 36
+    },
+    {
+      "title": "Naval's Rule of Wealth",
+      "hook": "Naval Ravikant said you won't get rich renting out your time. The rich own things that earn while they sleep.",
+      "query": "modern luxury bedroom city skyline night dim light",
+      "seq": 12
+    },
+    {
+      "title": "The $5 Latte Lie",
+      "hook": "It was never about the latte. The latte is just where your money leaks finally become visible.",
+      "query": "espresso coffee marble desk laptop morning luxury"
+    },
+    {
+      "title": "Delayed Gratification Is a Cheat Code",
+      "hook": "The most underrated money skill isn't earning or investing. It's the ability to wait when everyone else can't.",
+      "query": "calm man window rain night city lights reflection",
+      "seq": 15
+    },
+    {
+      "title": "The Emotion Behind Every Purchase",
+      "hook": "You don't buy products. You buy a feeling. Every empire is built on someone's quiet desire.",
+      "query": "luxury shopping mall night neon designer store"
+    },
+    {
+      "title": "Why Looking Rich Keeps You Poor",
+      "hook": "Looking rich and being rich are opposite strategies. Most people pick the one that bankrupts them.",
+      "query": "designer fashion luxury boutique gold mannequin",
+      "seq": 21
+    },
+    {
+      "title": "Charlie Munger's Brutal Truth",
+      "hook": "Charlie Munger said the first rule of compounding is to never interrupt it. Almost nobody can resist.",
+      "query": "chess board strategy dark moody close up gold light",
+      "seq": 18
+    },
+    {
+      "title": "Money Habits That Made Me Wealthy",
+      "hook": "Five quiet habits separate the wealthy from everyone else, and none of them are about income.",
+      "query": "modern luxury home office night laptop city view"
+    },
+    {
+      "title": "The High-Income Poverty Trap",
+      "hook": "You can earn six figures and still feel broke every single month. This is why.",
+      "query": "young professional luxury apartment stressed phone night",
+      "seq": 33
+    },
+    {
+      "title": "Why Lottery Winners Go Broke",
+      "hook": "You think more money would fix everything. 70% of lottery winners are broke within years — a poor money mind can't hold a rich account. Your habits set the ceiling, not your income.",
+      "seq": 1
+    },
+    {
+      "title": "Why More Money Won't Fix Your Money Stress",
+      "hook": "You keep thinking the next raise ends the anxiety. Studies show money stress barely drops as income rises — it was never about the number. It's the story you tell yourself about safety.",
+      "seq": 4
+    },
+    {
+      "title": "Why You Self-Sabotage Right Before Getting Rich",
+      "hook": "Every time you get close to real money, something 'happens.' That's an inner thermostat resetting you to the wealth level you secretly believe you deserve. Raise the setting, not just the income.",
+      "seq": 7
+    },
+    {
+      "title": "Why the First $100K Is the Hardest",
+      "hook": "You feel like you save forever and nothing moves. Munger said the first $100K is brutal but you must do it — compounding barely shows up until then. The slow part is where everyone quits.",
+      "seq": 10
+    },
+    {
+      "title": "Why Cheap Things Cost You the Most",
+      "hook": "You buy the cheap version to save money. The poor man pays for boots twice while the rich man buys once. Being broke is expensive.",
+      "seq": 13
+    },
+    {
+      "title": "Why Your Childhood Decides Your Bank Account",
+      "hook": "You think your money habits are choices. Most were installed before you turned seven — watching how your parents fought, hid, or spent. You're running money software you never wrote.",
+      "seq": 16
+    },
+    {
+      "title": "Why Debt Feels Invisible Until It's Too Late",
+      "hook": "Swiping never hurts the way cash does. Your brain feels almost no pain on a card — by design. The gap between buying and paying is where wealth quietly dies.",
+      "seq": 19
+    },
+    {
+      "title": "Why Rich People Say No to Almost Everything",
+      "hook": "You say yes to stay liked, and your money leaks everywhere. Buffett said successful people say no to almost everything. Every yes is a withdrawal — of time, focus, and wealth.",
+      "seq": 22
+    },
+    {
+      "title": "Why You Buy Things to Impress People You Don't Like",
+      "hook": "You spend money you don't have on people you don't even respect. It's status anxiety wearing a logo. The moment you stop performing wealth is the moment you start building it.",
+      "seq": 25
+    },
+    {
+      "title": "Why Your Brain Treats $1,000 Like $100",
+      "hook": "You agonize over a $5 coffee, then drop $1,000 without blinking. Your mind judges money in percentages, not amounts — and that's how it leaks. A dollar is a dollar in every account.",
+      "seq": 28
+    },
+    {
+      "title": "Why Winning the Money Argument Loses the Relationship",
+      "hook": "You prove you're right about the budget, then wonder why it's cold after. Money fights are never about money — they're about fear and control. Win the person, not the point.",
+      "seq": 31
+    },
+    {
+      "title": "Why You Treat Money Like Safety",
+      "hook": "You hoard it, fear losing it, check it to feel okay. Somewhere you learned money equals survival — so no amount feels safe. Security was never in the account. It's in the nervous system.",
+      "seq": 34
+    },
+    {
+      "title": "Why Payday Feels Like Free Money",
+      "hook": "The money lands and suddenly you 'deserve' a treat. Your brain files fresh income as a bonus, not a budget — and it's gone by the weekend. Wealth is built in the 24 hours before you let yourself spend.",
+      "seq": 37
+    },
+    {
+      "title": "Why You Spend More on a Card Than Cash",
+      "hook": "You'd never hand over $80 cash for that — but you'll tap a card for it twice. People spend up to 100% more on plastic. The less it hurts, the more it costs.",
+      "seq": 40
+    },
+    {
+      "title": "Why You Feel Broke Even When You're Not",
+      "hook": "Your income doubled and you still feel behind. It's the treadmill — every new level becomes normal in weeks. Without a definition of 'enough,' no number ever feels like it.",
+      "seq": 2
+    },
+    {
+      "title": "Why You Can't Stop Impulse Buying",
+      "hook": "You feel the urge and it's in the cart before you think. That's a dopamine loop, not a decision. The 24-hour rule kills most of it — the wanting fades when the clock runs.",
+      "seq": 5
+    },
+    {
+      "title": "Why Checking Your Bank Balance Scares You",
+      "hook": "You'd rather not look than know. It's the ostrich effect — avoiding the number feels safer than facing it. But fear grows in the dark; the balance only loses power once you look.",
+      "seq": 8
+    },
+    {
+      "title": "Why Asking for a Raise Terrifies You",
+      "hook": "You'd rather stay underpaid than have the conversation. Underneath is a quiet belief you're not worth more. Your salary reflects your self-worth before it reflects your skill.",
+      "seq": 11
+    },
+    {
+      "title": "Why You Feel Guilty Spending on Yourself",
+      "hook": "You'll buy for everyone but flinch at your own needs. That guilt was learned young — money as scarcity, wanting as selfish. Spending on growth isn't guilt. It's investment.",
+      "seq": 14
+    },
+    {
+      "title": "Why Budgets Never Work for You",
+      "hook": "You make the spreadsheet, then ignore it by week two. Budgets fail because money is emotional, not mathematical. Fix the feeling driving the spend and the numbers fix themselves.",
+      "seq": 17
+    },
+    {
+      "title": "Why You Always Spend What You Earn",
+      "hook": "More comes in, more goes out, nothing's left. Expenses expand to fill the income available — every time. Until you pay yourself first, raises just buy bigger versions of the same trap.",
+      "seq": 20
+    },
+    {
+      "title": "Why You Compare Your Salary to Everyone",
+      "hook": "Their raise quietly ruins your week. Wealth feels relative — you don't want more, you want more than them. That race has no finish line and steals every win you already have.",
+      "seq": 23
+    },
+    {
+      "title": "Why 'Treat Yourself' Is Keeping You Poor",
+      "hook": "Every hard day earns a reward you can't afford. 'Treat yourself' is permission marketing — it sells you broke and calls it self-care. Real self-care is a you that isn't stressed about money.",
+      "seq": 26
+    },
+    {
+      "title": "Why You Undercharge for Your Work",
+      "hook": "You quote low so no one says no. You're not pricing the work — you're pricing your fear of rejection. People trust the number you believe in; raise it and watch.",
+      "seq": 29
+    },
+    {
+      "title": "Why Saving Feels Like Punishment",
+      "hook": "Saving feels like saying no to your life. That's a framing bug — you've cast future-you as the enemy. Flip it: every amount saved is freedom you're buying back.",
+      "seq": 32
+    },
+    {
+      "title": "Why You Keep Saying You'll Invest Later",
+      "hook": "There's always a better time next month. Present bias makes today's coffee feel realer than tomorrow's freedom. The best day was years ago; the second best is the one you keep skipping.",
+      "seq": 35
+    },
+    {
+      "title": "Why You Feel Poor Around Certain People",
+      "hook": "One dinner with them and you feel behind in life. Wealth is relative, and your brain benchmarks to the room you're in. Pick your rooms — they quietly set your sense of enough.",
+      "seq": 38
+    },
+    {
+      "title": "Why You'll Never Feel Ready to Invest",
+      "hook": "You're waiting to understand it all first. That's analysis paralysis dressed as caution — and it costs more than any mistake would. Clarity comes from starting small, not from waiting.",
+      "seq": 41
+    },
+    {
+      "title": "Why You Avoid Talking About Money",
+      "hook": "You'll discuss anything but your salary or your debt. Money is the last taboo — and silence is what keeps you stuck and underpaid. The people who talk about it openly get ahead.",
+      "seq": 39
+    },
+    {
+      "title": "Why You Can't Build Wealth on Willpower Alone",
+      "hook": "You promise to be disciplined and break it by Friday. Willpower is a terrible savings plan. The wealthy don't resist temptation — they automate it away so the right thing happens without them.",
+      "seq": 42
+    }
   ]
 }
