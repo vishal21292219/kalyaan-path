@@ -34,6 +34,16 @@ CHANNEL_NAME = {
     "bhajan": "Kalyaan Path", "itihaas": "Itihaasvani",
     "moneurons": "Money Neurons",
 }
+# A concrete, series-flavoured reason to follow (per channel). A specific promise
+# ("a new god decoded every day") converts far better than a generic "follow for
+# more" — follower conversion is the #1 growth/monetisation lever for these pages.
+FOLLOW_PROMISE = {
+    "godmind": "a new god decoded every day", "gom": "a new god decoded every day",
+    "ancient": "history's hidden secrets decoded daily",
+    "bhakti": "daily shanti, bhakti & inner peace", "bhajan": "daily shanti, bhakti & inner peace",
+    "itihaas": "Bharat ka asli itihaas, roz",
+    "moneurons": "the psychology of money, daily",
+}
 def _promo_comment() -> str:
     """The lead-magnet + paid link block for the FB FIRST COMMENT (kept OUT of the
     caption so the reel's reach isn't penalised for an external link). Only niches
@@ -47,10 +57,23 @@ def _promo_comment() -> str:
 def _caption(script: dict, channel: str = "") -> str:
     # Caption stays link-FREE on purpose — the promo link goes in the first comment
     # (see _promo_comment) so FB doesn't suppress the reel's reach.
-    hook = (script.get("hook") or "").strip()
+    # First line = the strongest pain-first hook. Fallbacks (title → first body
+    # line) guarantee the caption is NEVER empty/weak — FB shows the first ~125
+    # chars in-feed, so a dead first line kills the open-rate.
+    body = script.get("body") or []
+    hook = (script.get("hook") or script.get("title")
+            or (body[0] if isinstance(body, list) and body else "")).strip()
     cta = (script.get("cta") or "").strip()
     name = CHANNEL_NAME.get(channel, "")
-    follow = f"👉 Follow {name} for more." if name else ""
+    # Series-flavoured follow ask with a concrete promise → converts viewers into
+    # followers (the audit's #1 blocker: big reach, weak follow conversion).
+    promise = FOLLOW_PROMISE.get(channel)
+    if name and promise:
+        follow = f"👉 Follow {name} — {promise}. Don't miss the next one."
+    elif name:
+        follow = f"👉 Follow {name} for more."
+    else:
+        follow = ""
     tags = script.get("hashtags") or []
     tagline = " ".join(t if t.startswith("#") else f"#{t}" for t in tags)[:600]
     parts = [p for p in (hook, cta, follow, tagline) if p]
