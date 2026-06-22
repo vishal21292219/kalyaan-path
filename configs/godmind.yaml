@@ -3,6 +3,9 @@ niche: godmind
 branding:
   channel_handle: '@GodsOfTheMind'
   cta: "🧠 Decoding the gods within — Subscribe Gods of the Mind"
+  # Promo CTA auto-appended to every GoM FB/IG caption + YouTube description.
+  # Free lead-magnet first, paid workbook second. Edit here anytime (no code change).
+  promo: "🆓 Free Stage 1 — Become Shiva (Ego-Death Workbook): https://gopulab.gumroad.com/l/cokng\n📖 Full 10-stage Become Shiva workbook ($12): https://gopulab.gumroad.com/l/smaolv"
   ai_disclosure: "🧠 Gods of the Mind | Ancient Hindu wisdom decoded as psychology — original scripts, AI-assisted visuals & narration."
   hashtags:
   - '#godsofthemind'

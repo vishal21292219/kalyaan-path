@@ -69,9 +69,13 @@ def upload(video_path: Path, script: dict, thumb_path: Path | None = None,
         "ai_disclosure",
         "🤖 Made with AI tools | Hand-curated by our team for authentic devotional/educational content."
     )
+    # Optional per-niche promo (lead-magnet + paid product), high in the description.
+    # Only niches whose config defines branding.promo carry it; else "" → no-op.
+    promo = (cfg.get("branding", {}).get("promo") or "").strip()
     description = (
         f"{script.get('description', '')}\n\n"
-        f"{cfg['branding']['cta']}\n\n"
+        + (f"{promo}\n\n" if promo else "")
+        + f"{cfg['branding']['cta']}\n\n"
         f"{credit}\n\n"
         f"{disclosure}\n\n"
         f"{hashtags} {' '.join(script.get('hashtags', []))}"

@@ -22,6 +22,8 @@ import requests
 
 from dotenv import load_dotenv
 
+from .utils import load_config
+
 load_dotenv()
 
 
@@ -37,9 +39,16 @@ def _caption(script: dict, channel: str = "") -> str:
     cta = (script.get("cta") or "").strip()
     name = CHANNEL_NAME.get(channel, "")
     follow = f"👉 Follow {name} for more." if name else ""
+    # Optional per-niche promo (lead-magnet + paid product). Only niches whose
+    # config defines branding.promo carry it; everyone else gets "" → no-op.
+    # Read from the ACTIVE niche config (set_active_niche is done before publish).
+    try:
+        promo = (load_config().get("branding", {}).get("promo") or "").strip()
+    except Exception:
+        promo = ""
     tags = script.get("hashtags") or []
     tagline = " ".join(t if t.startswith("#") else f"#{t}" for t in tags)[:600]
-    parts = [p for p in (hook, cta, follow, tagline) if p]
+    parts = [p for p in (hook, cta, follow, promo, tagline) if p]
     return "\n\n".join(parts)[:2000]
 
 
