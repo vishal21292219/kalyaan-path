@@ -186,6 +186,11 @@ publish:
 
 video:
   bitrate: 6M
+  # On-screen brand + retention overlays (assembler._apply_brand_overlays):
+  # big opening HOOK CARD (0–3s, wins the 3-sec retention battle + becomes the
+  # FB reel cover frame) + a small persistent @GodsOfTheMind wordmark (brand
+  # recall → follows). Gated here + fully guarded, so it can never break renders.
+  brand_overlays: true
   music: true
   music_volume: 0.09   # meditative bed slightly more present (you "lean in to listen")
   stings: false

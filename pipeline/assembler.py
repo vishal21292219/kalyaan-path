@@ -403,6 +403,54 @@ def _apply_caption_batches(base: "Path", entries: list, work: "Path", BR: str,
     return cur
 
 
+def _apply_brand_overlays(base: "Path", work: "Path", BR: str, cfg: dict,
+                          script: dict, W: int, H: int, duration: float) -> "Path":
+    """OPTIONAL on-screen brand + retention overlays, gated by `video.brand_overlays`
+    and FULLY guarded. Adds:
+      1. a big opening HOOK CARD (first ~3s) — wins the 3-second retention battle
+         that decides Reel distribution, and
+      2. a small persistent channel WORDMARK (brand recall → follows).
+    Runs as its OWN isolated pass AFTER captions, so any failure here can never
+    break the caption batches or the render: on ANY error it returns `base`
+    unchanged and the reel still ships normally."""
+    if not cfg.get("video", {}).get("brand_overlays"):
+        return base
+    try:
+        entries = []  # (png, x_expr, y_expr, start, end)
+        # 1) Opening hook card — the strongest pain line, big, upper third, 0–3s.
+        body = script.get("body") or []
+        hook = (script.get("hook") or script.get("title")
+                or (body[0] if isinstance(body, list) and body else "")).strip()
+        if hook:
+            hp = work / "brand_hook.png"
+            _render_caption_png(hook[:90], W, max(72, int(W * 0.075)), 0.55, hp)
+            entries.append((hp, "(W-w)/2", "H*0.10", 0.0, 3.0))
+        # 2) Persistent wordmark (brand "bug"), small, top-left, whole video.
+        mark = ((cfg.get("branding", {}) or {}).get("channel_handle") or "").strip()
+        if mark:
+            mp = work / "brand_mark.png"
+            _render_caption_png(mark, W, 40, 0.0, mp)
+            entries.append((mp, "40", "46", 0.0, max(float(duration), 1.0)))
+        if not entries:
+            return base
+        cur = base
+        for i, (png, x, y, s, e) in enumerate(entries):
+            out = work / f"brandov_{i:02d}.mp4"
+            _run([
+                "ffmpeg", "-y", "-i", str(cur), "-i", str(png),
+                "-filter_complex",
+                f"[0:v][1:v]overlay=x={x}:y={y}:"
+                f"enable='between(t\\,{s:.3f}\\,{e:.3f})'[v]",
+                "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast",
+                "-crf", "16", "-pix_fmt", "yuv420p", str(out),
+            ])
+            cur = out
+        return cur
+    except Exception as ex:
+        print(f"[brand] overlays skipped ({type(ex).__name__}: {ex})")
+        return base
+
+
 def _clean_word(word: str) -> str:
     """Strip punctuation for set-membership lookups."""
     return word.strip(",.!?।॥;:\"'()[]")
@@ -901,12 +949,25 @@ def assemble(
     # filter_complex). Runs AFTER any badge/shloka overlays above.
     if phrase_batch_entries:
         print(f"[captions] applying {len(phrase_batch_entries)} phrase overlays in batches")
-        captioned = _apply_caption_batches(base_for_phrases, phrase_batch_entries, work, BR)
-        if captioned != slides_subbed:
-            shutil.copy(captioned, slides_subbed)
+        # Guarded: a caption-batch failure must NOT kill the whole render (that
+        # turns into a missed post slot). On error, ship the un-captioned cut.
+        try:
+            captioned = _apply_caption_batches(base_for_phrases, phrase_batch_entries, work, BR)
+            if captioned != slides_subbed:
+                shutil.copy(captioned, slides_subbed)
+        except Exception as e:
+            print(f"[captions] phrase overlay batch failed ({e}); shipping without phrase captions")
+            if not slides_subbed.exists():
+                shutil.copy(base_for_phrases, slides_subbed)
     elif not filter_complex:
         # no overlays at all — just copy slides
         shutil.copy(slides, slides_subbed)
+
+    # OPTIONAL on-screen brand + retention overlays (gated by video.brand_overlays,
+    # fully guarded — see _apply_brand_overlays). Isolated pass after captions.
+    _branded = _apply_brand_overlays(slides_subbed, work, BR, cfg, script, W, H, duration)
+    if _branded != slides_subbed:
+        shutil.copy(_branded, slides_subbed)
 
     # 4. Mix audio with optional bg music (ducked). Re-encode video to
     # yuv420p tv-range + faststart so QuickTime / iOS / web players all
