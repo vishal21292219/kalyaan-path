@@ -34,21 +34,26 @@ CHANNEL_NAME = {
     "bhajan": "Kalyaan Path", "itihaas": "Itihaasvani",
     "moneurons": "Money Neurons",
 }
+def _promo_comment() -> str:
+    """The lead-magnet + paid link block for the FB FIRST COMMENT (kept OUT of the
+    caption so the reel's reach isn't penalised for an external link). Only niches
+    whose ACTIVE config defines branding.promo return text; others → "" (no comment)."""
+    try:
+        return (load_config().get("branding", {}).get("promo") or "").strip()
+    except Exception:
+        return ""
+
+
 def _caption(script: dict, channel: str = "") -> str:
+    # Caption stays link-FREE on purpose — the promo link goes in the first comment
+    # (see _promo_comment) so FB doesn't suppress the reel's reach.
     hook = (script.get("hook") or "").strip()
     cta = (script.get("cta") or "").strip()
     name = CHANNEL_NAME.get(channel, "")
     follow = f"👉 Follow {name} for more." if name else ""
-    # Optional per-niche promo (lead-magnet + paid product). Only niches whose
-    # config defines branding.promo carry it; everyone else gets "" → no-op.
-    # Read from the ACTIVE niche config (set_active_niche is done before publish).
-    try:
-        promo = (load_config().get("branding", {}).get("promo") or "").strip()
-    except Exception:
-        promo = ""
     tags = script.get("hashtags") or []
     tagline = " ".join(t if t.startswith("#") else f"#{t}" for t in tags)[:600]
-    parts = [p for p in (hook, cta, follow, promo, tagline) if p]
+    parts = [p for p in (hook, cta, follow, tagline) if p]
     return "\n\n".join(parts)[:2000]
 
 
@@ -116,8 +121,12 @@ def _enqueue(video_url: str, script: dict, channel: str, fb_page_id: str, post_a
         recs = []
     rid = f"{channel}_{post_at}"
     recs = [r for r in recs if r.get("id") != rid]  # dedup → one per slot (channel+time)
-    recs.append({"id": rid, "video_url": video_url, "caption": _caption(script, channel),
-                 "channel": channel, "fb_page_id": (fb_page_id or "").strip(), "post_at": post_at})
+    rec = {"id": rid, "video_url": video_url, "caption": _caption(script, channel),
+           "channel": channel, "fb_page_id": (fb_page_id or "").strip(), "post_at": post_at}
+    _c = _promo_comment()
+    if _c:
+        rec["comment"] = _c   # poster forwards it → Make posts it as the first comment
+    recs.append(rec)
     _PENDING.write_text(json.dumps(recs, ensure_ascii=False, indent=1))
     print(f"[make-reel] QUEUED {rid} for {post_at} → pending_reels.json")
     return True
@@ -151,6 +160,9 @@ def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None
         payload = {"video_url": url, "caption": _caption(script, channel), "channel": channel}
         if fb_page_id:
             payload["fb_page_id"] = str(fb_page_id).strip()
+        _c = _promo_comment()
+        if _c:
+            payload["comment"] = _c
         r = requests.post(webhook, json=payload, timeout=120)
         ok = r.status_code in (200, 202)
         print(f"[make-reel] webhook ({channel}, page={fb_page_id}): {r.status_code} {r.text[:120]}")

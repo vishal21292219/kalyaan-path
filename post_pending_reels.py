@@ -207,6 +207,8 @@ def main():
                        "channel": r.get("channel", "")}
             if r.get("fb_page_id"):
                 payload["fb_page_id"] = r["fb_page_id"]
+            if r.get("comment"):
+                payload["comment"] = r["comment"]   # Make posts it as the first comment
             resp = requests.post(WEBHOOK, json=payload, timeout=120)
             if resp.status_code in (200, 202):
                 posted += 1
