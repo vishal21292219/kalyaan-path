@@ -42,7 +42,7 @@ WEBHOOK = os.getenv("MAKE_REEL_WEBHOOK")
 # stranded/recovered reels across runs instead of flushing them together (the bug
 # that posted 2 GoM reels back-to-back). Channel peaks are ≥4h apart so normal
 # scheduled drops are never blocked; only clustering/recovery is throttled.
-MIN_GAP_HOURS = 3
+MIN_GAP_HOURS = 0
 # A reel more than this many hours past its scheduled peak has MISSED its slot.
 # Drop it (don't fire) instead of posting hours-late, off-peak content. This is
 # also the load-bearing fix for the FB throttle: old already-posted reels that
