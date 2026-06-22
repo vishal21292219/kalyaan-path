@@ -43,6 +43,18 @@ WEBHOOK = os.getenv("MAKE_REEL_WEBHOOK")
 # that posted 2 GoM reels back-to-back). Channel peaks are ≥4h apart so normal
 # scheduled drops are never blocked; only clustering/recovery is throttled.
 MIN_GAP_HOURS = 3
+# A reel more than this many hours past its scheduled peak has MISSED its slot.
+# Drop it (don't fire) instead of posting hours-late, off-peak content. This is
+# also the load-bearing fix for the FB throttle: old already-posted reels that
+# sneak back into the queue (git races between the poster and the generation/
+# catch-up runs re-add them) would otherwise be re-fired every run — Make
+# dedup-blocks the upload but the poster still records a "post", resetting the
+# per-channel gap clock and HOLDING the genuinely-new reel run after run. By
+# dropping anything well past its peak, no stale reel is ever re-fired, so the
+# gap guard only ever reflects real recent posts and fresh reels land on time.
+# Comfortably larger than the 2h poster cadence + GitHub cron lag, so an on-time
+# reel is never dropped; only genuinely-late/phantom ones are.
+MAX_AGE_HOURS = 6
 
 
 def _alert(msg: str) -> None:
@@ -141,6 +153,7 @@ def main():
     n = _now()
     grace = datetime.timedelta(minutes=2)
     stale_cut = n - datetime.timedelta(days=1)
+    past_peak_cut = n - datetime.timedelta(hours=MAX_AGE_HOURS)
     gap = datetime.timedelta(hours=MIN_GAP_HOURS)
     keep, posted, dropped, skipped, held = [], 0, 0, 0, 0
 
@@ -165,6 +178,16 @@ def main():
             continue
         if pa > n + grace:
             keep.append(r)            # not due yet → keep
+            continue
+        # Past its peak by > MAX_AGE_HOURS → MISSED. Drop without firing: never
+        # re-post an already-posted reel that crept back into the queue (which
+        # would re-poison the gap guard and starve fresh reels), and never spam
+        # the page with hours-late, off-peak content. The video stays on Cloudinary.
+        if pa < past_peak_cut:
+            dropped += 1
+            mins = int((n - pa).total_seconds() // 60)
+            print(f"[poster] DROP past-peak {r.get('id')} ({channel}) — "
+                  f"{mins}m late (> {MAX_AGE_HOURS}h); off-peak, not posting")
             continue
         # SOP G2/G3/G5 — NO back-to-back: if this page got a post within the last
         # MIN_GAP_HOURS (incl. one posted earlier in THIS run, since each post
