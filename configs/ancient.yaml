@@ -103,6 +103,21 @@ llm:
   content_spec: |
     OUTPUT RULES — apply to every TimeDecoders Short, no exceptions.
 
+    0. OPEN-LOOP / CURIOSITY-GAP STRUCTURE — the MOST important rule (retention is
+       the #1 thing the algorithm rewards). Build EVERY script as an unresolved loop:
+       - FIRST 1–2 SECONDS: open on a TENSION, an unfinished moment, or a bold
+         incomplete claim the viewer's brain is FORCED to close. Never a slow
+         setup, never "Did you know". They must feel "I HAVE to see how this ends."
+       - TEASE, DON'T TELL: hint at the payoff/twist but withhold it ("what they
+         found inside changes everything…", "the real reason isn't what you think…").
+       - DELAY THE REVEAL: land the main twist/answer at ~70–80% of the script,
+         never up front.
+       - CLOSE THE LOOP: actually deliver the payoff — reward the curiosity, never
+         click-bait and leave it empty (a hook with no payoff kills the channel).
+       - LOOP-BACK ENDING: write the FINAL line to echo/answer the OPENING line →
+         drives replays → more watch-time → more reach.
+       Golden rule: curiosity earns the STOP, real value earns the FOLLOW.
+
     1. title (≤80 chars):
        - English only, NO hashtags in title
        - Start with iconic topic/place name (YouTube search ranking)
