@@ -182,6 +182,10 @@ publish:
 
 video:
   bitrate: 6M
+  # Small persistent @TimeDecoders wordmark (brand recall → follows). Gated +
+  # fully guarded (assembler._apply_brand_overlays). No hook card (removed — it
+  # covered the subject; captions already show the hook).
+  brand_overlays: true
   # A/B TEST (2026-06): re-enabling music with PROPER western cinematic beds
   # (mystery/epic, no Indian instruments — the old annoyance was devotional
   # drone/stings over English footage). Very low volume so narration+footage

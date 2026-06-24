@@ -4,47 +4,56 @@
     {
       "title": "Gobekli Tepe: The Temple That Shouldn't Exist",
       "hook": "It's 12,000 years old, built before farming, before the wheel, before writing.",
-      "query": "ancient stone temple"
+      "query": "ancient stone temple",
+      "seq": 8
     },
     {
       "title": "Scientists Scanned Under the Pyramids And Found a City",
       "hook": "Radar revealed shafts going 2km below Giza, and nobody can explain them.",
-      "query": "giza pyramids egypt"
+      "query": "giza pyramids egypt",
+      "seq": 5
     },
     {
       "title": "The Hidden Void Inside the Pyramid They Can't Open",
       "hook": "A sealed chamber was detected in Menkaure, and it's never been entered.",
-      "query": "pyramid interior chamber"
+      "query": "pyramid interior chamber",
+      "seq": 7
     },
     {
       "title": "Yonaguni: Japan's Underwater Pyramid That Breaks History",
       "hook": "Perfect right angles, 25m underwater, possibly 10,000 years old.",
-      "query": "underwater ruins diver"
+      "query": "underwater ruins diver",
+      "seq": 3
     },
     {
       "title": "Puma Punku: Stone Cut Too Perfect for the Stone Age",
       "hook": "Machine-precision angles carved into the hardest rock on Earth.",
-      "query": "ancient stone ruins"
+      "query": "ancient stone ruins",
+      "seq": 6
     },
     {
       "title": "The Lost City That Sank Beneath the Sea Overnight",
       "hook": "Heracleion vanished underwater and was found 1,200 years later.",
-      "query": "underwater ancient city"
+      "query": "underwater ancient city",
+      "seq": 12
     },
     {
       "title": "Baalbek: The 1,000-Ton Stones No One Can Lift",
       "hook": "Even modern cranes can't move what ancient builders somehow placed.",
-      "query": "ancient roman ruins"
+      "query": "ancient roman ruins",
+      "seq": 11
     },
     {
       "title": "The Nazca Lines Were Never Meant for Human Eyes",
       "hook": "You can only see them from the sky, so who were they for?",
-      "query": "desert aerial landscape"
+      "query": "desert aerial landscape",
+      "seq": 16
     },
     {
       "title": "They Found Cleopatra's Lost Tomb Under the Sea",
       "hook": "A sunken city near Alexandria may end a 2,000-year mystery.",
-      "query": "underwater ocean ruins"
+      "query": "underwater ocean ruins",
+      "seq": 13
     },
     {
       "title": "The Sahara Was Once Green And Something Built Here",
@@ -54,37 +63,44 @@
     {
       "title": "Why the Sphinx Might Be Older Than We Thought",
       "hook": "Water erosion suggests it was carved before the desert existed.",
-      "query": "great sphinx egypt"
+      "query": "great sphinx egypt",
+      "seq": 31
     },
     {
       "title": "The Underground Labyrinth Egypt Tried to Bury",
       "hook": "Ancient writers described 3,000 rooms below the sand.",
-      "query": "ancient stone corridor"
+      "query": "ancient stone corridor",
+      "seq": 29
     },
     {
       "title": "Derinkuyu: The Underground City for 20,000 People",
       "hook": "Hidden 18 stories deep, and we don't know who they were hiding from.",
-      "query": "underground cave tunnel"
+      "query": "underground cave tunnel",
+      "seq": 15
     },
     {
       "title": "Stonehenge's Stones Were Carried 200 Miles. How?",
       "hook": "Each megalith weighs 25 tons and came from another country.",
-      "query": "stonehenge england"
+      "query": "stonehenge england",
+      "seq": 19
     },
     {
       "title": "The Ancient Map That Shows Antarctica With No Ice",
       "hook": "The Piri Reis map drew a coastline buried under ice for 6,000 years.",
-      "query": "antarctica ice landscape"
+      "query": "antarctica ice landscape",
+      "seq": 14
     },
     {
       "title": "Easter Island's Statues Have Bodies You Never See",
       "hook": "The famous heads are buried up to their necks underground.",
-      "query": "easter island statues"
+      "query": "easter island statues",
+      "seq": 17
     },
     {
       "title": "The Indian Temple Carved From a Single Rock",
       "hook": "Kailasa was cut top-down from one mountain with no room for error.",
-      "query": "ancient indian temple"
+      "query": "ancient indian temple",
+      "seq": 18
     },
     {
       "title": "Scientists Are Baffled by the Bosnian Pyramid",
@@ -94,17 +110,20 @@
     {
       "title": "The 5,000-Year-Old City Wired Like It Had Plumbing",
       "hook": "Mohenjo-daro had toilets and drains before most of the world had walls.",
-      "query": "ancient ruins excavation"
+      "query": "ancient ruins excavation",
+      "seq": 36
     },
     {
       "title": "Atlantis Might Be Real And Hidden in the Sahara",
       "hook": "A perfect ring structure in the desert matches Plato's description.",
-      "query": "desert aerial view"
+      "query": "desert aerial view",
+      "seq": 41
     },
     {
       "title": "The Stone Door Sealed for 1,500 Years",
       "hook": "India's Padmanabhaswamy vault has never been opened, and locals say it's cursed.",
-      "query": "ancient temple door"
+      "query": "ancient temple door",
+      "seq": 34
     },
     {
       "title": "Why Did Every Ancient Culture Build Pyramids?",
@@ -119,22 +138,26 @@
     {
       "title": "Petra: The City Carved Into a Cliff Face",
       "hook": "An entire metropolis hidden in rock, lost for over a thousand years.",
-      "query": "petra jordan ruins"
+      "query": "petra jordan ruins",
+      "seq": 21
     },
     {
       "title": "The Mayan City LIDAR Found Hidden in the Jungle",
       "hook": "Lasers revealed millions lived where we saw only trees.",
-      "query": "jungle ancient ruins"
+      "query": "jungle ancient ruins",
+      "seq": 22
     },
     {
       "title": "The Antikythera Mechanism: A 2,000-Year-Old Computer",
       "hook": "It predicted eclipses with gears we couldn't build until the 1700s.",
-      "query": "ancient artifact museum"
+      "query": "ancient artifact museum",
+      "seq": 1
     },
     {
       "title": "Angkor Wat Was Bigger Than We Ever Imagined",
       "hook": "Scans found a vast lost city sprawling around the famous temple.",
-      "query": "angkor wat cambodia"
+      "query": "angkor wat cambodia",
+      "seq": 37
     },
     {
       "title": "The Desert Pyramids of Sudan Nobody Talks About",
@@ -144,12 +167,14 @@
     {
       "title": "Teotihuacan: Built by a Civilization With No Name",
       "hook": "A massive city, and we don't know what its people called themselves.",
-      "query": "teotihuacan pyramid mexico"
+      "query": "teotihuacan pyramid mexico",
+      "seq": 35
     },
     {
       "title": "The Granite Boxes No Tool Could Carve",
       "hook": "Serapeum boxes are cut to micron precision out of solid granite.",
-      "query": "ancient egyptian stone"
+      "query": "ancient egyptian stone",
+      "seq": 20
     },
     {
       "title": "A Drowned Stone Age World Beneath the North Sea",
@@ -164,7 +189,8 @@
     {
       "title": "The Megaliths in Russia That Dwarf Stonehenge",
       "hook": "Mount Shoria's stones may weigh over 3,000 tons each.",
-      "query": "giant boulder mountain"
+      "query": "giant boulder mountain",
+      "seq": 42
     },
     {
       "title": "The Stone Circles Older Than the Pyramids in Africa",
@@ -174,27 +200,32 @@
     {
       "title": "The Sunken Temple City Found Off India's Coast",
       "hook": "Divers off Dwarka found ruins matching a mythical lost city.",
-      "query": "underwater ancient stones"
+      "query": "underwater ancient stones",
+      "seq": 28
     },
     {
       "title": "The Frozen Mummies That Prove an Unknown People",
       "hook": "Tarim mummies in China have European faces and 4,000-year-old secrets.",
-      "query": "desert mummy archaeology"
+      "query": "desert mummy archaeology",
+      "seq": 32
     },
     {
       "title": "The Lost Pharaoh's Tomb They Just Reopened",
       "hook": "Thutmose II's tomb was the first found in the Valley since Tutankhamun.",
-      "query": "egyptian tomb interior"
+      "query": "egyptian tomb interior",
+      "seq": 38
     },
     {
       "title": "The 11,000-Year-Old Town Under Turkey's Soil",
       "hook": "Catalhoyuk had no streets, so everyone walked across the rooftops.",
-      "query": "ancient excavation site"
+      "query": "ancient excavation site",
+      "seq": 30
     },
     {
       "title": "Mohenjo-daro: The City That Was Vitrified",
       "hook": "Some claim the ruins show signs of a heat blast we can't explain.",
-      "query": "ancient ruins desert"
+      "query": "ancient ruins desert",
+      "seq": 24
     },
     {
       "title": "The Ica Stones That Shouldn't Be Possible",
@@ -204,17 +235,20 @@
     {
       "title": "The Library of Alexandria's Final Night",
       "hook": "700,000 scrolls — the entire knowledge of the ancient world — burned in a single night, and we still don't know what we lost.",
-      "query": "ancient library scrolls"
+      "query": "ancient library scrolls",
+      "seq": 40
     },
     {
       "title": "Roman Concrete That Heals Its Own Cracks",
       "hook": "Their 2,000-year-old harbors still stand in the sea, while our concrete crumbles in 50 years — and we just cracked their secret.",
-      "query": "ancient roman ruins"
+      "query": "ancient roman ruins",
+      "seq": 4
     },
     {
       "title": "The 2,400-Year-Old Man With Skin Still Intact",
       "hook": "They pulled him from a bog and his face was perfect — even the food in his stomach survived.",
-      "query": "misty bog wetland"
+      "query": "misty bog wetland",
+      "seq": 10
     },
     {
       "title": "The 1513 Map That Shows Antarctica Without Ice",
@@ -224,7 +258,8 @@
     {
       "title": "The Baghdad Battery: Electricity 2,000 Years Early",
       "hook": "A clay jar, a copper tube, an iron rod — assembled, it still produces a current nobody can explain.",
-      "query": "ancient clay pottery"
+      "query": "ancient clay pottery",
+      "seq": 2
     },
     {
       "title": "The Nazca Lines Only Gods Could See",
@@ -234,17 +269,20 @@
     {
       "title": "The Sealed Tomb of China's First Emperor",
       "hook": "Rivers of mercury, a hidden army, traps still armed — and no one has dared open it in 2,200 years.",
-      "query": "ancient chinese tomb"
+      "query": "ancient chinese tomb",
+      "seq": 9
     },
     {
       "title": "The Antarctic Pyramid Hidden in Plain Sight",
       "hook": "A perfect three-sided peak juts from the ice — too symmetrical, scientists say, to be natural.",
-      "query": "antarctica ice mountains"
+      "query": "antarctica ice mountains",
+      "seq": 23
     },
     {
       "title": "The Megaliths That Weigh More Than Jets",
       "hook": "1,000-ton stones cut and moved with precision — by a people who supposedly had no machines.",
-      "query": "massive stone megalith"
+      "query": "massive stone megalith",
+      "seq": 33
     },
     {
       "title": "The Underwater City Off the Coast of Japan",
@@ -254,22 +292,26 @@
     {
       "title": "The Code in the Voynich Manuscript",
       "hook": "600 years old, written in a language that exists nowhere else — and no human or AI has cracked it.",
-      "query": "old handwritten manuscript"
+      "query": "old handwritten manuscript",
+      "seq": 27
     },
     {
       "title": "The 5,500-Year-Old Sandal Still Tied",
       "hook": "Found in a cave, laces knotted exactly as its owner left them before vanishing.",
-      "query": "dark cave interior"
+      "query": "dark cave interior",
+      "seq": 39
     },
     {
       "title": "The Stone Spheres No One Can Explain",
       "hook": "Hundreds of perfect granite balls, scattered across a jungle — purpose unknown, makers gone.",
-      "query": "jungle ancient stones"
+      "query": "jungle ancient stones",
+      "seq": 26
     },
     {
       "title": "The Roman Dodecahedron Nobody Can Solve",
       "hook": "A bronze object found across an empire — with no manual, no mention, and no agreed-upon use.",
-      "query": "ancient bronze artifact"
+      "query": "ancient bronze artifact",
+      "seq": 25
     },
     {
       "title": "The Door in the Rock at Hayu Marca",
