@@ -1,0 +1,53 @@
+# Auto-replenish topic pools so the pipeline never repeats topics for lack of
+# fresh ones — and nobody has to manually top them up. Runs daily; the LLM is
+# only called for a niche whose fresh pool has dropped below the threshold,
+# otherwise it's a cheap no-op count.
+name: Topic Refill (auto-replenish pools)
+
+on:
+  schedule:
+    - cron: "0 9 * * *"   # daily 09:00 UTC (off-peak) — generates only when low
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: topic-refill
+  cancel-in-progress: false
+
+jobs:
+  refill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Replenish low topic pools (LLM-generated, on-brand)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python -m pipeline.topic_refill godmind ancient moneurons
+      - name: Commit any new topics
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/viral_topics_*.json
+          if git diff --cached --quiet; then
+            echo "no new topics this run"; exit 0
+          fi
+          git commit -m "auto: replenish topic pools [skip ci]"
+          for i in 1 2 3 4 5; do
+            git pull --rebase --autostash origin main && git push origin main && { echo pushed; exit 0; }
+            sleep 3
+          done
+          echo "push failed after retries (will re-attempt next run)"; exit 0
