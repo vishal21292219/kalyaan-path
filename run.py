@@ -51,9 +51,9 @@ def _slot_publish_at(args) -> str | None:
 
 
 def _publish_at_iso(hhmm: str | None) -> str | None:
-    """Turn a 'HH:MM' UTC time-of-day into an RFC3339 timestamp: today's peak if
-    it's still ahead, else NOW (so a late-generated reel is queued for the poster
-    immediately, not deferred 24h). Returns None only if not given/malformed."""
+    """Turn a 'HH:MM' UTC time-of-day into an RFC3339 timestamp at the NEAREST
+    occurrence of that peak: today's if it's still ahead, else either tomorrow's
+    or NOW. Returns None only if not given/malformed."""
     if not hhmm:
         return None
     # Full RFC3339 timestamp (date-specific schedule, e.g. "2026-06-15T01:00:00Z")
@@ -64,14 +64,22 @@ def _publish_at_iso(hhmm: str | None) -> str | None:
         from datetime import datetime, timedelta, timezone
         h, m = (int(x) for x in hhmm.split(":"))
         now = datetime.now(timezone.utc)
-        target = now.replace(hour=h, minute=m, second=0, microsecond=0)
-        # If today's peak already passed, DON'T defer to tomorrow — that stranded
-        # late-generated reels for ~24h and confused catch-up/retry into making
-        # duplicates. Queue for NOW; the reel-poster fires it next run and its
-        # per-page gap guard spaces it, while the poster's ">6h past peak → drop"
-        # rule still prevents posting at a bad off-peak hour.
-        if target <= now:
-            target = now + timedelta(minutes=1)
+        today = now.replace(hour=h, minute=m, second=0, microsecond=0)
+        if today > now:
+            target = today
+        else:
+            # Peak already passed today. Pick whichever occurrence is NEARER:
+            #  - passed >12h ago → it's a late-night peak meant for the NEXT day
+            #    (e.g. GoM's 01:00 slot generated the previous evening ~21:00).
+            #    Schedule tomorrow so it lands AT its peak instead of posting
+            #    hours early, getting gap-held, then dropped >6h past peak — the
+            #    bug that silently ate GoM's 01:00 reel every evening.
+            #  - passed <12h ago → a genuinely missed same-day peak (late gen /
+            #    catch-up re-run). Post NOW+1m so it isn't stranded ~24h; the
+            #    poster's per-page gap guard still spaces it and its ">6h past
+            #    peak → drop" rule still blocks a bad off-peak post.
+            tomorrow = today + timedelta(days=1)
+            target = tomorrow if (now - today) > timedelta(hours=12) else now + timedelta(minutes=1)
         return target.strftime("%Y-%m-%dT%H:%M:%SZ")
     except Exception as e:
         print(f"[publish-at] bad value {hhmm!r} ({e}) — publishing immediately")
