@@ -21,7 +21,8 @@ STATE_DIR = "data/state"
 # Files that must never lose entries (dedup truth). Everything else = best-effort.
 def _is_monotonic(path):
     b = os.path.basename(path)
-    return b in ("posted_reels_log.json", "published_log.json") or "history" in b
+    return b in ("posted_reels_log.json", "published_log.json",
+                 "published_titles.json") or "history" in b
 
 
 def sh(*a):

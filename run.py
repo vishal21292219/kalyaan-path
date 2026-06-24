@@ -237,6 +237,21 @@ def main(argv: list[str]) -> int:
             print(f"[topic] long-form viral-format applied: {topic.get('title')}")
     print(f"[topic] {topic}")
 
+    # TOPIC-based dedup (second layer, after the slot guard above). A different
+    # slot/seed/run picking the SAME topic, or a festival topic repeating across
+    # days, slips past the slot guard and produces a DUPLICATE YouTube upload
+    # (observed: Stonehenge ×7, Overthinking ×2). Skip the WHOLE run (no YT + no
+    # FB) if this topic was already published in the last 10 days. --force bypasses.
+    if (args.publish or args.notify_telegram) and not args.force:
+        try:
+            from pipeline.publish_log import title_published_recently
+            if title_published_recently(topic.get("title", "")):
+                print(f"[dedup] topic '{topic.get('title')}' already published "
+                      f"recently — skipping to avoid a duplicate upload (use --force)")
+                return 0
+        except Exception:
+            traceback.print_exc()
+
     stamp = today_stamp()
     slug = slugify(topic["title"])
     base = f"{stamp}_{slug}"
@@ -670,8 +685,9 @@ def main(argv: list[str]) -> int:
     # 9. Record delivery for the catch-up safety net (only if actually delivered).
     if _delivered:
         try:
-            from pipeline.publish_log import mark_published
+            from pipeline.publish_log import mark_published, mark_title_published
             mark_published(args.niche, args.kind, args.seed_offset)
+            mark_title_published(topic.get("title", ""))  # topic-dedup ledger → no duplicate uploads
             print(f"[catchup] marked {args.niche}/{args.kind} s{args.seed_offset} as delivered today")
         except Exception:
             traceback.print_exc()

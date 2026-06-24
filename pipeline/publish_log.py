@@ -20,6 +20,7 @@ Old days are pruned so the file stays small.
 from __future__ import annotations
 
 import json
+import re
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -27,6 +28,14 @@ from .utils import ROOT
 
 LOG_PATH = ROOT / "data" / "state" / "published_log.json"
 _KEEP_DAYS = 10
+
+# Second, TOPIC-based dedup ledger. The slot guard (was_published_today) only
+# catches the SAME slot re-running. A duplicate upload also happens when a
+# DIFFERENT slot/seed/run picks the SAME topic, or a festival topic repeats
+# across days (the YouTube dups: Stonehenge ×7, Overthinking ×2). This ledger is
+# keyed by the normalised TOPIC title so those are caught too.
+TITLE_LOG_PATH = ROOT / "data" / "state" / "published_titles.json"
+_TITLE_KEEP_DAYS = 12
 
 
 def slot_key(niche: str, kind: str, seed: int = 0) -> str:
@@ -82,6 +91,48 @@ def _coerce_ts(day: str, val) -> datetime | None:
     except Exception:
         return None
     return ts.replace(tzinfo=timezone.utc) if ts.tzinfo is None else ts
+
+
+def _norm_title(title: str) -> str:
+    """Normalise a TOPIC title to a dedup key: lowercase, '#shorts'/'shorts' and
+    all emoji/punctuation stripped, whitespace collapsed. So the same topic always
+    maps to the same key regardless of emoji or the ' #Shorts' suffix."""
+    t = (title or "").lower().replace("#shorts", " ").replace("shorts", " ")
+    t = re.sub(r"[^a-z0-9]+", " ", t)
+    return " ".join(t.split())
+
+
+def _load_titles() -> dict:
+    if TITLE_LOG_PATH.exists():
+        try:
+            return json.loads(TITLE_LOG_PATH.read_text())
+        except Exception:
+            return {}
+    return {}
+
+
+def title_published_recently(title: str, days: int = 10) -> bool:
+    """True if (essentially) this topic was already published in the last `days`.
+    Catches duplicate uploads the slot guard misses (cross-slot same-topic, a
+    festival topic repeating, a re-run after a lost marker)."""
+    key = _norm_title(title)
+    if not key:
+        return False
+    cutoff = (date.today() - timedelta(days=days)).isoformat()
+    val = _load_titles().get(key)
+    return bool(val and str(val) >= cutoff)
+
+
+def mark_title_published(title: str) -> None:
+    """Record a published topic (normalised key → today). Pruned + idempotent."""
+    key = _norm_title(title)
+    if not key:
+        return
+    TITLE_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    cutoff = (date.today() - timedelta(days=_TITLE_KEEP_DAYS)).isoformat()
+    data = {k: v for k, v in _load_titles().items() if str(v) >= cutoff}
+    data[key] = date.today().isoformat()
+    TITLE_LOG_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
 
 def last_published(niche: str, kind: str, seed: int = 0) -> datetime | None:
