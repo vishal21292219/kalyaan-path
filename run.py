@@ -521,6 +521,7 @@ def main(argv: list[str]) -> int:
 
     # Track successful delivery so the catch-up safety net knows this slot is done.
     _delivered = False
+    _platforms: dict = {}   # per-platform outcome (url / queued / posted / failed) for the Discord report
 
     # 6d. notify Telegram (optional). Also fires when facebook_manual is set — while
     # FB auto-posting is paused (Meta account flag), each published video is dropped
@@ -553,9 +554,11 @@ def main(argv: list[str]) -> int:
                 url = yt_upload(video_path, script, thumb_path=thumb_path,
                                 publish_at=_publish_at_iso(_slot_publish_at(args)))
                 print(f"[publish] youtube: {url}")
+                _platforms["youtube"] = url
                 _delivered = True
             except Exception:
                 traceback.print_exc()
+                _platforms["youtube"] = "failed"
                 print("[publish] youtube failed — see traceback above")
         else:
             print("[publish] skipped youtube (disabled in config)")
@@ -569,6 +572,7 @@ def main(argv: list[str]) -> int:
                                    publish_at_iso=_publish_at_iso(_slot_publish_at(args)))
                 if fb_url:
                     print(f"[publish] facebook: {fb_url}")
+                    _platforms["facebook"] = fb_url
                     # Bonus channel: only counts as "slot delivered" (which
                     # suppresses catch-up) when YouTube isn't the primary. Else a
                     # YT failure would be masked and never recovered.
@@ -606,6 +610,7 @@ def main(argv: list[str]) -> int:
                     _fb_at = (_dt.now(_tz.utc) + _td(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
                 if make_upload(video_path, script, channel=args.niche, fb_page_id=_pg, post_at=_fb_at):
                     print(f"[publish] make-reel {('queued for ' + _fb_at) if _fb_at else 'posted'} ({args.niche} → FB page {_pg})")
+                    _platforms["facebook"] = ("queued", _fb_at) if _fb_at else "posted"
                     # Bonus channel: the reel-poster + posted-ledger own FB/IG
                     # reliability. Only mark the SLOT delivered (which suppresses
                     # catch-up) when YouTube isn't the primary for this niche —
@@ -615,6 +620,7 @@ def main(argv: list[str]) -> int:
                         _delivered = True
             except Exception:
                 traceback.print_exc()
+                _platforms["facebook"] = "failed"
                 print("[publish] make-reel failed — see traceback above")
 
         if publish_cfg.get("instagram", False):
@@ -623,8 +629,10 @@ def main(argv: list[str]) -> int:
                     from pipeline.uploader_instagram import upload as ig_upload
                     media_id = ig_upload(args.public_url, script)
                     print(f"[publish] instagram: {media_id}")
+                    _platforms["instagram"] = "posted"
                 except Exception:
                     traceback.print_exc()
+                    _platforms["instagram"] = "failed"
                     print("[publish] instagram failed — see traceback above")
             else:
                 print("[publish] skipped instagram (no --public-url provided)")
@@ -693,8 +701,9 @@ def main(argv: list[str]) -> int:
             traceback.print_exc()
         # Discord alert (Telegram replacement) — fire-and-forget, never breaks a run.
         try:
-            from pipeline.notifier_discord import alert as _dc_alert
-            _dc_alert(f"✅ **{args.niche}** s{args.seed_offset} posted: {script.get('title','')}")
+            from pipeline.notifier_discord import report as _dc_report
+            _dc_report(args.niche, args.seed_offset, script, _platforms,
+                       schedule_iso=_publish_at_iso(_slot_publish_at(args)))
         except Exception:
             pass
 

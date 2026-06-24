@@ -104,8 +104,14 @@ def _discord(msg: str) -> None:
     dw = os.getenv("DISCORD_WEBHOOK")
     if not dw:
         return
+    color = 0x2ECC71  # green
+    if msg.startswith("🔴"):
+        color = 0xE74C3C
+    elif msg.startswith("🟡"):
+        color = 0xF1C40F
+    embed = {"title": "🩺 Pipeline Health Check", "description": msg, "color": color}
     try:
-        requests.post(dw, json={"content": msg}, timeout=20)
+        requests.post(dw, json={"embeds": [embed]}, timeout=20)
     except Exception as e:
         print(f"[health] discord failed: {e}")
 
