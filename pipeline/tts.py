@@ -444,10 +444,15 @@ def _synth_elevenlabs(text: str, out_path: Path, v: dict, is_shloka: bool) -> li
     }
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # Route via an optional proxy (e.g. a Cloudflare Worker) so ElevenLabs works
+    # from datacenter IPs it blocks at the edge (Hetzner etc.). Defaults to the
+    # real API; set ELEVENLABS_BASE_URL to the proxy origin to switch.
+    base = (os.getenv("ELEVENLABS_BASE_URL") or "https://api.elevenlabs.io").rstrip("/")
+
     # PRIMARY: /with-timestamps → audio (base64) + exact per-character alignment.
     try:
         r = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps",
+            f"{base}/v1/text-to-speech/{voice_id}/with-timestamps",
             headers={"xi-api-key": api_key, "Content-Type": "application/json",
                      "Accept": "application/json"},
             json=payload, timeout=180,
@@ -465,7 +470,7 @@ def _synth_elevenlabs(text: str, out_path: Path, v: dict, is_shloka: bool) -> li
     except Exception as e:
         print(f"[tts] /with-timestamps failed ({e}); falling back to plain TTS + uniform estimate")
         r = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            f"{base}/v1/text-to-speech/{voice_id}",
             headers={"xi-api-key": api_key, "Content-Type": "application/json",
                      "Accept": "audio/mpeg"},
             json=payload, timeout=120,
