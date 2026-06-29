@@ -1,15 +1,15 @@
 {
- "date": "22 Jun 2026",
+ "date": "29 Jun 2026",
  "channels": {
   "KalyaanPath": {
-   "subs": 41,
-   "views": 4791,
+   "subs": 44,
+   "views": 4978,
    "videoCount": 44
   },
   "TimeDecoders": {
-   "subs": 152,
-   "views": 24275,
-   "videoCount": 57
+   "subs": 181,
+   "views": 29720,
+   "videoCount": 81
   },
   "Itihaasvani": {
    "subs": 34,
@@ -22,13 +22,13 @@
    "videoCount": null
   },
   "MoneyNeurons": {
-   "subs": 2,
+   "subs": null,
    "views": null,
    "videoCount": null
   },
   "Lakeerein": {
    "subs": 1,
-   "views": 500,
+   "views": 502,
    "videoCount": 8
   }
  }
