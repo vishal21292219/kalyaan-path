@@ -45,7 +45,8 @@ images:
   # ancient/historical look. Flip to `mode: footage` only as a free fallback.
   mode: image
   provider: fal
-  model: fal-ai/flux/dev          # premium 28-step (fal recharged) — crisp dark-luxury
+  model: fal-ai/flux/schnell      # COST CUT 2026-06-30: bulk scenes on cheap schnell (~$0.003 vs dev $0.025). moneurons = abstract luxury (skylines/charts/suits), no recurring character needing 28-step everywhere. 8 imgs/reel: ~$0.20→~$0.024/video.
+  master_model: fal-ai/flux/dev   # focal/hero portrait stays premium 28-step (only used if a subject master is built; consistency OFF = no nano-banana extra cost)
   num_per_reel: 8                  # tighter Short (~40-45s) → 8 scenes, faster pace
   negative: text, watermark, logo, captions, signature, ugly, deformed, mutated, extra fingers, extra limbs, distorted face, broken anatomy, blurry, low quality, cartoon, anime, chibi, childish, meme, comic, washed out, flat lighting, cluttered, poverty, slums, daytime suburban, stock-photo cheesy thumbs-up, clip-art, ANCIENT, historical, medieval, roman, greek, parchment, scroll, hourglass, old coins, vintage, antique, candlelight period, sepia, dusty ruins, toga, ye-olde
   style_suffix: ', dark luxury cinematic finance aesthetic, premium and aspirational, moody low-key lighting with deep blacks and golden rim light, sophisticated and expensive mood — Manhattan skyline at blue hour from a glass penthouse, sleek modern interiors, a focused professional in a tailored suit, glowing stock-market candlestick charts on dark screens, slow-motion luxury, marble, gold, glass and steel, shallow depth of field, color graded teal-and-gold with rich shadows, photorealistic 8K editorial photography, single dominant focal subject, vertical 9:16 portrait, no text no watermark, no cartoon, no clip-art, masterpiece'
