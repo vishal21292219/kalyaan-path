@@ -2,6 +2,78 @@
   "_note": "Fresh viral topic pool for TimeDecoders. pick_viral() rotates with recency avoidance. query = Pexels footage search term.",
   "topics": [
     {
+      "seq": -12,
+      "title": "The Iron Pillar of Delhi: 1,600 Years and It Still Won't Rust",
+      "query": "iron pillar delhi ancient",
+      "hook": "For 1,600 years it has stood in the open air of Delhi — through rain, heat and monsoon — and it has never rusted. Modern metallurgists still cannot fully explain why."
+    },
+    {
+      "seq": -11,
+      "title": "Damascus Steel: A Blade Modern Science Still Can't Recreate",
+      "query": "damascus steel blade pattern ancient",
+      "hook": "Its blades could split a falling hair and never shatter. The recipe was lost three centuries ago — and with all our technology, we still cannot reproduce it."
+    },
+    {
+      "seq": -10,
+      "title": "The Baghdad Battery: 2,000-Year-Old Electricity No One Can Explain",
+      "query": "baghdad battery ancient clay jar copper",
+      "hook": "A 2,000-year-old clay jar, a copper cylinder, an iron rod. Fill it with vinegar and it makes electricity. No one knows what the ancients used it for."
+    },
+    {
+      "seq": -9,
+      "title": "The Nimrud Lens: Ground Glass 3,000 Years Before Telescopes",
+      "query": "nimrud lens rock crystal assyria",
+      "hook": "Three thousand years ago someone in Assyria ground rock crystal into a near-perfect lens — millennia before the telescope was supposedly invented."
+    },
+    {
+      "seq": -8,
+      "title": "Ulfberht Swords: Viking Steel 800 Years Ahead of Its Time",
+      "query": "ulfberht viking sword steel",
+      "hook": "Viking blades stamped with one name were made of steel so pure it needed furnaces over 1,600 degrees — a heat Europe would not reach for another 800 years."
+    },
+    {
+      "seq": -7,
+      "title": "Vitrified Forts: Ancient Walls Melted by a Heat We Can't Match",
+      "query": "vitrified fort melted stone scotland",
+      "hook": "Across Scotland and Europe, ancient stone walls were melted until the rock fused like glass. It takes over a thousand degrees to do this. No one knows how — or why."
+    },
+    {
+      "seq": -6,
+      "title": "The Longyou Caves: Millions of Tool Marks, No Record Who Carved Them",
+      "query": "longyou caves carved rock china",
+      "hook": "Carved by hand from solid rock, covered in millions of identical chisel marks, vast enough to swallow buildings — and not one historical record says who made them."
+    },
+    {
+      "seq": -5,
+      "title": "The Nebra Sky Disc: The Oldest Map of the Stars, 3,600 Years Old",
+      "query": "nebra sky disc bronze gold stars",
+      "hook": "A 3,600-year-old bronze disc inlaid with gold stars — the oldest known map of the sky, made by a people we assumed could never chart the heavens."
+    },
+    {
+      "seq": -4,
+      "title": "The Phaistos Disc: A Printed Code No One Has Ever Cracked",
+      "query": "phaistos disc clay symbols crete",
+      "hook": "A clay disc stamped with 241 symbols using movable type — three thousand years before the printing press. And no one has ever been able to read it."
+    },
+    {
+      "seq": -3,
+      "title": "Klerksdorp Spheres: Grooved Metal Balls in 3-Billion-Year-Old Rock",
+      "query": "klerksdorp spheres metallic grooved",
+      "hook": "Miners in South Africa keep pulling out perfect metallic spheres, grooved around the middle, embedded in rock nearly three billion years old."
+    },
+    {
+      "seq": -2,
+      "title": "The Dendera Light: A Temple Carving That Looks Like a Lightbulb",
+      "query": "dendera temple carving egypt light",
+      "hook": "On the wall of an ancient temple is a carving that looks unmistakably like a giant lightbulb, wires and all. The argument over what it really shows has never ended."
+    },
+    {
+      "seq": -1,
+      "title": "The Sabu Disc: A 5,000-Year-Old Stone Wheel That Shouldn't Exist",
+      "query": "sabu disc stone egypt tri-lobed",
+      "hook": "Buried in a 5,000-year-old tomb was a fragile stone disc carved into a shape no one can explain — too thin, too precise, and useless for anything we know of."
+    },
+    {
       "title": "Gobekli Tepe: The Temple That Shouldn't Exist",
       "hook": "It's 12,000 years old, built before farming, before the wheel, before writing.",
       "query": "ancient stone temple",
@@ -11,19 +83,22 @@
       "title": "Scientists Scanned Under the Pyramids And Found a City",
       "hook": "Radar revealed shafts going 2km below Giza, and nobody can explain them.",
       "query": "giza pyramids egypt",
-      "seq": 5
+      "seq": 5,
+      "weight": 1
     },
     {
       "title": "The Hidden Void Inside the Pyramid They Can't Open",
       "hook": "A sealed chamber was detected in Menkaure, and it's never been entered.",
       "query": "pyramid interior chamber",
-      "seq": 7
+      "seq": 7,
+      "weight": 1
     },
     {
       "title": "Yonaguni: Japan's Underwater Pyramid That Breaks History",
       "hook": "Perfect right angles, 25m underwater, possibly 10,000 years old.",
       "query": "underwater ruins diver",
-      "seq": 3
+      "seq": 3,
+      "weight": 1
     },
     {
       "title": "Puma Punku: Stone Cut Too Perfect for the Stone Age",
@@ -50,12 +125,6 @@
       "seq": 16
     },
     {
-      "title": "They Found Cleopatra's Lost Tomb Under the Sea",
-      "hook": "A sunken city near Alexandria may end a 2,000-year mystery.",
-      "query": "underwater ocean ruins",
-      "seq": 13
-    },
-    {
       "title": "The Sahara Was Once Green And Something Built Here",
       "hook": "Satellite scans found ancient structures buried under the sand.",
       "query": "sahara desert dunes"
@@ -64,13 +133,15 @@
       "title": "Why the Sphinx Might Be Older Than We Thought",
       "hook": "Water erosion suggests it was carved before the desert existed.",
       "query": "great sphinx egypt",
-      "seq": 31
+      "seq": 31,
+      "weight": 1
     },
     {
       "title": "The Underground Labyrinth Egypt Tried to Bury",
       "hook": "Ancient writers described 3,000 rooms below the sand.",
       "query": "ancient stone corridor",
-      "seq": 29
+      "seq": 29,
+      "weight": 1
     },
     {
       "title": "Derinkuyu: The Underground City for 20,000 People",
@@ -105,7 +176,8 @@
     {
       "title": "Scientists Are Baffled by the Bosnian Pyramid",
       "hook": "A hill in Europe may be the largest pyramid ever built.",
-      "query": "pyramid mountain landscape"
+      "query": "pyramid mountain landscape",
+      "weight": 1
     },
     {
       "title": "The 5,000-Year-Old City Wired Like It Had Plumbing",
@@ -128,7 +200,8 @@
     {
       "title": "Why Did Every Ancient Culture Build Pyramids?",
       "hook": "Egypt, Mexico, China and Sudan all did it without ever meeting.",
-      "query": "ancient pyramid ruins"
+      "query": "ancient pyramid ruins",
+      "weight": 1
     },
     {
       "title": "The Underwater Roads Found Off the Bahamas",
@@ -162,19 +235,22 @@
     {
       "title": "The Desert Pyramids of Sudan Nobody Talks About",
       "hook": "Sudan has more pyramids than Egypt, and almost no one visits them.",
-      "query": "sudan desert pyramids"
+      "query": "sudan desert pyramids",
+      "weight": 1
     },
     {
       "title": "Teotihuacan: Built by a Civilization With No Name",
       "hook": "A massive city, and we don't know what its people called themselves.",
       "query": "teotihuacan pyramid mexico",
-      "seq": 35
+      "seq": 35,
+      "weight": 1
     },
     {
       "title": "The Granite Boxes No Tool Could Carve",
       "hook": "Serapeum boxes are cut to micron precision out of solid granite.",
       "query": "ancient egyptian stone",
-      "seq": 20
+      "seq": 20,
+      "weight": 1
     },
     {
       "title": "A Drowned Stone Age World Beneath the North Sea",
@@ -195,25 +271,14 @@
     {
       "title": "The Stone Circles Older Than the Pyramids in Africa",
       "hook": "Nabta Playa tracked the stars 2,000 years before Stonehenge.",
-      "query": "stone circle desert"
+      "query": "stone circle desert",
+      "weight": 1
     },
     {
       "title": "The Sunken Temple City Found Off India's Coast",
       "hook": "Divers off Dwarka found ruins matching a mythical lost city.",
       "query": "underwater ancient stones",
       "seq": 28
-    },
-    {
-      "title": "The Frozen Mummies That Prove an Unknown People",
-      "hook": "Tarim mummies in China have European faces and 4,000-year-old secrets.",
-      "query": "desert mummy archaeology",
-      "seq": 32
-    },
-    {
-      "title": "The Lost Pharaoh's Tomb They Just Reopened",
-      "hook": "Thutmose II's tomb was the first found in the Valley since Tutankhamun.",
-      "query": "egyptian tomb interior",
-      "seq": 38
     },
     {
       "title": "The 11,000-Year-Old Town Under Turkey's Soil",
@@ -267,16 +332,11 @@
       "query": "desert aerial landscape"
     },
     {
-      "title": "The Sealed Tomb of China's First Emperor",
-      "hook": "Rivers of mercury, a hidden army, traps still armed — and no one has dared open it in 2,200 years.",
-      "query": "ancient chinese tomb",
-      "seq": 9
-    },
-    {
       "title": "The Antarctic Pyramid Hidden in Plain Sight",
       "hook": "A perfect three-sided peak juts from the ice — too symmetrical, scientists say, to be natural.",
       "query": "antarctica ice mountains",
-      "seq": 23
+      "seq": 23,
+      "weight": 1
     },
     {
       "title": "The Megaliths That Weigh More Than Jets",
@@ -356,7 +416,8 @@
     {
       "title": "The Statue That Bleeds in the Desert Heat",
       "hook": "A 3,000-year-old colossus that 'sang' at dawn — until the Romans tried to repair it and silenced it.",
-      "query": "egyptian statue desert"
+      "query": "egyptian statue desert",
+      "weight": 1
     },
     {
       "title": "The Lake That Turns Animals to Stone",
@@ -371,7 +432,8 @@
     {
       "title": "The Forbidden City Beneath the Pyramids",
       "hook": "Ground radar found shafts and chambers 2 km under Giza — and excavation was quietly stopped.",
-      "query": "giza pyramids egypt"
+      "query": "giza pyramids egypt",
+      "weight": 1
     },
     {
       "title": "The 12,000-Year-Old Temple Built Before Farming",
@@ -387,11 +449,6 @@
       "title": "The Roman Road Still Perfect After 2,000 Years",
       "hook": "Engineered so well that modern highways trace its exact path — built without a single machine.",
       "query": "ancient stone road"
-    },
-    {
-      "title": "The Pharaoh's Tomb They Just Reopened",
-      "hook": "Sealed for 3,000 years with a warning carved at the door — and the team that entered fell ill.",
-      "query": "egyptian tomb interior"
     },
     {
       "title": "The Bronze Age City That Vanished in a Day",
@@ -449,11 +506,6 @@
       "query": "sahara desert glass"
     },
     {
-      "title": "The Tomb That Killed Everyone Who Opened It",
-      "hook": "A string of sudden deaths followed the men who broke its seal — coincidence, or a 3,000-year warning?",
-      "query": "torch lit tomb"
-    },
-    {
       "title": "The City That Ruled the Amazon Then Disappeared",
       "hook": "LIDAR exposed roads and plazas under the canopy — a million people, erased from memory.",
       "query": "amazon jungle canopy"
@@ -466,12 +518,8 @@
     {
       "title": "The 3,000-Room Labyrinth Egypt Buried",
       "hook": "Ancient writers called it greater than the pyramids — then the sand took it, and we lost the door.",
-      "query": "desert excavation site"
-    },
-    {
-      "title": "The Sword Pulled From a Chinese Tomb — Still Sharp",
-      "hook": "2,500 years underground, untarnished, razor-edged — coated in a metal they shouldn't have known.",
-      "query": "ancient bronze sword"
+      "query": "desert excavation site",
+      "weight": 1
     },
     {
       "title": "The Underwater Wall Longer Than Any Border",
@@ -496,7 +544,8 @@
     {
       "title": "The Pyramid Bigger Than Giza Hidden as a Hill",
       "hook": "For centuries a town grew on its slopes — never knowing it lived atop the largest pyramid on Earth.",
-      "query": "grass covered hill"
+      "query": "grass covered hill",
+      "weight": 1
     },
     {
       "title": "The 1,000-Year-Old Phone From the Americas",
@@ -555,10 +604,6 @@
       "hook": "You feel a restless curiosity about the giants of old when you see seven thousand massive stone fortresses built without a single drop of mortar."
     },
     {
-      "title": "The White Mummies of Western China",
-      "hook": "You feel a strange disconnect when you look at three-thousand-year-old mummies found in Asia wearing European wool and boasting bright red hair."
-    },
-    {
       "title": "The Oldest Submerged City in the World",
       "hook": "You feel a wave of deep-sea claustrophobia thinking about this pristine bronze-age town resting just off the coast of Greece, perfectly preserved beneath the waves."
     },
@@ -572,7 +617,8 @@
     },
     {
       "title": "The 20,000-Year-Old Pyramid Hidden in Indonesia",
-      "hook": "You feel a wave of academic anger when you realize this ordinary-looking hill might actually be a massive stepped pyramid older than the last Ice Age."
+      "hook": "You feel a wave of academic anger when you realize this ordinary-looking hill might actually be a massive stepped pyramid older than the last Ice Age.",
+      "weight": 1
     },
     {
       "title": "The Deepest Underground Sanctuary in Iran",
@@ -644,7 +690,8 @@
     },
     {
       "title": "The Ancient City Swallowed by the Nile",
-      "hook": "You feel a sudden rush of explorer's adrenaline when you see giant statues of pharaohs being pulled from the dark depths of the Mediterranean Sea."
+      "hook": "You feel a sudden rush of explorer's adrenaline when you see giant statues of pharaohs being pulled from the dark depths of the Mediterranean Sea.",
+      "weight": 1
     },
     {
       "title": "The Stone Age Temple Aligned to the Solstice",
