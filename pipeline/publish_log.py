@@ -102,6 +102,98 @@ def _norm_title(title: str) -> str:
     return " ".join(t.split())
 
 
+def _norm_topic(title: str) -> str:
+    """Normalise to the TOPIC segment only — the part BEFORE any subtitle separator
+    (— : | ·  or ' - '). This is what catches the real-world dups the title ledger
+    missed: 'Why Krishna Stole Butter — The Psychology Behind' and '… — The Hidden
+    Psychology' are the SAME topic but have different full titles → different keys.
+    Stripping the subtitle collapses both to 'why krishna stole butter'."""
+    head = re.split(r"\s[—:\|·]\s|\s-\s|[—:\|·]", title or "", maxsplit=1)[0]
+    return _norm_title(head)
+
+
+# niche → YouTube @handle (for the real-time channel-side dedup below).
+_YT_HANDLES = {
+    "godmind": "GodsOfTheMind", "gom": "GodsOfTheMind",
+    "ancient": "TimeDecoders",
+    "moneurons": "moneurons",
+    "bhakti": "KalyaanPath", "bhajan": "KalyaanPath",
+    "itihaas": "Itihaasvani",
+    "lakeerein": "LakeereinStories",
+}
+_READONLY_SCOPE = "https://www.googleapis.com/auth/youtube.readonly"
+
+
+def _reader_creds():
+    """A readonly-capable YouTube OAuth credential. readonly can read the PUBLIC
+    uploads of ANY channel, so one such token (TimeDecoders/ancient is restored in
+    every workflow) works as a universal reader. Returns None if none available."""
+    for name in ("ancient", "bhakti", "lakeerein"):
+        p = ROOT / "secrets" / f"{name}_youtube_token.json"
+        if not p.exists():
+            continue
+        try:
+            d = json.loads(p.read_text())
+        except Exception:
+            continue
+        if _READONLY_SCOPE not in (d.get("scopes") or []):
+            continue
+        try:
+            from google.oauth2.credentials import Credentials
+            return Credentials(
+                token=d.get("token"), refresh_token=d.get("refresh_token"),
+                token_uri=d.get("token_uri", "https://oauth2.googleapis.com/token"),
+                client_id=d.get("client_id"), client_secret=d.get("client_secret"),
+                scopes=d.get("scopes"))
+        except Exception:
+            return None
+    return None
+
+
+def topic_live_on_youtube(topic_title: str, niche: str, days: int = 21) -> bool:
+    """Real-time dedup against ACTUAL YouTube — True if this topic already exists
+    among the channel's recent uploads (last `days`). Immune to the git-race state
+    loss that let duplicates through when runs bunched up (catch-up floods, manual
+    back-to-back triggers). FAIL-OPEN: any error / missing token / quota → False,
+    so it can NEVER block a legitimate upload (a missed slot is worse than a rare
+    dup that the other two ledgers still guard)."""
+    key = _norm_topic(topic_title)
+    handle = _YT_HANDLES.get((niche or "").lower())
+    if not key or len(key) < 10 or not handle:
+        return False
+    try:
+        creds = _reader_creds()
+        if creds is None:
+            return False
+        from googleapiclient.discovery import build
+        yt = build("youtube", "v3", credentials=creds, cache_discovery=False)
+        chs = yt.channels().list(part="contentDetails", forHandle=handle).execute().get("items") or []
+        if not chs:
+            return False
+        up = chs[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+        pit = yt.playlistItems().list(part="contentDetails", playlistId=up, maxResults=40).execute()
+        ids = [i["contentDetails"]["videoId"] for i in pit.get("items", [])]
+        if not ids:
+            return False
+        cutoff = (date.today() - timedelta(days=days)).isoformat()
+        vr = yt.videos().list(part="snippet", id=",".join(ids[:50])).execute()
+        for v in vr.get("items", []):
+            sn = v.get("snippet", {})
+            if (sn.get("publishedAt", "") or "")[:10] < cutoff:
+                continue
+            other = _norm_topic(sn.get("title", ""))
+            if not other:
+                continue
+            if other == key or other.startswith(key + " ") or key.startswith(other + " "):
+                print(f"[dedup] LIVE YouTube match — '{topic_title}' already on @{handle} "
+                      f"(as '{sn.get('title')}') → skipping to avoid a duplicate")
+                return True
+        return False
+    except Exception as e:
+        print(f"[dedup] live YT check skipped ({type(e).__name__}: {e})")
+        return False
+
+
 def _load_titles() -> dict:
     if TITLE_LOG_PATH.exists():
         try:

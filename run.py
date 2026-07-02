@@ -252,9 +252,13 @@ def main(argv: list[str]) -> int:
     # FB) if this topic was already published in the last 10 days. --force bypasses.
     if (args.publish or args.notify_telegram) and not args.force:
         try:
-            from pipeline.publish_log import title_published_recently
-            if title_published_recently(topic.get("title", "")):
-                print(f"[dedup] topic '{topic.get('title')}' already published "
+            from pipeline.publish_log import title_published_recently, topic_live_on_youtube
+            _tt = topic.get("title", "")
+            # Two layers: (1) local ledger (fast, but can be stale under a git-race),
+            # (2) LIVE YouTube check (slower, but immune to state loss — catches the
+            # same-topic-different-subtitle dups the ledger missed). Either → skip.
+            if title_published_recently(_tt) or topic_live_on_youtube(_tt, args.niche):
+                print(f"[dedup] topic '{_tt}' already published "
                       f"recently — skipping to avoid a duplicate upload (use --force)")
                 return 0
         except Exception:
