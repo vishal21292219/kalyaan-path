@@ -15,8 +15,8 @@
       "next_retry_at": "2026-07-04T20:00:37Z"
     },
     {
-      "id": "godmind_trending_3_auto",
-      "niche": "godmind",
+      "id": "moneurons_trending_3_auto",
+      "niche": "moneurons",
       "kind": "trending",
       "topic": "auto",
       "seed_offset": 3,
@@ -24,9 +24,9 @@
       "failed_reason": "GeminiUnavailable: Gemini failed after 5 retries: HTTP 429 — {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a",
       "attempts": 1,
       "status": "PENDING",
-      "first_failed_at": "2026-07-04T20:35:33Z",
-      "last_attempted_at": "2026-07-04T20:35:33Z",
-      "next_retry_at": "2026-07-04T21:35:33Z"
+      "first_failed_at": "2026-07-04T20:50:38Z",
+      "last_attempted_at": "2026-07-04T20:50:38Z",
+      "next_retry_at": "2026-07-04T21:50:38Z"
     }
   ]
 }
