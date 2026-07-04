@@ -8,11 +8,25 @@
       "seed_offset": 3,
       "mode": "publish",
       "failed_reason": "GeminiUnavailable: Gemini failed after 5 retries: HTTP 429 — {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a",
-      "attempts": 1,
+      "attempts": 2,
       "status": "PENDING",
       "first_failed_at": "2026-07-04T19:00:37Z",
-      "last_attempted_at": "2026-07-04T19:00:37Z",
-      "next_retry_at": "2026-07-04T20:00:37Z"
+      "last_attempted_at": "2026-07-04T20:52:07Z",
+      "next_retry_at": "2026-07-04T21:52:07Z"
+    },
+    {
+      "id": "godmind_trending_3_auto",
+      "niche": "godmind",
+      "kind": "trending",
+      "topic": "auto",
+      "seed_offset": 3,
+      "mode": "publish",
+      "failed_reason": "GeminiUnavailable: Gemini failed after 5 retries: HTTP 429 — {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a",
+      "attempts": 1,
+      "status": "PENDING",
+      "first_failed_at": "2026-07-04T21:21:35Z",
+      "last_attempted_at": "2026-07-04T21:21:35Z",
+      "next_retry_at": "2026-07-04T22:21:35Z"
     },
     {
       "id": "moneurons_trending_3_auto",
@@ -24,9 +38,9 @@
       "failed_reason": "GeminiUnavailable: Gemini failed after 5 retries: HTTP 429 — {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a",
       "attempts": 1,
       "status": "PENDING",
-      "first_failed_at": "2026-07-04T20:50:38Z",
-      "last_attempted_at": "2026-07-04T20:50:38Z",
-      "next_retry_at": "2026-07-04T21:50:38Z"
+      "first_failed_at": "2026-07-04T21:37:24Z",
+      "last_attempted_at": "2026-07-04T21:37:24Z",
+      "next_retry_at": "2026-07-04T22:37:24Z"
     }
   ]
 }
