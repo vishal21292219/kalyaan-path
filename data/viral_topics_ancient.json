@@ -2,6 +2,54 @@
   "_note": "Fresh viral topic pool for TimeDecoders. pick_viral() rotates with recency avoidance. query = Pexels footage search term.",
   "topics": [
     {
+      "seq": -20,
+      "title": "Oumuamua: The Interstellar Object That Sped Up On Its Own",
+      "query": "oumuamua interstellar object cosmic space",
+      "hook": "In 2017 a cigar-shaped object tumbled through our solar system from another star — then accelerated as it left, with no engine, no tail, no explanation. A Harvard astronomer said the numbers only make sense one way."
+    },
+    {
+      "seq": -19,
+      "title": "The WOW! Signal: 72 Seconds From Space That Never Repeated",
+      "query": "wow signal radio telescope deep space",
+      "hook": "In 1977 a telescope caught a signal from deep space so strong the astronomer circled it and wrote one word: Wow. It lasted 72 seconds, came from a starless patch of sky, and has never been heard again."
+    },
+    {
+      "seq": -18,
+      "title": "The Star That's Older Than the Universe Itself",
+      "query": "methuselah star ancient cosmic space",
+      "hook": "A star 190 light-years away measures 14.5 billion years old — older than the universe that supposedly made it. Either our science is broken, or this star should not exist."
+    },
+    {
+      "seq": -17,
+      "title": "The Planet Made of Diamond, Twice the Size of Earth",
+      "query": "diamond planet 55 cancri cosmic space",
+      "hook": "Forty light-years away orbits a world whose surface may be crystallized carbon — a planet that could be one-third pure diamond, worth more than every economy on Earth combined."
+    },
+    {
+      "seq": -16,
+      "title": "The Cold Spot: A Hole in the Universe 1.8 Billion Light-Years Wide",
+      "query": "cmb cold spot supervoid universe cosmic",
+      "hook": "In one direction of the sky lies a region so vast, so empty and so cold it should not be possible. Some scientists believe it is a scar — the mark where our universe collided with another."
+    },
+    {
+      "seq": -15,
+      "title": "Tabby's Star: The Light That Dims Like Something's Blocking It",
+      "query": "tabbys star boyajian dimming cosmic space",
+      "hook": "One star flickers in a pattern no natural object explains — dimming by 22 percent at random, as if something enormous orbits it. For a while, even scientists could not rule out a structure built by someone."
+    },
+    {
+      "seq": -14,
+      "title": "The Great Attractor: Something Is Pulling Our Galaxy Toward It",
+      "query": "great attractor galaxy gravity cosmic space",
+      "hook": "Our entire galaxy is being dragged through space at over a million miles per hour toward a single point — and it hides behind the Milky Way, so we cannot see what is pulling us in."
+    },
+    {
+      "seq": -13,
+      "title": "The Signal From Space That Repeats Every 157 Days",
+      "query": "fast radio burst repeating signal cosmic space",
+      "hook": "A blast of radio energy from 3 billion light-years away arrives on a schedule — every 157 days, like clockwork. In a fraction of a second it unleashes more energy than the Sun makes in years. Nobody knows the source."
+    },
+    {
       "seq": -11,
       "title": "Damascus Steel: A Blade Modern Science Still Can't Recreate",
       "query": "damascus steel blade pattern ancient",
