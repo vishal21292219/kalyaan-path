@@ -150,7 +150,7 @@ def _reader_creds():
     return None
 
 
-def topic_live_on_youtube(topic_title: str, niche: str, days: int = 21) -> bool:
+def topic_live_on_youtube(topic_title: str, niche: str, days: int = 45) -> bool:
     """Real-time dedup against ACTUAL YouTube — True if this topic already exists
     among the channel's recent uploads (last `days`). Immune to the git-race state
     loss that let duplicates through when runs bunched up (catch-up floods, manual
@@ -171,23 +171,34 @@ def topic_live_on_youtube(topic_title: str, niche: str, days: int = 21) -> bool:
         if not chs:
             return False
         up = chs[0]["contentDetails"]["relatedPlaylists"]["uploads"]
-        pit = yt.playlistItems().list(part="contentDetails", playlistId=up, maxResults=40).execute()
-        ids = [i["contentDetails"]["videoId"] for i in pit.get("items", [])]
+        # Fetch a WIDE window of recent uploads (~120 ≈ 40 days at 3/day) so a topic
+        # that already aired weeks ago is still caught — the Iron Pillar (aired 06-13)
+        # and Baghdad Battery (06-04) dups slipped through when this only looked at the
+        # last ~13 days.
+        ids, tok = [], None
+        while len(ids) < 120:
+            pit = yt.playlistItems().list(part="contentDetails", playlistId=up,
+                                          maxResults=50, pageToken=tok).execute()
+            ids += [i["contentDetails"]["videoId"] for i in pit.get("items", [])]
+            tok = pit.get("nextPageToken")
+            if not tok:
+                break
         if not ids:
             return False
         cutoff = (date.today() - timedelta(days=days)).isoformat()
-        vr = yt.videos().list(part="snippet", id=",".join(ids[:50])).execute()
-        for v in vr.get("items", []):
-            sn = v.get("snippet", {})
-            if (sn.get("publishedAt", "") or "")[:10] < cutoff:
-                continue
-            other = _norm_topic(sn.get("title", ""))
-            if not other:
-                continue
-            if other == key or other.startswith(key + " ") or key.startswith(other + " "):
-                print(f"[dedup] LIVE YouTube match — '{topic_title}' already on @{handle} "
-                      f"(as '{sn.get('title')}') → skipping to avoid a duplicate")
-                return True
+        for b in range(0, len(ids), 50):
+            vr = yt.videos().list(part="snippet", id=",".join(ids[b:b + 50])).execute()
+            for v in vr.get("items", []):
+                sn = v.get("snippet", {})
+                if (sn.get("publishedAt", "") or "")[:10] < cutoff:
+                    continue
+                other = _norm_topic(sn.get("title", ""))
+                if not other:
+                    continue
+                if other == key or other.startswith(key + " ") or key.startswith(other + " "):
+                    print(f"[dedup] LIVE YouTube match — '{topic_title}' already on @{handle} "
+                          f"(as '{sn.get('title')}') → skipping to avoid a duplicate")
+                    return True
         return False
     except Exception as e:
         print(f"[dedup] live YT check skipped ({type(e).__name__}: {e})")

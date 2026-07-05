@@ -2,22 +2,10 @@
   "_note": "Fresh viral topic pool for TimeDecoders. pick_viral() rotates with recency avoidance. query = Pexels footage search term.",
   "topics": [
     {
-      "seq": -12,
-      "title": "The Iron Pillar of Delhi: 1,600 Years and It Still Won't Rust",
-      "query": "iron pillar delhi ancient",
-      "hook": "For 1,600 years it has stood in the open air of Delhi — through rain, heat and monsoon — and it has never rusted. Modern metallurgists still cannot fully explain why."
-    },
-    {
       "seq": -11,
       "title": "Damascus Steel: A Blade Modern Science Still Can't Recreate",
       "query": "damascus steel blade pattern ancient",
       "hook": "Its blades could split a falling hair and never shatter. The recipe was lost three centuries ago — and with all our technology, we still cannot reproduce it."
-    },
-    {
-      "seq": -10,
-      "title": "The Baghdad Battery: 2,000-Year-Old Electricity No One Can Explain",
-      "query": "baghdad battery ancient clay jar copper",
-      "hook": "A 2,000-year-old clay jar, a copper cylinder, an iron rod. Fill it with vinegar and it makes electricity. No one knows what the ancients used it for."
     },
     {
       "seq": -9,
@@ -321,12 +309,6 @@
       "query": "old world map parchment"
     },
     {
-      "title": "The Baghdad Battery: Electricity 2,000 Years Early",
-      "hook": "A clay jar, a copper tube, an iron rod — assembled, it still produces a current nobody can explain.",
-      "query": "ancient clay pottery",
-      "seq": 2
-    },
-    {
       "title": "The Nazca Lines Only Gods Could See",
       "hook": "Miles of perfect figures carved into the desert — invisible from the ground, flawless from the sky.",
       "query": "desert aerial landscape"
@@ -454,11 +436,6 @@
       "title": "The Bronze Age City That Vanished in a Day",
       "hook": "Streets full of homes, no bodies, no battle — an entire people gone, as if they walked out together.",
       "query": "ancient excavation ruins"
-    },
-    {
-      "title": "The 1,600-Year-Old Iron Pillar That Won't Rust",
-      "hook": "Open to monsoon rain for sixteen centuries — and metallurgists still can't reproduce it.",
-      "query": "ancient iron pillar"
     },
     {
       "title": "The Cave Paintings Older Than Humans in Europe",
