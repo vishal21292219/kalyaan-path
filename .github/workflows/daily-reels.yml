@@ -53,9 +53,9 @@ on:
     - cron: "0 19 * * *"    # gen 19:00 UTC → peak 01:00 UTC / 9 PM ET (6h buffer)   [GoM #3]
     # Money Neurons (MN — US money-psychology): 3/day, big buffer → publishAt peaks.
     # Gens staggered from GoM minutes + ≥3h apart same-niche → no collision / no dup.
-    - cron: "25 12 * * *"   # gen 12:25 UTC → peak 17:00 UTC / 1 PM ET   [MN #1 seed1]
-    - cron: "5 16 * * *"    # gen 16:05 UTC → peak 22:00 UTC / 6 PM ET   [MN #2 seed2]
-    - cron: "25 19 * * *"   # gen 19:25 UTC → peak 01:00 UTC / 9 PM ET   [MN #3 seed3]
+    # - cron: "25 12 * * *"   # [MN #1] PAUSED 2026-07-05 — moneurons cut to 1/day (2 subs, finance niche gatekept)
+    # - cron: "5 16 * * *"    # [MN #2] PAUSED 2026-07-05 — moneurons cut to 1/day
+    - cron: "25 19 * * *"   # gen 19:25 UTC → peak 01:00 UTC / 9 PM ET   [MN #3 seed3] — only MN slot kept (US prime)
     # - cron: "0 11 * * 6"    # Itihaasvani Saturday LONG-FORM — HELD 2026-06-20
     # - cron: "30 16 * * 6"   # TimeDecoders Saturday long-form — PARKED until pivot strategy ready
     # ONE-OFF: Neem Karoli Baba Jayanti (15 June) — DISABLED 2026-06-09: the katha
