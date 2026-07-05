@@ -52,7 +52,7 @@ def render_race(spec, bgpath, out):
             d.text((190,cy),initials(nm),font=anton(30),fill=(255,255,255),anchor="mm")
             d.text((68,cy),str(targ[nm]+1),font=osw(38),fill=(150,165,190),anchor="mm")
             d.text((x0+18,cy),nm,font=anton(26),fill=(255,255,255),anchor="lm")
-            vv=f"{unit}{v/1000:.1f}T" if (suf=='B' and v>=1000) else f"{unit}{int(round(v))}{suf}"
+            vv=(f"{unit}{v/1000:.1f}T" if (suf=="B" and v>=1000) else f"{unit}{int(round(v)):,}{suf}")
             d.text((x0+bw+12,cy),vv,font=osw(30),fill=col,anchor="lm")
         return im.convert("RGB")
     FPS=30; per=13; yrs=list(range(int(y0),int(y1)+1))

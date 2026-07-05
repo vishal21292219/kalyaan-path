@@ -1,0 +1,54 @@
+{
+ "title": "SAFE vs RISKY",
+ "subtitle": "$1,000 SINCE 2015",
+ "unit": "$",
+ "suffix": "",
+ "intro": [
+  "$1,000 IN 2015",
+  "safe or risky \u2014 who won?"
+ ],
+ "outro": [
+  "THE LESSON",
+  "Comfort is expensive.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In twenty fifteen, you had one thousand dollars and a choice. Play it safe in a savings account, and today it would be worth barely eleven hundred. Gold would double it. The S and P three x. Apple would make it ten thousand. But Bitcoin, the risky bet everyone laughed at, would have turned that same thousand dollars into over a hundred and fifty thousand. The price of playing it safe has never been clearer. Where was your money? Follow, for the money nobody explains.",
+ "data": {
+  "Bitcoin": {
+   "2015": 1000,
+   "2018": 14000,
+   "2020": 12000,
+   "2021": 120000,
+   "2022": 45000,
+   "2024": 90000,
+   "2026": 165000
+  },
+  "Apple": {
+   "2015": 1000,
+   "2018": 2200,
+   "2020": 4200,
+   "2023": 8000,
+   "2026": 9800
+  },
+  "S&P 500": {
+   "2015": 1000,
+   "2018": 1400,
+   "2020": 1800,
+   "2023": 2500,
+   "2026": 3200
+  },
+  "Gold": {
+   "2015": 1000,
+   "2020": 1700,
+   "2023": 2100,
+   "2026": 2500
+  },
+  "Savings": {
+   "2015": 1000,
+   "2020": 1050,
+   "2023": 1090,
+   "2026": 1130
+  }
+ }
+}

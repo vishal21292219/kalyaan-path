@@ -1,0 +1,64 @@
+{
+ "title": "$1,000 IN CRYPTO",
+ "subtitle": "SINCE 2018",
+ "unit": "$",
+ "suffix": "",
+ "intro": [
+  "$1,000 IN CRYPTO",
+  "which coin exploded the most?"
+ ],
+ "outro": [
+  "REGRET YET?",
+  "BNB quietly beat them all.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "Back in twenty eighteen, everyone was arguing about crypto. Say you ignored the noise and put one thousand dollars into each. Bitcoin would have grown it to around thirteen thousand. Ethereum, twenty five thousand. But the quiet winner nobody talks about? BNB, which turned that thousand dollars into well over a hundred thousand. While Solana came from nowhere to shock everyone. The gap between these coins is staggering. Which did you hold? Follow, for the money nobody explains.",
+ "data": {
+  "BNB": {
+   "2018": 1000,
+   "2019": 3000,
+   "2021": 90000,
+   "2022": 40000,
+   "2024": 110000,
+   "2026": 160000
+  },
+  "Ethereum": {
+   "2018": 1000,
+   "2019": 700,
+   "2021": 18000,
+   "2022": 9000,
+   "2024": 16000,
+   "2026": 28000
+  },
+  "Solana": {
+   "2020": 1000,
+   "2021": 40000,
+   "2022": 8000,
+   "2024": 35000,
+   "2026": 75000
+  },
+  "Bitcoin": {
+   "2018": 1000,
+   "2019": 900,
+   "2021": 9000,
+   "2022": 4000,
+   "2024": 8000,
+   "2026": 14000
+  },
+  "XRP": {
+   "2018": 1000,
+   "2019": 500,
+   "2021": 2500,
+   "2024": 3000,
+   "2026": 6000
+  },
+  "Cardano": {
+   "2018": 1000,
+   "2019": 400,
+   "2021": 9000,
+   "2022": 2000,
+   "2026": 4500
+  }
+ }
+}
