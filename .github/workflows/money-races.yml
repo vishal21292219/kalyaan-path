@@ -6,11 +6,16 @@ on:
 jobs:
   race:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     concurrency:
       group: money-races
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
