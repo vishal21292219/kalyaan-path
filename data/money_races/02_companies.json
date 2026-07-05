@@ -1,0 +1,17 @@
+{"title":"BIGGEST COMPANIES","subtitle":"MARKET CAP - 2000 to 2026","unit":"$","suffix":"B",
+"out":"output/manual/COMPANIES_FINAL.mp4",
+"intro":["THE TRILLION\nDOLLAR RACE","who rules the market?"],
+"outro":["WHO'S NEXT?","Nvidia came from nowhere.","Follow for the money\nnobody explains.","@moneurons"],
+"vo":"In the year two thousand, oil and software giants ruled the market. Then everything changed. Apple explodes from nearly nothing. Amazon and Google rise. And Nvidia, once tiny, storms to the very top in just a few years, powered by the chips behind artificial intelligence. By twenty twenty-six, the trillion dollar throne belongs to a whole new king. Which company takes it next? Follow, for the money nobody explains.",
+"data":{
+"Apple":{"2000":5,"2005":60,"2010":295,"2015":640,"2020":2000,"2023":2900,"2026":3500},
+"Microsoft":{"2000":600,"2005":280,"2010":235,"2015":440,"2020":1600,"2023":2500,"2026":3300},
+"Nvidia":{"2010":10,"2015":15,"2020":320,"2022":420,"2023":1000,"2024":2200,"2026":3400},
+"Amazon":{"2000":15,"2005":20,"2010":80,"2015":315,"2020":1600,"2023":1300,"2026":2100},
+"Alphabet":{"2005":150,"2010":190,"2015":530,"2020":1180,"2023":1600,"2026":2200},
+"Saudi Aramco":{"2019":1700,"2020":1800,"2022":2300,"2023":2100,"2026":1900},
+"Meta":{"2012":60,"2015":300,"2020":780,"2022":350,"2023":900,"2026":1600},
+"ExxonMobil":{"2000":300,"2005":370,"2008":500,"2010":370,"2015":360,"2020":180,"2026":520},
+"Tesla":{"2013":20,"2015":30,"2020":670,"2021":1000,"2023":800,"2026":1200},
+"Berkshire":{"2000":100,"2010":200,"2015":330,"2020":550,"2023":780,"2026":1050}
+}}

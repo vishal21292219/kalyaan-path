@@ -1,0 +1,45 @@
+name: Money Races (moneurons daily)
+on:
+  schedule:
+    - cron: "0 22 * * *"    # 22:00 UTC = 6 PM ET — daily premium bar-race → moneurons YT + FB
+  workflow_dispatch:
+jobs:
+  race:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: money-races
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install python deps
+        run: pip install -q pillow edge-tts requests google-auth google-auth-oauthlib google-api-python-client python-dotenv pyyaml cloudinary
+      - name: Restore moneurons YouTube OAuth
+        env:
+          YT_MONEURONS_TOKEN_JSON: ${{ secrets.YT_MONEURONS_TOKEN_JSON }}
+          YT_MONEURONS_CLIENT_SECRET_JSON: ${{ secrets.YT_MONEURONS_CLIENT_SECRET_JSON }}
+        run: |
+          mkdir -p secrets
+          [ -n "$YT_MONEURONS_TOKEN_JSON" ] && echo "$YT_MONEURONS_TOKEN_JSON" > secrets/moneurons_youtube_token.json
+          [ -n "$YT_MONEURONS_CLIENT_SECRET_JSON" ] && echo "$YT_MONEURONS_CLIENT_SECRET_JSON" > secrets/moneurons_youtube_client_secret.json
+      - name: Generate + publish premium money race
+        env:
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
+          FB_PAGE_ID_MONEURONS: ${{ secrets.FB_PAGE_ID_MONEURONS }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python -m pipeline.money_race_runner
+      - name: Persist used-topic state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/state/money_race_used.json 2>/dev/null || true
+          git commit -m "money-race: topic rotation state [skip ci]" || echo "no change"
+          git pull --rebase -X ours origin main || true
+          git push || echo "push skipped"

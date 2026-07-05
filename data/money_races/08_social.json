@@ -1,0 +1,66 @@
+{
+ "title": "BIGGEST PLATFORMS",
+ "subtitle": "USERS - 2008 to 2026",
+ "unit": "",
+ "suffix": "M",
+ "intro": [
+  "THE SOCIAL\nWARS",
+  "which app owns the world?"
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "TikTok came out of nowhere.",
+  "Follow for the numbers\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In two thousand eight, Facebook was just beginning its takeover. It crushed MySpace and ruled for a decade. Then YouTube and WhatsApp scaled to billions. Instagram exploded. And out of nowhere, TikTok rewrote how the world spends its time. By twenty twenty-six, the battle for your attention has never been fiercer. Which app wins next? Follow, for the numbers nobody explains.",
+ "data": {
+  "Facebook": {
+   "2008": 100,
+   "2010": 600,
+   "2012": 1000,
+   "2015": 1500,
+   "2018": 2200,
+   "2020": 2700,
+   "2026": 3100
+  },
+  "YouTube": {
+   "2010": 500,
+   "2013": 1000,
+   "2017": 1500,
+   "2020": 2200,
+   "2023": 2500,
+   "2026": 2900
+  },
+  "WhatsApp": {
+   "2013": 300,
+   "2015": 900,
+   "2018": 1500,
+   "2020": 2000,
+   "2023": 2400,
+   "2026": 2900
+  },
+  "Instagram": {
+   "2012": 50,
+   "2015": 400,
+   "2018": 1000,
+   "2020": 1200,
+   "2023": 2000,
+   "2026": 2500
+  },
+  "TikTok": {
+   "2018": 270,
+   "2020": 700,
+   "2022": 1200,
+   "2024": 1700,
+   "2026": 2100
+  },
+  "WeChat": {
+   "2012": 300,
+   "2015": 700,
+   "2018": 1080,
+   "2020": 1200,
+   "2026": 1400
+  }
+ }
+}

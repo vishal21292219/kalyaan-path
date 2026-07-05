@@ -1,0 +1,65 @@
+{
+ "title": "MOST SUBSCRIBED",
+ "subtitle": "YOUTUBE - 2013 to 2026",
+ "unit": "",
+ "suffix": "M",
+ "intro": [
+  "THE YOUTUBE\nCROWN",
+  "who's the king of YouTube?"
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "MrBeast changed everything.",
+  "Follow for the numbers\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "For years, PewDiePie was the undisputed king of YouTube, the first to dominate the platform. Then a music channel from India, T-Series, began an unstoppable climb, sparking the biggest subscriber war in history. And just when it seemed settled, one creator rewrote the rules entirely. MrBeast. By twenty twenty-six, the throne belongs to a whole new kind of star. Who takes it next? Follow, for the numbers nobody explains.",
+ "data": {
+  "PewDiePie": {
+   "2013": 12,
+   "2015": 40,
+   "2017": 57,
+   "2019": 102,
+   "2021": 110,
+   "2023": 111,
+   "2026": 111
+  },
+  "T-Series": {
+   "2013": 2,
+   "2015": 8,
+   "2017": 30,
+   "2019": 110,
+   "2021": 190,
+   "2023": 245,
+   "2026": 290
+  },
+  "MrBeast": {
+   "2017": 10,
+   "2019": 25,
+   "2021": 80,
+   "2022": 130,
+   "2023": 230,
+   "2024": 330,
+   "2026": 420
+  },
+  "Cocomelon": {
+   "2019": 50,
+   "2021": 120,
+   "2023": 165,
+   "2026": 195
+  },
+  "SET India": {
+   "2017": 15,
+   "2019": 50,
+   "2021": 110,
+   "2023": 160,
+   "2026": 190
+  },
+  "Kids Diana Show": {
+   "2019": 30,
+   "2021": 85,
+   "2023": 115,
+   "2026": 135
+  }
+ }
+}

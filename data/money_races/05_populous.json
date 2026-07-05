@@ -1,0 +1,77 @@
+{
+ "title": "MOST POPULOUS",
+ "subtitle": "POPULATION - 1990 to 2026",
+ "unit": "",
+ "suffix": "M",
+ "intro": [
+  "THE HUMAN\nRACE",
+  "which country has the most people?"
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "India passed China.",
+  "Follow for the numbers\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "For decades, China was the most populous nation on Earth, untouchable. But India was rising fast. Year after year the gap shrank, until, in twenty twenty-three, India quietly overtook China to become the most populous country in human history. Meanwhile Nigeria and Pakistan surge up the ranks. By twenty twenty-six, the map of humanity looks nothing like before. Follow, for the numbers nobody explains.",
+ "data": {
+  "China": {
+   "1990": 1176,
+   "2000": 1290,
+   "2010": 1370,
+   "2020": 1425,
+   "2023": 1410,
+   "2026": 1408
+  },
+  "India": {
+   "1990": 870,
+   "2000": 1060,
+   "2010": 1240,
+   "2020": 1396,
+   "2023": 1430,
+   "2026": 1465
+  },
+  "United States": {
+   "1990": 250,
+   "2000": 282,
+   "2010": 309,
+   "2020": 331,
+   "2026": 345
+  },
+  "Indonesia": {
+   "1990": 181,
+   "2000": 214,
+   "2010": 242,
+   "2020": 271,
+   "2026": 283
+  },
+  "Pakistan": {
+   "1990": 115,
+   "2000": 154,
+   "2010": 194,
+   "2020": 227,
+   "2026": 250
+  },
+  "Nigeria": {
+   "1990": 95,
+   "2000": 123,
+   "2010": 160,
+   "2020": 208,
+   "2026": 235
+  },
+  "Brazil": {
+   "1990": 150,
+   "2000": 175,
+   "2010": 196,
+   "2020": 213,
+   "2026": 218
+  },
+  "Bangladesh": {
+   "1990": 106,
+   "2000": 129,
+   "2010": 149,
+   "2020": 167,
+   "2026": 176
+  }
+ }
+}

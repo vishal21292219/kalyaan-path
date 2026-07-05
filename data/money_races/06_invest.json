@@ -1,0 +1,68 @@
+{
+ "title": "$1,000 INVESTED",
+ "subtitle": "GROWTH SINCE 2015",
+ "unit": "$",
+ "suffix": "",
+ "intro": [
+  "$1,000 IN 2015",
+  "where would it be now?"
+ ],
+ "outro": [
+  "REGRET YET?",
+  "One choice changed everything.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "Imagine you had one thousand dollars in twenty fifteen. Put it in gold, and you would barely double it. The S and P five hundred? A solid three times. Apple would make you rich. But Tesla, and then Nvidia, would have turned that thousand dollars into a small fortune. The difference between these choices is staggering. Which one did you pick? Follow, for the money nobody explains.",
+ "data": {
+  "Nvidia": {
+   "2015": 1000,
+   "2018": 4000,
+   "2020": 8000,
+   "2022": 15000,
+   "2023": 30000,
+   "2024": 75000,
+   "2026": 140000
+  },
+  "Tesla": {
+   "2015": 1000,
+   "2018": 2500,
+   "2020": 9000,
+   "2021": 22000,
+   "2023": 14000,
+   "2026": 26000
+  },
+  "Apple": {
+   "2015": 1000,
+   "2018": 2200,
+   "2020": 4200,
+   "2022": 6500,
+   "2024": 8000,
+   "2026": 9500
+  },
+  "Amazon": {
+   "2015": 1000,
+   "2018": 3500,
+   "2020": 6500,
+   "2022": 5000,
+   "2024": 7500,
+   "2026": 9000
+  },
+  "S&P 500": {
+   "2015": 1000,
+   "2018": 1400,
+   "2020": 1800,
+   "2022": 2100,
+   "2024": 2800,
+   "2026": 3200
+  },
+  "Gold": {
+   "2015": 1000,
+   "2018": 1250,
+   "2020": 1700,
+   "2022": 1800,
+   "2024": 2200,
+   "2026": 2500
+  }
+ }
+}

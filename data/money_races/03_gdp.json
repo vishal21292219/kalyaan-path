@@ -1,0 +1,91 @@
+{
+ "title": "BIGGEST ECONOMIES",
+ "subtitle": "GDP - 1990 to 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE ECONOMIC\nSUPERPOWERS",
+  "who really runs the world?"
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "China nearly caught America.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In nineteen ninety, America and Japan towered over the world. Then China woke up. From a fraction of the pack, it storms upward, overtaking Japan, then Germany, closing in on the United States itself. India rises from nowhere into the top five. By twenty twenty-six, the balance of global power has completely shifted. Who leads the world next? Follow, for the money nobody explains.",
+ "data": {
+  "United States": {
+   "1990": 5900,
+   "2000": 10250,
+   "2010": 15000,
+   "2020": 21000,
+   "2026": 29000
+  },
+  "China": {
+   "1990": 360,
+   "2000": 1200,
+   "2010": 6100,
+   "2015": 11000,
+   "2020": 14700,
+   "2026": 19500
+  },
+  "Japan": {
+   "1990": 3100,
+   "2000": 4900,
+   "2010": 5700,
+   "2020": 5000,
+   "2026": 4200
+  },
+  "Germany": {
+   "1990": 1600,
+   "2000": 1900,
+   "2010": 3400,
+   "2020": 3900,
+   "2026": 4600
+  },
+  "India": {
+   "1990": 320,
+   "2000": 470,
+   "2010": 1680,
+   "2020": 2670,
+   "2026": 4300
+  },
+  "United Kingdom": {
+   "1990": 1090,
+   "2000": 1660,
+   "2010": 2490,
+   "2020": 2700,
+   "2026": 3600
+  },
+  "France": {
+   "1990": 1270,
+   "2000": 1360,
+   "2010": 2650,
+   "2020": 2640,
+   "2026": 3200
+  },
+  "Brazil": {
+   "1995": 770,
+   "2005": 890,
+   "2010": 2210,
+   "2015": 1800,
+   "2020": 1450,
+   "2026": 2300
+  },
+  "Italy": {
+   "1990": 1180,
+   "2000": 1150,
+   "2010": 2130,
+   "2020": 1900,
+   "2026": 2400
+  },
+  "Canada": {
+   "1995": 600,
+   "2005": 1170,
+   "2010": 1610,
+   "2020": 1650,
+   "2026": 2300
+  }
+ }
+}

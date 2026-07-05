@@ -1,0 +1,66 @@
+{
+ "title": "VALUABLE TEAMS",
+ "subtitle": "SPORTS - 2010 to 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE SPORTS\nEMPIRES",
+  "which team is worth the most?"
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "The Cowboys never lost the lead.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In twenty ten, soccer giants like Manchester United and Real Madrid topped the world of sports wealth. But American football had other plans. The Dallas Cowboys, without winning a title in decades, became the most valuable team on the planet. NBA franchises surged. By twenty twenty-six, sports teams are worth more than entire companies. Which one leads next? Follow, for the money nobody explains.",
+ "data": {
+  "Dallas Cowboys": {
+   "2010": 1.8,
+   "2015": 4,
+   "2018": 5,
+   "2020": 5.7,
+   "2023": 9,
+   "2026": 11
+  },
+  "Real Madrid": {
+   "2010": 1.5,
+   "2015": 3.2,
+   "2018": 4.2,
+   "2020": 4.2,
+   "2023": 5.1,
+   "2026": 6.5
+  },
+  "New York Yankees": {
+   "2010": 1.6,
+   "2015": 3.2,
+   "2018": 4,
+   "2020": 5,
+   "2023": 7.1,
+   "2026": 8.5
+  },
+  "Manchester United": {
+   "2010": 1.8,
+   "2015": 3.1,
+   "2018": 4.1,
+   "2020": 3.8,
+   "2023": 6,
+   "2026": 6.6
+  },
+  "Golden State Warriors": {
+   "2013": 0.8,
+   "2015": 1.9,
+   "2018": 3.1,
+   "2020": 4.3,
+   "2023": 7,
+   "2026": 9
+  },
+  "Barcelona": {
+   "2010": 1,
+   "2015": 3,
+   "2018": 4,
+   "2020": 4.8,
+   "2026": 5.5
+  }
+ }
+}

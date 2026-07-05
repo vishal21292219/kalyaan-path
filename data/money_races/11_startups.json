@@ -1,0 +1,61 @@
+{
+ "title": "TOP STARTUPS",
+ "subtitle": "VALUATION - 2015 to 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE UNICORN\nRACE",
+  "which startup is worth billions?"
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "OpenAI went from zero to giant.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In twenty fifteen, ride-hailing apps like Uber ruled the startup world. Then TikTok's parent, ByteDance, became the most valuable private company ever. SpaceX reached for the stars and the valuations. And when artificial intelligence went mainstream, OpenAI exploded from almost nothing to a hundred-billion-dollar giant in record time. By twenty twenty-six, the private money game is unrecognizable. Who's next? Follow, for the money nobody explains.",
+ "data": {
+  "ByteDance": {
+   "2017": 20,
+   "2018": 75,
+   "2020": 180,
+   "2021": 350,
+   "2023": 220,
+   "2026": 300
+  },
+  "SpaceX": {
+   "2015": 12,
+   "2018": 28,
+   "2020": 46,
+   "2022": 127,
+   "2024": 210,
+   "2026": 350
+  },
+  "OpenAI": {
+   "2021": 14,
+   "2023": 29,
+   "2024": 90,
+   "2025": 157,
+   "2026": 300
+  },
+  "Stripe": {
+   "2015": 5,
+   "2018": 20,
+   "2021": 95,
+   "2023": 50,
+   "2026": 90
+  },
+  "Uber": {
+   "2015": 50,
+   "2018": 72,
+   "2019": 82
+  },
+  "Shein": {
+   "2018": 5,
+   "2020": 15,
+   "2022": 100,
+   "2023": 66,
+   "2026": 80
+  }
+ }
+}

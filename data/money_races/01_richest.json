@@ -1,0 +1,114 @@
+{
+ "title": "WORLD'S RICHEST",
+ "subtitle": "1990 - 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE RICHEST\nPERSON ON EARTH",
+  "36 years. One throne."
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "Musk won't hold it forever.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In nineteen ninety, one name owned the top of the world. But wealth never sits still. Bill Gates rules for two decades. Then Jeff Bezos surges past. Bernard Arnault climbs. And in twenty twenty-one, Elon Musk does not just take the lead. He leaves everyone behind. By twenty twenty-six, he stands alone, at three hundred fifty billion dollars. Who takes the crown next? Follow, for the money nobody explains.",
+ "data": {
+  "Bill Gates": {
+   "1990": 2,
+   "1995": 13,
+   "2000": 60,
+   "2005": 46,
+   "2010": 53,
+   "2015": 79,
+   "2020": 98,
+   "2023": 114,
+   "2026": 120
+  },
+  "Warren Buffett": {
+   "1990": 4,
+   "1995": 15,
+   "2000": 36,
+   "2005": 44,
+   "2010": 47,
+   "2015": 72,
+   "2020": 88,
+   "2023": 106,
+   "2026": 135
+  },
+  "Carlos Slim": {
+   "1995": 6,
+   "2000": 30,
+   "2005": 24,
+   "2010": 53,
+   "2015": 77,
+   "2020": 52,
+   "2023": 93,
+   "2026": 95
+  },
+  "Jeff Bezos": {
+   "2000": 6,
+   "2005": 5,
+   "2010": 12,
+   "2015": 50,
+   "2018": 112,
+   "2020": 113,
+   "2023": 120,
+   "2026": 210
+  },
+  "Elon Musk": {
+   "2012": 2,
+   "2015": 13,
+   "2020": 27,
+   "2021": 270,
+   "2023": 180,
+   "2024": 230,
+   "2026": 350
+  },
+  "Bernard Arnault": {
+   "2005": 17,
+   "2010": 28,
+   "2015": 37,
+   "2020": 76,
+   "2023": 211,
+   "2024": 190,
+   "2026": 185
+  },
+  "Larry Ellison": {
+   "1995": 6,
+   "2000": 47,
+   "2005": 19,
+   "2010": 28,
+   "2015": 50,
+   "2020": 59,
+   "2023": 107,
+   "2026": 190
+  },
+  "Mark Zuckerberg": {
+   "2012": 17,
+   "2015": 40,
+   "2018": 71,
+   "2020": 55,
+   "2023": 64,
+   "2024": 177,
+   "2026": 205
+  },
+  "Amancio Ortega": {
+   "2005": 15,
+   "2010": 25,
+   "2015": 65,
+   "2020": 55,
+   "2023": 68,
+   "2026": 95
+  },
+  "Larry Page": {
+   "2005": 7,
+   "2010": 15,
+   "2015": 30,
+   "2020": 52,
+   "2023": 79,
+   "2026": 135
+  }
+ }
+}

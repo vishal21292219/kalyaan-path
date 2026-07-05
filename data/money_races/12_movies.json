@@ -1,0 +1,65 @@
+{
+ "title": "BIGGEST FRANCHISES",
+ "subtitle": "BOX OFFICE - 2000 to 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE BOX OFFICE\nKINGS",
+  "which franchise made the most?"
+ ],
+ "outro": [
+  "WHO'S NEXT?",
+  "Marvel rewrote Hollywood.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In the year two thousand, Star Wars and James Bond were Hollywood royalty. Then Harry Potter cast its spell. But nothing prepared the world for the Marvel Cinematic Universe, a franchise that turned comic books into the highest-grossing film series in history. By twenty twenty-six, a handful of franchises dominate the global box office. Which one wins next? Follow, for the money nobody explains.",
+ "data": {
+  "Marvel (MCU)": {
+   "2008": 0.6,
+   "2012": 3,
+   "2015": 8,
+   "2018": 17,
+   "2019": 22,
+   "2023": 29,
+   "2026": 33
+  },
+  "Star Wars": {
+   "2000": 4,
+   "2005": 6,
+   "2015": 8,
+   "2018": 9,
+   "2020": 10,
+   "2026": 11
+  },
+  "Harry Potter": {
+   "2001": 1,
+   "2005": 4,
+   "2011": 8,
+   "2016": 9.5,
+   "2022": 10,
+   "2026": 10.5
+  },
+  "James Bond": {
+   "2000": 3,
+   "2006": 4,
+   "2012": 5,
+   "2015": 6,
+   "2021": 7.1,
+   "2026": 7.5
+  },
+  "Jurassic Park": {
+   "2000": 2,
+   "2015": 3.5,
+   "2018": 5,
+   "2022": 6,
+   "2026": 6.5
+  },
+  "Avatar": {
+   "2009": 2.7,
+   "2015": 2.9,
+   "2022": 5,
+   "2026": 5.5
+  }
+ }
+}
