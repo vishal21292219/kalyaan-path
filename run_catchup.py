@@ -51,9 +51,6 @@ SLOTS = [
     ("godmind",   "trending", 1, "publish", 12,  0, None),  # cron 0 12  → go-live 17:00 UTC / 1 PM ET
     ("godmind",   "trending", 2, "publish", 15,  0, None),  # cron 0 15  → go-live 21:00 UTC / 5 PM ET
     ("godmind",   "trending", 3, "publish", 19,  0, None),  # cron 0 19  → go-live 01:00 UTC / 9 PM ET
-    ("moneurons", "trending", 1, "publish", 12, 25, None),  # cron 25 12 → go-live 17:00 UTC / 1 PM ET
-    ("moneurons", "trending", 2, "publish", 16,  5, None),  # cron 5 16  → go-live 22:00 UTC / 6 PM ET
-    ("moneurons", "trending", 3, "publish", 19, 25, None),  # cron 25 19 → go-live 01:00 UTC / 9 PM ET
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled
