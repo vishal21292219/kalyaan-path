@@ -18,7 +18,7 @@ def valat(pts,yf):
         if ks[i]<=yf<=ks[i+1]:
             t=(yf-ks[i])/(ks[i+1]-ks[i]); return pts[ks[i]]+(pts[ks[i+1]]-pts[ks[i]])*t
     return None
-def render_race(spec, bgpath, out):
+def render_race(spec, bgpath, out, duration=None):
     data={nm:({int(y):v for y,v in pts.items()},PAL[i%len(PAL)]) for i,(nm,pts) in enumerate(spec['data'].items())}
     bg=ImageOps.fit(Image.open(bgpath).convert('RGB'),(W,H)).filter(ImageFilter.GaussianBlur(7))
     bg=ImageEnhance.Brightness(bg).enhance(0.30)
@@ -55,11 +55,19 @@ def render_race(spec, bgpath, out):
             vv=(f"{unit}{v/1000:.1f}T" if (suf=="B" and v>=1000) else f"{unit}{int(round(v)):,}{suf}")
             d.text((W-16,cy),vv,font=osw(30),fill=col,anchor="rm")
         return im.convert("RGB")
-    FPS=30; per=13; yrs=list(range(int(y0),int(y1)+1))
+    FPS=30; HOLD=48; yrs=list(range(int(y0),int(y1)+1)); steps=max(len(yrs)-1,1)
+    # frames-per-year-step: derive from the target duration so the animation
+    # is paced to the voiceover instead of racing through whenever a topic
+    # spans few years (e.g. crypto 2018-2026 would otherwise finish in ~5s).
+    if duration:
+        total=max(int(round(duration*FPS)),steps+HOLD)
+        per=max(1,int(round((total-HOLD)/steps)))
+    else:
+        per=13
     p=subprocess.Popen(["ffmpeg","-y","-loglevel","error","-f","image2pipe","-framerate",str(FPS),"-i","-","-vf","format=yuv420p","-c:v","libx264","-crf","20",out],stdin=subprocess.PIPE)
     for yi in range(len(yrs)-1):
         for s in range(per): frame(yrs[yi]+s/per).save(p.stdin,"JPEG",quality=90)
-    for _ in range(48): frame(yrs[-1]).save(p.stdin,"JPEG",quality=90)
+    for _ in range(HOLD): frame(yrs[-1]).save(p.stdin,"JPEG",quality=90)
     p.stdin.close(); p.wait()
 
 def make_card(spec,bgpath,blocks,out):
@@ -71,15 +79,20 @@ def make_card(spec,bgpath,blocks,out):
     im.convert("RGB").save(out,quality=92)
 
 def make_video(spec, bgpath, outdir):
-    render_race(spec,bgpath,f"{outdir}/_race.mp4")
-    asyncio.run(edge_tts.Communicate(spec['vo'],'en-US-ChristopherNeural',rate='+6%').save(f"{outdir}/_vo.mp3"))
-    make_card(spec,bgpath,[(430,spec['intro'][0],anton(66),(245,212,120,255)),(600,spec['intro'][1],bebas(42),(220,228,244,255))],f"{outdir}/_intro.png")
-    make_card(spec,bgpath,[(430,spec['outro'][0],anton(78),(245,212,120,255)),(560,spec['outro'][1],osw(32),(230,238,248,255)),(660,spec['outro'][2],bebas(40),(143,217,182,255)),(850,spec['outro'][3],osw(30),(150,165,190,255))],f"{outdir}/_outro.png")
     import os
     def dur(f): return float(subprocess.check_output(["ffprobe","-v","error","-show_entries","format=duration","-of","csv=p=0",f]).strip())
-    R=dur(f"{outdir}/_race.mp4"); V=dur(f"{outdir}/_vo.mp3"); O=max(4.0,V-4.5-R)
+    # Voiceover FIRST, so the race animation can be paced to match the narration.
+    asyncio.run(edge_tts.Communicate(spec['vo'],'en-US-ChristopherNeural',rate='+6%').save(f"{outdir}/_vo.mp3"))
+    V=dur(f"{outdir}/_vo.mp3")
+    INTRO=4.5                                # intro card (voice sets the scene over it)
+    OUTRO=max(4.0,min(6.0,V*0.16))           # closing CTA card
+    race_target=max(6.0,V-INTRO-OUTRO)       # race fills the middle span of the voiceover
+    render_race(spec,bgpath,f"{outdir}/_race.mp4",duration=race_target)
+    make_card(spec,bgpath,[(430,spec['intro'][0],anton(66),(245,212,120,255)),(600,spec['intro'][1],bebas(42),(220,228,244,255))],f"{outdir}/_intro.png")
+    make_card(spec,bgpath,[(430,spec['outro'][0],anton(78),(245,212,120,255)),(560,spec['outro'][1],osw(32),(230,238,248,255)),(660,spec['outro'][2],bebas(40),(143,217,182,255)),(850,spec['outro'][3],osw(30),(150,165,190,255))],f"{outdir}/_outro.png")
+    R=dur(f"{outdir}/_race.mp4"); O=max(4.0,V-INTRO-R)   # keep total video length == voiceover length
     def clip(png,t,o): subprocess.run(["ffmpeg","-y","-loglevel","error","-loop","1","-i",png,"-t",str(t),"-r","30","-vf","scale=720:1280,format=yuv420p","-c:v","libx264",o])
-    clip(f"{outdir}/_intro.png",4.5,f"{outdir}/_i.mp4"); clip(f"{outdir}/_outro.png",O,f"{outdir}/_o.mp4")
+    clip(f"{outdir}/_intro.png",INTRO,f"{outdir}/_i.mp4"); clip(f"{outdir}/_outro.png",O,f"{outdir}/_o.mp4")
     subprocess.run(["ffmpeg","-y","-loglevel","error","-i",f"{outdir}/_race.mp4","-r","30","-vf","scale=720:1280,format=yuv420p","-c:v","libx264",f"{outdir}/_r.mp4"])
     open(f"{outdir}/_l.txt","w").write(f"file '_i.mp4'\nfile '_r.mp4'\nfile '_o.mp4'\n")
     subprocess.run(["ffmpeg","-y","-loglevel","error","-f","concat","-safe","0","-i",f"{outdir}/_l.txt","-c:v","libx264","-pix_fmt","yuv420p","-r","30",f"{outdir}/_s.mp4"],cwd=outdir if False else None)
