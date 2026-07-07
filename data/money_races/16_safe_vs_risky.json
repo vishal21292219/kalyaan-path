@@ -3,6 +3,8 @@
  "subtitle": "$1,000 SINCE 2015",
  "unit": "$",
  "suffix": "",
+ "format": "line",
+ "caption": "$1,000 in 2015 · indicative values, not financial advice",
  "intro": [
   "$1,000 IN 2015",
   "safe or risky \u2014 who won?"
