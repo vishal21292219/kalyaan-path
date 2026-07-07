@@ -3,6 +3,8 @@
  "subtitle": "GROWTH SINCE 2015",
  "unit": "$",
  "suffix": "",
+ "format": "line",
+ "caption": "$1,000 invested in 2015 · indicative annual values",
  "intro": [
   "$1,000 IN 2015",
   "where would it be now?"

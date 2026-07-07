@@ -11,7 +11,7 @@ from __future__ import annotations
 import json, os, sys, glob, datetime, traceback
 from pathlib import Path
 from pipeline.utils import ROOT, set_active_niche, load_config
-from pipeline import money_race
+from pipeline import money_race, money_line
 
 USED = ROOT / "data/state/money_race_used.json"
 
@@ -46,8 +46,9 @@ def main(argv):
     spec = json.loads(Path(tf).read_text())
     outdir = ROOT / "output/money_races"; outdir.mkdir(parents=True, exist_ok=True)
     out = outdir / f"{stem}.mp4"; spec["out"] = str(out)
-    print(f"[money-race] topic={stem}  title={spec['title']}  publish={publish}")
-    money_race.make_video(spec, str(ROOT / "assets/money_race/bg.jpg"), str(outdir))
+    engine = money_line if spec.get("format") == "line" else money_race
+    print(f"[money-race] topic={stem}  title={spec['title']}  format={spec.get('format','bar')}  publish={publish}")
+    engine.make_video(spec, str(ROOT / "assets/money_race/bg.jpg"), str(outdir))
     if not out.exists() or out.stat().st_size < 100000:
         print("[money-race] render FAILED"); return 1
     print(f"[money-race] rendered {out} ({out.stat().st_size} bytes)")

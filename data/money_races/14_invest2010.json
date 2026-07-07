@@ -3,6 +3,8 @@
  "subtitle": "WHERE IT IS NOW - 2026",
  "unit": "$",
  "suffix": "",
+ "format": "line",
+ "caption": "$1,000 invested in 2010 · indicative annual values",
  "intro": [
   "$1,000 IN 2010",
   "which stock made you rich?"

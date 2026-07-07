@@ -78,27 +78,33 @@ def make_card(spec,bgpath,blocks,out):
         for i,ln in enumerate(txt.split("\n")): d.text((W//2,y+i*66),ln,font=f,fill=col,anchor="mm")
     im.convert("RGB").save(out,quality=92)
 
+def _dur(f): return float(subprocess.check_output(["ffprobe","-v","error","-show_entries","format=duration","-of","csv=p=0",f]).strip())
+
+def assemble(spec, bgpath, outdir, middle_mp4, V, INTRO=4.5):
+    """Wrap a pre-rendered middle segment (bar race OR line chart) with the shared
+    intro/outro cards and mux the voiceover + background music. The outro is sized so
+    the total video length equals the voiceover length V (keeps audio/video in sync).
+    _vo.mp3 must already exist in outdir (both formats generate it before pacing)."""
+    make_card(spec,bgpath,[(430,spec['intro'][0],anton(66),(245,212,120,255)),(600,spec['intro'][1],bebas(42),(220,228,244,255))],f"{outdir}/_intro.png")
+    make_card(spec,bgpath,[(430,spec['outro'][0],anton(78),(245,212,120,255)),(560,spec['outro'][1],osw(32),(230,238,248,255)),(660,spec['outro'][2],bebas(40),(143,217,182,255)),(850,spec['outro'][3],osw(30),(150,165,190,255))],f"{outdir}/_outro.png")
+    R=_dur(middle_mp4); O=max(4.0,V-INTRO-R)   # keep total video length == voiceover length
+    def clip(png,t,o): subprocess.run(["ffmpeg","-y","-loglevel","error","-loop","1","-i",png,"-t",str(t),"-r","30","-vf","scale=720:1280,format=yuv420p","-c:v","libx264",o])
+    clip(f"{outdir}/_intro.png",INTRO,f"{outdir}/_i.mp4"); clip(f"{outdir}/_outro.png",O,f"{outdir}/_o.mp4")
+    subprocess.run(["ffmpeg","-y","-loglevel","error","-i",middle_mp4,"-r","30","-vf","scale=720:1280,format=yuv420p","-c:v","libx264",f"{outdir}/_r.mp4"])
+    open(f"{outdir}/_l.txt","w").write(f"file '_i.mp4'\nfile '_r.mp4'\nfile '_o.mp4'\n")
+    subprocess.run(["ffmpeg","-y","-loglevel","error","-f","concat","-safe","0","-i","_l.txt","-c:v","libx264","-pix_fmt","yuv420p","-r","30","_s.mp4"],cwd=outdir)
+    subprocess.run(["ffmpeg","-y","-loglevel","error","-i",f"{outdir}/_s.mp4","-i",f"{outdir}/_vo.mp3","-i","assets/money_race/music.mp3","-filter_complex","[1:a]volume=1.0[vo];[2:a]afade=t=in:st=0:d=1,volume=0.19[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[a]","-map","0:v","-map","[a]","-c:v","libx264","-crf","20","-c:a","aac","-b:a","192k","-shortest",spec['out']])
+    print("VIDEO DONE:",spec['out'])
+
 def make_video(spec, bgpath, outdir):
-    import os
-    def dur(f): return float(subprocess.check_output(["ffprobe","-v","error","-show_entries","format=duration","-of","csv=p=0",f]).strip())
     # Voiceover FIRST, so the race animation can be paced to match the narration.
     asyncio.run(edge_tts.Communicate(spec['vo'],'en-US-ChristopherNeural',rate='+6%').save(f"{outdir}/_vo.mp3"))
-    V=dur(f"{outdir}/_vo.mp3")
+    V=_dur(f"{outdir}/_vo.mp3")
     INTRO=4.5                                # intro card (voice sets the scene over it)
     OUTRO=max(4.0,min(6.0,V*0.16))           # closing CTA card
     race_target=max(6.0,V-INTRO-OUTRO)       # race fills the middle span of the voiceover
     render_race(spec,bgpath,f"{outdir}/_race.mp4",duration=race_target)
-    make_card(spec,bgpath,[(430,spec['intro'][0],anton(66),(245,212,120,255)),(600,spec['intro'][1],bebas(42),(220,228,244,255))],f"{outdir}/_intro.png")
-    make_card(spec,bgpath,[(430,spec['outro'][0],anton(78),(245,212,120,255)),(560,spec['outro'][1],osw(32),(230,238,248,255)),(660,spec['outro'][2],bebas(40),(143,217,182,255)),(850,spec['outro'][3],osw(30),(150,165,190,255))],f"{outdir}/_outro.png")
-    R=dur(f"{outdir}/_race.mp4"); O=max(4.0,V-INTRO-R)   # keep total video length == voiceover length
-    def clip(png,t,o): subprocess.run(["ffmpeg","-y","-loglevel","error","-loop","1","-i",png,"-t",str(t),"-r","30","-vf","scale=720:1280,format=yuv420p","-c:v","libx264",o])
-    clip(f"{outdir}/_intro.png",INTRO,f"{outdir}/_i.mp4"); clip(f"{outdir}/_outro.png",O,f"{outdir}/_o.mp4")
-    subprocess.run(["ffmpeg","-y","-loglevel","error","-i",f"{outdir}/_race.mp4","-r","30","-vf","scale=720:1280,format=yuv420p","-c:v","libx264",f"{outdir}/_r.mp4"])
-    open(f"{outdir}/_l.txt","w").write(f"file '_i.mp4'\nfile '_r.mp4'\nfile '_o.mp4'\n")
-    subprocess.run(["ffmpeg","-y","-loglevel","error","-f","concat","-safe","0","-i",f"{outdir}/_l.txt","-c:v","libx264","-pix_fmt","yuv420p","-r","30",f"{outdir}/_s.mp4"],cwd=outdir if False else None)
-    subprocess.run(["ffmpeg","-y","-loglevel","error","-f","concat","-safe","0","-i","_l.txt","-c:v","libx264","-pix_fmt","yuv420p","-r","30","_s.mp4"],cwd=outdir)
-    subprocess.run(["ffmpeg","-y","-loglevel","error","-i",f"{outdir}/_s.mp4","-i",f"{outdir}/_vo.mp3","-i","assets/money_race/music.mp3","-filter_complex","[1:a]volume=1.0[vo];[2:a]afade=t=in:st=0:d=1,volume=0.19[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[a]","-map","0:v","-map","[a]","-c:v","libx264","-crf","20","-c:a","aac","-b:a","192k","-shortest",spec['out']])
-    print("VIDEO DONE:",spec['out'])
+    assemble(spec,bgpath,outdir,f"{outdir}/_race.mp4",V,INTRO)
 
 if __name__=="__main__":
     spec=json.load(open(sys.argv[1]))
