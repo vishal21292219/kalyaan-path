@@ -320,9 +320,13 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
                   "and atmosphere, premium quality")
     _hm = cfg["images"].get("hero_model")
     hero_model = _hm if (_hm and str(_hm).startswith("fal-ai/")) else "fal-ai/flux/dev"
+    # Premium the OPENING the viewer judges (not just frame 0): the first
+    # `hero_scenes` scenes render at hero quality. Default 2 (~first 8-12s + the FB
+    # cover). Cost ~$0.05/video — still trivial vs the removed Kling clip.
+    hero_scenes = max(1, int(cfg["images"].get("hero_scenes", 2)))
 
     for i, raw_prompt in enumerate(visual_prompts):
-        is_hero = (i == 0)   # opening scene = retention hook + FB cover → premium
+        is_hero = (i < hero_scenes)   # opening scenes = retention hook + FB cover → premium
         boost = HERO_BOOST if is_hero else ""
         prompt = f"{raw_prompt}{style}{boost}. Avoid: {negative}"
         path = out_dir / f"img_{i:02d}.jpg"

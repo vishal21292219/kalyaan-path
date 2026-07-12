@@ -65,13 +65,13 @@ SHARE_TRIGGER = {
 # makes FB push the reel to more non-followers → more reach → more followers).
 # Ends with "I read/reply to every comment" — the promise that actually pulls replies.
 COMMENT_BAIT = {
-    "godmind": "👇 Which part of this felt like it was about YOU? Tell me below — I read every single comment.",
-    "gom": "👇 Which part of this felt like it was about YOU? Tell me below — I read every single comment.",
-    "ancient": "👇 What's the one detail here that shouldn't be possible? Drop it below — I reply to everyone.",
-    "moneurons": "👇 Be honest — is this exactly how YOU are with money? Comment below, I reply to all.",
-    "bhakti": "🙏 Comment 'Jai' if this touched your heart — main har comment padhta hoon.",
-    "bhajan": "🙏 Comment 'Jai' if this touched your heart — main har comment padhta hoon.",
-    "itihaas": "👇 Ye baat pehle se pata thi? Comment me batao — main sabko reply karta hoon.",
+    "godmind": "This one sat with me for a while. 🕉️ Which god feels like it's describing YOUR mind right now? Tell me honestly — I read & reply to every comment. 👇",
+    "gom": "This one sat with me for a while. 🕉️ Which god feels like it's describing YOUR mind right now? Tell me honestly — I read & reply to every comment. 👇",
+    "ancient": "Every time I look into this, I get chills. 🌌 What's the one detail here you just can't explain? Drop your theory — I reply to everyone. 👇",
+    "moneurons": "Tiny habit, massive difference over the years. 💰 Be honest — is this you with money? Tell me below, I reply to all. 👇",
+    "bhakti": "🙏 Iss baat ne mera dil chhoo liya. Comment 'Jai' agar aapke bhi. Main har comment padhta hoon.",
+    "bhajan": "🙏 Iss baat ne mera dil chhoo liya. Comment 'Jai' agar aapke bhi. Main har comment padhta hoon.",
+    "itihaas": "Itihaas ki ye baat bahut kam log jaante hain. 📜 Aapko pata thi? Comment me batao — main sabko reply karta hoon. 👇",
 }
 
 

@@ -54,6 +54,7 @@ images:
   model: fal-ai/flux/schnell        # BULK scenes — cheap
   master_model: fal-ai/flux/dev     # MASTER deity portrait — premium 28-step face, propagated via consistency
   hero_model: fal-ai/flux/dev       # FIRST image (hook + FB cover) — premium since Kling hero-motion is off. Bump to fal-ai/flux-pro/v1.1 for max wow (+cost).
+  hero_scenes: 2                    # how many OPENING scenes get premium treatment (the part viewers judge). ~$0.05/video.
   num_per_reel: 10
   consistency: true                 # lock the dev-quality deity face across the hero scenes
   consistency_max_scenes: 3         # cost guard: only top-3 hero scenes reference-conditioned
