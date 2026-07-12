@@ -44,6 +44,19 @@ FOLLOW_PROMISE = {
     "itihaas": "Bharat ka asli itihaas, roz",
     "moneurons": "the psychology of money, daily",
 }
+
+# AUDIT 2026-07-08: SHARES are the #1 FB growth driver (winners had 25-57 shares →
+# FB pushed them to non-followers → new followers). An explicit share/tag trigger
+# turns passive viewers into distributors. Per channel so the ask fits the content.
+SHARE_TRIGGER = {
+    "godmind": "💬 Tag someone who needs to hear this today.",
+    "gom": "💬 Tag someone who needs to hear this today.",
+    "ancient": "💬 Send this to someone who'd lose sleep over it.",
+    "moneurons": "💬 Tag the friend who overthinks every rupee.",
+    "bhakti": "🙏 Share this blessing with someone you love.",
+    "bhajan": "🙏 Share this blessing with someone you love.",
+    "itihaas": "💬 Kisi ko bhejo jise itihaas pasand hai.",
+}
 def _promo_comment() -> str:
     """The lead-magnet + paid link block for the FB FIRST COMMENT (kept OUT of the
     caption so the reel's reach isn't penalised for an external link). Only niches
@@ -74,9 +87,10 @@ def _caption(script: dict, channel: str = "") -> str:
         follow = f"👉 Follow {name} for more."
     else:
         follow = ""
+    share = SHARE_TRIGGER.get(channel, "")
     tags = script.get("hashtags") or []
     tagline = " ".join(t if t.startswith("#") else f"#{t}" for t in tags)[:600]
-    parts = [p for p in (hook, cta, follow, tagline) if p]
+    parts = [p for p in (hook, cta, share, follow, tagline) if p]
     return "\n\n".join(parts)[:2000]
 
 

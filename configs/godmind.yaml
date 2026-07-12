@@ -216,6 +216,7 @@ publish:
   youtube: true
   facebook_make: true     # AUTO FB via Make.com (Cloudinary→webhook, channel=gom → "Gods of the Mind" page). Bypasses the flagged dev-app.
   facebook_make_scheduled: true  # queue the reel for its exact US peak (poster cron) instead of posting at render-time → no drift
+  facebook_make_slots: [1]  # AUDIT 2026-07-08: 3/day HALVED FB reach (over-posting). FB now 1/day = ONLY seed 1 (17:00 UTC / 1 PM ET — proven 10.6k breakout slot). YouTube stays 3/day (all seeds). Post-less-reach-more.
   facebook_manual: false  # no longer needed — FB now auto via facebook_make
   facebook: false  # direct Graph-API still paused (dev-app flagged); Make path used instead.
 

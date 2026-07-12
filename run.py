@@ -596,7 +596,12 @@ def main(argv: list[str]) -> int:
 
         # Facebook/IG Reel via Make.com (Cloudinary + webhook). Bypasses the
         # flagged Meta dev-app token. Enable per niche with publish.facebook_make: true.
-        if publish_cfg.get("facebook_make", False):
+        # AUDIT 2026-07-08: FB organic reach is CAPPED — posting 3/day HALVED GoM's
+        # per-post reach (over-posting dilutes + signals low-priority). `facebook_make_slots`
+        # (list of seed_offsets) limits FB to specific slots so a niche can be 1/day on FB
+        # while staying 3/day on YouTube. Unset → all slots post to FB (unchanged).
+        _fb_slots = publish_cfg.get("facebook_make_slots")
+        if publish_cfg.get("facebook_make", False) and (_fb_slots is None or args.seed_offset in _fb_slots):
             try:
                 from pipeline.uploader_make_reel import upload as make_upload
                 # Resolve this channel's FB page id. GoM has no FB_PAGE_ID secret →
