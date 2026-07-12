@@ -57,10 +57,40 @@ SHARE_TRIGGER = {
     "bhajan": "🙏 Share this blessing with someone you love.",
     "itihaas": "💬 Kisi ko bhejo jise itihaas pasand hai.",
 }
-def _promo_comment() -> str:
-    """The lead-magnet + paid link block for the FB FIRST COMMENT (kept OUT of the
-    caption so the reel's reach isn't penalised for an external link). Only niches
-    whose ACTIVE config defines branding.promo return text; others → "" (no comment)."""
+# AUDIT 2026-07-08 v2: the FB FIRST COMMENT is now a VIDEO-RELATED ENGAGEMENT
+# question, NOT a Gumroad/promo link. Why: (a) the GoM Gumroad link "bilkool nahi
+# chali" (0 conversions) and external links in comments get the reel's reach
+# SUPPRESSED, (b) a reply-inviting question that references THIS video drives
+# comments — and comment velocity is a top FB reach signal (a busy comment thread
+# makes FB push the reel to more non-followers → more reach → more followers).
+# Ends with "I read/reply to every comment" — the promise that actually pulls replies.
+COMMENT_BAIT = {
+    "godmind": "👇 Which part of this felt like it was about YOU? Tell me below — I read every single comment.",
+    "gom": "👇 Which part of this felt like it was about YOU? Tell me below — I read every single comment.",
+    "ancient": "👇 What's the one detail here that shouldn't be possible? Drop it below — I reply to everyone.",
+    "moneurons": "👇 Be honest — is this exactly how YOU are with money? Comment below, I reply to all.",
+    "bhakti": "🙏 Comment 'Jai' if this touched your heart — main har comment padhta hoon.",
+    "bhajan": "🙏 Comment 'Jai' if this touched your heart — main har comment padhta hoon.",
+    "itihaas": "👇 Ye baat pehle se pata thi? Comment me batao — main sabko reply karta hoon.",
+}
+
+
+def _promo_comment(script: dict | None = None, channel: str = "") -> str:
+    """Text for the FB FIRST COMMENT — a video-related engagement question that
+    invites replies (drives comment velocity → FB reach). Falls back to the active
+    config's channel; returns "" if no bait is defined (→ no comment posted)."""
+    ch = channel
+    if not ch:
+        try:
+            ch = (load_config().get("niche") or load_config().get("channel") or "").strip()
+        except Exception:
+            ch = ""
+    bait = COMMENT_BAIT.get(ch, "")
+    if bait:
+        return bait
+    # Legacy fallback: if a config still defines branding.promo AND we have no bait
+    # for this channel, use it (keeps any real product link working for niches we
+    # didn't map). Most channels now use the engagement bait above.
     try:
         return (load_config().get("branding", {}).get("promo") or "").strip()
     except Exception:
@@ -160,7 +190,7 @@ def _enqueue(video_url: str, script: dict, channel: str, fb_page_id: str, post_a
     recs = [r for r in recs if r.get("id") != rid]  # dedup → one per slot (channel+time)
     rec = {"id": rid, "video_url": video_url, "caption": _caption(script, channel),
            "channel": channel, "fb_page_id": (fb_page_id or "").strip(), "post_at": post_at}
-    _c = _promo_comment()
+    _c = _promo_comment(script, channel)
     if _c:
         rec["comment"] = _c   # poster forwards it → Make posts it as the first comment
     recs.append(rec)
@@ -197,7 +227,7 @@ def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None
         payload = {"video_url": url, "caption": _caption(script, channel), "channel": channel}
         if fb_page_id:
             payload["fb_page_id"] = str(fb_page_id).strip()
-        _c = _promo_comment()
+        _c = _promo_comment(script, channel)
         if _c:
             payload["comment"] = _c
         r = requests.post(webhook, json=payload, timeout=120)
