@@ -1,0 +1,91 @@
+{
+ "title": "RICHEST COUNTRIES",
+ "subtitle": "2000 - 2026",
+ "unit": "$",
+ "suffix": "K",
+ "intro": [
+  "RICHEST COUNTRY\nPER PERSON",
+  "Not the biggest. The richest."
+ ],
+ "outro": [
+  "SIZE ISN'T WEALTH.",
+  "Tiny nations. Giant income.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "Forget the biggest economies. Who earns the most per person? In two thousand, Luxembourg already led. Ireland was nothing special. Then the tax havens turned on. Ireland rockets past. Switzerland climbs. Singapore surges from behind. And America quietly keeps rising. By twenty twenty-six, the richest countries aren't the largest. They're the smallest.",
+ "data": {
+  "Luxembourg": {
+   "2000": 49,
+   "2005": 80,
+   "2010": 105,
+   "2015": 101,
+   "2020": 117,
+   "2023": 128,
+   "2026": 140
+  },
+  "Ireland": {
+   "2000": 26,
+   "2005": 50,
+   "2010": 48,
+   "2015": 62,
+   "2020": 86,
+   "2023": 104,
+   "2026": 115
+  },
+  "Switzerland": {
+   "2000": 38,
+   "2005": 54,
+   "2010": 74,
+   "2015": 82,
+   "2020": 87,
+   "2023": 99,
+   "2026": 106
+  },
+  "Singapore": {
+   "2000": 24,
+   "2005": 29,
+   "2010": 47,
+   "2015": 55,
+   "2020": 60,
+   "2023": 85,
+   "2026": 95
+  },
+  "Norway": {
+   "2000": 38,
+   "2005": 66,
+   "2010": 87,
+   "2015": 74,
+   "2020": 67,
+   "2023": 87,
+   "2026": 92
+  },
+  "USA": {
+   "2000": 36,
+   "2005": 44,
+   "2010": 48,
+   "2015": 56,
+   "2020": 63,
+   "2023": 76,
+   "2026": 86
+  },
+  "Qatar": {
+   "2000": 30,
+   "2005": 54,
+   "2010": 71,
+   "2015": 66,
+   "2020": 52,
+   "2023": 81,
+   "2026": 84
+  },
+  "Denmark": {
+   "2000": 30,
+   "2005": 48,
+   "2010": 58,
+   "2015": 53,
+   "2020": 61,
+   "2023": 68,
+   "2026": 75
+  }
+ }
+}

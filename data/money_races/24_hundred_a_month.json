@@ -1,0 +1,59 @@
+{
+ "title": "$100 A MONTH",
+ "subtitle": "OVER 30 YEARS",
+ "unit": "$",
+ "suffix": "",
+ "intro": [
+  "$100 A MONTH.\n30 YEARS.",
+  "Same money. Different choice."
+ ],
+ "outro": [
+  "THE COST OF\nNOT INVESTING.",
+  "$38K vs $228K. Same $100.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "Imagine you save one hundred dollars a month. For thirty years. Where you put it changes everything. In a savings account, you end with thirty-eight thousand. Barely more than you put in. In bonds, a little better. In gold, better still. But in the stock market, that same hundred dollars a month becomes over two hundred thousand dollars. Same effort. Same money. Six times the result. The difference isn't income. It's the choice.",
+ "data": {
+  "S&P 500": {
+   "5": 7744,
+   "10": 20484,
+   "15": 41447,
+   "20": 75937,
+   "25": 132683,
+   "30": 226049
+  },
+  "Real Estate": {
+   "5": 7348,
+   "10": 18295,
+   "15": 34604,
+   "20": 58902,
+   "25": 95103,
+   "30": 149036
+  },
+  "Gold": {
+   "5": 6977,
+   "10": 16388,
+   "15": 29082,
+   "20": 46204,
+   "25": 69299,
+   "30": 100452
+  },
+  "Bonds": {
+   "5": 6630,
+   "10": 14725,
+   "15": 24609,
+   "20": 36677,
+   "25": 51413,
+   "30": 69405
+  },
+  "Savings": {
+   "5": 6074,
+   "10": 12302,
+   "15": 18688,
+   "20": 25235,
+   "25": 31949,
+   "30": 38832
+  }
+ }
+}

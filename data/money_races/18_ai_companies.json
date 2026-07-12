@@ -1,0 +1,82 @@
+{
+ "title": "AI GOLD RUSH",
+ "subtitle": "2019 - 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE AI\nGOLD RUSH",
+  "From zero to hundreds of billions."
+ ],
+ "outro": [
+  "THE BUBBLE OR\nTHE FUTURE?",
+  "Trillions are betting future.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In twenty nineteen, OpenAI was worth one billion. A rounding error. Then ChatGPT changed everything. OpenAI explodes past a hundred billion. Anthropic rises from nothing. Elon's xAI appears and instantly worth billions. Databricks quietly climbs. In just a few years, companies that didn't exist became worth more than century-old giants. The fastest wealth creation in history.",
+ "data": {
+  "OpenAI": {
+   "2019": 1,
+   "2021": 14,
+   "2022": 20,
+   "2023": 29,
+   "2024": 157,
+   "2025": 300,
+   "2026": 500
+  },
+  "Anthropic": {
+   "2019": 0,
+   "2021": 1,
+   "2022": 4,
+   "2023": 18,
+   "2024": 40,
+   "2025": 60,
+   "2026": 200
+  },
+  "xAI": {
+   "2019": 0,
+   "2021": 0,
+   "2022": 0,
+   "2023": 0,
+   "2024": 24,
+   "2025": 50,
+   "2026": 200
+  },
+  "Databricks": {
+   "2019": 6,
+   "2021": 38,
+   "2022": 38,
+   "2023": 43,
+   "2024": 62,
+   "2025": 100,
+   "2026": 130
+  },
+  "Mistral": {
+   "2019": 0,
+   "2021": 0,
+   "2022": 0,
+   "2023": 2,
+   "2024": 6,
+   "2025": 12,
+   "2026": 15
+  },
+  "Perplexity": {
+   "2019": 0,
+   "2021": 0,
+   "2022": 0,
+   "2023": 1,
+   "2024": 9,
+   "2025": 18,
+   "2026": 20
+  },
+  "Scale AI": {
+   "2019": 1,
+   "2021": 7,
+   "2022": 7,
+   "2023": 7,
+   "2024": 14,
+   "2025": 29,
+   "2026": 29
+  }
+ }
+}

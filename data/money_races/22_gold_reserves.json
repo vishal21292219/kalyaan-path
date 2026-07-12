@@ -1,0 +1,82 @@
+{
+ "title": "WHO HOLDS GOLD",
+ "subtitle": "2000 - 2026",
+ "unit": "",
+ "suffix": "t",
+ "intro": [
+  "WHO HOARDS\nTHE MOST GOLD",
+  "When money fails, gold rules."
+ ],
+ "outro": [
+  "THE QUIET\nGOLD WAR.",
+  "China & Russia are stacking.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "Paper money can be printed. Gold cannot. So who's really holding the metal? America sits untouched on eight thousand tonnes, more than the next three combined. Germany and Italy guard their vaults. But watch the challengers. Russia quietly buys for two decades. China stacks in silence. While the West holds steady, the East is preparing for something.",
+ "data": {
+  "USA": {
+   "2000": 8137,
+   "2005": 8135,
+   "2010": 8133,
+   "2015": 8133,
+   "2020": 8133,
+   "2023": 8133,
+   "2026": 8133
+  },
+  "Germany": {
+   "2000": 3469,
+   "2005": 3428,
+   "2010": 3401,
+   "2015": 3381,
+   "2020": 3362,
+   "2023": 3355,
+   "2026": 3352
+  },
+  "Italy": {
+   "2000": 2452,
+   "2005": 2452,
+   "2010": 2452,
+   "2015": 2452,
+   "2020": 2452,
+   "2023": 2452,
+   "2026": 2452
+  },
+  "France": {
+   "2000": 3025,
+   "2005": 2856,
+   "2010": 2435,
+   "2015": 2436,
+   "2020": 2436,
+   "2023": 2437,
+   "2026": 2437
+  },
+  "Russia": {
+   "2000": 384,
+   "2005": 387,
+   "2010": 789,
+   "2015": 1415,
+   "2020": 2299,
+   "2023": 2333,
+   "2026": 2360
+  },
+  "China": {
+   "2000": 395,
+   "2005": 600,
+   "2010": 1054,
+   "2015": 1762,
+   "2020": 1948,
+   "2023": 2235,
+   "2026": 2290
+  },
+  "Switzerland": {
+   "2000": 2590,
+   "2005": 1290,
+   "2010": 1040,
+   "2015": 1040,
+   "2020": 1040,
+   "2023": 1040,
+   "2026": 1040
+  }
+ }
+}

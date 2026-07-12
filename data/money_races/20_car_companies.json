@@ -1,0 +1,82 @@
+{
+ "title": "CAR WARS",
+ "subtitle": "2010 - 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE CAR EMPIRE\nFLIP",
+  "A startup ate the giants."
+ ],
+ "outro": [
+  "100 YEARS\nBEATEN IN 10.",
+  "Tesla rewrote the rules.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In twenty ten, Tesla was worth two billion. A joke next to Toyota's mountain. Everyone laughed. Then the electric wave hit. Tesla doesn't grow. It erupts. Two billion to over a trillion. It passes Toyota, Volkswagen, every legend that spent a century building cars. BYD rises from China to challenge. The oldest industry on earth, rewritten in one decade.",
+ "data": {
+  "Tesla": {
+   "2010": 2,
+   "2015": 32,
+   "2018": 52,
+   "2020": 669,
+   "2021": 1061,
+   "2023": 790,
+   "2026": 1400
+  },
+  "Toyota": {
+   "2010": 120,
+   "2015": 200,
+   "2018": 175,
+   "2020": 200,
+   "2021": 250,
+   "2023": 250,
+   "2026": 320
+  },
+  "BYD": {
+   "2010": 8,
+   "2015": 14,
+   "2018": 20,
+   "2020": 90,
+   "2021": 130,
+   "2023": 90,
+   "2026": 140
+  },
+  "Ferrari": {
+   "2010": 0,
+   "2015": 10,
+   "2018": 24,
+   "2020": 45,
+   "2021": 50,
+   "2023": 70,
+   "2026": 95
+  },
+  "Volkswagen": {
+   "2010": 80,
+   "2015": 75,
+   "2018": 80,
+   "2020": 90,
+   "2021": 140,
+   "2023": 65,
+   "2026": 60
+  },
+  "Mercedes": {
+   "2010": 60,
+   "2015": 90,
+   "2018": 75,
+   "2020": 70,
+   "2021": 90,
+   "2023": 70,
+   "2026": 75
+  },
+  "Porsche": {
+   "2010": 0,
+   "2015": 0,
+   "2018": 0,
+   "2020": 0,
+   "2021": 0,
+   "2023": 90,
+   "2026": 85
+  }
+ }
+}

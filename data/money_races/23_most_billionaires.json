@@ -1,0 +1,67 @@
+{
+ "title": "BILLIONAIRE MAP",
+ "subtitle": "2010 - 2026",
+ "unit": "",
+ "suffix": "",
+ "intro": [
+  "WHERE BILLIONAIRES\nARE BORN",
+  "Which country mints the most?"
+ ],
+ "outro": [
+  "TWO SUPERPOWERS\nOF WEALTH.",
+  "US leads. China chased.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "Where are the world's billionaires actually made? In twenty ten, America had four hundred. China had sixty-four. Then China's boom minted new billionaires faster than anywhere in history, nearly catching the US. But after twenty twenty-one, Beijing cracked down, and the numbers fell. Meanwhile India quietly rises. America still leads, but the map of money is shifting east.",
+ "data": {
+  "USA": {
+   "2010": 403,
+   "2015": 536,
+   "2018": 585,
+   "2020": 614,
+   "2023": 735,
+   "2026": 820
+  },
+  "China": {
+   "2010": 64,
+   "2015": 213,
+   "2018": 373,
+   "2020": 389,
+   "2023": 495,
+   "2026": 470
+  },
+  "India": {
+   "2010": 49,
+   "2015": 90,
+   "2018": 119,
+   "2020": 102,
+   "2023": 169,
+   "2026": 205
+  },
+  "Germany": {
+   "2010": 52,
+   "2015": 103,
+   "2018": 114,
+   "2020": 107,
+   "2023": 126,
+   "2026": 132
+  },
+  "Russia": {
+   "2010": 62,
+   "2015": 88,
+   "2018": 102,
+   "2020": 99,
+   "2023": 105,
+   "2026": 125
+  },
+  "UK": {
+   "2010": 32,
+   "2015": 53,
+   "2018": 54,
+   "2020": 56,
+   "2023": 52,
+   "2026": 58
+  }
+ }
+}

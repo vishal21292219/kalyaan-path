@@ -1,0 +1,61 @@
+{
+ "title": "DYNASTY MONEY",
+ "subtitle": "2015 - 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "THE RICHEST\nFAMILIES ALIVE",
+  "Wealth that never dies."
+ ],
+ "outro": [
+  "OLD MONEY\nNEVER SLEEPS.",
+  "One family. Half a trillion.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "Individuals get the headlines. But families hold the real fortune. The Waltons of Walmart sit on the throne, growing richer every year. The Al Nahyan of Abu Dhabi ride oil to over three hundred billion. The Hermès family turns handbags into a two hundred billion empire. The Mars candy dynasty. The Kochs. This is money measured in generations, not lifetimes.",
+ "data": {
+  "Waltons": {
+   "2015": 149,
+   "2018": 151,
+   "2020": 215,
+   "2023": 259,
+   "2026": 430
+  },
+  "Al Nahyan": {
+   "2015": 150,
+   "2018": 180,
+   "2020": 230,
+   "2023": 305,
+   "2026": 345
+  },
+  "Hermes": {
+   "2015": 50,
+   "2018": 63,
+   "2020": 64,
+   "2023": 151,
+   "2026": 220
+  },
+  "Mars": {
+   "2015": 80,
+   "2018": 90,
+   "2020": 127,
+   "2023": 141,
+   "2026": 170
+  },
+  "Kochs": {
+   "2015": 82,
+   "2018": 120,
+   "2020": 113,
+   "2023": 127,
+   "2026": 150
+  },
+  "Ambanis": {
+   "2015": 21,
+   "2018": 40,
+   "2020": 80,
+   "2023": 95,
+   "2026": 115
+  }
+ }
+}

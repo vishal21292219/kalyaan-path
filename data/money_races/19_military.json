@@ -1,0 +1,82 @@
+{
+ "title": "WAR BUDGETS",
+ "subtitle": "2000 - 2026",
+ "unit": "$",
+ "suffix": "B",
+ "intro": [
+  "WHO SPENDS\nMOST ON WAR",
+  "The price of power."
+ ],
+ "outro": [
+  "ONE NATION\nOUTSPENDS ALL.",
+  "The US alone. Then everyone.",
+  "Follow for the money\nnobody explains.",
+  "@moneurons"
+ ],
+ "vo": "In two thousand, America spent three hundred billion on defense. China? Barely twenty. Then the century turned into an arms race. China's budget explodes fifteen times over. Russia surges after twenty twenty-two. India climbs steadily. But no one catches America. By twenty twenty-six, the US spends nearly a trillion dollars. More than the next ten countries combined.",
+ "data": {
+  "USA": {
+   "2000": 320,
+   "2005": 503,
+   "2010": 738,
+   "2015": 640,
+   "2020": 778,
+   "2023": 916,
+   "2026": 1000
+  },
+  "China": {
+   "2000": 22,
+   "2005": 45,
+   "2010": 105,
+   "2015": 180,
+   "2020": 245,
+   "2023": 296,
+   "2026": 360
+  },
+  "Russia": {
+   "2000": 19,
+   "2005": 35,
+   "2010": 58,
+   "2015": 66,
+   "2020": 62,
+   "2023": 109,
+   "2026": 135
+  },
+  "India": {
+   "2000": 14,
+   "2005": 28,
+   "2010": 46,
+   "2015": 51,
+   "2020": 73,
+   "2023": 84,
+   "2026": 96
+  },
+  "Saudi Arabia": {
+   "2000": 20,
+   "2005": 29,
+   "2010": 45,
+   "2015": 87,
+   "2020": 62,
+   "2023": 76,
+   "2026": 80
+  },
+  "UK": {
+   "2000": 36,
+   "2005": 48,
+   "2010": 60,
+   "2015": 56,
+   "2020": 59,
+   "2023": 75,
+   "2026": 85
+  },
+  "Germany": {
+   "2000": 28,
+   "2005": 31,
+   "2010": 46,
+   "2015": 39,
+   "2020": 53,
+   "2023": 67,
+   "2026": 95
+  }
+ }
+}
