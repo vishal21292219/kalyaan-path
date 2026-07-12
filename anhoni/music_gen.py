@@ -1,25 +1,21 @@
 #!/usr/bin/env python3
-"""ANHONI music — generate a suspense track (fal stable-audio) for a story.
+"""ANHONI music — pick a background track from the local library (music/*.mp3).
+Date-rotated so each day gets a different track. assemble.py then trims it to the
+video length with fade in/out + loudnorm. (Was fal stable-audio; now uses the
+creator's own tracks for a premium, hand-picked vibe.)
   python music_gen.py <slug>   -> out/<slug>/music.mp3"""
-import os, sys, json, urllib.request
+import sys, shutil, datetime
 from pathlib import Path
 OUT = Path(__file__).parent
-ENV = OUT.parent / ".env"; E = dict(os.environ)
-if ENV.exists():
-    for l in ENV.read_text().splitlines():
-        if "=" in l and not l.strip().startswith("#"):
-            k, v = l.split("=", 1); E.setdefault(k.strip(), v.strip())
-KEY = E["FAL_KEY"]
+
 def main(slug):
-    spec = json.loads((OUT / f"story_{slug}.json").read_text())
-    prompt = spec.get("music_prompt") or "dark cinematic suspense background music, tense low drone, eerie, no vocals, no drums"
+    lib = sorted((OUT / "music").glob("*.mp3"))
+    if not lib:
+        print("no music library — assemble will render silent"); return
+    track = lib[datetime.date.today().toordinal() % len(lib)]
     base = OUT / "out" / slug; base.mkdir(parents=True, exist_ok=True)
-    body = json.dumps({"prompt": prompt, "seconds_total": 47}).encode()
-    req = urllib.request.Request("https://fal.run/fal-ai/stable-audio", data=body,
-        headers={"Authorization": "Key " + KEY, "Content-Type": "application/json"})
-    d = json.load(urllib.request.urlopen(req, timeout=180))
-    url = (d.get("audio_file") or {}).get("url") or (d.get("audio") or {}).get("url")
-    urllib.request.urlretrieve(url, base / "music.mp3")
-    print("MUSIC ->", base / "music.mp3")
+    shutil.copy(track, base / "music.mp3")
+    print("MUSIC:", track.name)
+
 if __name__ == "__main__":
     main(sys.argv[1])
