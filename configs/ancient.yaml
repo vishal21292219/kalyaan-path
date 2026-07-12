@@ -207,6 +207,7 @@ publish:
   privacy: public
   youtube: true
   facebook_make: true     # AUTO FB via Make.com (Cloudinary→webhook, page from FB_PAGE_ID_ANCIENT). Bypasses flagged dev-app.
+  facebook_make_slots: [2]  # AUDIT 2026-07-08: FB 1/day (growing-page rule — 824 followers). ONLY seed 2 (8 PM ET PRIME). YouTube stays 2/day.
   facebook_manual: false  # FB now auto via facebook_make
   facebook: false  # PAUSED 2026-06-10: FB token failing ("cannot call API on behalf of user")
                    # — Meta flagged the dev account; failing calls worsen the flag. Re-enable
