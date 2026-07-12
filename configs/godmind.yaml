@@ -22,6 +22,13 @@ branding:
   - '#youtubeshorts'
   music_credit: "Music: meditative ambient — original, royalty-free"
 
+# ── TOPIC CRITERIA (viral formula — codified 2026-07-08) ──────────────────────
+# Every GoM topic MUST be FELT-PAIN / IDENTITY first, deity as the REFRAME second.
+# Proven: the 10.6k breakout was "You were taught to kill your darkest urges. The
+# gods never did." Formula = <a private struggle the viewer already feels> + <a
+# deity/myth that reframes it> → the viewer sees THEMSELVES in the god.
+# NOT "Here's a myth about Shiva" (info) — YES "That stillness you can't find? Shiva
+# IS it" (identity). Any new pool topic must pass this felt-pain-first test.
 paths:
   topics_file: data/viral_topics_godmind.json
   music_dir: data/music_godmind

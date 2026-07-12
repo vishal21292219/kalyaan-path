@@ -19,6 +19,15 @@ branding:
   - '#hiddenhistory'
   music_credit: "Music: cinematic ambient — original, royalty-free"
 
+# ── TOPIC CRITERIA (viral formula — codified 2026-07-08) ──────────────────────
+# The ACTIVE pool is data/viral_topics_ancient.json. Every TD topic MUST hit AWE /
+# "this shouldn't be possible" anchored to a SPECIFIC number or measurement.
+# Proven winners: space ("Planet Made of Diamond", "Star Older Than the Universe")
+# + impossible ancient tech (Antikythera 2000-yr computer, Baalbek 1000-ton stones,
+# micron-cut granite). Formula = <a concrete, verifiable marvel> + <an unanswered
+# how/who>. AVOID generic regional monuments (petroglyphs, local stone forts) — low
+# awe punch, so they carry "weight": 1 in the pool; space + marquee tech carry
+# "weight": 6 (pick_viral biases toward them). Best topics carry a jaw-dropping number.
 paths:
   topics_file: data/topics_ancient.json
   music_dir: data/music_ancient

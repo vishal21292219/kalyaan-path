@@ -1,738 +1,780 @@
 {
-  "_note": "Fresh viral topic pool for TimeDecoders. pick_viral() rotates with recency avoidance. query = Pexels footage search term.",
-  "topics": [
-    {
-      "seq": -20,
-      "title": "Oumuamua: The Interstellar Object That Sped Up On Its Own",
-      "query": "oumuamua interstellar object cosmic space",
-      "hook": "In 2017 a cigar-shaped object tumbled through our solar system from another star — then accelerated as it left, with no engine, no tail, no explanation. A Harvard astronomer said the numbers only make sense one way."
-    },
-    {
-      "seq": -19,
-      "title": "The WOW! Signal: 72 Seconds From Space That Never Repeated",
-      "query": "wow signal radio telescope deep space",
-      "hook": "In 1977 a telescope caught a signal from deep space so strong the astronomer circled it and wrote one word: Wow. It lasted 72 seconds, came from a starless patch of sky, and has never been heard again."
-    },
-    {
-      "seq": -18,
-      "title": "The Star That's Older Than the Universe Itself",
-      "query": "methuselah star ancient cosmic space",
-      "hook": "A star 190 light-years away measures 14.5 billion years old — older than the universe that supposedly made it. Either our science is broken, or this star should not exist."
-    },
-    {
-      "seq": -17,
-      "title": "The Planet Made of Diamond, Twice the Size of Earth",
-      "query": "diamond planet 55 cancri cosmic space",
-      "hook": "Forty light-years away orbits a world whose surface may be crystallized carbon — a planet that could be one-third pure diamond, worth more than every economy on Earth combined."
-    },
-    {
-      "seq": -16,
-      "title": "The Cold Spot: A Hole in the Universe 1.8 Billion Light-Years Wide",
-      "query": "cmb cold spot supervoid universe cosmic",
-      "hook": "In one direction of the sky lies a region so vast, so empty and so cold it should not be possible. Some scientists believe it is a scar — the mark where our universe collided with another."
-    },
-    {
-      "seq": -15,
-      "title": "Tabby's Star: The Light That Dims Like Something's Blocking It",
-      "query": "tabbys star boyajian dimming cosmic space",
-      "hook": "One star flickers in a pattern no natural object explains — dimming by 22 percent at random, as if something enormous orbits it. For a while, even scientists could not rule out a structure built by someone."
-    },
-    {
-      "seq": -14,
-      "title": "The Great Attractor: Something Is Pulling Our Galaxy Toward It",
-      "query": "great attractor galaxy gravity cosmic space",
-      "hook": "Our entire galaxy is being dragged through space at over a million miles per hour toward a single point — and it hides behind the Milky Way, so we cannot see what is pulling us in."
-    },
-    {
-      "seq": -13,
-      "title": "The Signal From Space That Repeats Every 157 Days",
-      "query": "fast radio burst repeating signal cosmic space",
-      "hook": "A blast of radio energy from 3 billion light-years away arrives on a schedule — every 157 days, like clockwork. In a fraction of a second it unleashes more energy than the Sun makes in years. Nobody knows the source."
-    },
-    {
-      "seq": -11,
-      "title": "Damascus Steel: A Blade Modern Science Still Can't Recreate",
-      "query": "damascus steel blade pattern ancient",
-      "hook": "Its blades could split a falling hair and never shatter. The recipe was lost three centuries ago — and with all our technology, we still cannot reproduce it."
-    },
-    {
-      "seq": -9,
-      "title": "The Nimrud Lens: Ground Glass 3,000 Years Before Telescopes",
-      "query": "nimrud lens rock crystal assyria",
-      "hook": "Three thousand years ago someone in Assyria ground rock crystal into a near-perfect lens — millennia before the telescope was supposedly invented."
-    },
-    {
-      "seq": -8,
-      "title": "Ulfberht Swords: Viking Steel 800 Years Ahead of Its Time",
-      "query": "ulfberht viking sword steel",
-      "hook": "Viking blades stamped with one name were made of steel so pure it needed furnaces over 1,600 degrees — a heat Europe would not reach for another 800 years."
-    },
-    {
-      "seq": -7,
-      "title": "Vitrified Forts: Ancient Walls Melted by a Heat We Can't Match",
-      "query": "vitrified fort melted stone scotland",
-      "hook": "Across Scotland and Europe, ancient stone walls were melted until the rock fused like glass. It takes over a thousand degrees to do this. No one knows how — or why."
-    },
-    {
-      "seq": -6,
-      "title": "The Longyou Caves: Millions of Tool Marks, No Record Who Carved Them",
-      "query": "longyou caves carved rock china",
-      "hook": "Carved by hand from solid rock, covered in millions of identical chisel marks, vast enough to swallow buildings — and not one historical record says who made them."
-    },
-    {
-      "seq": -5,
-      "title": "The Nebra Sky Disc: The Oldest Map of the Stars, 3,600 Years Old",
-      "query": "nebra sky disc bronze gold stars",
-      "hook": "A 3,600-year-old bronze disc inlaid with gold stars — the oldest known map of the sky, made by a people we assumed could never chart the heavens."
-    },
-    {
-      "seq": -4,
-      "title": "The Phaistos Disc: A Printed Code No One Has Ever Cracked",
-      "query": "phaistos disc clay symbols crete",
-      "hook": "A clay disc stamped with 241 symbols using movable type — three thousand years before the printing press. And no one has ever been able to read it."
-    },
-    {
-      "seq": -3,
-      "title": "Klerksdorp Spheres: Grooved Metal Balls in 3-Billion-Year-Old Rock",
-      "query": "klerksdorp spheres metallic grooved",
-      "hook": "Miners in South Africa keep pulling out perfect metallic spheres, grooved around the middle, embedded in rock nearly three billion years old."
-    },
-    {
-      "seq": -2,
-      "title": "The Dendera Light: A Temple Carving That Looks Like a Lightbulb",
-      "query": "dendera temple carving egypt light",
-      "hook": "On the wall of an ancient temple is a carving that looks unmistakably like a giant lightbulb, wires and all. The argument over what it really shows has never ended."
-    },
-    {
-      "seq": -1,
-      "title": "The Sabu Disc: A 5,000-Year-Old Stone Wheel That Shouldn't Exist",
-      "query": "sabu disc stone egypt tri-lobed",
-      "hook": "Buried in a 5,000-year-old tomb was a fragile stone disc carved into a shape no one can explain — too thin, too precise, and useless for anything we know of."
-    },
-    {
-      "title": "Gobekli Tepe: The Temple That Shouldn't Exist",
-      "hook": "It's 12,000 years old, built before farming, before the wheel, before writing.",
-      "query": "ancient stone temple",
-      "seq": 8
-    },
-    {
-      "title": "Scientists Scanned Under the Pyramids And Found a City",
-      "hook": "Radar revealed shafts going 2km below Giza, and nobody can explain them.",
-      "query": "giza pyramids egypt",
-      "seq": 5,
-      "weight": 1
-    },
-    {
-      "title": "The Hidden Void Inside the Pyramid They Can't Open",
-      "hook": "A sealed chamber was detected in Menkaure, and it's never been entered.",
-      "query": "pyramid interior chamber",
-      "seq": 7,
-      "weight": 1
-    },
-    {
-      "title": "Yonaguni: Japan's Underwater Pyramid That Breaks History",
-      "hook": "Perfect right angles, 25m underwater, possibly 10,000 years old.",
-      "query": "underwater ruins diver",
-      "seq": 3,
-      "weight": 1
-    },
-    {
-      "title": "Puma Punku: Stone Cut Too Perfect for the Stone Age",
-      "hook": "Machine-precision angles carved into the hardest rock on Earth.",
-      "query": "ancient stone ruins",
-      "seq": 6
-    },
-    {
-      "title": "The Lost City That Sank Beneath the Sea Overnight",
-      "hook": "Heracleion vanished underwater and was found 1,200 years later.",
-      "query": "underwater ancient city",
-      "seq": 12
-    },
-    {
-      "title": "Baalbek: The 1,000-Ton Stones No One Can Lift",
-      "hook": "Even modern cranes can't move what ancient builders somehow placed.",
-      "query": "ancient roman ruins",
-      "seq": 11
-    },
-    {
-      "title": "The Nazca Lines Were Never Meant for Human Eyes",
-      "hook": "You can only see them from the sky, so who were they for?",
-      "query": "desert aerial landscape",
-      "seq": 16
-    },
-    {
-      "title": "The Sahara Was Once Green And Something Built Here",
-      "hook": "Satellite scans found ancient structures buried under the sand.",
-      "query": "sahara desert dunes"
-    },
-    {
-      "title": "Why the Sphinx Might Be Older Than We Thought",
-      "hook": "Water erosion suggests it was carved before the desert existed.",
-      "query": "great sphinx egypt",
-      "seq": 31,
-      "weight": 1
-    },
-    {
-      "title": "The Underground Labyrinth Egypt Tried to Bury",
-      "hook": "Ancient writers described 3,000 rooms below the sand.",
-      "query": "ancient stone corridor",
-      "seq": 29,
-      "weight": 1
-    },
-    {
-      "title": "Derinkuyu: The Underground City for 20,000 People",
-      "hook": "Hidden 18 stories deep, and we don't know who they were hiding from.",
-      "query": "underground cave tunnel",
-      "seq": 15
-    },
-    {
-      "title": "Stonehenge's Stones Were Carried 200 Miles. How?",
-      "hook": "Each megalith weighs 25 tons and came from another country.",
-      "query": "stonehenge england",
-      "seq": 19
-    },
-    {
-      "title": "The Ancient Map That Shows Antarctica With No Ice",
-      "hook": "The Piri Reis map drew a coastline buried under ice for 6,000 years.",
-      "query": "antarctica ice landscape",
-      "seq": 14
-    },
-    {
-      "title": "Easter Island's Statues Have Bodies You Never See",
-      "hook": "The famous heads are buried up to their necks underground.",
-      "query": "easter island statues",
-      "seq": 17
-    },
-    {
-      "title": "The Indian Temple Carved From a Single Rock",
-      "hook": "Kailasa was cut top-down from one mountain with no room for error.",
-      "query": "ancient indian temple",
-      "seq": 18
-    },
-    {
-      "title": "Scientists Are Baffled by the Bosnian Pyramid",
-      "hook": "A hill in Europe may be the largest pyramid ever built.",
-      "query": "pyramid mountain landscape",
-      "weight": 1
-    },
-    {
-      "title": "The 5,000-Year-Old City Wired Like It Had Plumbing",
-      "hook": "Mohenjo-daro had toilets and drains before most of the world had walls.",
-      "query": "ancient ruins excavation",
-      "seq": 36
-    },
-    {
-      "title": "Atlantis Might Be Real And Hidden in the Sahara",
-      "hook": "A perfect ring structure in the desert matches Plato's description.",
-      "query": "desert aerial view",
-      "seq": 41
-    },
-    {
-      "title": "The Stone Door Sealed for 1,500 Years",
-      "hook": "India's Padmanabhaswamy vault has never been opened, and locals say it's cursed.",
-      "query": "ancient temple door",
-      "seq": 34
-    },
-    {
-      "title": "Why Did Every Ancient Culture Build Pyramids?",
-      "hook": "Egypt, Mexico, China and Sudan all did it without ever meeting.",
-      "query": "ancient pyramid ruins",
-      "weight": 1
-    },
-    {
-      "title": "The Underwater Roads Found Off the Bahamas",
-      "hook": "The Bimini Road looks man-made and predates known history.",
-      "query": "underwater rock formation"
-    },
-    {
-      "title": "Petra: The City Carved Into a Cliff Face",
-      "hook": "An entire metropolis hidden in rock, lost for over a thousand years.",
-      "query": "petra jordan ruins",
-      "seq": 21
-    },
-    {
-      "title": "The Mayan City LIDAR Found Hidden in the Jungle",
-      "hook": "Lasers revealed millions lived where we saw only trees.",
-      "query": "jungle ancient ruins",
-      "seq": 22
-    },
-    {
-      "title": "The Antikythera Mechanism: A 2,000-Year-Old Computer",
-      "hook": "It predicted eclipses with gears we couldn't build until the 1700s.",
-      "query": "ancient artifact museum",
-      "seq": 1
-    },
-    {
-      "title": "Angkor Wat Was Bigger Than We Ever Imagined",
-      "hook": "Scans found a vast lost city sprawling around the famous temple.",
-      "query": "angkor wat cambodia",
-      "seq": 37
-    },
-    {
-      "title": "The Desert Pyramids of Sudan Nobody Talks About",
-      "hook": "Sudan has more pyramids than Egypt, and almost no one visits them.",
-      "query": "sudan desert pyramids",
-      "weight": 1
-    },
-    {
-      "title": "Teotihuacan: Built by a Civilization With No Name",
-      "hook": "A massive city, and we don't know what its people called themselves.",
-      "query": "teotihuacan pyramid mexico",
-      "seq": 35,
-      "weight": 1
-    },
-    {
-      "title": "The Granite Boxes No Tool Could Carve",
-      "hook": "Serapeum boxes are cut to micron precision out of solid granite.",
-      "query": "ancient egyptian stone",
-      "seq": 20,
-      "weight": 1
-    },
-    {
-      "title": "A Drowned Stone Age World Beneath the North Sea",
-      "hook": "Doggerland was a country where Britain now meets Europe, now underwater.",
-      "query": "ocean waves seabed"
-    },
-    {
-      "title": "The Temple Aligned Perfectly to the Stars",
-      "hook": "Karnak channels sunlight to a hidden room one day a year.",
-      "query": "ancient temple columns"
-    },
-    {
-      "title": "The Megaliths in Russia That Dwarf Stonehenge",
-      "hook": "Mount Shoria's stones may weigh over 3,000 tons each.",
-      "query": "giant boulder mountain",
-      "seq": 42
-    },
-    {
-      "title": "The Stone Circles Older Than the Pyramids in Africa",
-      "hook": "Nabta Playa tracked the stars 2,000 years before Stonehenge.",
-      "query": "stone circle desert",
-      "weight": 1
-    },
-    {
-      "title": "The Sunken Temple City Found Off India's Coast",
-      "hook": "Divers off Dwarka found ruins matching a mythical lost city.",
-      "query": "underwater ancient stones",
-      "seq": 28
-    },
-    {
-      "title": "The 11,000-Year-Old Town Under Turkey's Soil",
-      "hook": "Catalhoyuk had no streets, so everyone walked across the rooftops.",
-      "query": "ancient excavation site",
-      "seq": 30
-    },
-    {
-      "title": "Mohenjo-daro: The City That Was Vitrified",
-      "hook": "Some claim the ruins show signs of a heat blast we can't explain.",
-      "query": "ancient ruins desert",
-      "seq": 24
-    },
-    {
-      "title": "The Ica Stones That Shouldn't Be Possible",
-      "hook": "Carved stones in Peru seem to show things ancient people couldn't know.",
-      "query": "ancient carved stone"
-    },
-    {
-      "title": "The Library of Alexandria's Final Night",
-      "hook": "700,000 scrolls — the entire knowledge of the ancient world — burned in a single night, and we still don't know what we lost.",
-      "query": "ancient library scrolls",
-      "seq": 40
-    },
-    {
-      "title": "Roman Concrete That Heals Its Own Cracks",
-      "hook": "Their 2,000-year-old harbors still stand in the sea, while our concrete crumbles in 50 years — and we just cracked their secret.",
-      "query": "ancient roman ruins",
-      "seq": 4
-    },
-    {
-      "title": "The 2,400-Year-Old Man With Skin Still Intact",
-      "hook": "They pulled him from a bog and his face was perfect — even the food in his stomach survived.",
-      "query": "misty bog wetland",
-      "seq": 10
-    },
-    {
-      "title": "The 1513 Map That Shows Antarctica Without Ice",
-      "hook": "It maps a coastline buried under ice for 6,000 years — drawn centuries before anyone reached it.",
-      "query": "old world map parchment"
-    },
-    {
-      "title": "The Nazca Lines Only Gods Could See",
-      "hook": "Miles of perfect figures carved into the desert — invisible from the ground, flawless from the sky.",
-      "query": "desert aerial landscape"
-    },
-    {
-      "title": "The Antarctic Pyramid Hidden in Plain Sight",
-      "hook": "A perfect three-sided peak juts from the ice — too symmetrical, scientists say, to be natural.",
-      "query": "antarctica ice mountains",
-      "seq": 23,
-      "weight": 1
-    },
-    {
-      "title": "The Megaliths That Weigh More Than Jets",
-      "hook": "1,000-ton stones cut and moved with precision — by a people who supposedly had no machines.",
-      "query": "massive stone megalith",
-      "seq": 33
-    },
-    {
-      "title": "The Underwater City Off the Coast of Japan",
-      "hook": "Sharp terraces and staircases sit 80 feet down — built, some say, before the last Ice Age ended.",
-      "query": "underwater ruins ocean"
-    },
-    {
-      "title": "The Code in the Voynich Manuscript",
-      "hook": "600 years old, written in a language that exists nowhere else — and no human or AI has cracked it.",
-      "query": "old handwritten manuscript",
-      "seq": 27
-    },
-    {
-      "title": "The 5,500-Year-Old Sandal Still Tied",
-      "hook": "Found in a cave, laces knotted exactly as its owner left them before vanishing.",
-      "query": "dark cave interior",
-      "seq": 39
-    },
-    {
-      "title": "The Stone Spheres No One Can Explain",
-      "hook": "Hundreds of perfect granite balls, scattered across a jungle — purpose unknown, makers gone.",
-      "query": "jungle ancient stones",
-      "seq": 26
-    },
-    {
-      "title": "The Roman Dodecahedron Nobody Can Solve",
-      "hook": "A bronze object found across an empire — with no manual, no mention, and no agreed-upon use.",
-      "query": "ancient bronze artifact",
-      "seq": 25
-    },
-    {
-      "title": "The Door in the Rock at Hayu Marca",
-      "hook": "A flat doorway carved into a cliff — locals swear it was a gateway, and people who touched it changed.",
-      "query": "rock cliff face andes"
-    },
-    {
-      "title": "The City Found Under the Sahara Sand",
-      "hook": "Satellites revealed streets and walls beneath the dunes — a civilization the desert swallowed whole.",
-      "query": "sahara desert dunes"
-    },
-    {
-      "title": "The 9,000-Year-Old Town That Had No Streets",
-      "hook": "Thousands lived here entering homes through the roof — and then abandoned it for reasons unknown.",
-      "query": "ancient mud brick ruins"
-    },
-    {
-      "title": "The Crystal Skulls That Defy the Tools of Their Time",
-      "hook": "Carved against the grain of the quartz — a feat that should have shattered them instantly.",
-      "query": "crystal gemstone close"
-    },
-    {
-      "title": "The Ark the Vatican Won't Discuss",
-      "hook": "A relic said to hold unimaginable power vanished from history — and one country claims it never left.",
-      "query": "ancient golden relic"
-    },
-    {
-      "title": "The Lost Roman Legion That Marched Into China",
-      "hook": "5,000 soldiers vanished — and a town deep in Asia carries Roman blood and Roman walls.",
-      "query": "ancient roman soldiers"
-    },
-    {
-      "title": "The 2,000-Year-Old Computer From a Shipwreck",
-      "hook": "Thirty bronze gears that tracked the planets — technology that wouldn't reappear for 1,400 years.",
-      "query": "ancient bronze gears"
-    },
-    {
-      "title": "The Tunnel Network Under Ancient Europe",
-      "hook": "Stone passages stretch from Scotland to Turkey — dug by hand, for a purpose long forgotten.",
-      "query": "dark stone tunnel"
-    },
-    {
-      "title": "The Statue That Bleeds in the Desert Heat",
-      "hook": "A 3,000-year-old colossus that 'sang' at dawn — until the Romans tried to repair it and silenced it.",
-      "query": "egyptian statue desert",
-      "weight": 1
-    },
-    {
-      "title": "The Lake That Turns Animals to Stone",
-      "hook": "Birds that land on it are perfectly preserved — calcified mid-motion, like a curse made real.",
-      "query": "still red lake"
-    },
-    {
-      "title": "The 280-Million-Year-Old 'Map' in Russia",
-      "hook": "A slab with raised terrain and channels — some claim it's a relief map carved before dinosaurs.",
-      "query": "carved stone slab"
-    },
-    {
-      "title": "The Forbidden City Beneath the Pyramids",
-      "hook": "Ground radar found shafts and chambers 2 km under Giza — and excavation was quietly stopped.",
-      "query": "giza pyramids egypt",
-      "weight": 1
-    },
-    {
-      "title": "The 12,000-Year-Old Temple Built Before Farming",
-      "hook": "Massive carved pillars raised by hunter-gatherers — then deliberately buried, and no one knows why.",
-      "query": "ancient carved pillars"
-    },
-    {
-      "title": "The Skeleton Lake of the Himalayas",
-      "hook": "500 bodies surface every summer at 16,000 feet — all killed the same way, in a single moment.",
-      "query": "himalaya frozen lake"
-    },
-    {
-      "title": "The Roman Road Still Perfect After 2,000 Years",
-      "hook": "Engineered so well that modern highways trace its exact path — built without a single machine.",
-      "query": "ancient stone road"
-    },
-    {
-      "title": "The Bronze Age City That Vanished in a Day",
-      "hook": "Streets full of homes, no bodies, no battle — an entire people gone, as if they walked out together.",
-      "query": "ancient excavation ruins"
-    },
-    {
-      "title": "The Cave Paintings Older Than Humans in Europe",
-      "hook": "Handprints and beasts painted 65,000 years ago — before our species was thought to arrive.",
-      "query": "cave wall paintings"
-    },
-    {
-      "title": "The Ghost Fleet Frozen Under Antarctica",
-      "hook": "Sonar mapped shapes beneath the ice shelf — too ordered, some argue, to be ice formations.",
-      "query": "antarctica ice shelf"
-    },
-    {
-      "title": "The Temple Aligned to a Star You Can't See",
-      "hook": "Its corridor lights up one day a year — pointing at a star that moved 4,000 years ago.",
-      "query": "ancient temple corridor"
-    },
-    {
-      "title": "The 6,000-Year-Old Eye Surgery That Worked",
-      "hook": "A skull with a healed hole — drilled while the patient lived, and survived for years after.",
-      "query": "ancient human skull"
-    },
-    {
-      "title": "The Sunken Palace of Cleopatra",
-      "hook": "Earthquakes dropped her city into the sea — and divers keep finding rooms no record mentions.",
-      "query": "underwater statue ruins"
-    },
-    {
-      "title": "The Hill That Hums With No Source",
-      "hook": "Locals hear it, instruments record it — a low tone rising from ancient ground nobody can trace.",
-      "query": "green rolling hills"
-    },
-    {
-      "title": "The 4,000-Year-Old Recipe Carved in Clay",
-      "hook": "The world's oldest written instructions — for a dish, and a beer, we just recreated.",
-      "query": "ancient clay tablet"
-    },
-    {
-      "title": "The Forbidden Room in the Taj Mahal's Basement",
-      "hook": "Sealed chambers below the river side — never opened, and officially they don't exist.",
-      "query": "white marble monument"
-    },
-    {
-      "title": "The Desert Glass Made by an Ancient Blast",
-      "hook": "Green glass scattered across the Sahara — formed at a heat only a sky-borne explosion could create.",
-      "query": "sahara desert glass"
-    },
-    {
-      "title": "The City That Ruled the Amazon Then Disappeared",
-      "hook": "LIDAR exposed roads and plazas under the canopy — a million people, erased from memory.",
-      "query": "amazon jungle canopy"
-    },
-    {
-      "title": "The Stone Heads Sailing Across an Island",
-      "hook": "Multi-ton statues 'walked' miles from the quarry — and the islanders said exactly how, but we didn't listen.",
-      "query": "easter island statues"
-    },
-    {
-      "title": "The 3,000-Room Labyrinth Egypt Buried",
-      "hook": "Ancient writers called it greater than the pyramids — then the sand took it, and we lost the door.",
-      "query": "desert excavation site",
-      "weight": 1
-    },
-    {
-      "title": "The Underwater Wall Longer Than Any Border",
-      "hook": "A straight stone line runs for miles on the seabed — natural rock, geologists insist, but the angles say otherwise.",
-      "query": "underwater rock formation"
-    },
-    {
-      "title": "The Monastery Carved Into a Single Cliff",
-      "hook": "Hundreds of rooms cut top-down from one rock — finished, then half-abandoned mid-chisel.",
-      "query": "cliff carved monastery"
-    },
-    {
-      "title": "The 40,000-Year-Old Flute That Still Plays",
-      "hook": "Carved from bone with perfect spacing — proof music is older than civilization itself.",
-      "query": "prehistoric bone artifact"
-    },
-    {
-      "title": "The Empire History Tried to Erase",
-      "hook": "Maps, books, and buildings credited to it were quietly rewritten — and the cover-up is the real mystery.",
-      "query": "old empire ruins"
-    },
-    {
-      "title": "The Pyramid Bigger Than Giza Hidden as a Hill",
-      "hook": "For centuries a town grew on its slopes — never knowing it lived atop the largest pyramid on Earth.",
-      "query": "grass covered hill",
-      "weight": 1
-    },
-    {
-      "title": "The 1,000-Year-Old Phone From the Americas",
-      "hook": "A gourd and twine device that carried sound — found in a tomb, ages before the telephone.",
-      "query": "ancient artifact museum"
-    },
-    {
-      "title": "The Salt Mine Cathedral Carved by Miners",
-      "hook": "An entire church — chandeliers, altars, saints — chiseled from rock salt deep underground.",
-      "query": "underground salt cavern"
-    },
-    {
-      "title": "The Star Map Painted 17,000 Years Ago",
-      "hook": "Dots on a cave ceiling match the night sky of the Ice Age — the oldest map of the heavens.",
-      "query": "cave ceiling painting"
-    },
-    {
-      "title": "The Fortress in the Clouds They Forgot to Finish",
-      "hook": "A city of terraces at 8,000 feet — built, lived in, then left to the mist within a century.",
-      "query": "mountain cloud fortress"
-    },
-    {
-      "title": "The Laser-Cut Giant of Saudi Arabia",
-      "hook": "You feel a deep frustration when experts claim ancient tools did everything, because this massive desert boulder is sliced perfectly in half with laser-like precision."
-    },
-    {
-      "title": "The 12,000-Year-Old Wooden Giant",
-      "hook": "You hate feeling like our ancestors were just primitive cavemen, but this wooden statue is twice as old as the pyramids and covered in a code we can't crack."
-    },
-    {
-      "title": "The Giant Stone Jars of Laos",
-      "hook": "You feel a chilling sense of dread when you look at these thousands of massive stone vessels scattered across a landscape, with no bodies ever found inside."
-    },
-    {
-      "title": "The Venice of the Pacific",
-      "hook": "You feel completely overwhelmed by how much of our past is lost when you see an entire city built of ninety-ton magnetic stones floating on a coral reef."
-    },
-    {
-      "title": "The Miles of Straight Lines in Bolivia",
-      "hook": "You feel incredibly small realizing that a forgotten culture etched thousands of perfectly straight paths across the Andes, covering an area fifteen times larger than Nazca."
-    },
-    {
-      "title": "The Hand-Carved Caverns of Longyou",
-      "hook": "You know that exhausting feeling of working on a project that never gets noticed, but ancient builders carved out twenty-four massive underground halls and left absolutely no record of it."
-    },
-    {
-      "title": "The 5,000-Year-Old Cosmic Map of Scotland",
-      "hook": "You feel a sudden spark of suspicion when you learn the government buried a massive stone covered in unexplained spiral symbols just to keep the public away from it."
-    },
-    {
-      "title": "The Perfectly Polished Caves of India",
-      "hook": "You feel an eerie sense of isolation inside these granite chambers, where the walls are polished to a mirror shine and the acoustics stretch a single whisper into a minute-long echo."
-    },
-    {
-      "title": "The Bronze Age Towers of Sardinia",
-      "hook": "You feel a restless curiosity about the giants of old when you see seven thousand massive stone fortresses built without a single drop of mortar."
-    },
-    {
-      "title": "The Oldest Submerged City in the World",
-      "hook": "You feel a wave of deep-sea claustrophobia thinking about this pristine bronze-age town resting just off the coast of Greece, perfectly preserved beneath the waves."
-    },
-    {
-      "title": "The Secret City Built Beneath Miami",
-      "hook": "You feel a bizarre sense of vertigo standing in downtown Miami, knowing that buried beneath the concrete is a perfect circle of ancient stone cut into the bedrock."
-    },
-    {
-      "title": "The Giant Snake Mound of Ohio",
-      "hook": "You feel a cosmic pull when you stand above this massive earthen snake, because its curves align perfectly with the solstices and the constellations above."
-    },
-    {
-      "title": "The 20,000-Year-Old Pyramid Hidden in Indonesia",
-      "hook": "You feel a wave of academic anger when you realize this ordinary-looking hill might actually be a massive stepped pyramid older than the last Ice Age.",
-      "weight": 1
-    },
-    {
-      "title": "The Deepest Underground Sanctuary in Iran",
-      "hook": "You feel a suffocating sense of panic imagining an entire population escaping war by retreating into a multi-level subterranean labyrinth carved deep into the desert."
-    },
-    {
-      "title": "The Mysterious Cart Ruts of Malta",
-      "hook": "You feel a baffling sense of confusion when you look at these deep stone tracks that run straight off cliff edges and disappear directly into the sea."
-    },
-    {
-      "title": "The America Before Columbus They Hid From You",
-      "hook": "You feel a sting of resentment toward your history books when you discover a prehistoric metropolis in Illinois was once larger and more populated than London."
-    },
-    {
-      "title": "The Stone Age Village Older Than Stonehenge",
-      "hook": "You feel an intimate connection to the deep past when you step into these stone homes, fully furnished with beds and shelves, preserved under the sand for five thousand years."
-    },
-    {
-      "title": "The Mysterious Stone Tower of Rhode Island",
-      "hook": "You feel a nagging doubt about who actually discovered America when you look at this medieval-style stone tower standing in a New England park."
-    },
-    {
-      "title": "The Undeciphered Clay Disk of Crete",
-      "hook": "You feel a burning obsession trying to decode this ancient spiral of stamped symbols, knowing that the secrets of a lost Minoan civilization are locked inside it."
-    },
-    {
-      "title": "The Giant Stone Heads of Guatemala",
-      "hook": "You feel a deep frustration when you find out a massive, fine-featured stone head discovered in the jungle was destroyed before scientists could ever study it."
-    },
-    {
-      "title": "The 4,000-Year-Old Psychedelic Mural of Texas",
-      "hook": "You feel a trippy sense of wonder looking at this ancient rock art, which depicts a cosmic journey through the spirit world using precise astronomical alignments."
-    },
-    {
-      "title": "The Solar Temple Older Than Stonehenge",
-      "hook": "You feel an ancient rhythm in your bones when you realize this massive concentric wooden circle was used to track the heavens seven thousand years ago."
-    },
-    {
-      "title": "The Giant Monoliths of Ollantaytambo",
-      "hook": "You feel a crushing sense of disbelief when you see six massive pink granite blocks, weighing over fifty tons each, fitted together perfectly on top of a steep mountain."
-    },
-    {
-      "title": "The Giant Geoglyphs of the Mojave",
-      "hook": "You feel a dizzying sense of scale looking at these massive human figures etched into the California desert, visible only from the sky."
-    },
-    {
-      "title": "The Mysterious Writing Older Than Sumer",
-      "hook": "You feel a shock of disbelief when you realize these small clay tablets found in Europe might push the birth of writing back by over a thousand years."
-    },
-    {
-      "title": "The Giant Carved Granite of Japan",
-      "hook": "You feel a profound sense of mystery staring at this eight-hundred-ton carved granite block sitting in the middle of a bamboo forest with no known purpose."
-    },
-    {
-      "title": "The Lost Kingdom of the Paiute Giants",
-      "hook": "You feel a creepy sensation of folklore coming to life when you hear about the massive sandals and red hair discovered inside a dark Nevada cave."
-    },
-    {
-      "title": "The Prehistoric Wall Hidden Under Texas",
-      "hook": "You feel a deep skepticism when geologists claim this massive, perfectly rectangular underground stone wall is just a natural formation."
-    },
-    {
-      "title": "The Sun Gate of Tiwanaku",
-      "hook": "You feel an intellectual hunger trying to decode the bizarre, winged figures carved into this ten-ton single stone archway high in the Andes."
-    },
-    {
-      "title": "The Oldest Petroglyphs in North America",
-      "hook": "You feel a haunting presence when you look at these deeply carved limestone boulders, created by a forgotten people nearly fifteen thousand years ago."
-    },
-    {
-      "title": "The Ancient City Swallowed by the Nile",
-      "hook": "You feel a sudden rush of explorer's adrenaline when you see giant statues of pharaohs being pulled from the dark depths of the Mediterranean Sea.",
-      "weight": 1
-    },
-    {
-      "title": "The Stone Age Temple Aligned to the Solstice",
-      "hook": "You feel a breathtaking sense of anticipation waiting for the single beam of winter solstice light to pierce the dark chamber of this prehistoric tomb."
-    },
-    {
-      "title": "The Massive Stone Fort on a Cliff",
-      "hook": "You feel a dizzying sense of fear standing on the edge of this prehistoric Irish fort, built right on a sheer three-hundred-foot drop into the Atlantic."
-    },
-    {
-      "title": "The Mysterious Petroglyphs of North Carolina",
-      "hook": "You feel a strange urge to decipher the chaotic carvings on this massive soapstone boulder, which local legends say was stepped on by a giant."
-    },
-    {
-      "title": "The Iron Pipes Inside a Chinese Mountain",
-      "hook": "You feel a deep unease when scientists find ancient, pipe-like structures running deep into a mountain cave, with some containing elements not from earth."
-    }
-  ]
+ "_note": "Fresh viral topic pool for TimeDecoders. pick_viral() rotates with recency avoidance. query = Pexels footage search term.",
+ "topics": [
+  {
+   "seq": -20,
+   "title": "Oumuamua: The Interstellar Object That Sped Up On Its Own",
+   "query": "oumuamua interstellar object cosmic space",
+   "hook": "In 2017 a cigar-shaped object tumbled through our solar system from another star — then accelerated as it left, with no engine, no tail, no explanation. A Harvard astronomer said the numbers only make sense one way.",
+   "weight": 6
+  },
+  {
+   "seq": -19,
+   "title": "The WOW! Signal: 72 Seconds From Space That Never Repeated",
+   "query": "wow signal radio telescope deep space",
+   "hook": "In 1977 a telescope caught a signal from deep space so strong the astronomer circled it and wrote one word: Wow. It lasted 72 seconds, came from a starless patch of sky, and has never been heard again."
+  },
+  {
+   "seq": -18,
+   "title": "The Star That's Older Than the Universe Itself",
+   "query": "methuselah star ancient cosmic space",
+   "hook": "A star 190 light-years away measures 14.5 billion years old — older than the universe that supposedly made it. Either our science is broken, or this star should not exist.",
+   "weight": 6
+  },
+  {
+   "seq": -17,
+   "title": "The Planet Made of Diamond, Twice the Size of Earth",
+   "query": "diamond planet 55 cancri cosmic space",
+   "hook": "Forty light-years away orbits a world whose surface may be crystallized carbon — a planet that could be one-third pure diamond, worth more than every economy on Earth combined.",
+   "weight": 6
+  },
+  {
+   "seq": -16,
+   "title": "The Cold Spot: A Hole in the Universe 1.8 Billion Light-Years Wide",
+   "query": "cmb cold spot supervoid universe cosmic",
+   "hook": "In one direction of the sky lies a region so vast, so empty and so cold it should not be possible. Some scientists believe it is a scar — the mark where our universe collided with another.",
+   "weight": 6
+  },
+  {
+   "seq": -15,
+   "title": "Tabby's Star: The Light That Dims Like Something's Blocking It",
+   "query": "tabbys star boyajian dimming cosmic space",
+   "hook": "One star flickers in a pattern no natural object explains — dimming by 22 percent at random, as if something enormous orbits it. For a while, even scientists could not rule out a structure built by someone.",
+   "weight": 6
+  },
+  {
+   "seq": -14,
+   "title": "The Great Attractor: Something Is Pulling Our Galaxy Toward It",
+   "query": "great attractor galaxy gravity cosmic space",
+   "hook": "Our entire galaxy is being dragged through space at over a million miles per hour toward a single point — and it hides behind the Milky Way, so we cannot see what is pulling us in.",
+   "weight": 6
+  },
+  {
+   "seq": -13,
+   "title": "The Signal From Space That Repeats Every 157 Days",
+   "query": "fast radio burst repeating signal cosmic space",
+   "hook": "A blast of radio energy from 3 billion light-years away arrives on a schedule — every 157 days, like clockwork. In a fraction of a second it unleashes more energy than the Sun makes in years. Nobody knows the source.",
+   "weight": 6
+  },
+  {
+   "seq": -11,
+   "title": "Damascus Steel: A Blade Modern Science Still Can't Recreate",
+   "query": "damascus steel blade pattern ancient",
+   "hook": "Its blades could split a falling hair and never shatter. The recipe was lost three centuries ago — and with all our technology, we still cannot reproduce it.",
+   "weight": 6
+  },
+  {
+   "seq": -9,
+   "title": "The Nimrud Lens: Ground Glass 3,000 Years Before Telescopes",
+   "query": "nimrud lens rock crystal assyria",
+   "hook": "Three thousand years ago someone in Assyria ground rock crystal into a near-perfect lens — millennia before the telescope was supposedly invented."
+  },
+  {
+   "seq": -8,
+   "title": "Ulfberht Swords: Viking Steel 800 Years Ahead of Its Time",
+   "query": "ulfberht viking sword steel",
+   "hook": "Viking blades stamped with one name were made of steel so pure it needed furnaces over 1,600 degrees — a heat Europe would not reach for another 800 years.",
+   "weight": 6
+  },
+  {
+   "seq": -7,
+   "title": "Vitrified Forts: Ancient Walls Melted by a Heat We Can't Match",
+   "query": "vitrified fort melted stone scotland",
+   "hook": "Across Scotland and Europe, ancient stone walls were melted until the rock fused like glass. It takes over a thousand degrees to do this. No one knows how — or why."
+  },
+  {
+   "seq": -6,
+   "title": "The Longyou Caves: Millions of Tool Marks, No Record Who Carved Them",
+   "query": "longyou caves carved rock china",
+   "hook": "Carved by hand from solid rock, covered in millions of identical chisel marks, vast enough to swallow buildings — and not one historical record says who made them.",
+   "weight": 6
+  },
+  {
+   "seq": -5,
+   "title": "The Nebra Sky Disc: The Oldest Map of the Stars, 3,600 Years Old",
+   "query": "nebra sky disc bronze gold stars",
+   "hook": "A 3,600-year-old bronze disc inlaid with gold stars — the oldest known map of the sky, made by a people we assumed could never chart the heavens.",
+   "weight": 6
+  },
+  {
+   "seq": -4,
+   "title": "The Phaistos Disc: A Printed Code No One Has Ever Cracked",
+   "query": "phaistos disc clay symbols crete",
+   "hook": "A clay disc stamped with 241 symbols using movable type — three thousand years before the printing press. And no one has ever been able to read it.",
+   "weight": 6
+  },
+  {
+   "seq": -3,
+   "title": "Klerksdorp Spheres: Grooved Metal Balls in 3-Billion-Year-Old Rock",
+   "query": "klerksdorp spheres metallic grooved",
+   "hook": "Miners in South Africa keep pulling out perfect metallic spheres, grooved around the middle, embedded in rock nearly three billion years old."
+  },
+  {
+   "seq": -2,
+   "title": "The Dendera Light: A Temple Carving That Looks Like a Lightbulb",
+   "query": "dendera temple carving egypt light",
+   "hook": "On the wall of an ancient temple is a carving that looks unmistakably like a giant lightbulb, wires and all. The argument over what it really shows has never ended.",
+   "weight": 6
+  },
+  {
+   "seq": -1,
+   "title": "The Sabu Disc: A 5,000-Year-Old Stone Wheel That Shouldn't Exist",
+   "query": "sabu disc stone egypt tri-lobed",
+   "hook": "Buried in a 5,000-year-old tomb was a fragile stone disc carved into a shape no one can explain — too thin, too precise, and useless for anything we know of."
+  },
+  {
+   "title": "Gobekli Tepe: The Temple That Shouldn't Exist",
+   "hook": "It's 12,000 years old, built before farming, before the wheel, before writing.",
+   "query": "ancient stone temple",
+   "seq": 8,
+   "weight": 6
+  },
+  {
+   "title": "Scientists Scanned Under the Pyramids And Found a City",
+   "hook": "Radar revealed shafts going 2km below Giza, and nobody can explain them.",
+   "query": "giza pyramids egypt",
+   "seq": 5,
+   "weight": 6
+  },
+  {
+   "title": "The Hidden Void Inside the Pyramid They Can't Open",
+   "hook": "A sealed chamber was detected in Menkaure, and it's never been entered.",
+   "query": "pyramid interior chamber",
+   "seq": 7,
+   "weight": 6
+  },
+  {
+   "title": "Yonaguni: Japan's Underwater Pyramid That Breaks History",
+   "hook": "Perfect right angles, 25m underwater, possibly 10,000 years old.",
+   "query": "underwater ruins diver",
+   "seq": 3,
+   "weight": 6
+  },
+  {
+   "title": "Puma Punku: Stone Cut Too Perfect for the Stone Age",
+   "hook": "Machine-precision angles carved into the hardest rock on Earth.",
+   "query": "ancient stone ruins",
+   "seq": 6,
+   "weight": 6
+  },
+  {
+   "title": "The Lost City That Sank Beneath the Sea Overnight",
+   "hook": "Heracleion vanished underwater and was found 1,200 years later.",
+   "query": "underwater ancient city",
+   "seq": 12
+  },
+  {
+   "title": "Baalbek: The 1,000-Ton Stones No One Can Lift",
+   "hook": "Even modern cranes can't move what ancient builders somehow placed.",
+   "query": "ancient roman ruins",
+   "seq": 11,
+   "weight": 6
+  },
+  {
+   "title": "The Nazca Lines Were Never Meant for Human Eyes",
+   "hook": "You can only see them from the sky, so who were they for?",
+   "query": "desert aerial landscape",
+   "seq": 16,
+   "weight": 6
+  },
+  {
+   "title": "The Sahara Was Once Green And Something Built Here",
+   "hook": "Satellite scans found ancient structures buried under the sand.",
+   "query": "sahara desert dunes"
+  },
+  {
+   "title": "Why the Sphinx Might Be Older Than We Thought",
+   "hook": "Water erosion suggests it was carved before the desert existed.",
+   "query": "great sphinx egypt",
+   "seq": 31,
+   "weight": 6
+  },
+  {
+   "title": "The Underground Labyrinth Egypt Tried to Bury",
+   "hook": "Ancient writers described 3,000 rooms below the sand.",
+   "query": "ancient stone corridor",
+   "seq": 29
+  },
+  {
+   "title": "Derinkuyu: The Underground City for 20,000 People",
+   "hook": "Hidden 18 stories deep, and we don't know who they were hiding from.",
+   "query": "underground cave tunnel",
+   "seq": 15,
+   "weight": 6
+  },
+  {
+   "title": "Stonehenge's Stones Were Carried 200 Miles. How?",
+   "hook": "Each megalith weighs 25 tons and came from another country.",
+   "query": "stonehenge england",
+   "seq": 19,
+   "weight": 6
+  },
+  {
+   "title": "The Ancient Map That Shows Antarctica With No Ice",
+   "hook": "The Piri Reis map drew a coastline buried under ice for 6,000 years.",
+   "query": "antarctica ice landscape",
+   "seq": 14
+  },
+  {
+   "title": "Easter Island's Statues Have Bodies You Never See",
+   "hook": "The famous heads are buried up to their necks underground.",
+   "query": "easter island statues",
+   "seq": 17,
+   "weight": 6
+  },
+  {
+   "title": "The Indian Temple Carved From a Single Rock",
+   "hook": "Kailasa was cut top-down from one mountain with no room for error.",
+   "query": "ancient indian temple",
+   "seq": 18
+  },
+  {
+   "title": "Scientists Are Baffled by the Bosnian Pyramid",
+   "hook": "A hill in Europe may be the largest pyramid ever built.",
+   "query": "pyramid mountain landscape",
+   "weight": 6
+  },
+  {
+   "title": "The 5,000-Year-Old City Wired Like It Had Plumbing",
+   "hook": "Mohenjo-daro had toilets and drains before most of the world had walls.",
+   "query": "ancient ruins excavation",
+   "seq": 36
+  },
+  {
+   "title": "Atlantis Might Be Real And Hidden in the Sahara",
+   "hook": "A perfect ring structure in the desert matches Plato's description.",
+   "query": "desert aerial view",
+   "seq": 41
+  },
+  {
+   "title": "The Stone Door Sealed for 1,500 Years",
+   "hook": "India's Padmanabhaswamy vault has never been opened, and locals say it's cursed.",
+   "query": "ancient temple door",
+   "seq": 34
+  },
+  {
+   "title": "Why Did Every Ancient Culture Build Pyramids?",
+   "hook": "Egypt, Mexico, China and Sudan all did it without ever meeting.",
+   "query": "ancient pyramid ruins",
+   "weight": 6
+  },
+  {
+   "title": "The Underwater Roads Found Off the Bahamas",
+   "hook": "The Bimini Road looks man-made and predates known history.",
+   "query": "underwater rock formation"
+  },
+  {
+   "title": "Petra: The City Carved Into a Cliff Face",
+   "hook": "An entire metropolis hidden in rock, lost for over a thousand years.",
+   "query": "petra jordan ruins",
+   "seq": 21,
+   "weight": 6
+  },
+  {
+   "title": "The Mayan City LIDAR Found Hidden in the Jungle",
+   "hook": "Lasers revealed millions lived where we saw only trees.",
+   "query": "jungle ancient ruins",
+   "seq": 22
+  },
+  {
+   "title": "The Antikythera Mechanism: A 2,000-Year-Old Computer",
+   "hook": "It predicted eclipses with gears we couldn't build until the 1700s.",
+   "query": "ancient artifact museum",
+   "seq": 1,
+   "weight": 6
+  },
+  {
+   "title": "Angkor Wat Was Bigger Than We Ever Imagined",
+   "hook": "Scans found a vast lost city sprawling around the famous temple.",
+   "query": "angkor wat cambodia",
+   "seq": 37,
+   "weight": 6
+  },
+  {
+   "title": "The Desert Pyramids of Sudan Nobody Talks About",
+   "hook": "Sudan has more pyramids than Egypt, and almost no one visits them.",
+   "query": "sudan desert pyramids",
+   "weight": 6
+  },
+  {
+   "title": "Teotihuacan: Built by a Civilization With No Name",
+   "hook": "A massive city, and we don't know what its people called themselves.",
+   "query": "teotihuacan pyramid mexico",
+   "seq": 35,
+   "weight": 6
+  },
+  {
+   "title": "The Granite Boxes No Tool Could Carve",
+   "hook": "Serapeum boxes are cut to micron precision out of solid granite.",
+   "query": "ancient egyptian stone",
+   "seq": 20,
+   "weight": 6
+  },
+  {
+   "title": "A Drowned Stone Age World Beneath the North Sea",
+   "hook": "Doggerland was a country where Britain now meets Europe, now underwater.",
+   "query": "ocean waves seabed"
+  },
+  {
+   "title": "The Temple Aligned Perfectly to the Stars",
+   "hook": "Karnak channels sunlight to a hidden room one day a year.",
+   "query": "ancient temple columns"
+  },
+  {
+   "title": "The Megaliths in Russia That Dwarf Stonehenge",
+   "hook": "Mount Shoria's stones may weigh over 3,000 tons each.",
+   "query": "giant boulder mountain",
+   "seq": 42,
+   "weight": 6
+  },
+  {
+   "title": "The Stone Circles Older Than the Pyramids in Africa",
+   "hook": "Nabta Playa tracked the stars 2,000 years before Stonehenge.",
+   "query": "stone circle desert",
+   "weight": 6
+  },
+  {
+   "title": "The Sunken Temple City Found Off India's Coast",
+   "hook": "Divers off Dwarka found ruins matching a mythical lost city.",
+   "query": "underwater ancient stones",
+   "seq": 28
+  },
+  {
+   "title": "The 11,000-Year-Old Town Under Turkey's Soil",
+   "hook": "Catalhoyuk had no streets, so everyone walked across the rooftops.",
+   "query": "ancient excavation site",
+   "seq": 30
+  },
+  {
+   "title": "Mohenjo-daro: The City That Was Vitrified",
+   "hook": "Some claim the ruins show signs of a heat blast we can't explain.",
+   "query": "ancient ruins desert",
+   "seq": 24,
+   "weight": 6
+  },
+  {
+   "title": "The Ica Stones That Shouldn't Be Possible",
+   "hook": "Carved stones in Peru seem to show things ancient people couldn't know.",
+   "query": "ancient carved stone"
+  },
+  {
+   "title": "The Library of Alexandria's Final Night",
+   "hook": "700,000 scrolls — the entire knowledge of the ancient world — burned in a single night, and we still don't know what we lost.",
+   "query": "ancient library scrolls",
+   "seq": 40
+  },
+  {
+   "title": "Roman Concrete That Heals Its Own Cracks",
+   "hook": "Their 2,000-year-old harbors still stand in the sea, while our concrete crumbles in 50 years — and we just cracked their secret.",
+   "query": "ancient roman ruins",
+   "seq": 4
+  },
+  {
+   "title": "The 2,400-Year-Old Man With Skin Still Intact",
+   "hook": "They pulled him from a bog and his face was perfect — even the food in his stomach survived.",
+   "query": "misty bog wetland",
+   "seq": 10
+  },
+  {
+   "title": "The 1513 Map That Shows Antarctica Without Ice",
+   "hook": "It maps a coastline buried under ice for 6,000 years — drawn centuries before anyone reached it.",
+   "query": "old world map parchment"
+  },
+  {
+   "title": "The Nazca Lines Only Gods Could See",
+   "hook": "Miles of perfect figures carved into the desert — invisible from the ground, flawless from the sky.",
+   "query": "desert aerial landscape",
+   "weight": 6
+  },
+  {
+   "title": "The Antarctic Pyramid Hidden in Plain Sight",
+   "hook": "A perfect three-sided peak juts from the ice — too symmetrical, scientists say, to be natural.",
+   "query": "antarctica ice mountains",
+   "seq": 23,
+   "weight": 6
+  },
+  {
+   "title": "The Megaliths That Weigh More Than Jets",
+   "hook": "1,000-ton stones cut and moved with precision — by a people who supposedly had no machines.",
+   "query": "massive stone megalith",
+   "seq": 33
+  },
+  {
+   "title": "The Underwater City Off the Coast of Japan",
+   "hook": "Sharp terraces and staircases sit 80 feet down — built, some say, before the last Ice Age ended.",
+   "query": "underwater ruins ocean"
+  },
+  {
+   "title": "The Code in the Voynich Manuscript",
+   "hook": "600 years old, written in a language that exists nowhere else — and no human or AI has cracked it.",
+   "query": "old handwritten manuscript",
+   "seq": 27
+  },
+  {
+   "title": "The 5,500-Year-Old Sandal Still Tied",
+   "hook": "Found in a cave, laces knotted exactly as its owner left them before vanishing.",
+   "query": "dark cave interior",
+   "seq": 39
+  },
+  {
+   "title": "The Stone Spheres No One Can Explain",
+   "hook": "Hundreds of perfect granite balls, scattered across a jungle — purpose unknown, makers gone.",
+   "query": "jungle ancient stones",
+   "seq": 26
+  },
+  {
+   "title": "The Roman Dodecahedron Nobody Can Solve",
+   "hook": "A bronze object found across an empire — with no manual, no mention, and no agreed-upon use.",
+   "query": "ancient bronze artifact",
+   "seq": 25
+  },
+  {
+   "title": "The Door in the Rock at Hayu Marca",
+   "hook": "A flat doorway carved into a cliff — locals swear it was a gateway, and people who touched it changed.",
+   "query": "rock cliff face andes"
+  },
+  {
+   "title": "The City Found Under the Sahara Sand",
+   "hook": "Satellites revealed streets and walls beneath the dunes — a civilization the desert swallowed whole.",
+   "query": "sahara desert dunes"
+  },
+  {
+   "title": "The 9,000-Year-Old Town That Had No Streets",
+   "hook": "Thousands lived here entering homes through the roof — and then abandoned it for reasons unknown.",
+   "query": "ancient mud brick ruins"
+  },
+  {
+   "title": "The Crystal Skulls That Defy the Tools of Their Time",
+   "hook": "Carved against the grain of the quartz — a feat that should have shattered them instantly.",
+   "query": "crystal gemstone close"
+  },
+  {
+   "title": "The Ark the Vatican Won't Discuss",
+   "hook": "A relic said to hold unimaginable power vanished from history — and one country claims it never left.",
+   "query": "ancient golden relic"
+  },
+  {
+   "title": "The Lost Roman Legion That Marched Into China",
+   "hook": "5,000 soldiers vanished — and a town deep in Asia carries Roman blood and Roman walls.",
+   "query": "ancient roman soldiers"
+  },
+  {
+   "title": "The 2,000-Year-Old Computer From a Shipwreck",
+   "hook": "Thirty bronze gears that tracked the planets — technology that wouldn't reappear for 1,400 years.",
+   "query": "ancient bronze gears"
+  },
+  {
+   "title": "The Tunnel Network Under Ancient Europe",
+   "hook": "Stone passages stretch from Scotland to Turkey — dug by hand, for a purpose long forgotten.",
+   "query": "dark stone tunnel"
+  },
+  {
+   "title": "The Statue That Bleeds in the Desert Heat",
+   "hook": "A 3,000-year-old colossus that 'sang' at dawn — until the Romans tried to repair it and silenced it.",
+   "query": "egyptian statue desert"
+  },
+  {
+   "title": "The Lake That Turns Animals to Stone",
+   "hook": "Birds that land on it are perfectly preserved — calcified mid-motion, like a curse made real.",
+   "query": "still red lake"
+  },
+  {
+   "title": "The 280-Million-Year-Old 'Map' in Russia",
+   "hook": "A slab with raised terrain and channels — some claim it's a relief map carved before dinosaurs.",
+   "query": "carved stone slab"
+  },
+  {
+   "title": "The Forbidden City Beneath the Pyramids",
+   "hook": "Ground radar found shafts and chambers 2 km under Giza — and excavation was quietly stopped.",
+   "query": "giza pyramids egypt",
+   "weight": 6
+  },
+  {
+   "title": "The 12,000-Year-Old Temple Built Before Farming",
+   "hook": "Massive carved pillars raised by hunter-gatherers — then deliberately buried, and no one knows why.",
+   "query": "ancient carved pillars"
+  },
+  {
+   "title": "The Skeleton Lake of the Himalayas",
+   "hook": "500 bodies surface every summer at 16,000 feet — all killed the same way, in a single moment.",
+   "query": "himalaya frozen lake"
+  },
+  {
+   "title": "The Roman Road Still Perfect After 2,000 Years",
+   "hook": "Engineered so well that modern highways trace its exact path — built without a single machine.",
+   "query": "ancient stone road"
+  },
+  {
+   "title": "The Bronze Age City That Vanished in a Day",
+   "hook": "Streets full of homes, no bodies, no battle — an entire people gone, as if they walked out together.",
+   "query": "ancient excavation ruins"
+  },
+  {
+   "title": "The Cave Paintings Older Than Humans in Europe",
+   "hook": "Handprints and beasts painted 65,000 years ago — before our species was thought to arrive.",
+   "query": "cave wall paintings"
+  },
+  {
+   "title": "The Ghost Fleet Frozen Under Antarctica",
+   "hook": "Sonar mapped shapes beneath the ice shelf — too ordered, some argue, to be ice formations.",
+   "query": "antarctica ice shelf"
+  },
+  {
+   "title": "The Temple Aligned to a Star You Can't See",
+   "hook": "Its corridor lights up one day a year — pointing at a star that moved 4,000 years ago.",
+   "query": "ancient temple corridor",
+   "weight": 6
+  },
+  {
+   "title": "The 6,000-Year-Old Eye Surgery That Worked",
+   "hook": "A skull with a healed hole — drilled while the patient lived, and survived for years after.",
+   "query": "ancient human skull"
+  },
+  {
+   "title": "The Sunken Palace of Cleopatra",
+   "hook": "Earthquakes dropped her city into the sea — and divers keep finding rooms no record mentions.",
+   "query": "underwater statue ruins"
+  },
+  {
+   "title": "The Hill That Hums With No Source",
+   "hook": "Locals hear it, instruments record it — a low tone rising from ancient ground nobody can trace.",
+   "query": "green rolling hills"
+  },
+  {
+   "title": "The 4,000-Year-Old Recipe Carved in Clay",
+   "hook": "The world's oldest written instructions — for a dish, and a beer, we just recreated.",
+   "query": "ancient clay tablet"
+  },
+  {
+   "title": "The Forbidden Room in the Taj Mahal's Basement",
+   "hook": "Sealed chambers below the river side — never opened, and officially they don't exist.",
+   "query": "white marble monument"
+  },
+  {
+   "title": "The Desert Glass Made by an Ancient Blast",
+   "hook": "Green glass scattered across the Sahara — formed at a heat only a sky-borne explosion could create.",
+   "query": "sahara desert glass"
+  },
+  {
+   "title": "The City That Ruled the Amazon Then Disappeared",
+   "hook": "LIDAR exposed roads and plazas under the canopy — a million people, erased from memory.",
+   "query": "amazon jungle canopy"
+  },
+  {
+   "title": "The Stone Heads Sailing Across an Island",
+   "hook": "Multi-ton statues 'walked' miles from the quarry — and the islanders said exactly how, but we didn't listen.",
+   "query": "easter island statues",
+   "weight": 1
+  },
+  {
+   "title": "The 3,000-Room Labyrinth Egypt Buried",
+   "hook": "Ancient writers called it greater than the pyramids — then the sand took it, and we lost the door.",
+   "query": "desert excavation site"
+  },
+  {
+   "title": "The Underwater Wall Longer Than Any Border",
+   "hook": "A straight stone line runs for miles on the seabed — natural rock, geologists insist, but the angles say otherwise.",
+   "query": "underwater rock formation"
+  },
+  {
+   "title": "The Monastery Carved Into a Single Cliff",
+   "hook": "Hundreds of rooms cut top-down from one rock — finished, then half-abandoned mid-chisel.",
+   "query": "cliff carved monastery"
+  },
+  {
+   "title": "The 40,000-Year-Old Flute That Still Plays",
+   "hook": "Carved from bone with perfect spacing — proof music is older than civilization itself.",
+   "query": "prehistoric bone artifact"
+  },
+  {
+   "title": "The Empire History Tried to Erase",
+   "hook": "Maps, books, and buildings credited to it were quietly rewritten — and the cover-up is the real mystery.",
+   "query": "old empire ruins"
+  },
+  {
+   "title": "The Pyramid Bigger Than Giza Hidden as a Hill",
+   "hook": "For centuries a town grew on its slopes — never knowing it lived atop the largest pyramid on Earth.",
+   "query": "grass covered hill",
+   "weight": 6
+  },
+  {
+   "title": "The 1,000-Year-Old Phone From the Americas",
+   "hook": "A gourd and twine device that carried sound — found in a tomb, ages before the telephone.",
+   "query": "ancient artifact museum"
+  },
+  {
+   "title": "The Salt Mine Cathedral Carved by Miners",
+   "hook": "An entire church — chandeliers, altars, saints — chiseled from rock salt deep underground.",
+   "query": "underground salt cavern"
+  },
+  {
+   "title": "The Star Map Painted 17,000 Years Ago",
+   "hook": "Dots on a cave ceiling match the night sky of the Ice Age — the oldest map of the heavens.",
+   "query": "cave ceiling painting",
+   "weight": 6
+  },
+  {
+   "title": "The Fortress in the Clouds They Forgot to Finish",
+   "hook": "A city of terraces at 8,000 feet — built, lived in, then left to the mist within a century.",
+   "query": "mountain cloud fortress"
+  },
+  {
+   "title": "The Laser-Cut Giant of Saudi Arabia",
+   "hook": "You feel a deep frustration when experts claim ancient tools did everything, because this massive desert boulder is sliced perfectly in half with laser-like precision."
+  },
+  {
+   "title": "The 12,000-Year-Old Wooden Giant",
+   "hook": "You hate feeling like our ancestors were just primitive cavemen, but this wooden statue is twice as old as the pyramids and covered in a code we can't crack."
+  },
+  {
+   "title": "The Giant Stone Jars of Laos",
+   "hook": "You feel a chilling sense of dread when you look at these thousands of massive stone vessels scattered across a landscape, with no bodies ever found inside."
+  },
+  {
+   "title": "The Venice of the Pacific",
+   "hook": "You feel completely overwhelmed by how much of our past is lost when you see an entire city built of ninety-ton magnetic stones floating on a coral reef."
+  },
+  {
+   "title": "The Miles of Straight Lines in Bolivia",
+   "hook": "You feel incredibly small realizing that a forgotten culture etched thousands of perfectly straight paths across the Andes, covering an area fifteen times larger than Nazca."
+  },
+  {
+   "title": "The Hand-Carved Caverns of Longyou",
+   "hook": "You know that exhausting feeling of working on a project that never gets noticed, but ancient builders carved out twenty-four massive underground halls and left absolutely no record of it.",
+   "weight": 6
+  },
+  {
+   "title": "The 5,000-Year-Old Cosmic Map of Scotland",
+   "hook": "You feel a sudden spark of suspicion when you learn the government buried a massive stone covered in unexplained spiral symbols just to keep the public away from it.",
+   "weight": 6
+  },
+  {
+   "title": "The Perfectly Polished Caves of India",
+   "hook": "You feel an eerie sense of isolation inside these granite chambers, where the walls are polished to a mirror shine and the acoustics stretch a single whisper into a minute-long echo."
+  },
+  {
+   "title": "The Bronze Age Towers of Sardinia",
+   "hook": "You feel a restless curiosity about the giants of old when you see seven thousand massive stone fortresses built without a single drop of mortar."
+  },
+  {
+   "title": "The Oldest Submerged City in the World",
+   "hook": "You feel a wave of deep-sea claustrophobia thinking about this pristine bronze-age town resting just off the coast of Greece, perfectly preserved beneath the waves."
+  },
+  {
+   "title": "The Secret City Built Beneath Miami",
+   "hook": "You feel a bizarre sense of vertigo standing in downtown Miami, knowing that buried beneath the concrete is a perfect circle of ancient stone cut into the bedrock."
+  },
+  {
+   "title": "The Giant Snake Mound of Ohio",
+   "hook": "You feel a cosmic pull when you stand above this massive earthen snake, because its curves align perfectly with the solstices and the constellations above."
+  },
+  {
+   "title": "The 20,000-Year-Old Pyramid Hidden in Indonesia",
+   "hook": "You feel a wave of academic anger when you realize this ordinary-looking hill might actually be a massive stepped pyramid older than the last Ice Age.",
+   "weight": 6
+  },
+  {
+   "title": "The Deepest Underground Sanctuary in Iran",
+   "hook": "You feel a suffocating sense of panic imagining an entire population escaping war by retreating into a multi-level subterranean labyrinth carved deep into the desert."
+  },
+  {
+   "title": "The Mysterious Cart Ruts of Malta",
+   "hook": "You feel a baffling sense of confusion when you look at these deep stone tracks that run straight off cliff edges and disappear directly into the sea."
+  },
+  {
+   "title": "The America Before Columbus They Hid From You",
+   "hook": "You feel a sting of resentment toward your history books when you discover a prehistoric metropolis in Illinois was once larger and more populated than London."
+  },
+  {
+   "title": "The Stone Age Village Older Than Stonehenge",
+   "hook": "You feel an intimate connection to the deep past when you step into these stone homes, fully furnished with beds and shelves, preserved under the sand for five thousand years.",
+   "weight": 6
+  },
+  {
+   "title": "The Mysterious Stone Tower of Rhode Island",
+   "hook": "You feel a nagging doubt about who actually discovered America when you look at this medieval-style stone tower standing in a New England park.",
+   "weight": 1
+  },
+  {
+   "title": "The Undeciphered Clay Disk of Crete",
+   "hook": "You feel a burning obsession trying to decode this ancient spiral of stamped symbols, knowing that the secrets of a lost Minoan civilization are locked inside it."
+  },
+  {
+   "title": "The Giant Stone Heads of Guatemala",
+   "hook": "You feel a deep frustration when you find out a massive, fine-featured stone head discovered in the jungle was destroyed before scientists could ever study it.",
+   "weight": 1
+  },
+  {
+   "title": "The 4,000-Year-Old Psychedelic Mural of Texas",
+   "hook": "You feel a trippy sense of wonder looking at this ancient rock art, which depicts a cosmic journey through the spirit world using precise astronomical alignments.",
+   "weight": 1
+  },
+  {
+   "title": "The Solar Temple Older Than Stonehenge",
+   "hook": "You feel an ancient rhythm in your bones when you realize this massive concentric wooden circle was used to track the heavens seven thousand years ago.",
+   "weight": 1
+  },
+  {
+   "title": "The Giant Monoliths of Ollantaytambo",
+   "hook": "You feel a crushing sense of disbelief when you see six massive pink granite blocks, weighing over fifty tons each, fitted together perfectly on top of a steep mountain."
+  },
+  {
+   "title": "The Giant Geoglyphs of the Mojave",
+   "hook": "You feel a dizzying sense of scale looking at these massive human figures etched into the California desert, visible only from the sky.",
+   "weight": 1
+  },
+  {
+   "title": "The Mysterious Writing Older Than Sumer",
+   "hook": "You feel a shock of disbelief when you realize these small clay tablets found in Europe might push the birth of writing back by over a thousand years.",
+   "weight": 1
+  },
+  {
+   "title": "The Giant Carved Granite of Japan",
+   "hook": "You feel a profound sense of mystery staring at this eight-hundred-ton carved granite block sitting in the middle of a bamboo forest with no known purpose.",
+   "weight": 1
+  },
+  {
+   "title": "The Lost Kingdom of the Paiute Giants",
+   "hook": "You feel a creepy sensation of folklore coming to life when you hear about the massive sandals and red hair discovered inside a dark Nevada cave.",
+   "weight": 1
+  },
+  {
+   "title": "The Prehistoric Wall Hidden Under Texas",
+   "hook": "You feel a deep skepticism when geologists claim this massive, perfectly rectangular underground stone wall is just a natural formation.",
+   "weight": 1
+  },
+  {
+   "title": "The Sun Gate of Tiwanaku",
+   "hook": "You feel an intellectual hunger trying to decode the bizarre, winged figures carved into this ten-ton single stone archway high in the Andes.",
+   "weight": 6
+  },
+  {
+   "title": "The Oldest Petroglyphs in North America",
+   "hook": "You feel a haunting presence when you look at these deeply carved limestone boulders, created by a forgotten people nearly fifteen thousand years ago.",
+   "weight": 1
+  },
+  {
+   "title": "The Ancient City Swallowed by the Nile",
+   "hook": "You feel a sudden rush of explorer's adrenaline when you see giant statues of pharaohs being pulled from the dark depths of the Mediterranean Sea."
+  },
+  {
+   "title": "The Stone Age Temple Aligned to the Solstice",
+   "hook": "You feel a breathtaking sense of anticipation waiting for the single beam of winter solstice light to pierce the dark chamber of this prehistoric tomb."
+  },
+  {
+   "title": "The Massive Stone Fort on a Cliff",
+   "hook": "You feel a dizzying sense of fear standing on the edge of this prehistoric Irish fort, built right on a sheer three-hundred-foot drop into the Atlantic.",
+   "weight": 1
+  },
+  {
+   "title": "The Mysterious Petroglyphs of North Carolina",
+   "hook": "You feel a strange urge to decipher the chaotic carvings on this massive soapstone boulder, which local legends say was stepped on by a giant.",
+   "weight": 1
+  },
+  {
+   "title": "The Iron Pipes Inside a Chinese Mountain",
+   "hook": "You feel a deep unease when scientists find ancient, pipe-like structures running deep into a mountain cave, with some containing elements not from earth.",
+   "weight": 1
+  }
+ ]
 }
