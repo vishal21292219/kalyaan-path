@@ -310,8 +310,21 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
             cap = f"first {max_ref}" if max_ref else "all"
             print(f"[consistency] {len(masters)} character master(s) — reference-conditioning {cap} recurring scene(s)")
 
+    # ── HERO first image: scene 0 is the 3-sec retention hook AND the FB reel
+    # cover. With Kling hero-motion OFF, this STILL frame must carry the "wow" —
+    # render it with a PREMIUM model + a cinematic quality boost (~$0.025 vs the
+    # old $1.4-2.8 Kling clip). Tunable via images.hero_model (default flux/dev,
+    # 28-step) — a big jump over the 4-step schnell used for bulk scenes.
+    HERO_BOOST = (", cinematic hero shot, dramatic volumetric lighting, ultra-detailed, "
+                  "razor-sharp focus, striking eye-catching composition, rich depth "
+                  "and atmosphere, premium quality")
+    _hm = cfg["images"].get("hero_model")
+    hero_model = _hm if (_hm and str(_hm).startswith("fal-ai/")) else "fal-ai/flux/dev"
+
     for i, raw_prompt in enumerate(visual_prompts):
-        prompt = f"{raw_prompt}{style}. Avoid: {negative}"
+        is_hero = (i == 0)   # opening scene = retention hook + FB cover → premium
+        boost = HERO_BOOST if is_hero else ""
+        prompt = f"{raw_prompt}{style}{boost}. Avoid: {negative}"
         path = out_dir / f"img_{i:02d}.jpg"
         seed = seeds[i] if seeds and i < len(seeds) else None
 
@@ -325,7 +338,7 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
                 from .char_consistent import generate_scene_with_reference
                 names = " and ".join(c["name"] for c in cast if c.get("name") in masters)
                 if generate_scene_with_reference(
-                    ref_urls, raw_prompt, path,
+                    ref_urls, raw_prompt + boost, path,
                     char_name=names, art_style=style.lstrip(", ").strip(),
                     target_w=target_w, target_h=target_h,
                 ):
@@ -337,7 +350,7 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 
         # Provider chain: fal.ai FLUX 1.1-pro (paid premium) → HF FLUX schnell (free) → Gemini (free)
         ok = False
-        if use_fal and _generate_fal_flux(prompt, path, model=fal_model, target_w=target_w, target_h=target_h, seed=seed):
+        if use_fal and _generate_fal_flux(prompt, path, model=(hero_model if is_hero else fal_model), target_w=target_w, target_h=target_h, seed=seed):
             ok = True
             fal_succeeded += 1
         elif _generate_hf_flux(prompt, path):
