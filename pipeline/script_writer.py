@@ -30,6 +30,7 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
   ],
   "cta": "Closing line in the channel's primary language — MUST ask a specific engagement question AND mention the channel name to subscribe.",
   "cta_roman": "Roman transliteration of the cta",
+  "fb_comment": "The FB FIRST-COMMENT engagement question — SPECIFIC to THIS video's topic (not generic), <=22 words, in the channel's primary language. Reference the exact subject/claim of this reel and invite the viewer to reply about THEMSELVES or their opinion, then add a warm 'I read every comment' style nudge. NO links, NO hashtags. This is pinned as the first comment to spark replies (comment velocity = FB reach). Example (godmind, Kali-rage video): 'That sudden rage Kali carries — do you feel it in you too? 👇 Tell me honestly, I read every comment.' Example (ancient, Roman concrete): '2000-year-old concrete stronger than ours — accident or lost tech? 👇 Drop your theory, I reply to everyone.'",
   "visuals": [
      "vivid image prompt 1 (in English) — depicts EXACTLY what body[0] narrates",
      "..."  // EXACTLY same count as body[]. visuals[i] must depict the scene narrated in body[i] — same characters, same action, same moment. 1:1 narrative sync.

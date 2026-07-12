@@ -77,8 +77,20 @@ COMMENT_BAIT = {
 
 def _promo_comment(script: dict | None = None, channel: str = "") -> str:
     """Text for the FB FIRST COMMENT — a video-related engagement question that
-    invites replies (drives comment velocity → FB reach). Falls back to the active
-    config's channel; returns "" if no bait is defined (→ no comment posted)."""
+    invites replies (drives comment velocity → FB reach).
+
+    Preference order:
+      1) script['fb_comment'] — a VIDEO-SPECIFIC question the script writer wrote
+         for THIS reel (best: unique per video, so FB never sees repeated comment
+         text and the question is actually about the content the viewer just saw).
+      2) COMMENT_BAIT[channel] — a per-channel static fallback (used if the writer
+         didn't produce fb_comment, e.g. an older cached script).
+      3) branding.promo — legacy product-link fallback for unmapped channels.
+    Returns "" if none apply (→ no comment posted)."""
+    if isinstance(script, dict):
+        dyn = (script.get("fb_comment") or "").strip()
+        if dyn:
+            return dyn[:600]
     ch = channel
     if not ch:
         try:
