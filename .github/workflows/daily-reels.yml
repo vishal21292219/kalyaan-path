@@ -39,7 +39,7 @@ on:
     # prior run's dedup/topic state persists first → NO duplicate topics.
     - cron: "37 15 * * *"   # TimeDecoders #1 (seed1, go-live 18:00 UTC / 2 PM ET)
     - cron: "42 16 * * *"   # TimeDecoders #2 (seed2, go-live 00:00 UTC / 8 PM ET PRIME)
-    - cron: "45 17 * * *"   # TimeDecoders #3 (seed3, go-live 21:00 UTC / 5 PM ET)
+    # - cron: "45 17 * * *"  # [TD #3 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day. Keep 2 PM (seed1) + 8 PM PRIME (seed2).
     # GodsOfTheMind (English god-psychology): 3/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
     # GoM generates with a BIG 5-6h BUFFER before its peak (SOP G3 — "no missed
@@ -49,7 +49,7 @@ on:
     # Render time + cron lag no longer cause a miss. Catch-up (15:30/19:30/23:30)
     # is the backstop if a whole gen run is dropped — recovers BEFORE the peak.
     - cron: "0 12 * * *"    # gen 12:00 UTC → peak 17:00 UTC / 1 PM ET (5h buffer)   [GoM #1]
-    - cron: "0 15 * * *"    # gen 15:00 UTC → peak 21:00 UTC / 5 PM ET (6h buffer)   [GoM #2]
+    # - cron: "0 15 * * *"  # [GoM #2 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day (quality>quantity). Keep proven 1 PM (10.6k) + 9 PM (9.3k).
     - cron: "0 19 * * *"    # gen 19:00 UTC → peak 01:00 UTC / 9 PM ET (6h buffer)   [GoM #3]
     # Money Neurons (MN — US money-psychology): 3/day, big buffer → publishAt peaks.
     # Gens staggered from GoM minutes + ≥3h apart same-niche → no collision / no dup.
