@@ -225,6 +225,7 @@ publish:
                    # after the account is confirmed + token re-generated (Time Decoders).
 
 video:
+  hero_motion: false   # OFF 2026-07-12 per user: Kling clip costs $1.4-2.8/video AND looks weak (just a "breathing" character). Ken Burns cinematic motion (free) is enough.
   bitrate: 6M
   # Small persistent @TimeDecoders wordmark (brand recall → follows). Gated +
   # fully guarded (assembler._apply_brand_overlays). No hook card (removed — it

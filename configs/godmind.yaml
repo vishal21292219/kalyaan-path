@@ -231,6 +231,7 @@ publish:
   facebook: false  # direct Graph-API still paused (dev-app flagged); Make path used instead.
 
 video:
+  hero_motion: false   # OFF 2026-07-12 per user: Kling clip costs $1.4-2.8/video AND looks weak (just a "breathing" character). Ken Burns cinematic motion (free) is enough.
   bitrate: 6M
   # On-screen brand + retention overlays (assembler._apply_brand_overlays):
   # big opening HOOK CARD (0–3s, wins the 3-sec retention battle + becomes the
