@@ -108,6 +108,14 @@ def brand(img):
     d.rounded_rectangle([W//2-72, 98, W//2+72, 144], radius=16, fill=(200, 22, 30, 235))
     d.text((W//2, 121), "PART 1", font=F(BLACK, 27), fill=(255, 255, 255, 255), anchor="mm")
 
+def intro_caption(img, text):
+    # panel-1 SETUP narration — instantly tells the viewer what the story is about
+    d = ImageDraw.Draw(img, "RGBA"); f = F(BOLD, 46); lines = wrap(d, text, f, W-130); lh = 62
+    bh = lh*len(lines)+44; by = int(H*0.135)
+    d.rounded_rectangle([46, by, W-46, by+bh], radius=20, fill=(0,0,0,180))
+    for i, l in enumerate(lines):
+        d.text((W//2, by+22+i*lh+lh//2), l, font=f, fill=(248, 236, 210, 255), anchor="mm", stroke_width=2, stroke_fill=(0,0,0,255))
+
 def caption_bar(img, text):
     # placed in the SAFE zone (mid), never the bottom (IG/YT cover the bottom)
     d = ImageDraw.Draw(img, "RGBA"); f = F(BOLD, 54); lines = wrap(d, text, f, W-200); lh = 72
@@ -116,7 +124,7 @@ def caption_bar(img, text):
     for i, l in enumerate(lines):
         d.text((W//2, by+25+i*lh+lh//2), l, font=f, fill=(255,255,255,255), anchor="mm", stroke_width=2, stroke_fill=(0,0,0,255))
 
-DUR = {1:5, 2:5, 3:5, 4:5, 5:5, 6:5, 7:5, 8:5, 9:6, 10:7}
+DUR = {1:7, 2:5, 3:5, 4:5, 5:5, 6:5, 7:5, 8:5, 9:6, 10:7}   # panel 1 longer to read the setup
 
 def main(slug):
     spec = json.loads((OUT / f"story_{slug}.json").read_text())
@@ -127,7 +135,9 @@ def main(slug):
         pid = p["id"]; img = cover(Image.open(raw / f"panel_{pid:02d}.png").convert("RGB")).convert("RGBA")
         px = detail_map(img); sp = p.get("speaker", [0.5, 0.4]); speaker = (int(sp[0]*W), int(sp[1]*H))
         brand(img)
-        if p["bubble"] == "caption": caption_bar(img, p["text"])
+        if pid == 1 and spec.get("intro"):
+            intro_caption(img, spec["intro"])            # setup narration on the opening panel
+        elif p["bubble"] == "caption": caption_bar(img, p["text"])
         else:
             f, lines, lh, bw, bh = measure(p["text"]); cx, cy = place(px, int(bw*1.5), int(bh*1.75), speaker)
             draw_bubble(img, p["text"], p["bubble"], cx, cy, speaker)

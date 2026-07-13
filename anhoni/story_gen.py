@@ -21,6 +21,7 @@ SCHEMA = """Output ONLY one JSON object (no markdown, no prose) with EXACTLY thi
   "slug": "kebab-case-short",
   "title": "YouTube title: Hindi hook + | Anhoni #shorts  (<=90 chars, curiosity-gap, no clickbait lies)",
   "characters": { "<key>": "<very detailed FIXED visual description: age, face shape, skin tone, hair, exact clothes & colours, one distinctive feature>" },
+  "intro": "<one-line SETUP narration (Hinglish, <= 28 words) shown on panel 1 — instantly tells the viewer WHAT the story is about (who + situation + what went wrong), so there is zero confusion at the start>",
   "music_prompt": "dark cinematic suspense background music, <mood>, tense, no vocals, no drums",
   "panels": [
     { "id": 1, "chars": ["<key>"], "bubble": "thought|speech|caption", "who": "<Name or empty>",
@@ -37,7 +38,8 @@ comic channel. Your stories must be so gripping that people watch till the very 
 NEED Part 2. This is NOT cheap horror-shock — it is smart, eerie, twisty suspense.
 
 QUALITY BAR (non-negotiable — a boring or predictable story is a FAILURE):
-- PANEL 1 = a killer hook: an image + line that instantly plants a burning question. No slow setup.
+- OPENING: the "intro" narration (shown on panel 1) must INSTANTLY make clear WHAT the story is about — the situation/premise — so there is zero confusion at the start, while still being intriguing. (Panel 1's own dialogue is replaced by this intro.)
+- PANEL 1 image = a strong visual hook that fits the intro.
 - EVERY line must add tension or new information. Zero filler, zero repeated beats, no padding.
 - Build logically: normal → something's off → it gets worse → a TWIST that re-frames what we already saw.
 - The twist must be genuinely surprising yet FAIR (small clues were planted earlier). Never random.
