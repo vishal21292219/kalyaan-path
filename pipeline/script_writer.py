@@ -86,6 +86,20 @@ Rules:
   * Each gets ONE locked head-to-toe "look" (skin, hair, crown, weapon,
     clothing, face). The pipeline generates a single master portrait from it
     and reuses that exact identity in every scene the character appears in.
+  * 🕉️ HINDU DEITY CANON — NON-NEGOTIABLE authenticity. The "look" MUST match
+    each deity's canonical iconography, ESPECIALLY facial hair:
+      - CLEAN-SHAVEN, YOUTHFUL, NO beard, NO moustache (write these words
+        explicitly in the "look"): Vishnu, Krishna, Rama, Lakshmana, Kartikeya,
+        Hanuman, Indra, and every youthful male god. e.g. Krishna = "blue-skinned
+        youthful CLEAN-SHAVEN face, no beard, no moustache, peacock feather, flute";
+        Vishnu = "blue-skinned youthful CLEAN-SHAVEN face, no beard, four arms
+        holding conch, discus, mace, lotus, tall crown".
+      - Facial hair ONLY where canon demands it: Shiva (light/neat beard + matted
+        jata), Brahma (elderly WHITE beard, four faces), rishis/sages (long beard).
+      - Goddesses (Durga, Kali, Lakshmi, Saraswati, Parvati) = female faces, obviously
+        no facial hair.
+    If unsure, default youthful male deities to CLEAN-SHAVEN. A bearded Krishna or
+    Vishnu is a HARD FAILURE — devotees find it deeply wrong.
   * In visuals[], refer to each recurring character by the SAME "name" word
     you put in the bible (and list any other words used as "aliases"), so the
     pipeline can tell which scenes show them. Describe their ACTION/pose/
