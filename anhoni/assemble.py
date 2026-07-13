@@ -58,14 +58,16 @@ def place(px, bw, bh, speaker):
     # from the character/face). Search a dense grid in the safe upper-2/3 (avoid
     # top UI + bottom IG/YT overlay). NO pull toward the speaker — that used to
     # drag the bubble onto the speaker's face; the short tail shows who talks.
-    m = 38; TOP = int(H*0.11); BOT = int(H*0.66); best = None
-    for cyf in (0.14, 0.19, 0.24, 0.30, 0.36, 0.43, 0.51):
-        for cxf in (0.22, 0.31, 0.40, 0.50, 0.60, 0.69, 0.78):
+    m = 34; TOP = int(H*0.11); BOT = int(H*0.66); PAD = 62; best = None
+    for cyf in (0.14, 0.19, 0.24, 0.29, 0.35, 0.42, 0.50):
+        for cxf in (0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80):
             cx, cy = int(cxf*W), int(cyf*H); x0, y0, x1, y1 = cx-bw//2, cy-bh//2, cx+bw//2, cy+bh//2
             if x0 < m or x1 > W-m or y0 < TOP or y1 > BOT: continue
-            det = region_detail(px, x0, y0, x1, y1)
+            # score the bubble PLUS a margin around it -> keeps clear space around
+            # the bubble so it never touches the face/hair/character
+            det = region_detail(px, x0-PAD, y0-PAD, x1+PAD, y1+PAD)
             if best is None or det < best[0]: best = (det, cx, cy)
-    return (best[1], best[2]) if best else (W//2, int(H*0.16))
+    return (best[1], best[2]) if best else (W//2, int(H*0.15))
 
 def cloud_bubble(d, x0, y0, x1, y1):
     cx, cy, a, b = (x0+x1)/2, (y0+y1)/2, (x1-x0)/2, (y1-y0)/2
@@ -82,12 +84,12 @@ def draw_bubble(img, text, kind, cx, cy, target):
     if kind == "thought":
         cloud_bubble(d, x0, y0, x1, y1)
         nx, ny = cx+(bw/2)*ux, cy+(bh/2)*uy
-        for rr, dist in ((20, 22), (13, 50), (8, 74)):
+        for rr, dist in ((15, 15), (9, 33)):   # 2 SHORT dots — never reach the face
             pxc, pyc = nx+ux*dist, ny+uy*dist
             d.ellipse([pxc-rr, pyc-rr, pxc+rr, pyc+rr], fill=(255,255,255,255), outline=(22,22,28,255), width=4)
     else:
         ea, eb = int(bw*0.70), int(bh*0.82); ex0, ey0, ex1, ey1 = cx-ea, cy-eb, cx+ea, cy+eb
-        nx, ny = cx+ea*ux, cy+eb*uy; tl = min(dd*0.4, 50); tx, ty = nx+ux*tl, ny+uy*tl
+        nx, ny = cx+ea*ux, cy+eb*uy; tl = min(dd*0.3, 34); tx, ty = nx+ux*tl, ny+uy*tl   # SHORT tail
         pxx, pyy = -uy*22, ux*22
         d.ellipse([ex0+5, ey0+7, ex1+5, ey1+7], fill=(0,0,0,70))
         d.polygon([(nx+pxx, ny+pyy), (nx-pxx, ny-pyy), (tx, ty)], fill=(255,255,255,255))
