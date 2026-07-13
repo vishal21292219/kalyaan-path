@@ -116,6 +116,57 @@ def intro_caption(img, text):
     for i, l in enumerate(lines):
         d.text((W//2, by+22+i*lh+lh//2), l, font=f, fill=(248, 236, 210, 255), anchor="mm", stroke_width=2, stroke_fill=(0,0,0,255))
 
+def _intro_layout(text):
+    f = F(BOLD, 46); d0 = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    lines = wrap(d0, text, f, W-170); lh = 62
+    bh = lh*len(lines)+44; y0i = int(H*0.135)
+    return f, lines, lh, (46, y0i, W-46, y0i+bh)
+
+def _rounded_mask(w, h, r):
+    m = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(m).rounded_rectangle([0, 0, w-1, h-1], radius=r, fill=255)
+    return m
+
+def _frosted_scrim(base, box):
+    # premium frosted-glass panel (blurred+darkened art) instead of a flat black patti
+    x0, y0, x1, y1 = box; bw, bh = x1-x0, y1-y0
+    crop = base.convert("RGB").crop((x0, y0, x1, y1)).filter(ImageFilter.GaussianBlur(18))
+    crop = ImageEnhance.Brightness(crop).enhance(0.38).convert("RGBA")
+    scrim = Image.alpha_composite(crop, Image.new("RGBA", (bw, bh), (8, 8, 12, 120)))
+    d = ImageDraw.Draw(scrim); d.rounded_rectangle([1, 1, bw-2, bh-2], radius=22, outline=(214, 176, 110, 150), width=2)
+    return scrim, _rounded_mask(bw, bh, 22)
+
+def draw_intro_text(img, lines, f, lh, box, n, cursor):
+    x0, y0, x1, y1 = box
+    d = ImageDraw.Draw(img, "RGBA")
+    running = 0; shown = []
+    for ln in lines:
+        if running >= n: break
+        shown.append(ln[:min(len(ln), n-running)]); running += len(ln)
+    for i, l in enumerate(shown):
+        txt = l + ("|" if (cursor and i == len(shown)-1) else "")
+        d.text((x0+30, y0+22+i*lh+lh//2), txt, font=f, fill=(248, 236, 210, 255),
+               anchor="lm", stroke_width=3, stroke_fill=(0, 0, 0, 255))
+
+def render_typewriter_clip(base, text, dur, out_path, clipdir):
+    # panel-1 setup narration that TYPES out (typewriter) on a frosted-glass panel
+    f, lines, lh, box = _intro_layout(text)
+    scrim, mask = _frosted_scrim(base, box); x0, y0 = box[0], box[1]
+    total = sum(len(l) for l in lines); nframes = int(dur*FPS)
+    tf = min(int((dur-1.9)*FPS), int(total/20*FPS)); tf = max(tf, 1)   # ~20 chars/sec, >=1.9s hold
+    tw = clipdir / "tw"
+    if tw.exists(): shutil.rmtree(tw)
+    tw.mkdir(parents=True)
+    for fi in range(nframes):
+        n = total if fi >= tf else int(total * (fi/tf))
+        img = base.copy(); img.paste(scrim, (x0, y0), mask)
+        draw_intro_text(img, lines, f, lh, box, n, cursor=(fi < tf and (fi//11) % 2 == 0))
+        img.convert("RGB").save(tw / f"{fi:04d}.png")
+    subprocess.run([FFMPEG, "-y", "-framerate", str(FPS), "-i", str(tw / "%04d.png"),
+                    "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", str(out_path)],
+                   check=True, capture_output=True)
+    return out_path
+
 def caption_bar(img, text):
     # placed in the SAFE zone (mid), never the bottom (IG/YT cover the bottom)
     d = ImageDraw.Draw(img, "RGBA"); f = F(BOLD, 54); lines = wrap(d, text, f, W-200); lh = 72
@@ -124,7 +175,7 @@ def caption_bar(img, text):
     for i, l in enumerate(lines):
         d.text((W//2, by+25+i*lh+lh//2), l, font=f, fill=(255,255,255,255), anchor="mm", stroke_width=2, stroke_fill=(0,0,0,255))
 
-DUR = {1:7, 2:5, 3:5, 4:5, 5:5, 6:5, 7:5, 8:5, 9:6, 10:7}   # panel 1 longer to read the setup
+DUR = {1:9, 2:5, 3:5, 4:5, 5:5, 6:5, 7:5, 8:5, 9:6, 10:7}   # panel 1 longer: typewriter intro types out + holds
 
 def main(slug):
     spec = json.loads((OUT / f"story_{slug}.json").read_text())
@@ -133,18 +184,19 @@ def main(slug):
     clips = []
     for p in spec["panels"]:
         pid = p["id"]; img = cover(Image.open(raw / f"panel_{pid:02d}.png").convert("RGB")).convert("RGBA")
-        px = detail_map(img); sp = p.get("speaker", [0.5, 0.4]); speaker = (int(sp[0]*W), int(sp[1]*H))
         brand(img)
+        dur = DUR.get(pid, 5); out = CLIP / f"c{pid:02d}.mp4"
         if pid == 1 and spec.get("intro"):
-            intro_caption(img, spec["intro"])            # setup narration on the opening panel
-        elif p["bubble"] == "caption": caption_bar(img, p["text"])
+            render_typewriter_clip(img, spec["intro"], dur, out, CLIP)   # setup narration TYPES out (typewriter)
+            clips.append(out); continue
+        px = detail_map(img); sp = p.get("speaker", [0.5, 0.4]); speaker = (int(sp[0]*W), int(sp[1]*H))
+        if p["bubble"] == "caption": caption_bar(img, p["text"])
         else:
             f, lines, lh, bw, bh = measure(p["text"]); cx, cy = place(px, int(bw*1.5), int(bh*1.75), speaker)
             draw_bubble(img, p["text"], p["bubble"], cx, cy, speaker)
         png = FR / f"p{pid:02d}.png"; img.convert("RGB").save(png)
-        dur = DUR.get(pid, 5); fr = int(dur*FPS)
+        fr = int(dur*FPS)
         z, x, y = "min(zoom+0.0012,1.12)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"
-        out = CLIP / f"c{pid:02d}.mp4"
         # NO fade to/from black (first frame stays a full panel -> good thumbnail; no black flashes)
         vf = (f"scale=1350:2400,zoompan=z='{z}':x='{x}':y='{y}':d={fr}:s={W}x{H}:fps={FPS},format=yuv420p")
         subprocess.run([FFMPEG, "-y", "-loop", "1", "-i", str(png), "-t", str(dur), "-vf", vf, "-r", str(FPS),

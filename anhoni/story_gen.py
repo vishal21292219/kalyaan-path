@@ -45,6 +45,7 @@ QUALITY BAR (non-negotiable — a boring or predictable story is a FAILURE):
 - The twist must be genuinely surprising yet FAIR (small clues were planted earlier). Never random.
 - Panel 10 (caption) = a REAL cliffhanger: a fresh shocking reveal that makes Part 2 essential. Do NOT resolve the mystery.
 - Dialogue = natural spoken Hinglish, sharp and SHORT (<= 8 words; bubbles are tiny). Real people, real fear/suspicion/denial.
+- NUMBERS: write every amount/quantity/time as DIGITS, never spelled out — "Rs 15,000" not "pandrah hazaar", "3 baje" not "teen baje". Use "Rs" for money; NEVER the ₹ symbol (the font cannot render it).
 
 FORMAT:
 - EXACTLY 10 panels. Mostly "speech" (two characters talking) + 1-2 "thought". Panel 10 MUST be "caption".
