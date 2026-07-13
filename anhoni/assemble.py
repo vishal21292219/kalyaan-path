@@ -54,16 +54,16 @@ def measure(text):
     return f, lines, lh, int(tw) + 62, lh * len(lines) + 44
 
 def place(px, bw, bh, speaker):
-    m = 44; best = None
-    for cyf in (0.19, 0.25, 0.31, 0.85):
+    # SAFE ZONE only: keep bubbles in the upper-middle band (IG/YT overlay the
+    # bottom ~25% with username/caption/buttons and the very top with UI).
+    m = 44; TOP = int(H*0.15); BOT = int(H*0.66); best = None
+    for cyf in (0.20, 0.26, 0.32, 0.38, 0.44):
         for cxf in (0.26, 0.38, 0.5, 0.62, 0.74):
             cx, cy = int(cxf*W), int(cyf*H); x0, y0, x1, y1 = cx-bw//2, cy-bh//2, cx+bw//2, cy+bh//2
-            if x0 < m or x1 > W-m or y0 < m or y1 > H-m: continue
-            det = region_detail(px, x0, y0, x1, y1)
-            if cyf == 0.85: det *= 1.5
-            det += abs(cx - speaker[0]) * 0.004
+            if x0 < m or x1 > W-m or y0 < TOP or y1 > BOT: continue
+            det = region_detail(px, x0, y0, x1, y1) + abs(cx - speaker[0]) * 0.004
             if best is None or det < best[0]: best = (det, cx, cy)
-    return (best[1], best[2]) if best else (W//2, int(H*0.18))
+    return (best[1], best[2]) if best else (W//2, int(H*0.22))
 
 def cloud_bubble(d, x0, y0, x1, y1):
     cx, cy, a, b = (x0+x1)/2, (y0+y1)/2, (x1-x0)/2, (y1-y0)/2
@@ -98,15 +98,19 @@ def draw_bubble(img, text, kind, cx, cy, target):
 
 def brand(img):
     d = ImageDraw.Draw(img, "RGBA")
-    d.rounded_rectangle([W//2-150, 36, W//2+150, 90], radius=26, fill=(0,0,0,120))
-    d.text((W//2, 63), "A N H O N I", font=F(BLACK, 30), fill=(GOLD[0], GOLD[1], GOLD[2], 245), anchor="mm")
+    d.rounded_rectangle([W//2-150, 34, W//2+150, 88], radius=26, fill=(0,0,0,130))
+    d.text((W//2, 61), "A N H O N I", font=F(BLACK, 30), fill=(GOLD[0], GOLD[1], GOLD[2], 245), anchor="mm")
+    # PART 1 badge (series hook)
+    d.rounded_rectangle([W//2-72, 98, W//2+72, 144], radius=16, fill=(200, 22, 30, 235))
+    d.text((W//2, 121), "PART 1", font=F(BLACK, 27), fill=(255, 255, 255, 255), anchor="mm")
 
 def caption_bar(img, text):
-    d = ImageDraw.Draw(img, "RGBA"); f = F(BOLD, 52); lines = wrap(d, text, f, W-200); lh = 70
-    bh = lh*len(lines)+46; by = int(H*0.80)
-    d.rounded_rectangle([80, by, W-80, by+bh], radius=22, fill=(0,0,0,180))
+    # placed in the SAFE zone (mid), never the bottom (IG/YT cover the bottom)
+    d = ImageDraw.Draw(img, "RGBA"); f = F(BOLD, 54); lines = wrap(d, text, f, W-200); lh = 72
+    bh = lh*len(lines)+50; by = int(H*0.50) - bh//2
+    d.rounded_rectangle([70, by, W-70, by+bh], radius=24, fill=(0,0,0,190))
     for i, l in enumerate(lines):
-        d.text((W//2, by+23+i*lh+lh//2), l, font=f, fill=(255,255,255,255), anchor="mm", stroke_width=2, stroke_fill=(0,0,0,255))
+        d.text((W//2, by+25+i*lh+lh//2), l, font=f, fill=(255,255,255,255), anchor="mm", stroke_width=2, stroke_fill=(0,0,0,255))
 
 DUR = {1:5, 2:5, 3:5, 4:5, 5:5, 6:5, 7:5, 8:5, 9:6, 10:7}
 
@@ -123,13 +127,12 @@ def main(slug):
         else:
             f, lines, lh, bw, bh = measure(p["text"]); cx, cy = place(px, int(bw*1.5), int(bh*1.75), speaker)
             draw_bubble(img, p["text"], p["bubble"], cx, cy, speaker)
-        d2 = ImageDraw.Draw(img, "RGBA"); d2.text((W-60, H-48), f"{pid}/10", font=F(BOLD, 26), fill=(255,255,255,150), anchor="mm")
         png = FR / f"p{pid:02d}.png"; img.convert("RGB").save(png)
         dur = DUR.get(pid, 5); fr = int(dur*FPS)
         z, x, y = "min(zoom+0.0012,1.12)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"
         out = CLIP / f"c{pid:02d}.mp4"
-        vf = (f"scale=1350:2400,zoompan=z='{z}':x='{x}':y='{y}':d={fr}:s={W}x{H}:fps={FPS},"
-              f"fade=t=in:st=0:d=0.3,fade=t=out:st={dur-0.3}:d=0.3,format=yuv420p")
+        # NO fade to/from black (first frame stays a full panel -> good thumbnail; no black flashes)
+        vf = (f"scale=1350:2400,zoompan=z='{z}':x='{x}':y='{y}':d={fr}:s={W}x{H}:fps={FPS},format=yuv420p")
         subprocess.run([FFMPEG, "-y", "-loop", "1", "-i", str(png), "-t", str(dur), "-vf", vf, "-r", str(FPS),
                         "-c:v", "libx264", "-preset", "medium", "-crf", "19", str(out)], check=True, capture_output=True)
         clips.append(out)

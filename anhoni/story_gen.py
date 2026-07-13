@@ -14,7 +14,7 @@ if ENV.exists():
         if "=" in l and not l.strip().startswith("#"):
             k, v = l.split("=", 1); E.setdefault(k.strip(), v.strip())
 KEY = E["ANTHROPIC_API_KEY"]
-MODEL = "claude-sonnet-5"
+MODEL = "claude-opus-4-8"   # story is the soul — use the strongest model
 
 SCHEMA = """Output ONLY one JSON object (no markdown, no prose) with EXACTLY this shape:
 {
@@ -32,17 +32,26 @@ SCHEMA = """Output ONLY one JSON object (no markdown, no prose) with EXACTLY thi
   "hashtags": ["anhoni", "..."]
 }"""
 
-RULES = """You are the head writer of ANHONI — a premium Hindi SUSPENSE / THRILLER / MYSTERY
-comic-story channel (NOT gore/horror-shock; tasteful eerie suspense with a twist).
-Write a gripping, dialogue-DRIVEN micro-story from the seed. Requirements:
-- EXACTLY 10 panels. Characters TALK to each other (mostly "speech" bubbles) with a few "thought" bubbles. Panel 10 MUST be bubble="caption" = a Part-2 cliffhanger.
-- 1 or 2 recurring characters only; give each an ultra-consistent FIXED visual description (this locks their look across panels).
-- Strong 3-second HOOK on panel 1. Escalate tension. A real TWIST near the end. Leave an open loop (Part 2).
-- Dialogue: natural spoken Hindi/Hinglish, SHORT (bubbles are small). Roman script ok; keep it punchy.
-- "speaker" = approximate [x,y] (0..1) head position of whoever is speaking/thinking in that panel, so the tail points right.
-- panel "prompt": describe the SCENE + the character's action & emotion + a detailed setting. Prefer SIMPLE hand poses (hands at sides / holding one object / in pockets) — avoid complex pointing/gestures.
-- POLICY: no gore, no blood, no sexual content, no real named victims. Keep it suspense/mystery/supernatural-lite. Frame as fiction.
-- Make it PREMIUM and genuinely intriguing — the kind people watch till the end and follow for Part 2."""
+RULES = """You are the star writer of ANHONI — a PREMIUM Hindi SUSPENSE / THRILLER / MYSTERY
+comic channel. Your stories must be so gripping that people watch till the very end and
+NEED Part 2. This is NOT cheap horror-shock — it is smart, eerie, twisty suspense.
+
+QUALITY BAR (non-negotiable — a boring or predictable story is a FAILURE):
+- PANEL 1 = a killer hook: an image + line that instantly plants a burning question. No slow setup.
+- EVERY line must add tension or new information. Zero filler, zero repeated beats, no padding.
+- Build logically: normal → something's off → it gets worse → a TWIST that re-frames what we already saw.
+- The twist must be genuinely surprising yet FAIR (small clues were planted earlier). Never random.
+- Panel 10 (caption) = a REAL cliffhanger: a fresh shocking reveal that makes Part 2 essential. Do NOT resolve the mystery.
+- Dialogue = natural spoken Hinglish, sharp and SHORT (<= 8 words; bubbles are tiny). Real people, real fear/suspicion/denial.
+
+FORMAT:
+- EXACTLY 10 panels. Mostly "speech" (two characters talking) + 1-2 "thought". Panel 10 MUST be "caption".
+- 1-2 recurring characters; each gets an ULTRA-detailed FIXED look (age, face, skin, hair, exact clothes+colours, one distinctive feature) — this locks them across panels.
+- "speaker" = [x,y] (0..1) head position of whoever speaks/thinks that panel.
+- "prompt" = vivid SCENE + the character's action & emotion + a rich detailed setting. SIMPLE hand poses (hands at sides / holding one object / in pockets) — avoid pointing/complex gestures.
+
+POLICY: no gore/blood, no sexual content, no real named victims. Suspense/mystery/supernatural-lite. Fiction.
+Deliver a story you'd be proud to put your name on."""
 
 def generate(seed, slug):
     prompt = f"{RULES}\n\nSEED: {seed}\n\nUse slug \"{slug}\".\n\n{SCHEMA}"
