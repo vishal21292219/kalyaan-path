@@ -150,6 +150,46 @@ def _reader_creds():
     return None
 
 
+_GENERIC_TOK = {
+    "ancient", "mystery", "mysteries", "secret", "secrets", "hidden", "before",
+    "cannot", "couldnt", "science", "scientists", "people", "something", "really",
+    "inside", "beneath", "across", "without", "around", "between", "against",
+    "stronger", "oldest", "largest", "deepest", "little", "almost", "nobody",
+    "everyone", "reveal", "reveals", "explains", "explained", "should", "shouldnt",
+    "meaning", "psychology", "hidden", "secret", "reason", "history", "modern",
+    "world", "years", "still", "found", "never", "buried", "forgotten", "greatest",
+}
+
+
+def _rare_entity_tokens(topic_title: str, niche: str) -> set:
+    """Distinctive words (>=6 chars, not generic) in topic_title that are RARE in
+    the niche's topic pool (appear in <=1 pool topic). These uniquely identify ONE
+    topic — so their presence in a live YouTube title means the SAME topic even
+    after the script-writer rewrote the on-screen title (e.g. pool 'The Antikythera
+    Mechanism' vs live 'Antikythera: The 2,000-Year-Old Computer'). Multi-topic
+    entities (GoM 'krishna', 'ganesha', 'meaning' → many topics) are NOT rare →
+    excluded → this can never over-block a genuinely different same-deity topic."""
+    import re as _re
+    cand = {t for t in _re.findall(r"[a-z]+", _norm_title(topic_title))
+            if len(t) >= 6 and t not in _GENERIC_TOK}
+    if not cand:
+        return set()
+    try:
+        vf = ROOT / f"data/viral_topics_{niche}.json"
+        pool = json.loads(vf.read_text()).get("topics", []) if vf.exists() else []
+    except Exception:
+        return set()
+    if not pool:
+        return set()
+    freq = {t: 0 for t in cand}
+    for p in pool:
+        pt = set(_re.findall(r"[a-z]+", _norm_title(p.get("title", ""))))
+        for t in cand:
+            if t in pt:
+                freq[t] += 1
+    return {t for t in cand if freq[t] <= 1}   # unique-to-one-topic → safe to match on
+
+
 def topic_live_on_youtube(topic_title: str, niche: str, days: int = 45) -> bool:
     """Real-time dedup against ACTUAL YouTube — True if this topic already exists
     among the channel's recent uploads (last `days`). Immune to the git-race state
@@ -161,6 +201,7 @@ def topic_live_on_youtube(topic_title: str, niche: str, days: int = 45) -> bool:
     handle = _YT_HANDLES.get((niche or "").lower())
     if not key or len(key) < 10 or not handle:
         return False
+    rare = _rare_entity_tokens(topic_title, niche)   # unique-entity words → catch rewritten-title re-picks
     try:
         creds = _reader_creds()
         if creds is None:
@@ -199,6 +240,18 @@ def topic_live_on_youtube(topic_title: str, niche: str, days: int = 45) -> bool:
                     print(f"[dedup] LIVE YouTube match — '{topic_title}' already on @{handle} "
                           f"(as '{sn.get('title')}') → skipping to avoid a duplicate")
                     return True
+                # Rewritten-title catch: the script writer often reshapes the title
+                # (pool 'The Antikythera Mechanism' → live 'Antikythera: 2,000-Year-Old
+                # Computer'). If a UNIQUE-entity word from the pool topic appears in the
+                # live title, it's the same topic. `rare` only holds words unique to one
+                # pool topic, so same-deity GoM topics are never falsely matched.
+                if rare:
+                    other_words = set(_norm_title(sn.get("title", "")).split())
+                    hit = rare & other_words
+                    if hit:
+                        print(f"[dedup] LIVE YouTube match (entity '{next(iter(hit))}') — "
+                              f"'{topic_title}' already on @{handle} (as '{sn.get('title')}') → skipping")
+                        return True
         return False
     except Exception as e:
         print(f"[dedup] live YT check skipped ({type(e).__name__}: {e})")
