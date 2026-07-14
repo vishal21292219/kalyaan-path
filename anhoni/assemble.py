@@ -54,20 +54,24 @@ def measure(text):
     return f, lines, lh, int(tw) + 54, lh * len(lines) + 40
 
 def place(px, bw, bh, speaker):
-    # Put the bubble in the EMPTIEST background region (lowest edge-detail = away
-    # from the character/face). Search a dense grid in the safe upper-2/3 (avoid
-    # top UI + bottom IG/YT overlay). NO pull toward the speaker — that used to
-    # drag the bubble onto the speaker's face; the short tail shows who talks.
-    m = 34; TOP = int(H*0.11); BOT = int(H*0.66); PAD = 62; best = None
-    for cyf in (0.14, 0.19, 0.24, 0.29, 0.35, 0.42, 0.50):
-        for cxf in (0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80):
+    # Keep the bubble OFF the speaker's face: hard keep-out box around the head
+    # (from the per-panel `speaker` coord). Among boxes that clear the face, the
+    # top-most low-detail spot wins. Fallback = directly ABOVE the head — always
+    # safe. This is why bubbles now sit in the clear band over the character.
+    m = 34; TOP = int(H*0.10); BOT = int(H*0.64); PAD = 40
+    sx, sy = speaker
+    KW, KH = int(W*0.17), int(H*0.15)                       # face/head keep-out
+    kx0, ky0, kx1, ky1 = sx-KW, sy-KH, sx+KW, sy+KH
+    best = None
+    for cyf in (0.12, 0.15, 0.18, 0.21, 0.25, 0.30, 0.36, 0.44, 0.52):
+        for cxf in (0.20, 0.28, 0.36, 0.44, 0.50, 0.56, 0.64, 0.72, 0.80):
             cx, cy = int(cxf*W), int(cyf*H); x0, y0, x1, y1 = cx-bw//2, cy-bh//2, cx+bw//2, cy+bh//2
             if x0 < m or x1 > W-m or y0 < TOP or y1 > BOT: continue
-            # score the bubble PLUS a margin around it -> keeps clear space around
-            # the bubble so it never touches the face/hair/character
-            det = region_detail(px, x0-PAD, y0-PAD, x1+PAD, y1+PAD)
-            if best is None or det < best[0]: best = (det, cx, cy)
-    return (best[1], best[2]) if best else (W//2, int(H*0.15))
+            if not (x1 < kx0 or x0 > kx1 or y1 < ky0 or y0 > ky1): continue   # overlaps face -> reject
+            score = region_detail(px, x0-PAD, y0-PAD, x1+PAD, y1+PAD) + cyf*120  # prefer higher/clearer
+            if best is None or score < best[0]: best = (score, cx, cy)
+    if best: return best[1], best[2]
+    return sx, max(TOP + bh//2, sy - KH - bh//2)             # fallback: straight above the head
 
 def cloud_bubble(d, x0, y0, x1, y1):
     cx, cy, a, b = (x0+x1)/2, (y0+y1)/2, (x1-x0)/2, (y1-y0)/2
@@ -122,21 +126,9 @@ def _intro_layout(text):
     bh = lh*len(lines)+44; y0i = int(H*0.135)
     return f, lines, lh, (46, y0i, W-46, y0i+bh)
 
-def _rounded_mask(w, h, r):
-    m = Image.new("L", (w, h), 0)
-    ImageDraw.Draw(m).rounded_rectangle([0, 0, w-1, h-1], radius=r, fill=255)
-    return m
-
-def _frosted_scrim(base, box):
-    # premium frosted-glass panel (blurred+darkened art) instead of a flat black patti
-    x0, y0, x1, y1 = box; bw, bh = x1-x0, y1-y0
-    crop = base.convert("RGB").crop((x0, y0, x1, y1)).filter(ImageFilter.GaussianBlur(18))
-    crop = ImageEnhance.Brightness(crop).enhance(0.38).convert("RGBA")
-    scrim = Image.alpha_composite(crop, Image.new("RGBA", (bw, bh), (8, 8, 12, 120)))
-    d = ImageDraw.Draw(scrim); d.rounded_rectangle([1, 1, bw-2, bh-2], radius=22, outline=(214, 176, 110, 150), width=2)
-    return scrim, _rounded_mask(bw, bh, 22)
-
 def draw_intro_text(img, lines, f, lh, box, n, cursor):
+    # NO background box — cream text with a heavy dark stroke + soft shadow so it
+    # stays readable on any panel art (user found the black patti bekaar).
     x0, y0, x1, y1 = box
     d = ImageDraw.Draw(img, "RGBA")
     running = 0; shown = []
@@ -145,13 +137,13 @@ def draw_intro_text(img, lines, f, lh, box, n, cursor):
         shown.append(ln[:min(len(ln), n-running)]); running += len(ln)
     for i, l in enumerate(shown):
         txt = l + ("|" if (cursor and i == len(shown)-1) else "")
-        d.text((x0+30, y0+22+i*lh+lh//2), txt, font=f, fill=(248, 236, 210, 255),
-               anchor="lm", stroke_width=3, stroke_fill=(0, 0, 0, 255))
+        yy = y0 + 22 + i*lh + lh//2
+        d.text((x0+30+3, yy+3), txt, font=f, fill=(0, 0, 0, 150), anchor="lm", stroke_width=5, stroke_fill=(0, 0, 0, 150))
+        d.text((x0+30, yy), txt, font=f, fill=(250, 238, 212, 255), anchor="lm", stroke_width=5, stroke_fill=(0, 0, 0, 255))
 
 def render_typewriter_clip(base, text, dur, out_path, clipdir):
-    # panel-1 setup narration that TYPES out (typewriter) on a frosted-glass panel
+    # panel-1 setup narration that TYPES out (typewriter), no background box
     f, lines, lh, box = _intro_layout(text)
-    scrim, mask = _frosted_scrim(base, box); x0, y0 = box[0], box[1]
     total = sum(len(l) for l in lines); nframes = int(dur*FPS)
     tf = min(int((dur-1.9)*FPS), int(total/20*FPS)); tf = max(tf, 1)   # ~20 chars/sec, >=1.9s hold
     tw = clipdir / "tw"
@@ -159,7 +151,7 @@ def render_typewriter_clip(base, text, dur, out_path, clipdir):
     tw.mkdir(parents=True)
     for fi in range(nframes):
         n = total if fi >= tf else int(total * (fi/tf))
-        img = base.copy(); img.paste(scrim, (x0, y0), mask)
+        img = base.copy()
         draw_intro_text(img, lines, f, lh, box, n, cursor=(fi < tf and (fi//11) % 2 == 0))
         img.convert("RGB").save(tw / f"{fi:04d}.png")
     subprocess.run([FFMPEG, "-y", "-framerate", str(FPS), "-i", str(tw / "%04d.png"),
@@ -192,7 +184,7 @@ def main(slug):
         px = detail_map(img); sp = p.get("speaker", [0.5, 0.4]); speaker = (int(sp[0]*W), int(sp[1]*H))
         if p["bubble"] == "caption": caption_bar(img, p["text"])
         else:
-            f, lines, lh, bw, bh = measure(p["text"]); cx, cy = place(px, int(bw*1.5), int(bh*1.75), speaker)
+            f, lines, lh, bw, bh = measure(p["text"]); cx, cy = place(px, int(bw*1.3), int(bh*1.4), speaker)
             draw_bubble(img, p["text"], p["bubble"], cx, cy, speaker)
         png = FR / f"p{pid:02d}.png"; img.convert("RGB").save(png)
         fr = int(dur*FPS)
