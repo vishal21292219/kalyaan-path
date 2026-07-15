@@ -20,6 +20,8 @@ jobs:
   anhoni:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: write   # needed to commit+push published_log.json back to the repo
     steps:
       - uses: actions/checkout@v4
 

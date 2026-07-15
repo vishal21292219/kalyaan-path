@@ -38,6 +38,10 @@ def main(dry=False):
     if dry:
         print("DRY RUN — video ready at", OUT / "out" / slug / "final.mp4", "(not published)"); return
     yt = publish.main(slug)
+    if not yt:
+        # YouTube is the primary target; a None link means the upload failed.
+        # Fail loudly so the CI run goes red (and is retried) instead of a false green.
+        raise RuntimeError(f"YouTube upload failed for {slug} — no video link returned")
     log(slug, seed, yt)
     print("PUBLISHED ALL.")
 
