@@ -20,6 +20,8 @@ jobs:
   anhoni:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: write        # so the "Commit published log" git push isn't 403'd (mirrors daily-reels.yml)
     steps:
       - uses: actions/checkout@v4
 
@@ -64,5 +66,9 @@ jobs:
           git config user.name "anhoni-bot"
           git config user.email "bot@anhoni.local"
           git add anhoni/published_log.json || true
-          git commit -m "anhoni: published $(date -u +%F)" || echo "nothing to commit"
-          git push || echo "push skipped"
+          git commit -m "anhoni: published $(date -u +%F)" || { echo "nothing to commit"; exit 0; }
+          # rebase-before-push with backoff so a concurrent commit on main can't drop the marker
+          for i in 1 2 3 4; do
+            git pull --rebase --autostash origin main && git push && break
+            echo "push retry $i"; sleep $((2**i))
+          done
