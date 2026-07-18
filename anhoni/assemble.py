@@ -32,6 +32,17 @@ def cover(img):
 
 SW, SH = 96, 171
 def detail_map(img): return img.convert("L").resize((SW, SH)).filter(ImageFilter.FIND_EDGES).filter(ImageFilter.GaussianBlur(1)).load()
+def skin_map(img):
+    # detect skin-tone pixels (faces + hands) so bubbles never cover them — edge
+    # detection alone fails because busy backgrounds look "full" and smooth faces look "empty".
+    small = img.convert("RGB").resize((SW, SH)); sp = small.load()
+    m = Image.new("L", (SW, SH), 0); mp = m.load()
+    for y in range(SH):
+        for x in range(SW):
+            r, g, b = sp[x, y][:3]
+            if r > 95 and g > 40 and b > 20 and r > g and r > b and (r - b) > 15 and (max(r, g, b) - min(r, g, b)) > 15:
+                mp[x, y] = 255
+    return m.filter(ImageFilter.MaxFilter(3)).load()   # dilate = safety margin around faces
 def region_detail(px, x0, y0, x1, y1):
     sx0, sx1 = max(0, int(x0/W*SW)), min(SW, int(x1/W*SW)); sy0, sy1 = max(0, int(y0/H*SH)), min(SH, int(y1/H*SH))
     tot = cnt = 0
@@ -48,30 +59,25 @@ def wrap(d, t, f, mw):
     if cur: out.append(cur)
     return out
 def measure(text):
-    d = ImageDraw.Draw(Image.new("RGB", (10, 10))); f = F(SERIF, 38)
-    lines = wrap(d, text, f, 300); lh = 48
+    d = ImageDraw.Draw(Image.new("RGB", (10, 10))); f = F(SERIF, 36)
+    lines = wrap(d, text, f, 360); lh = 46      # wider wrap = fewer lines = compact bubble
     tw = max(d.textlength(l, font=f) for l in lines)
     return f, lines, lh, int(tw) + 54, lh * len(lines) + 40
 
-def place(px, bw, bh, speaker):
-    # Keep the bubble OFF the speaker's face: hard keep-out box around the head
-    # (from the per-panel `speaker` coord). Among boxes that clear the face, the
-    # top-most low-detail spot wins. Fallback = directly ABOVE the head — always
-    # safe. This is why bubbles now sit in the clear band over the character.
-    m = 34; TOP = int(H*0.10); BOT = int(H*0.64); PAD = 40
-    sx, sy = speaker
-    KW, KH = int(W*0.17), int(H*0.15)                       # face/head keep-out
-    kx0, ky0, kx1, ky1 = sx-KW, sy-KH, sx+KW, sy+KH
+def place(px, sk, bw, bh, speaker):
+    # Tail-less bubbles: find the emptiest SKIN-FREE spot (never on a face/hand).
+    # Reliable speaker position isn't in the story data, so NO tail -> no wrong arrow.
+    m = 40; TOP = int(H*0.10); BOT = int(H*0.66); PAD = 26
     best = None
-    for cyf in (0.12, 0.15, 0.18, 0.21, 0.25, 0.30, 0.36, 0.44, 0.52):
-        for cxf in (0.20, 0.28, 0.36, 0.44, 0.50, 0.56, 0.64, 0.72, 0.80):
+    for cyf in (0.12, 0.15, 0.18, 0.21, 0.25, 0.30, 0.36, 0.44, 0.52, 0.58):
+        for cxf in (0.18, 0.26, 0.34, 0.42, 0.50, 0.58, 0.66, 0.74, 0.82):
             cx, cy = int(cxf*W), int(cyf*H); x0, y0, x1, y1 = cx-bw//2, cy-bh//2, cx+bw//2, cy+bh//2
             if x0 < m or x1 > W-m or y0 < TOP or y1 > BOT: continue
-            if not (x1 < kx0 or x0 > kx1 or y1 < ky0 or y0 > ky1): continue   # overlaps face -> reject
-            score = region_detail(px, x0-PAD, y0-PAD, x1+PAD, y1+PAD) + cyf*120  # prefer higher/clearer
+            skin = region_detail(sk, x0-PAD, y0-PAD, x1+PAD, y1+PAD)
+            det = region_detail(px, x0, y0, x1, y1)
+            score = skin*5.0 + det*0.35 + cyf*28               # skin dominates -> off every face
             if best is None or score < best[0]: best = (score, cx, cy)
-    if best: return best[1], best[2]
-    return sx, max(TOP + bh//2, sy - KH - bh//2)             # fallback: straight above the head
+    return (best[1], best[2]) if best else (W//2, int(H*0.16))
 
 def cloud_bubble(d, x0, y0, x1, y1):
     cx, cy, a, b = (x0+x1)/2, (y0+y1)/2, (x1-x0)/2, (y1-y0)/2
@@ -81,28 +87,19 @@ def cloud_bubble(d, x0, y0, x1, y1):
         d.ellipse([pxc-r, pyc-r, pxc+r, pyc+r], fill=(255,255,255,255), outline=(22,22,28,255), width=5)
     d.ellipse([x0, y0, x1, y1], fill=(255,255,255,255))
 
-def draw_bubble(img, text, kind, cx, cy, target):
+def draw_bubble(img, text, kind, cx, cy):
+    # tail-less: speech = compact rounded-rect, thought = cloud. No arrow (can't reliably
+    # know which on-screen character is the speaker -> a wrong arrow is worse than none).
     d = ImageDraw.Draw(img, "RGBA"); f, lines, lh, bw, bh = measure(text)
     x0, y0, x1, y1 = cx-bw//2, cy-bh//2, cx+bw//2, cy+bh//2
-    ddx, ddy = target[0]-cx, target[1]-cy; dd = max(1.0, math.hypot(ddx, ddy)); ux, uy = ddx/dd, ddy/dd
     if kind == "thought":
         cloud_bubble(d, x0, y0, x1, y1)
-        nx, ny = cx+(bw/2)*ux, cy+(bh/2)*uy
-        for rr, dist in ((15, 15), (9, 33)):   # 2 SHORT dots — never reach the face
-            pxc, pyc = nx+ux*dist, ny+uy*dist
-            d.ellipse([pxc-rr, pyc-rr, pxc+rr, pyc+rr], fill=(255,255,255,255), outline=(22,22,28,255), width=4)
     else:
-        ea, eb = int(bw*0.70), int(bh*0.82); ex0, ey0, ex1, ey1 = cx-ea, cy-eb, cx+ea, cy+eb
-        nx, ny = cx+ea*ux, cy+eb*uy; tl = min(dd*0.3, 34); tx, ty = nx+ux*tl, ny+uy*tl   # SHORT tail
-        pxx, pyy = -uy*22, ux*22
-        d.ellipse([ex0+5, ey0+7, ex1+5, ey1+7], fill=(0,0,0,70))
-        d.polygon([(nx+pxx, ny+pyy), (nx-pxx, ny-pyy), (tx, ty)], fill=(255,255,255,255))
-        d.line([(nx+pxx, ny+pyy), (tx, ty)], fill=(20,20,25,255), width=5)
-        d.line([(nx-pxx, ny-pyy), (tx, ty)], fill=(20,20,25,255), width=5)
-        d.ellipse([ex0, ey0, ex1, ey1], fill=(255,255,255,255), outline=(20,20,25,255), width=5)
+        d.rounded_rectangle([x0+5, y0+7, x1+5, y1+7], radius=30, fill=(0, 0, 0, 70))        # soft shadow
+        d.rounded_rectangle([x0, y0, x1, y1], radius=30, fill=(255, 255, 255, 255), outline=(20, 20, 25, 255), width=5)
     ty0 = cy - (lh*len(lines))/2
     for i, l in enumerate(lines):
-        d.text((cx, ty0+i*lh+lh/2), l, font=f, fill=(20,20,25,255), anchor="mm")
+        d.text((cx, ty0+i*lh+lh/2), l, font=f, fill=(20, 20, 25, 255), anchor="mm")
 
 def brand(img):
     d = ImageDraw.Draw(img, "RGBA")
@@ -159,11 +156,22 @@ def render_typewriter_clip(base, text, dur, out_path, clipdir):
                    check=True, capture_output=True)
     return out_path
 
-def caption_bar(img, text):
-    # placed in the SAFE zone (mid), never the bottom (IG/YT cover the bottom)
+def caption_bar(img, text, px=None, speaker=None, sk=None):
+    # full-width bar placed in the band that covers the LEAST skin (no faces) and is
+    # clear of the IG/YT bottom overlay. Candidates: high, upper-mid, lower-safe.
     d = ImageDraw.Draw(img, "RGBA"); f = F(BOLD, 54); lines = wrap(d, text, f, W-200); lh = 72
-    bh = lh*len(lines)+50; by = int(H*0.50) - bh//2
-    d.rounded_rectangle([70, by, W-70, by+bh], radius=24, fill=(0,0,0,190))
+    bh = lh*len(lines)+50
+    cands = [int(H*0.125), int(H*0.30), int(H*0.615)-bh]                  # bar-top options
+    valid = [y for y in cands if y >= int(H*0.11) and y+bh <= int(H*0.70)] or [int(H*0.125)]
+    if sk is not None or px is not None:
+        def score(y):
+            skin = region_detail(sk, 70, y-24, W-70, y+bh+24) if sk is not None else 0
+            det = region_detail(px, 70, y-24, W-70, y+bh+24) if px is not None else 0
+            return skin*5.0 + det*0.35
+        by = min(valid, key=score)
+    else:
+        by = valid[0]
+    d.rounded_rectangle([70, by, W-70, by+bh], radius=24, fill=(0,0,0,200))
     for i, l in enumerate(lines):
         d.text((W//2, by+25+i*lh+lh//2), l, font=f, fill=(255,255,255,255), anchor="mm", stroke_width=2, stroke_fill=(0,0,0,255))
 
@@ -181,11 +189,11 @@ def main(slug):
         if pid == 1 and spec.get("intro"):
             render_typewriter_clip(img, spec["intro"], dur, out, CLIP)   # setup narration TYPES out (typewriter)
             clips.append(out); continue
-        px = detail_map(img); sp = p.get("speaker", [0.5, 0.4]); speaker = (int(sp[0]*W), int(sp[1]*H))
-        if p["bubble"] == "caption": caption_bar(img, p["text"])
+        px = detail_map(img); sk = skin_map(img); sp = p.get("speaker", [0.5, 0.4]); speaker = (int(sp[0]*W), int(sp[1]*H))
+        if p["bubble"] == "caption": caption_bar(img, p["text"], px, speaker, sk)
         else:
-            f, lines, lh, bw, bh = measure(p["text"]); cx, cy = place(px, int(bw*1.3), int(bh*1.4), speaker)
-            draw_bubble(img, p["text"], p["bubble"], cx, cy, speaker)
+            f, lines, lh, bw, bh = measure(p["text"]); cx, cy = place(px, sk, int(bw*1.15), int(bh*1.25), speaker)
+            draw_bubble(img, p["text"], p["bubble"], cx, cy)
         png = FR / f"p{pid:02d}.png"; img.convert("RGB").save(png)
         fr = int(dur*FPS)
         z, x, y = "min(zoom+0.0012,1.12)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"
