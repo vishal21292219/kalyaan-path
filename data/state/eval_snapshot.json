@@ -1,35 +1,35 @@
 {
- "date": "13 Jul 2026",
+ "date": "20 Jul 2026",
  "channels": {
   "KalyaanPath": {
-   "subs": 44,
-   "views": 5158,
-   "videoCount": 48
+   "subs": 45,
+   "views": 5374,
+   "videoCount": 50
   },
   "TimeDecoders": {
-   "subs": 196,
-   "views": 27701,
-   "videoCount": 94
+   "subs": 199,
+   "views": 28892,
+   "videoCount": 97
   },
   "Itihaasvani": {
-   "subs": 35,
+   "subs": null,
    "views": null,
    "videoCount": null
   },
   "GodsOfTheMind": {
-   "subs": 129,
+   "subs": null,
    "views": null,
    "videoCount": null
   },
   "MoneyNeurons": {
-   "subs": 2,
+   "subs": null,
    "views": null,
    "videoCount": null
   },
   "Lakeerein": {
-   "subs": 1,
-   "views": 502,
-   "videoCount": 1
+   "subs": 2,
+   "views": 14,
+   "videoCount": 10
   }
  }
 }
