@@ -40,17 +40,16 @@ from pipeline.publish_log import last_published
 # KEEP IN SYNC with the active crons in .github/workflows/daily-reels.yml. The
 # GodsOfTheMind (godmind) slots are the busiest channel and MUST be covered here
 # — a skipped GoM generation cron is otherwise unrecoverable.
-# FOCUS (2026-06-20): only the 3 active channels — TimeDecoders (ancient),
-# GodsOfTheMind (godmind), Money Neurons (moneurons), each x3 daily slots.
+# FOCUS: TimeDecoders (ancient) + GodsOfTheMind (godmind) are each 1/day as of
+# 2026-07-23 (cut 2→1 per user — one reel/day at the single best audience
+# window). Only those two surviving slots are recovered here; the dropped TD 2 PM
+# and GoM 9 PM slots are intentionally NOT listed (leaving them in would make
+# catch-up regenerate the very runs we cut).
 # Itihaasvani / KalyaanPath (mantra) / bhajan are HELD → intentionally NOT
 # recovered (leaving them in would make catch-up resurrect held channels daily).
 SLOTS = [
-    ("ancient",   "trending", 1, "publish", 15, 37, None),  # cron 37 15 → go-live 18:00 UTC / 2 PM ET
-    ("ancient",   "trending", 2, "publish", 16, 42, None),  # cron 42 16 → go-live 00:00 UTC / 8 PM ET
-    ("ancient",   "trending", 3, "publish", 17, 45, None),  # cron 45 17 → go-live 21:00 UTC / 5 PM ET
-    ("godmind",   "trending", 1, "publish", 12,  0, None),  # cron 0 12  → go-live 17:00 UTC / 1 PM ET
-    ("godmind",   "trending", 2, "publish", 15,  0, None),  # cron 0 15  → go-live 21:00 UTC / 5 PM ET
-    ("godmind",   "trending", 3, "publish", 19,  0, None),  # cron 0 19  → go-live 01:00 UTC / 9 PM ET
+    ("ancient",   "trending", 2, "publish", 18, 42, None),  # cron 42 18 → go-live 00:00 UTC / 8 PM ET PRIME (sole daily TD run)
+    ("godmind",   "trending", 1, "publish", 12,  0, None),  # cron 0 12  → go-live 17:00 UTC / 1 PM ET (sole daily GoM run)
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled

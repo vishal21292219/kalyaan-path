@@ -35,10 +35,11 @@ on:
     # - cron: "32 15 * * *"   # KalyaanPath mantra — HELD
     # - cron: "0 10 * * 0"    # KalyaanPath Sunday Bhajan — HELD
     # ===================================================================
-    # TimeDecoders (English ancient mysteries): 3/day. Each gen ~1h apart so the
-    # prior run's dedup/topic state persists first → NO duplicate topics.
-    - cron: "37 15 * * *"   # TimeDecoders #1 (seed1, go-live 18:00 UTC / 2 PM ET)
-    - cron: "42 18 * * *"   # TimeDecoders #2 (seed2, go-live 00:00 UTC / 8 PM ET PRIME) — moved 16:42→18:42 (2026-07-12): 3h AFTER TD#1 so its dedup state COMMITS first → no same-topic dup. Still 5h before peak.
+    # TimeDecoders (English ancient mysteries): 1/day (cut 2→1 on 2026-07-23 per
+    # user — one reel/day at the single best audience window). Keep the 8 PM ET
+    # PRIME slot (evening = peak US-English engagement); drop the 2 PM slot.
+    # - cron: "37 15 * * *"   # [TD #1 / 2 PM ET] DROPPED 2026-07-23 — TD cut to 1/day, keep 8 PM PRIME only.
+    - cron: "42 18 * * *"   # TimeDecoders (seed2, go-live 00:00 UTC / 8 PM ET PRIME) — sole daily TD run, best audience window.
     # - cron: "45 17 * * *"  # [TD #3 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day. Keep 2 PM (seed1) + 8 PM PRIME (seed2).
     # GodsOfTheMind (English god-psychology): 3/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
@@ -48,9 +49,11 @@ on:
     # (facebook_make_scheduled) → reel-poster.yml fires both at the EXACT peak.
     # Render time + cron lag no longer cause a miss. Catch-up (15:30/19:30/23:30)
     # is the backstop if a whole gen run is dropped — recovers BEFORE the peak.
-    - cron: "0 12 * * *"    # gen 12:00 UTC → peak 17:00 UTC / 1 PM ET (5h buffer)   [GoM #1]
+    # GodsOfTheMind: 1/day (cut 2→1 on 2026-07-23 per user). Keep the proven-best
+    # 1 PM ET slot (10.6k views vs 9 PM's 9.3k — top audience window); drop 9 PM.
+    - cron: "0 12 * * *"    # gen 12:00 UTC → peak 17:00 UTC / 1 PM ET (5h buffer)   [GoM #1 — sole daily run, best audience window]
     # - cron: "0 15 * * *"  # [GoM #2 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day (quality>quantity). Keep proven 1 PM (10.6k) + 9 PM (9.3k).
-    - cron: "0 19 * * *"    # gen 19:00 UTC → peak 01:00 UTC / 9 PM ET (6h buffer)   [GoM #3]
+    # - cron: "0 19 * * *"  # [GoM #3 / 9 PM ET] DROPPED 2026-07-23 — GoM cut to 1/day, keep proven-best 1 PM only.
     # Money Neurons (MN — US money-psychology): 3/day, big buffer → publishAt peaks.
     # Gens staggered from GoM minutes + ≥3h apart same-niche → no collision / no dup.
     # - cron: "25 12 * * *"   # [MN #1] PAUSED 2026-07-05 — moneurons cut to 1/day (2 subs, finance niche gatekept)
@@ -275,7 +278,8 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "42 16 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "42 18 * * *" ]; then
+            # TimeDecoders (sole daily run) — gen 18:42 UTC; go-live 00:00 UTC / 8 PM ET PRIME.
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT

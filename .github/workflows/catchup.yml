@@ -4,12 +4,13 @@
 #
 # Recovers any slot whose primary generation cron lagged/skipped. Each run sits a
 # few hours AFTER its target gen (so it never races a merely-lagged primary) and
-# ~1.5h BEFORE that slot's go-live peak, so a recovered GoM reel still hits its
+# ~1.5h BEFORE that slot's go-live peak, so a recovered reel still hits its
 # OWN peak (SOP G3 — "no missed slots"). Day-boundary safe (last_published
-# timestamps), so the 23:30 run correctly recovers the 19:00→01:00 GoM slot.
-#   15:30 → GoM#1 (gen 12:00, peak 17:00)
-#   19:30 → GoM#2 (gen 15:00, peak 21:00) + mantra(15:32) + ancient(15:37/16:42) + itihaas(16:00)
-#   23:30 → GoM#3 (gen 19:00, peak 01:00 next day)
+# timestamps), so the 23:30 run correctly recovers the TD 18:42→00:00 slot.
+# As of 2026-07-23 GoM and TD are each 1/day (see run_catchup.py SLOTS):
+#   15:30 → GoM (gen 12:00, peak 17:00 / 1 PM ET)
+#   23:30 → TD  (gen 18:42, go-live 00:00 next day / 8 PM ET PRIME)
+#   19:30 → backstop sweep (no dedicated slot; harmless no-op if all delivered)
 #   12:00 Sun → bhajan (gen 10:00, peak 13:30) — recover before its Sunday go-live
 name: Catch-up (recover missed posts)
 
