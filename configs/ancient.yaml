@@ -218,6 +218,10 @@ publish:
   privacy: public
   youtube: true
   facebook_make: true     # AUTO FB via Make.com (Cloudinary→webhook, page from FB_PAGE_ID_ANCIENT). Bypasses flagged dev-app.
+  facebook_make_scheduled: true  # 2026-07-29: route FB through the queue+poster (like GoM) instead of
+                                 # posting at render-time. Fixes the SOP-flagged G2 back-to-back risk (two
+                                 # ancient gens ~65min apart posting immediately), posts at the actual peak,
+                                 # and cuts concurrent Make runs contending on the shared Reel Publisher.
   # FB 2/day (2026-07-08 v2): match 2/day YT so NO video is wasted on FB. Slots
   # 18:00 UTC (2 PM ET) + 00:00 UTC (8 PM ET) are 6h apart → poster's 3h gap guard
   # fires both, never back-to-back. (No facebook_make_slots → all YT slots hit FB.)
