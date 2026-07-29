@@ -47,9 +47,15 @@ def _load() -> dict:
     if not p.exists():
         return {"entries": []}
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
+        data = json.loads(p.read_text(encoding="utf-8"))
     except Exception:
         return {"entries": []}
+    # Guard the shape: a state merge/reset can leave the file as `{}` (or a bare
+    # list), which made every reader crash on data["entries"] (KeyError: 'entries')
+    # so the hourly retry workflow failed on every run and nothing was ever retried.
+    if not isinstance(data, dict) or not isinstance(data.get("entries"), list):
+        return {"entries": []}
+    return data
 
 
 def _save(data: dict) -> None:

@@ -334,6 +334,21 @@ def pick_viral(seed_offset: int = 0) -> dict:
     recent = {h["title"] for h in state["history"] if date.fromisoformat(h["date"]) >= cutoff}
     avail = [t for t in pool if t["title"] not in recent]
 
+    # Also drop topics ALREADY published all-time. A published video lives on YouTube
+    # forever, so run.py's live-YouTube dedup would skip it — but pick_viral's 30-day
+    # window let a >30-day-old published topic re-enter `avail` and get picked (lowest
+    # seq) then skipped EVERY run = a dead slot, no upload. Align the picker with the
+    # permanent published ledger so only genuinely-fresh (never-published) topics are
+    # eligible. Guarded + falls back to the un-filtered list so we never pick nothing.
+    try:
+        from .publish_log import _norm_title, TITLE_LOG_PATH
+        published = set(json.loads(TITLE_LOG_PATH.read_text())) if TITLE_LOG_PATH.exists() else set()
+        never_pub = [t for t in avail if _norm_title(t.get("title", "")) not in published]
+        if never_pub:
+            avail = never_pub
+    except Exception:
+        pass
+
     rng = random.Random(_seed_for_today(seed_offset))
     # STRICT planned sequence (launch ramp): if any available topic carries an
     # integer 'seq', air the LOWEST-seq one first — a deterministic order instead

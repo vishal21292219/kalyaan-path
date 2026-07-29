@@ -46,7 +46,17 @@ def _deep_union(remote, local):
     if isinstance(remote, list) and isinstance(local, list):
         seen, out = set(), []
         for it in remote + local:
-            key = it.get("title") if isinstance(it, dict) and it.get("title") else json.dumps(it, sort_keys=True, ensure_ascii=False)
+            if isinstance(it, dict) and it.get("title"):
+                # viral_history stores the SAME title on MANY dates (one entry per
+                # use). Keying the union on title ALONE collapsed every re-use into
+                # the first entry → topic-history froze at each topic's first-ever
+                # date → pick_viral kept re-picking the same >30-day-old topic, which
+                # run.py then skipped (still live on YouTube) → nothing posted. Include
+                # the date so distinct uses of a title are preserved (title-only keys
+                # remain for date-less list items).
+                key = (it["title"], it["date"]) if it.get("date") else it["title"]
+            else:
+                key = json.dumps(it, sort_keys=True, ensure_ascii=False)
             if key not in seen:
                 seen.add(key); out.append(it)
         return out
