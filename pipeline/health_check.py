@@ -101,6 +101,8 @@ def _recent_failures(hours: int = 8) -> list[str]:
 
 
 def _discord(msg: str) -> None:
+    if (os.getenv("DISCORD_NOTIFY") or "").strip().lower() not in ("1", "true", "on", "yes"):
+        return
     dw = os.getenv("DISCORD_WEBHOOK")
     if not dw:
         return

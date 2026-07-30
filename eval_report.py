@@ -274,6 +274,8 @@ def tg_send(text):
 def discord_send(text):
     """Deliver the report to Discord (Telegram replacement — banned in India).
     Full report as a .txt attachment + chunked inline (Discord 2000-char cap)."""
+    if (os.getenv("DISCORD_NOTIFY") or "").strip().lower() not in ("1", "true", "on", "yes"):
+        print("[eval] Discord notifications disabled (set DISCORD_NOTIFY=1 to re-enable)"); return
     hook = (os.getenv("DISCORD_WEBHOOK") or "").strip()
     if not hook:
         print("[eval] no DISCORD_WEBHOOK"); return

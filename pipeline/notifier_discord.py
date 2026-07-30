@@ -33,7 +33,14 @@ CHANNEL = {
 }
 
 
+# Kill switch (added 2026-07-31): Discord notifications turned OFF globally.
+# Every notifier function routes through _webhook(), so returning None here
+# disables all Discord alerts everywhere — local runs and all GitHub workflows —
+# without touching the DISCORD_WEBHOOK secret. To re-enable, set env
+# DISCORD_NOTIFY=1 (or delete this guard).
 def _webhook() -> str | None:
+    if (os.getenv("DISCORD_NOTIFY") or "").strip().lower() not in ("1", "true", "on", "yes"):
+        return None
     return (os.getenv("DISCORD_WEBHOOK") or "").strip() or None
 
 
