@@ -7,8 +7,12 @@
 name: Anhoni Daily
 
 on:
-  schedule:
-    - cron: "45 15 * * *"   # 21:15 IST start → posts ~9:30 PM IST (prime suspense window)
+  # PAUSED 2026-07-30: near-zero traction (0–2 views/video, 2 subs over ~13 videos).
+  # Daily auto-post stopped to halt zero-return spend. Manual runs still available
+  # via the "Run workflow" button. Re-enable by uncommenting the schedule below once
+  # a differentiated format/angle is ready (or after the manual-post distribution test).
+  # schedule:
+  #   - cron: "45 15 * * *"   # 21:15 IST start → posts ~9:30 PM IST (prime suspense window)
   workflow_dispatch:         # manual "Run workflow" button
     inputs:
       dry_run:
