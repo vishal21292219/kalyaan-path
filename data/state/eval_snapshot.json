@@ -1,15 +1,15 @@
 {
- "date": "27 Jul 2026",
+ "date": "03 Aug 2026",
  "channels": {
   "KalyaanPath": {
-   "subs": 45,
-   "views": 5423,
+   "subs": 46,
+   "views": 5438,
    "videoCount": 52
   },
   "TimeDecoders": {
-   "subs": 201,
-   "views": 29884,
-   "videoCount": 101
+   "subs": 227,
+   "views": 30063,
+   "videoCount": 106
   },
   "Itihaasvani": {
    "subs": null,
@@ -28,8 +28,8 @@
   },
   "Lakeerein": {
    "subs": 2,
-   "views": 23,
-   "videoCount": 16
+   "views": 28,
+   "videoCount": 19
   }
  }
 }
