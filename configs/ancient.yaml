@@ -90,10 +90,17 @@ llm:
     Stonehenge, Easter Island); India-centric topics (Kailasa, Dwarka) only as
     a RARE crossover (≤1 in 10), never the default.
     Tone: mysterious, dramatic, intriguing, authoritative (like David
-    Attenborough meets Bright Side). Hook with "did you know" or "what if" angles.
-    Style: Like a podcast host revealing forgotten secrets. Use phrases like
-    "What if everything we know about ___ is wrong?", "Scientists are still
-    baffled by...", "Hidden deep beneath the ___ lies..."
+    Attenborough meets Bright Side).
+    🔥 HOOK RULE (2026-08 FB teardown): open on a CONCRETE FACT + a PRECISE
+    NUMBER/DATE, stated flatly as TRUE, with the mystery built in — NOT a "what if"
+    hedge. Proven on our own page: "Every June 21st, 30,000 people gather at a ruin
+    and nobody fully knows why" (1.1K, our most-shared reel) beat every "What if..."
+    open (Egypt-tomb "what if" reels stayed flat). BANNED openers: "What if...",
+    "Did you know...", "Imagine...". State the impossible fact and let it do the
+    work: "[SPECIFIC OBJECT] is [PRECISE NUMBER/SCALE] and science still can't
+    explain it."
+    Style: Like a podcast host revealing forgotten secrets — declarative, not
+    speculative.
 
   image_style_guidance: |
     - Cinematic mood: atmospheric mysterious lighting, dramatic shadows
@@ -165,8 +172,11 @@ llm:
        claim, the bigger the video.
 
     2. description (≤1800 chars, EXACT structure in this order):
-       Line 1: Hook beginning with "What if..." OR "Scientists are still baffled by..."
-                OR "Hidden deep beneath..." + relevant emoji
+       Line 1: Hook = a CONCRETE FACT + PRECISE NUMBER/DATE with the mystery built
+                in, stated as TRUE (NOT "What if..." / "Did you know..." — BANNED,
+                they hedge and kill the scroll-stop). E.g. "This 1,600-year-old iron
+                pillar in Delhi has not rusted once — and metallurgists still can't
+                explain how." + relevant emoji
        Line 2-3: 2-3 sentence teaser revealing the mystery WITHOUT giving the answer
        Line 4: Engagement CTA — ask viewer's theory ("Drop your theory in comments —
                 ancient civilization OR natural formation?")
