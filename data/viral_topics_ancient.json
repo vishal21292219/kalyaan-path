@@ -2,122 +2,122 @@
  "_note": "Fresh viral topic pool for TimeDecoders. pick_viral() rotates with recency avoidance. query = Pexels footage search term.",
  "topics": [
   {
-   "seq": -20,
+   "seq": -10,
    "title": "Oumuamua: The Interstellar Object That Sped Up On Its Own",
    "query": "oumuamua interstellar object cosmic space",
    "hook": "In 2017 a cigar-shaped object tumbled through our solar system from another star — then accelerated as it left, with no engine, no tail, no explanation. A Harvard astronomer said the numbers only make sense one way.",
    "weight": 6
   },
   {
-   "seq": -19,
+   "seq": -9,
    "title": "The WOW! Signal: 72 Seconds From Space That Never Repeated",
    "query": "wow signal radio telescope deep space",
    "hook": "In 1977 a telescope caught a signal from deep space so strong the astronomer circled it and wrote one word: Wow. It lasted 72 seconds, came from a starless patch of sky, and has never been heard again."
   },
   {
-   "seq": -18,
+   "seq": -8,
    "title": "The Star That's Older Than the Universe Itself",
    "query": "methuselah star ancient cosmic space",
    "hook": "A star 190 light-years away measures 14.5 billion years old — older than the universe that supposedly made it. Either our science is broken, or this star should not exist.",
    "weight": 6
   },
   {
-   "seq": -17,
+   "seq": -7,
    "title": "The Planet Made of Diamond, Twice the Size of Earth",
    "query": "diamond planet 55 cancri cosmic space",
    "hook": "Forty light-years away orbits a world whose surface may be crystallized carbon — a planet that could be one-third pure diamond, worth more than every economy on Earth combined.",
    "weight": 6
   },
   {
-   "seq": -16,
+   "seq": -6,
    "title": "The Cold Spot: A Hole in the Universe 1.8 Billion Light-Years Wide",
    "query": "cmb cold spot supervoid universe cosmic",
    "hook": "In one direction of the sky lies a region so vast, so empty and so cold it should not be possible. Some scientists believe it is a scar — the mark where our universe collided with another.",
    "weight": 6
   },
   {
-   "seq": -15,
+   "seq": -5,
    "title": "Tabby's Star: The Light That Dims Like Something's Blocking It",
    "query": "tabbys star boyajian dimming cosmic space",
    "hook": "One star flickers in a pattern no natural object explains — dimming by 22 percent at random, as if something enormous orbits it. For a while, even scientists could not rule out a structure built by someone.",
    "weight": 6
   },
   {
-   "seq": -14,
+   "seq": -4,
    "title": "The Great Attractor: Something Is Pulling Our Galaxy Toward It",
    "query": "great attractor galaxy gravity cosmic space",
    "hook": "Our entire galaxy is being dragged through space at over a million miles per hour toward a single point — and it hides behind the Milky Way, so we cannot see what is pulling us in.",
    "weight": 6
   },
   {
-   "seq": -13,
+   "seq": -3,
    "title": "The Signal From Space That Repeats Every 157 Days",
    "query": "fast radio burst repeating signal cosmic space",
    "hook": "A blast of radio energy from 3 billion light-years away arrives on a schedule — every 157 days, like clockwork. In a fraction of a second it unleashes more energy than the Sun makes in years. Nobody knows the source.",
    "weight": 6
   },
   {
-   "seq": -11,
+   "seq": -20,
    "title": "Damascus Steel: A Blade Modern Science Still Can't Recreate",
    "query": "damascus steel blade pattern ancient",
    "hook": "Its blades could split a falling hair and never shatter. The recipe was lost three centuries ago — and with all our technology, we still cannot reproduce it.",
    "weight": 6
   },
   {
-   "seq": -9,
+   "seq": -19,
    "title": "The Nimrud Lens: Ground Glass 3,000 Years Before Telescopes",
    "query": "nimrud lens rock crystal assyria",
    "hook": "Three thousand years ago someone in Assyria ground rock crystal into a near-perfect lens — millennia before the telescope was supposedly invented."
   },
   {
-   "seq": -8,
+   "seq": -18,
    "title": "Ulfberht Swords: Viking Steel 800 Years Ahead of Its Time",
    "query": "ulfberht viking sword steel",
    "hook": "Viking blades stamped with one name were made of steel so pure it needed furnaces over 1,600 degrees — a heat Europe would not reach for another 800 years.",
    "weight": 6
   },
   {
-   "seq": -7,
+   "seq": -17,
    "title": "Vitrified Forts: Ancient Walls Melted by a Heat We Can't Match",
    "query": "vitrified fort melted stone scotland",
    "hook": "Across Scotland and Europe, ancient stone walls were melted until the rock fused like glass. It takes over a thousand degrees to do this. No one knows how — or why."
   },
   {
-   "seq": -6,
+   "seq": -16,
    "title": "The Longyou Caves: Millions of Tool Marks, No Record Who Carved Them",
    "query": "longyou caves carved rock china",
    "hook": "Carved by hand from solid rock, covered in millions of identical chisel marks, vast enough to swallow buildings — and not one historical record says who made them.",
    "weight": 6
   },
   {
-   "seq": -5,
+   "seq": -15,
    "title": "The Nebra Sky Disc: The Oldest Map of the Stars, 3,600 Years Old",
    "query": "nebra sky disc bronze gold stars",
    "hook": "A 3,600-year-old bronze disc inlaid with gold stars — the oldest known map of the sky, made by a people we assumed could never chart the heavens.",
    "weight": 6
   },
   {
-   "seq": -4,
+   "seq": -14,
    "title": "The Phaistos Disc: A Printed Code No One Has Ever Cracked",
    "query": "phaistos disc clay symbols crete",
    "hook": "A clay disc stamped with 241 symbols using movable type — three thousand years before the printing press. And no one has ever been able to read it.",
    "weight": 6
   },
   {
-   "seq": -3,
+   "seq": -13,
    "title": "Klerksdorp Spheres: Grooved Metal Balls in 3-Billion-Year-Old Rock",
    "query": "klerksdorp spheres metallic grooved",
    "hook": "Miners in South Africa keep pulling out perfect metallic spheres, grooved around the middle, embedded in rock nearly three billion years old."
   },
   {
-   "seq": -2,
+   "seq": -12,
    "title": "The Dendera Light: A Temple Carving That Looks Like a Lightbulb",
    "query": "dendera temple carving egypt light",
    "hook": "On the wall of an ancient temple is a carving that looks unmistakably like a giant lightbulb, wires and all. The argument over what it really shows has never ended.",
    "weight": 6
   },
   {
-   "seq": -1,
+   "seq": -11,
    "title": "The Sabu Disc: A 5,000-Year-Old Stone Wheel That Shouldn't Exist",
    "query": "sabu disc stone egypt tri-lobed",
    "hook": "Buried in a 5,000-year-old tomb was a fragile stone disc carved into a shape no one can explain — too thin, too precise, and useless for anything we know of."
