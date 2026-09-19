@@ -590,6 +590,17 @@ def _claude(system: str, user: str, model: str) -> str:
         f"block types={[getattr(b, 'type', '?') for b in resp.content]})")
 
 
+# Third-leg fallback model. Groq DECOMMISSIONS models without notice and a
+# retired id returns HTTP 404, not a clear error — so even once GROQ_API_KEY was
+# set on 2026-09-19, the old hardcoded "llama-3.3-70b-versatile" still 404'd and
+# the leg stayed dead. Verified live against /v1/models on 2026-09-19; the
+# alternates below also passed the same json_object round-trip that day.
+# If this 404s, run: curl -H "Authorization: Bearer $GROQ_API_KEY" \
+#   https://api.groq.com/openai/v1/models   and pick a current id.
+# Alternates that worked: qwen/qwen3.8-27b, openai/gpt-oss-20b
+GROQ_MODEL = "openai/gpt-oss-120b"
+
+
 def _groq(system: str, user: str, model: str) -> str:
     import requests
     api_key = os.getenv("GROQ_API_KEY")
@@ -599,7 +610,7 @@ def _groq(system: str, user: str, model: str) -> str:
         "https://api.groq.com/openai/v1/chat/completions",
         headers={"Authorization": f"Bearer {api_key}"},
         json={
-            "model": model or "llama-3.3-70b-versatile",
+            "model": model or GROQ_MODEL,
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
@@ -772,7 +783,7 @@ def write_script(topic: dict, context: str, long_form: bool = False,
                   "Set the GitHub secret to restore the third leg of the chain.")
         if os.getenv("GROQ_API_KEY"):
             try:
-                groq_model = model if provider == "groq" else "llama-3.3-70b-versatile"
+                groq_model = model if provider == "groq" else GROQ_MODEL
                 return _groq(system, user, groq_model)
             except Exception as e:
                 errs.append(f"groq: {type(e).__name__}: {e}")
@@ -924,7 +935,7 @@ def _try_chain_repair(system: str, user: str, provider: str, model: str) -> str:
         except Exception:
             pass
     if os.getenv("GROQ_API_KEY"):
-        return _groq(system, user, "llama-3.3-70b-versatile")
+        return _groq(system, user, GROQ_MODEL)
     raise RuntimeError("No LLM provider available for visual repair")
 
 

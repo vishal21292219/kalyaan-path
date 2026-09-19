@@ -254,8 +254,8 @@ Output ONLY a JSON array of {n_scenes} prompt strings (no markdown fences):
         text = resp.text.strip()
     except Exception as e:
         print(f"[bhajan] Gemini storyboard failed ({type(e).__name__}) — trying Claude/Groq")
-        from pipeline.script_writer import _claude, _groq
-        for fn, mdl in ((_claude, "claude-sonnet-4-6"), (_groq, "llama-3.3-70b-versatile")):
+        from pipeline.script_writer import _claude, _groq, GROQ_MODEL
+        for fn, mdl in ((_claude, "claude-sonnet-4-6"), (_groq, GROQ_MODEL)):
             try:
                 text = fn(persona, user, mdl)
                 print(f"[bhajan] storyboard via {fn.__name__} fallback")
