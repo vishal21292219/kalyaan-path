@@ -572,7 +572,22 @@ def _claude(system: str, user: str, model: str) -> str:
         system=system,
         messages=[{"role": "user", "content": user}],
     )
-    return resp.content[0].text
+    # content is a LIST OF BLOCKS, not "text at index 0". On models where thinking
+    # is on by default (Sonnet 5, Opus 5 — unlike Sonnet 4.6) content[0] is a
+    # ThinkingBlock, and `content[0].text` raises AttributeError → the run falls
+    # through to Gemini, silently re-creating the very outage this file fixes.
+    # Caught live on 2026-09-19 the same day, against the real API. Always select
+    # the text block by type.
+    if getattr(resp, "stop_reason", None) == "refusal":
+        det = getattr(resp, "stop_details", None)
+        raise RuntimeError(f"Claude refused the request (category="
+                           f"{getattr(det, 'category', None)})")
+    for block in resp.content:
+        if getattr(block, "type", None) == "text":
+            return block.text
+    raise RuntimeError(
+        f"Claude returned no text block (stop_reason={getattr(resp, 'stop_reason', None)}, "
+        f"block types={[getattr(b, 'type', '?') for b in resp.content]})")
 
 
 def _groq(system: str, user: str, model: str) -> str:
