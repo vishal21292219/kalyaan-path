@@ -219,7 +219,7 @@ def call_claude(system: str, user: str, model: str) -> str:
     resp = client.messages.create(
         model=model,
         max_tokens=4096,
-        temperature=0.7,
+        # anthropic SDK 1.x removed `temperature` from messages.create()
         system=system,
         messages=[{"role": "user", "content": user}],
     )

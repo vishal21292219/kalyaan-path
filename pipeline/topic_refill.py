@@ -123,11 +123,28 @@ def refill(niche: str) -> int:
     want = min(TARGET_FRESH - fresh + 5, MAX_PER_RUN)
     gen = _generate(niche, want, {t.get("title", "") for t in pool})
     added = 0
+    # 2026-09-19 AUDIT — this filter was exact-title only, and the "don't rephrase
+    # these" instruction to the LLM was doing all the real work. It wasn't enough:
+    # the live pools had ~86 (GoM) and ~6 (TD) internal near-duplicate pairs, which
+    # is WHY duplicates reached YouTube — exact-title dedup downstream can never
+    # catch two pool entries describing the same subject in different words.
+    # Reject rephrasings at the source instead, against the pool AND what we've
+    # just added this run.
+    from .topic_generator import _too_similar
+    titles = [t.get("title", "") for t in pool]
+    skipped_dup = 0
     for t in gen:
-        if t["title"].lower() not in have and len(t["hook"]) >= 20:
-            pool.append({"title": t["title"], "hook": t["hook"]})
-            have.add(t["title"].lower())
-            added += 1
+        if t["title"].lower() in have or len(t["hook"]) < 20:
+            continue
+        if _too_similar(t["title"], titles):
+            skipped_dup += 1
+            continue
+        pool.append({"title": t["title"], "hook": t["hook"]})
+        have.add(t["title"].lower())
+        titles.append(t["title"])
+        added += 1
+    if skipped_dup:
+        print(f"[refill] {niche}: rejected {skipped_dup} near-duplicate rephrasing(s)")
     data["topics"] = pool
     vf.write_text(json.dumps(data, ensure_ascii=False, indent=2))
     print(f"[refill] {niche}: +{added} new topics → {len(pool)} total")

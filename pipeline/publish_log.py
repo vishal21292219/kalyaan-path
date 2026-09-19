@@ -35,7 +35,13 @@ _KEEP_DAYS = 10
 # across days (the YouTube dups: Stonehenge ×7, Overthinking ×2). This ledger is
 # keyed by the normalised TOPIC title so those are caught too.
 TITLE_LOG_PATH = ROOT / "data" / "state" / "published_titles.json"
-_TITLE_KEEP_DAYS = 12
+# 2026-09-19 audit: this was 12 days, but pick_viral treats it as the "published
+# all-time" ledger and its own recency window is 30 days — so the ledger expired
+# 18 days BEFORE the window it was meant to outlast, and did nothing. 120 days at
+# 2 uploads/day is ~240 entries; the file stays trivially small. This is what
+# stopped "Why Every Ancient Culture Built Pyramids" (01 Jun) re-airing on 14 Sep
+# for 4 views.
+_TITLE_KEEP_DAYS = 120
 
 
 def slot_key(niche: str, kind: str, seed: int = 0) -> str:

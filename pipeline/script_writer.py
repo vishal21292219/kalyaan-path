@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 
 from dotenv import load_dotenv
 
@@ -474,12 +475,20 @@ above — a tight reel keeps retention; a long slow one gets swiped):
     variety_block = ""
     if niche == "ancient" and not long_form:
         import hashlib as _hl
+        # 2026-09-19 AUDIT — two styles were DELETED here because they contradicted
+        # configs/ancient.yaml's own hook rule (commit d9e0bbd, 08 Aug: "ban 'what
+        # if' hooks, mandate number-first factual open") and this MANDATORY block
+        # was overriding it. Measured on the last 25 TD Facebook reels:
+        #   NUMBER-FIRST          n=3  median 189 views
+        #   AUTHORITY BLINDSIDED  n=6  median  84
+        #   EERIE QUESTION (was)  n=8  median  38   ← most-used, worst-but-one
+        #   DIRECT CHALLENGE(was) n=3  median  37   ← "Everything you were taught…" ×3
+        # The two banned styles accounted for 44% of output at ~1/5 the reach of
+        # the mandated one. Do not re-add them; _HOOK_BANNED below enforces it.
         _styles = [
             "IN MEDIA RES — open mid-scene at the most dramatic second, no setup ('The torch went out. Then they saw it.').",
             "SHOCKING NUMBER — lead with one hard stat that breaks the brain ('11,000 years old. Built before the wheel, before writing.').",
-            "DIRECT CHALLENGE — attack the viewer's assumption ('Everything you were taught about this is a lie.').",
             "AUTHORITY BLINDSIDED — experts who couldn't explain it ('They scanned beneath it. What came back made no sense.').",
-            "EERIE QUESTION — one unsettling question, no answer yet ('What if an entire city vanished in a single night?').",
             "SENSORY COLD-OPEN — drop them into the place ('Pitch black, 200 feet down, a door sealed for 1,500 years.').",
             "REVERSE REVEAL — state the bizarre result first, explain how second ('This 2,000-year-old metal still hasn't rusted. Nobody can copy it.').",
         ]
@@ -488,6 +497,9 @@ above — a tight reel keeps retention; a long slow one gets swiped):
             f"\nOPENING STYLE for THIS video (MANDATORY — vary structure so no two "
             f"reels feel templated): {_styles[_i]}\n"
             "Vary the fact-reveal order and sentence rhythm vs a typical video too.\n"
+            "HARD BAN on the first spoken line AND the description's first line: never "
+            "open with 'What if', 'Did you know', 'Imagine', 'Have you ever', 'Everything "
+            "you were taught', or any question. State the impossible FACT with its number.\n"
         )
 
     return f"""Topic: {topic['title']}
@@ -503,15 +515,41 @@ Reference facts (from Wikipedia, may be long — distill the essentials):
 Generate {n_images} visual prompts. Return ONLY the JSON object."""
 
 
-def _gemini(system: str, user: str, model: str) -> str:
+# Transient Gemini failures that are worth waiting out rather than failing the
+# whole run. The FREE tier is 5 requests/min/model — a burst (primary run +
+# catch-up, or the JSON-regeneration loop) trips it instantly and the error even
+# tells us how long to wait. Before this retry, 21 daily-reels runs died on a 429
+# that would have cleared in <60s (audit 2026-09-19).
+_GEMINI_TRANSIENT = ("429", "resourceexhausted", "quota", "503", "504",
+                     "deadline", "unavailable", "overloaded", "high demand")
+
+
+def _gemini(system: str, user: str, model: str, attempts: int = 3) -> str:
     import google.generativeai as genai
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY not set in .env")
     genai.configure(api_key=api_key)
     m = genai.GenerativeModel(model, system_instruction=system)
-    resp = m.generate_content(user, generation_config={"temperature": 0.85})
-    return resp.text
+    last = None
+    for i in range(attempts):
+        try:
+            resp = m.generate_content(user, generation_config={"temperature": 0.85})
+            return resp.text
+        except Exception as e:
+            last = e
+            msg = f"{type(e).__name__}: {e}".lower()
+            if not any(t in msg for t in _GEMINI_TRANSIENT) or i == attempts - 1:
+                raise
+            # Honour the server's own retry_delay when it gives one, else backoff.
+            wait = 65.0
+            mm = re.search(r"retry in ([0-9.]+)s", msg) or re.search(r"seconds:\s*(\d+)", msg)
+            if mm:
+                wait = min(float(mm.group(1)) + 5, 120)
+            print(f"[script_writer] gemini transient ({type(e).__name__}) — "
+                  f"retry {i + 1}/{attempts - 1} in {wait:.0f}s")
+            time.sleep(wait)
+    raise last
 
 
 def _claude(system: str, user: str, model: str) -> str:
@@ -520,10 +558,17 @@ def _claude(system: str, user: str, model: str) -> str:
     if not api_key:
         raise RuntimeError("ANTHROPIC_API_KEY not set in .env")
     client = anthropic.Anthropic(api_key=api_key)
+    # NOTE: anthropic SDK 1.x removed `temperature` from messages.create().
+    # Passing it raises TypeError, which silently demoted EVERY GoM + TD script
+    # to the Gemini fallback from 2026-08-23 → 09-19 (28 days, first seen in run
+    # 32639932650; audit 2026-09-19 dated it from the run logs). Do not re-add it.
+    # requirements.txt caps `anthropic<2` so the next major can't break this again.
+    #
+    # max_tokens: 4096 truncated long-form (30 scenes → unparseable JSON, which
+    # burned all 3 regeneration attempts). 16000 is the SDK-safe non-streaming cap.
     resp = client.messages.create(
-        model=model or "claude-sonnet-4-6",
-        max_tokens=4096,
-        temperature=0.85,
+        model=model or "claude-sonnet-5",
+        max_tokens=16000,
         system=system,
         messages=[{"role": "user", "content": user}],
     )
@@ -603,6 +648,56 @@ def _extract_json(text: str) -> dict:
         return _loads_lenient(candidate)  # if still bad, raises → caller retries
 
 
+# Niches whose config bans question//cliché openers. Keyed by niche so another
+# channel can opt in without touching the validator. TD's ban: configs/ancient.yaml
+# HOOK RULE (commit d9e0bbd) — number-first factual open, never a "what if" hedge.
+_HOOK_BANNED = {
+    "ancient": (
+        "what if", "did you know", "imagine ", "imagine,", "have you ever",
+        "everything you were taught", "what would happen if", "ever wondered",
+    ),
+}
+# Niches where the opener must not be a QUESTION at all (configs/ancient.yaml:
+# "State the impossible fact and let it do the work"). The shipped misses were
+# not only "What if…" — "What kind of cosmic fire…" (9 views), "What lies behind
+# a 1,500-year-old door" (20), "Who built a tower in Rhode Island" (34) and "How
+# did four continents build the same thing" (58) all slipped a phrase-list check.
+_HOOK_NO_QUESTION = {"ancient"}
+
+
+def _hook_violation(script: dict, niche: str) -> str | None:
+    """Return the banned phrase this script opens with, or None if it's clean.
+
+    Checks the three surfaces a viewer actually meets first: the spoken hook, the
+    first body line (the voiceover's real opener) and the first line of the
+    description (which becomes the Facebook reel caption verbatim)."""
+    key = (niche or "").lower()
+    banned = _HOOK_BANNED.get(key)
+    no_question = key in _HOOK_NO_QUESTION
+    if not banned and not no_question:
+        return None
+    body = script.get("body") or []
+    surfaces = [
+        script.get("hook") or "",
+        body[0] if body else "",
+        (script.get("description") or "").strip().split("\n")[0],
+    ]
+    for s in surfaces:
+        # Strip leading emoji/punctuation so "🗿 What if…" is still caught.
+        t = re.sub(r"^[^a-zA-Z]+", "", str(s)).lower().lstrip()
+        if not t:
+            continue
+        for phrase in (banned or ()):
+            if t.startswith(phrase):
+                return phrase.strip()
+        # The FIRST sentence being a question is itself the violation.
+        if no_question:
+            first = re.split(r"(?<=[.!?])\s", t, maxsplit=1)[0].strip()
+            if first.endswith("?"):
+                return f"question opener ({first[:40]}…)"
+    return None
+
+
 def write_script(topic: dict, context: str, long_form: bool = False,
                  prefer_free: bool = False) -> dict:
     cfg = load_config()
@@ -630,27 +725,45 @@ def write_script(topic: dict, context: str, long_form: bool = False,
         Used by the nightly pregen draft so it never touches the paid stack.
         """
         errs = []
-        if not prefer_free and (provider == "claude" or os.getenv("ANTHROPIC_API_KEY")):
+        # A provider skipped for a MISSING KEY used to be invisible — that is how
+        # the Groq third fallback sat dead (empty GROQ_API_KEY secret) while runs
+        # died two providers up. Every skip is now logged and reported in the
+        # final error, so a silent one-legged chain can't happen again.
+        skipped = []
+        if prefer_free:
+            skipped.append("claude (prefer_free)")
+        elif not (provider == "claude" or os.getenv("ANTHROPIC_API_KEY")):
+            skipped.append("claude (no ANTHROPIC_API_KEY)")
+        else:
             try:
-                claude_model = model if provider == "claude" else "claude-sonnet-4-6"
+                claude_model = model if provider == "claude" else "claude-sonnet-5"
                 return _claude(system, user, claude_model)
             except Exception as e:
                 errs.append(f"claude: {type(e).__name__}: {e}")
                 print(f"[script_writer] Claude failed ({errs[-1]}) — falling back")
-        if provider == "gemini" or os.getenv("GEMINI_API_KEY"):
+        if not (provider == "gemini" or os.getenv("GEMINI_API_KEY")):
+            skipped.append("gemini (no GEMINI_API_KEY)")
+        else:
             try:
                 gemini_model = model if provider == "gemini" else "gemini-flash-latest"
                 return _gemini(system, user, gemini_model)
             except Exception as e:
                 errs.append(f"gemini: {type(e).__name__}: {e}")
                 print(f"[script_writer] Gemini failed ({errs[-1]}) — falling back")
+        if not os.getenv("GROQ_API_KEY"):
+            skipped.append("groq (no GROQ_API_KEY)")
+            errs.append("groq: SKIPPED — GROQ_API_KEY is unset/empty")
+            print("[script_writer] ⚠ Groq fallback UNAVAILABLE — GROQ_API_KEY is empty. "
+                  "Set the GitHub secret to restore the third leg of the chain.")
         if os.getenv("GROQ_API_KEY"):
             try:
                 groq_model = model if provider == "groq" else "llama-3.3-70b-versatile"
                 return _groq(system, user, groq_model)
             except Exception as e:
                 errs.append(f"groq: {type(e).__name__}: {e}")
-        raise RuntimeError(f"All LLM providers failed: {' | '.join(errs)}")
+        raise RuntimeError(
+            f"All LLM providers failed: {' | '.join(errs)}"
+            + (f" || skipped: {', '.join(skipped)}" if skipped else ""))
 
     # Generate + parse, retrying the whole LLM call if the JSON won't parse
     # (malformed JSON is a flaky one-off — a fresh generation almost always fixes
@@ -687,6 +800,34 @@ def write_script(topic: dict, context: str, long_form: bool = False,
             last_err = e
     if script is None:
         raise RuntimeError(f"Script JSON unparseable after 3 attempts + repair: {last_err}")
+
+    # ── HOOK BAN ENFORCEMENT (2026-09-19 audit) ──────────────────────────────
+    # An instruction without a validator is a suggestion: configs/ancient.yaml has
+    # banned "What if…" opens since 08 Aug and 32% of shipped TD reels still used
+    # them. Regenerate on violation, then fail OPEN (a weak hook beats no upload).
+    if not long_form:
+        bad = _hook_violation(script, niche)
+        for fix_attempt in range(2):
+            if not bad:
+                break
+            print(f"[script_writer] ⚠ banned opener for niche '{niche}': {bad} — regenerating "
+                  f"({fix_attempt + 1}/2)")
+            user = user + (
+                "\n\nREJECTED — your previous opening line started with a BANNED pattern "
+                f"({bad}). Rewrite so the FIRST spoken line (body[0]/hook) AND the first "
+                "line of `description` both open on a concrete stated FACT with a precise "
+                "number, date or measurement. Never a question, never 'What if', 'Did you "
+                "know', 'Imagine', 'Have you ever', 'Everything you were taught'."
+            )
+            try:
+                script = _extract_json(_try_chain())
+                bad = _hook_violation(script, niche)
+            except Exception as e:
+                print(f"[script_writer] hook-fix regeneration failed ({e}) — keeping previous")
+                break
+        if bad:
+            print(f"[script_writer] ⚠⚠ SHIPPING WITH BANNED OPENER ({bad}) — "
+                  f"2 regenerations did not clear it. Topic: {topic.get('title', '')!r}")
 
     # Enforce 1:1 visual-body sync for Shorts (biggest quality lever).
     # If LLM returned mismatched counts, pad or truncate visuals to match body.
