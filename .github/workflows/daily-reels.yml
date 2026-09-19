@@ -39,7 +39,11 @@ on:
     # user — one reel/day at the single best audience window). Keep the 8 PM ET
     # PRIME slot (evening = peak US-English engagement); drop the 2 PM slot.
     # - cron: "37 15 * * *"   # [TD #1 / 2 PM ET] DROPPED 2026-07-23 — TD cut to 1/day, keep 8 PM PRIME only.
-    - cron: "42 18 * * *"   # TimeDecoders (seed2, go-live 00:00 UTC / 8 PM ET PRIME) — sole daily TD run, best audience window.
+    # 2026-09-19 AUDIT — gen moved 18:42 → 15:00 UTC. Measured GitHub cron lag on
+    # this slot over 21 runs: MEDIAN 156 min, MAX 259 min. At max lag the run was
+    # starting 23:01 and finishing ~14 min before its 00:00 go-live. 15:00 gives a
+    # 9h buffer. Go-live (publishAt 00:00 UTC / 8 PM ET PRIME) is UNCHANGED.
+    - cron: "0 15 * * *"    # TimeDecoders (seed2, go-live 00:00 UTC / 8 PM ET PRIME) — sole daily TD run, best audience window.
     # - cron: "45 17 * * *"  # [TD #3 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day. Keep 2 PM (seed1) + 8 PM PRIME (seed2).
     # GodsOfTheMind (English god-psychology): 3/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.
@@ -51,7 +55,14 @@ on:
     # is the backstop if a whole gen run is dropped — recovers BEFORE the peak.
     # GodsOfTheMind: 1/day (cut 2→1 on 2026-07-23 per user). Keep the proven-best
     # 1 PM ET slot (10.6k views vs 9 PM's 9.3k — top audience window); drop 9 PM.
-    - cron: "0 12 * * *"    # gen 12:00 UTC → peak 17:00 UTC / 1 PM ET (5h buffer)   [GoM #1 — sole daily run, best audience window]
+    # 2026-09-19 AUDIT — the "5h buffer" above was fiction. Measured lag on THIS
+    # slot over 18 runs: MEDIAN 235 min, MAX 319 min — i.e. the median run had ~65
+    # min left to render before its 17:00 peak, and at max lag it STARTED after the
+    # peak had already passed. Worse, it overlapped the 15:30 UTC catch-up sweep:
+    # both grabbed a topic before the primary wrote its marker (Sep 11: 4 picks for
+    # 1 upload). Gen moved 12:00 → 06:00 UTC = 11h buffer and no catch-up overlap.
+    # Go-live (publishAt 17:00 UTC / 1 PM ET) is UNCHANGED.
+    - cron: "0 6 * * *"     # gen 06:00 UTC → peak 17:00 UTC / 1 PM ET (11h buffer)  [GoM #1 — sole daily run, best audience window]
     # - cron: "0 15 * * *"  # [GoM #2 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day (quality>quantity). Keep proven 1 PM (10.6k) + 9 PM (9.3k).
     # - cron: "0 19 * * *"  # [GoM #3 / 9 PM ET] DROPPED 2026-07-23 — GoM cut to 1/day, keep proven-best 1 PM only.
     # Money Neurons (MN — US money-psychology): 3/day, big buffer → publishAt peaks.
@@ -278,8 +289,8 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=1"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "42 18 * * *" ]; then
-            # TimeDecoders (sole daily run) — gen 18:42 UTC; go-live 00:00 UTC / 8 PM ET PRIME.
+          elif [ "${{ github.event.schedule }}" = "0 15 * * *" ]; then
+            # TimeDecoders (sole daily run) — gen 15:00 UTC; go-live 00:00 UTC / 8 PM ET PRIME.
             echo "niche=ancient" >> $GITHUB_OUTPUT
             echo "kind=trending" >> $GITHUB_OUTPUT
             echo "mode=publish"  >> $GITHUB_OUTPUT
@@ -292,20 +303,18 @@ jobs:
             echo "mode=publish"  >> $GITHUB_OUTPUT
             echo "seed=3"        >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 12 * * *" ]; then
-            # GoM #1 — gen 12:00 UTC (5h buffer); YT+FB scheduled to peak 17:00 UTC / 1 PM ET.
+          elif [ "${{ github.event.schedule }}" = "0 6 * * *" ]; then
+            # GoM #1 — gen 06:00 UTC (11h buffer); YT+FB scheduled to peak 17:00 UTC / 1 PM ET.
             echo "niche=godmind"  >> $GITHUB_OUTPUT
             echo "kind=trending"  >> $GITHUB_OUTPUT
             echo "mode=publish"   >> $GITHUB_OUTPUT
             echo "seed=1"         >> $GITHUB_OUTPUT
             echo "long_form=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 15 * * *" ]; then
-            # GoM #2 — gen 15:00 UTC (6h buffer); peak 21:00 UTC / 5 PM ET.
-            echo "niche=godmind"  >> $GITHUB_OUTPUT
-            echo "kind=trending"  >> $GITHUB_OUTPUT
-            echo "mode=publish"   >> $GITHUB_OUTPUT
-            echo "seed=2"         >> $GITHUB_OUTPUT
-            echo "long_form=false" >> $GITHUB_OUTPUT
+          # [GoM #2 / 5 PM ET] matcher REMOVED 2026-09-19: its cron was dropped on
+          # 2026-07-08, and "0 15 * * *" is now the TimeDecoders slot above. Leaving
+          # a second branch on the same cron string was a live routing bug waiting
+          # to happen — the TD slot would have silently published as GoM if anyone
+          # reordered this if/elif chain.
           elif [ "${{ github.event.schedule }}" = "0 19 * * *" ]; then
             # GoM #3 — gen 19:00 UTC (6h buffer); peak 01:00 UTC / 9 PM ET.
             echo "niche=godmind"  >> $GITHUB_OUTPUT

@@ -218,12 +218,18 @@ def call_claude(system: str, user: str, model: str) -> str:
     client = anthropic.Anthropic(api_key=key)
     resp = client.messages.create(
         model=model,
-        max_tokens=4096,
-        temperature=0.7,
+        max_tokens=16000,
+        # anthropic SDK 1.x removed `temperature` from messages.create()
         system=system,
         messages=[{"role": "user", "content": user}],
     )
-    return resp.content[0].text
+    # Select the text block by type — on thinking-by-default models (Sonnet 5,
+    # Opus 5) content[0] is a ThinkingBlock and .text raises AttributeError.
+    for block in resp.content:
+        if getattr(block, "type", None) == "text":
+            return block.text
+    raise RuntimeError(f"Claude returned no text block "
+                       f"(stop_reason={getattr(resp, 'stop_reason', None)})")
 
 
 # --- main -------------------------------------------------------------------

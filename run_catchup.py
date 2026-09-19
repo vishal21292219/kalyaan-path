@@ -27,6 +27,7 @@ load_dotenv(ROOT / ".env")
 
 import run as runner
 from pipeline.publish_log import last_published
+from pipeline.topic_generator import has_active_reservation
 
 # Each entry mirrors a GENERATION cron in daily-reels.yml:
 # (niche, kind, seed, mode, hour_utc, minute_utc, weekday)
@@ -47,9 +48,14 @@ from pipeline.publish_log import last_published
 # catch-up regenerate the very runs we cut).
 # Itihaasvani / KalyaanPath (mantra) / bhajan are HELD → intentionally NOT
 # recovered (leaving them in would make catch-up resurrect held channels daily).
+# 2026-09-19 AUDIT: kept in sync with the gen crons moved earlier that day
+# (GoM 12:00→06:00, TD 18:42→15:00 UTC) to absorb GitHub's measured 2.5-4h cron
+# lag. These hours MUST match daily-reels.yml or catch-up computes the wrong
+# "due" window and either fires early (racing the primary run for a topic) or
+# never fires at all.
 SLOTS = [
-    ("ancient",   "trending", 2, "publish", 18, 42, None),  # cron 42 18 → go-live 00:00 UTC / 8 PM ET PRIME (sole daily TD run)
-    ("godmind",   "trending", 1, "publish", 12,  0, None),  # cron 0 12  → go-live 17:00 UTC / 1 PM ET (sole daily GoM run)
+    ("ancient",   "trending", 2, "publish", 15,  0, None),  # cron 0 15 → go-live 00:00 UTC / 8 PM ET PRIME (sole daily TD run)
+    ("godmind",   "trending", 1, "publish",  6,  0, None),  # cron 0 6  → go-live 17:00 UTC / 1 PM ET (sole daily GoM run)
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled
@@ -107,6 +113,15 @@ def main() -> int:
         lp = last_published(niche, kind, seed)
         if lp is not None and lp >= occ:
             print(f"  ✓ already delivered: {label} (at {lp.isoformat(timespec='minutes')})")
+            continue
+        # IN-FLIGHT GUARD (2026-09-19 audit). The published_log marker is written
+        # only AFTER the upload, so a primary run that is still generating looks
+        # exactly like a missed slot. That is how one GoM day produced 4 topic
+        # picks and 1 upload. An unexpired topic reservation means a run is live.
+        inflight = has_active_reservation(niche)
+        if inflight:
+            print(f"  ⏳ run already in flight for {niche} (holding '{inflight}') — "
+                  f"skipping {label}; next sweep will recover it if it dies")
             continue
         print(f"  ⚠ MISSED → recovering: {label}")
         if args.dry_run:

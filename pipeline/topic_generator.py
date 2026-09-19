@@ -4,7 +4,8 @@ from __future__ import annotations
 import hashlib
 import json
 import random
-from datetime import date, timedelta
+import re
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from .utils import ROOT, load_config, load_topics
@@ -312,6 +313,133 @@ def _viral_state_path(niche: str):
     return ROOT / f"data/state/viral_history_{niche}.json"
 
 
+# ── TOPIC RESERVATION (2026-09-19 audit) ─────────────────────────────────────
+# pick_viral used to append to history at PICK time and persist_state.py commits
+# state with `if: always()` — so a run that died in the script writer still ate
+# its topic permanently. Measured: GoM picked 22 topics 10-19 Sep and published
+# 10 videos; 12 topics were burned with nothing shipped, nine of them entries of
+# the brand-new "Gods Inside You" launch series.
+#
+# Fix: a pick writes a PENDING reservation. run.py confirms it only after the
+# upload succeeds. An unconfirmed reservation EXPIRES after RESERVE_HOURS and the
+# topic returns to the pool. The reservation still blocks a concurrent run (the
+# primary + catch-up collision) for the whole window, so this does not reopen the
+# duplicate-upload hole it was originally guarding.
+#
+# 2h is deliberate: long enough to cover a full generation (~45 min) so a
+# concurrent run can never grab the same topic, short enough that a DEAD run's
+# topic is back in the pool before the next catch-up sweep — so catch-up re-picks
+# the SAME topic and the "Gods Inside You" seq order is preserved rather than
+# skipping a number.
+RESERVE_HOURS = 2
+
+# Words too common across a niche's pool to signal "same topic". Without this,
+# "The Real Meaning of Shiva" and "The Real Meaning of Kali" look identical.
+_DUP_STOP = {
+    "the", "a", "an", "of", "and", "to", "in", "is", "it", "its", "you", "your",
+    "that", "this", "for", "with", "no", "on", "was", "were", "are", "be", "from",
+    "at", "as", "why", "how", "what", "who", "did", "does", "real", "meaning",
+    "inside", "hidden", "secret", "truth", "ancient", "mystery", "mysteries",
+    "shorts", "never", "still", "found", "years", "year", "old",
+    # GoM's series titles share a fixed emotional frame ("You Are Not Afraid of
+    # X", "The Part of You That …"), so these carry no topic signal — without
+    # them, "You Are Not Afraid of Kali" and "…of Yama's Mirror" collide on the
+    # frame alone and the picker would refuse a legitimately different deity.
+    "not", "one", "has", "have", "can", "cant", "will", "just", "like", "into",
+    "about", "every", "part", "thing", "things", "when", "then",
+}
+
+
+def _dup_tokens(title: str) -> set:
+    t = re.sub(r"#\w+", " ", (title or "").lower())
+    t = re.split(r"[—:|·]", t)[0]                     # topic segment, drop subtitle
+    t = re.sub(r"[^a-z0-9\s]+", " ", t)
+    return {w for w in t.split() if len(w) > 2 and w not in _DUP_STOP}
+
+
+def _too_similar(title: str, others, threshold: float = 0.6) -> bool:
+    """True if `title` shares >= threshold of its distinctive words with any of
+    `others` — i.e. it is a rephrasing of something already aired."""
+    a = _dup_tokens(title)
+    if len(a) < 2:
+        return False
+    for o in others:
+        b = _dup_tokens(o)
+        if len(b) < 2:
+            continue
+        shared = a & b
+        # Two distinct shared content words minimum. A single shared word is a
+        # coincidence ("afraid", "stone"); it is not the same topic.
+        if len(shared) < 2:
+            continue
+        if len(shared) / min(len(a), len(b)) >= threshold:
+            return True
+    return False
+
+
+def _safe_day(s):
+    try:
+        return date.fromisoformat(str(s))
+    except Exception:
+        return None
+
+
+def _is_blocking(entry: dict, now: datetime | None = None) -> bool:
+    """True if this history entry should still hide its topic from the picker.
+
+    Confirmed entries (published, or any legacy entry with no `pending` key) always
+    block. A pending reservation blocks only until it expires."""
+    if not entry.get("pending"):
+        return True                       # published, or legacy pre-reservation entry
+    try:
+        at = datetime.fromisoformat(str(entry.get("at")))
+    except Exception:
+        return False                      # malformed reservation → don't let it block
+    now = now or datetime.now(timezone.utc)
+    if at.tzinfo is None:
+        at = at.replace(tzinfo=timezone.utc)
+    return (now - at) < timedelta(hours=RESERVE_HOURS)
+
+
+def has_active_reservation(niche: str) -> str | None:
+    """Title of an UNEXPIRED pending reservation for this niche, else None.
+
+    This is the in-flight signal catch-up needs. Before it, the 15:30 UTC sweep
+    fired while the (cron-lagged) primary run was still generating — neither had
+    written its published_log marker yet, so both picked a topic and only one
+    shipped. Fails OPEN (returns None) so it can never block a real recovery."""
+    try:
+        sp = _viral_state_path(niche)
+        if not sp.exists():
+            return None
+        for h in reversed(json.loads(sp.read_text()).get("history", [])):
+            if h.get("pending") and _is_blocking(h):
+                return h.get("title")
+    except Exception as e:
+        print(f"[topic] reservation check skipped ({type(e).__name__}: {e})")
+    return None
+
+
+def confirm_topic(niche: str, title: str) -> None:
+    """Promote this topic's newest PENDING reservation to confirmed. Called by
+    run.py only after the video actually reached its primary channel. Never
+    raises — a bookkeeping failure must not fail a successful upload."""
+    try:
+        sp = _viral_state_path(niche)
+        if not sp.exists() or not title:
+            return
+        state = json.loads(sp.read_text())
+        for h in reversed(state.get("history", [])):
+            if h.get("title") == title and h.get("pending"):
+                h.pop("pending", None)
+                h.pop("at", None)
+                sp.write_text(json.dumps(state, indent=2, ensure_ascii=False))
+                print(f"[topic] confirmed '{title}' — reservation committed")
+                return
+    except Exception as e:
+        print(f"[topic] confirm_topic skipped ({type(e).__name__}: {e})")
+
+
 def pick_viral(seed_offset: int = 0) -> dict:
     """Pick from the FRESH researched viral-topic pool (data/viral_topics_{niche}.json),
     avoiding anything used in the last 30 days. This is what kills the 'same videos
@@ -331,8 +459,29 @@ def pick_viral(seed_offset: int = 0) -> dict:
     sp.parent.mkdir(parents=True, exist_ok=True)
     state = json.loads(sp.read_text()) if sp.exists() else {"history": []}
     cutoff = date.today() - timedelta(days=30)
-    recent = {h["title"] for h in state["history"] if date.fromisoformat(h["date"]) >= cutoff}
+    recent_entries = [h for h in state["history"]
+                      if _safe_day(h.get("date")) and _safe_day(h["date"]) >= cutoff
+                      and _is_blocking(h)]
+    recent = {h["title"] for h in recent_entries}
     avail = [t for t in pool if t["title"] not in recent]
+
+    # NEAR-DUPLICATE GUARD (2026-09-19 audit). Exact-title dedup could never catch
+    # the real repeats, because the POOL itself holds rephrasings of one subject.
+    # Measured cost on shipped video pairs — the repeat loses ~10x:
+    #   "The Demon Every God Kills Is Inside You" 1018 → "Every Hindu God Kills
+    #    the Same Demon" 93 | Ravana's 10 Heads 963 → 320 | Voynich 646 → 34 |
+    #   Menkaure 359 → 40 | "Something Is Dragging Our Galaxy" 70 → 19 (same day).
+    # Drop any candidate that shares >=60% of its distinctive words with a topic
+    # aired in the window. Guarded + never allowed to empty the pool.
+    try:
+        near = [t for t in avail if not _too_similar(t.get("title", ""), recent)]
+        if near:
+            dropped = len(avail) - len(near)
+            if dropped:
+                print(f"[topic] near-dup guard dropped {dropped} rephrasing(s) of recent topics")
+            avail = near
+    except Exception as e:
+        print(f"[topic] near-dup guard skipped ({type(e).__name__}: {e})")
 
     # Also drop topics ALREADY published all-time. A published video lives on YouTube
     # forever, so run.py's live-YouTube dedup would skip it — but pick_viral's 30-day
@@ -376,9 +525,18 @@ def pick_viral(seed_offset: int = 0) -> dict:
         for h in state["history"]:
             last_used[h["title"]] = h["date"]  # later entries win → most recent date
         chosen = min(pool, key=lambda t: last_used.get(t["title"], "0000-00-00"))
-    state["history"].append({"title": chosen["title"], "date": date.today().isoformat()})
+    # PENDING reservation — confirmed by run.py via confirm_topic() only after the
+    # video actually reaches its primary channel. Expires after RESERVE_HOURS so a
+    # failed run gives the topic back instead of burning it (see RESERVE_HOURS).
+    state["history"].append({
+        "title": chosen["title"],
+        "date": date.today().isoformat(),
+        "pending": True,
+        "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    })
     state["history"] = state["history"][-500:]
     sp.write_text(json.dumps(state, indent=2, ensure_ascii=False))
+    print(f"[topic] reserved '{chosen['title']}' (pending, expires in {RESERVE_HOURS}h)")
 
     return {
         "kind": "viral",

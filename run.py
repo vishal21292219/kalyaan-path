@@ -711,8 +711,14 @@ def main(argv: list[str]) -> int:
     if _delivered:
         try:
             from pipeline.publish_log import mark_published, mark_title_published
+            from pipeline.topic_generator import confirm_topic
             mark_published(args.niche, args.kind, args.seed_offset)
             mark_title_published(topic.get("title", ""))  # topic-dedup ledger → no duplicate uploads
+            # Commit the topic reservation. A run that dies before here leaves the
+            # reservation PENDING, so it expires and the topic returns to the pool
+            # instead of being burned (2026-09-19 audit: 12 GoM topics lost this way
+            # in 10 days, nine of them "Gods Inside You" launch-series entries).
+            confirm_topic(args.niche, topic.get("_original_title") or topic.get("title", ""))
             print(f"[catchup] marked {args.niche}/{args.kind} s{args.seed_offset} as delivered today")
         except Exception:
             traceback.print_exc()
