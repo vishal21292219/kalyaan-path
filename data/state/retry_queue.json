@@ -1,1 +1,18 @@
-{}
+{
+  "entries": [
+    {
+      "id": "ancient_trending_2_auto",
+      "niche": "ancient",
+      "kind": "trending",
+      "topic": "auto",
+      "seed_offset": 2,
+      "mode": "publish",
+      "failed_reason": "GeminiUnavailable: Gemini failed after 5 retries: HTTP 429 — {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a",
+      "attempts": 1,
+      "status": "PENDING",
+      "first_failed_at": "2026-10-11T17:31:44Z",
+      "last_attempted_at": "2026-10-11T17:31:44Z",
+      "next_retry_at": "2026-10-11T18:31:44Z"
+    }
+  ]
+}
