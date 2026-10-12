@@ -8,11 +8,11 @@
       "seed_offset": 2,
       "mode": "publish",
       "failed_reason": "GeminiUnavailable: Gemini failed after 5 retries: HTTP 429 — {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-a",
-      "attempts": 4,
+      "attempts": 5,
       "status": "PERMANENTLY_FAILED",
       "first_failed_at": "2026-10-11T17:31:44Z",
-      "last_attempted_at": "2026-10-11T23:25:00Z",
-      "next_retry_at": "2026-10-12T00:25:00Z"
+      "last_attempted_at": "2026-10-12T02:57:45Z",
+      "next_retry_at": "2026-10-12T03:57:45Z"
     }
   ]
 }
