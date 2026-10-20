@@ -121,7 +121,8 @@ def _pick_generic_for(target_date: date_t, seed_offset: int = 0) -> dict:
         return {"kind": "deity", "title": d["name"], "wiki": d["wiki"], "tags": d.get("tags", [])}
     if bucket == "story" and topics.get("stories"):
         s = rng.choice(topics["stories"])
-        return {"kind": "story", "title": s, "wiki": None, "tags": ["story", "mythology"]}
+        # same fix as topic_generator: this tag reaches the script prompt verbatim
+        return {"kind": "story", "title": s, "wiki": None, "tags": ["story", "sanatan"]}
     if bucket == "shloka" and topics.get("shlokas"):
         s = rng.choice(topics["shlokas"])
         return {"kind": "shloka", "title": s, "wiki": None, "tags": ["shloka", "mantra"]}

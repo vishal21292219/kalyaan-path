@@ -57,7 +57,11 @@ def pick_topic(force: str | None = None, seed_offset: int = 0) -> dict:
         return {"kind": "deity", "title": d["name"], "wiki": d["wiki"], "tags": d["tags"]}
     if bucket == "story":
         s = rng.choice(topics["stories"])
-        return {"kind": "story", "title": s, "wiki": None, "tags": ["story", "mythology"]}
+        # "mythology" was fed straight into the script prompt here (script_writer
+        # builds a "Tags: ..." line from this), while the same prompt tells the
+        # model never to use that word. Priming it with the one banned term was
+        # working against rule #1. 2026-10-21.
+        return {"kind": "story", "title": s, "wiki": None, "tags": ["story", "sanatan"]}
     if bucket == "shloka":
         s = rng.choice(topics["shlokas"])
         return {"kind": "shloka", "title": s, "wiki": None, "tags": ["shloka", "mantra"]}
@@ -230,7 +234,7 @@ def pick_series(seed_offset: int = 0) -> dict:
         "angle": ep.get("angle", ""),
         "footage": bool(ep.get("footage", s.get("footage", False))),
         "wiki": ep.get("wiki") or ep["title"].replace(" ", "_"),
-        "tags": ["series", s["id"], "mythology"],
+        "tags": ["series", s["id"], "sanatan"],
     }
 
 
