@@ -32,7 +32,7 @@ from pipeline.topic_generator import has_active_reservation
 # Each entry mirrors a GENERATION cron in daily-reels.yml:
 # (niche, kind, seed, mode, hour_utc, minute_utc, weekday)
 #   mode: "publish" (auto-YT) or "telegram" (drop)
-#   weekday: None = daily, else Python weekday (Mon=0 .. Sun=6)
+#   weekday: None = daily, one Python weekday (Mon=0 .. Sun=6), or a tuple of them
 # Saturday long-form is intentionally EXCLUDED (heavy/expensive; recover by hand).
 # hour/minute = the GENERATION cron time (UTC). run.py auto-schedules each
 # publish slot's exact go-live via its PUBLISH_TIMES map, so recovered videos
@@ -55,7 +55,7 @@ from pipeline.topic_generator import has_active_reservation
 # never fires at all.
 SLOTS = [
     ("ancient",   "trending", 2, "publish", 15,  0, None),  # cron 0 15 → go-live 00:00 UTC / 8 PM ET PRIME (sole daily TD run)
-    ("godmind",   "trending", 1, "publish",  6,  0, None),  # cron 0 6  → go-live 17:00 UTC / 1 PM ET (sole daily GoM run)
+    ("godmind",   "trending", 1, "publish",  6,  0, (0, 3, 4, 5)),  # cron 0 6 * * 1,4,5,6 → go-live 17:00 UTC / 1 PM ET (Mon/Thu/Fri/Sat)
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled
@@ -78,8 +78,11 @@ def _due_occurrence(now: datetime, hour: int, minute: int, weekday):
     occ = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
     if occ > now:
         occ -= timedelta(days=1)
-    if weekday is not None and occ.weekday() != weekday:
-        return None
+    if weekday is not None:
+        # int = one weekday (back-compat); a collection = several.
+        allowed = weekday if isinstance(weekday, (tuple, list, set, frozenset)) else (weekday,)
+        if occ.weekday() not in allowed:
+            return None
     age = (now - occ).total_seconds()
     if age < BUFFER_MIN * 60 or age > MAX_AGE_H * 3600:
         return None
