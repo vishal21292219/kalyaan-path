@@ -226,10 +226,16 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
             continue
         mp = out_dir / f"master_{slugify(name)}.jpg"
         if not mp.exists():
+            # The master portrait defines the deity for every scene that
+            # references it, so it gets the same one-deity treatment.
+            _icfg = load_config()          # cfg is not in this function's scope
+            _blk = _deity_block(look, _icfg)
+            _tail = ((_icfg.get("images", {}) or {}).get("style_tail") or "").strip() if _blk else style
             prompt = (
                 f"Full-body single-character reference portrait of {look}. "
+                f"{_blk} "
                 f"Centered frontal hero pose, clean plain simple background, "
-                f"dramatic divine lighting, intricate detail, masterpiece{style}."
+                f"dramatic divine lighting, intricate detail, masterpiece{_tail}."
             )
             if not _generate_fal_flux(prompt, mp, model=fal_model, target_w=target_w, target_h=target_h):
                 print(f"[consistency] master FAILED for {name} — scenes will use plain FLUX")
@@ -339,17 +345,18 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     for i, raw_prompt in enumerate(visual_prompts):
         is_hero = (i < hero_scenes)   # opening scenes = retention hook + FB cover → premium
         boost = HERO_BOOST if is_hero else ""
-    # 2026-10-21: the "Avoid: ..." tail was DELETED. None of the FLUX endpoints
-    # this pipeline uses (flux-pro/v1.1, flux/dev, flux/schnell) accept a
-    # negative prompt — dev and schnell are guidance-distilled, so there is no
-    # unconditional branch for a negative to work against. Concatenating the
-    # ban list onto the POSITIVE prompt was therefore describing the image:
-    # "beard on Krishna, bearded Vishnu, child, extra limbs" were being asked
-    # for, not forbidden. A controlled same-seed test reproduced it — the
-    # anti-anatomy list produced four arms and two tridents; removing it gave a
-    # correct two-armed figure. images.negative stays in config, unused here,
-    # for a model that has a real negative channel (qwen-image, flux-general).
-        prompt = f"{raw_prompt}{style}{boost}"
+        # No "Avoid: ..." tail: FLUX has no negative channel, so appending the
+        # ban list was DESCRIBING the banned things (same-seed test: it produced
+        # the four arms it was meant to prevent). images.negative stays in
+        # config, unused here, for a model that has one (qwen-image).
+        # With deity_blocks configured, one deity's marks + a short style tail
+        # replace the six-deity style_suffix — see _deity_block.
+        block = _deity_block(raw_prompt, cfg)
+        if block:
+            tail = (cfg["images"].get("style_tail") or "").strip()
+            prompt = f"{raw_prompt}. {block}{tail}{boost}"
+        else:
+            prompt = f"{raw_prompt}{style}{boost}"
         path = out_dir / f"img_{i:02d}.jpg"
         seed = seeds[i] if seeds and i < len(seeds) else None
 
@@ -413,6 +420,26 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     if not results:
         raise GeminiUnavailable("All providers failed for every image")
     return results
+
+
+def _deity_block(text: str, cfg: dict) -> str:
+    """Return the iconography block for the deity named in `text`, or "".
+
+    Added 2026-10-21. The old approach put SIX deities' attributes into every
+    prompt via images.style_suffix (416 of 624 T5 tokens) while the scene's own
+    text was ~3% — attributes bound to whoever was nearest rather than to the
+    deity asked for, and on the bulk model (schnell, 256-token cap) most of the
+    prompt was discarded unread. One deity's marks per prompt fixes both.
+    Longest name first so "kartikeya" is not shadowed by a shorter key.
+    """
+    blocks = (cfg.get("images", {}) or {}).get("deity_blocks") or {}
+    if not blocks:
+        return ""
+    low = (text or "").lower()
+    for name in sorted(blocks, key=len, reverse=True):
+        if name in low:
+            return str(blocks[name]).strip()
+    return ""
 
 
 def _fit_to_aspect(img, target_w: int, target_h: int):
