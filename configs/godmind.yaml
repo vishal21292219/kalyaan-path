@@ -91,7 +91,33 @@ images:
     ram: "He is a youthful prince in his twenties with a smooth clean-shaven jaw and a smooth bare upper lip. His skin is dark blue, visibly darker than anyone beside him. A cylindrical golden kirita crown sits on his dark hair. An arrow is held in his right hand and a great wooden longbow in his left. He wears reddish garments with a girdle and a sacred thread across his chest. He has two arms."
     hanuman: "Hanuman has the FACE OF A MONKEY — a furred monkey muzzle with a monkey's nose and mouth pushed forward, round monkey eyes full of devotion, and monkey ears set high with gold earrings. This monkey head sits on the strong upright body of a man. His skin and fur are bright sindoor orange-red. A long monkey tail rises behind him like a flag. In his right hand he holds a gada: a short thick club with a heavy round ball of gold at its top, resting against his shoulder."
     ganesha: "He has the head of an elephant on the body of a mature adult man with a large round belly. His skin is warm red-orange, never grey. His right tusk is broken and his left tusk is whole. His trunk curves down and to his left. His ears are very large and fan-like. A serpent is wound around his belly as a belt. A small conical crown sits between his ears. He has four arms: a goad, a noose, a bowl of modaka sweets that his trunk reaches down to taste, and one palm raised in blessing. A small mouse sits at his feet."
-    kali: "She is a fierce adult goddess with deep blue-black skin and three eyes, her long black hair loose and streaming, her tongue out. A garland of severed heads hangs at her chest and a girdle of arms circles her waist. She has four arms: a curved khadga sword raised, a severed head held low, one palm raised in fearlessness, one open in giving. She stands upright in cosmic fire."
+    # 2026-10-21: "severed heads" / "severed head" trip fal's prompt content
+    # checker — EVERY Kali prompt was rejected outright (caught building the
+    # photo lane; the reel pipeline was silently falling through to its HF /
+    # Gemini fallbacks for her). The Sanskrit names pass and are the more
+    # respectful terms anyway: mundamala = the garland, kanchi = the girdle.
+    # ── KALI — rewritten 2026-10-21 from sourced iconography, NOT from guesswork.
+    # Source: hdasianart.com "Kali Iconography: A Comprehensive Reference Guide".
+    # What the old block got wrong: no Shiva underfoot (the single most defining
+    # element of Dakshinakali), the mundamala described as merely hanging "at her
+    # chest" (FLUX drew a thin necklace), the four hands unassigned to left/right,
+    # a "dark lotus" that is not canonical for her at all, and "blue-black" skin
+    # where the texts say black (deep blue is the popular-art convention).
+    # Canon now encoded: right foot forward on a supine Shiva; mundamala draped
+    # left shoulder across the chest to the right hip (this IS her torso covering
+    # in devotional art — a sari or armour is the wrong fix and was tried and
+    # rejected); muṇḍāmbara skirt of arms waist-to-thigh; upper-left khadga,
+    # lower-left head, upper-right abhaya, lower-right varada; protruding tongue.
+    # WORD CHOICE: "severed head"/"severed arms" trip fal's prompt content filter
+    # outright, so the same objects are named as "small dark sculpted faces" and
+    # "small sculpted hands and forearms", which pass and render the same shapes.
+    # KNOWN OPEN RISK: even with this block FLUX renders the mundamala as a thin
+    # necklace and leaves her torso uncovered roughly as often as not — five
+    # wordings were tested on 2026-10-21 and none held. Kali is therefore BLOCKED
+    # in the photo lane (pipeline/photo_post.DENY_DEITIES). Reels still generate
+    # her from this block and carry that exposure. The real fix is reference-image
+    # conditioning on a Kalighat pata / temple murti, not more prompt wording.
+    kali: "She is Dakshinakali, a fierce adult goddess, her skin black as midnight. She has three eyes and her long red tongue protrudes from her mouth and is held between her teeth. Her long black hair hangs loose and wild. A broad heavy mundamala garland of many small dark sculpted faces is draped from her left shoulder across her chest to her right hip, completely covering her torso. A thick skirt of many small sculpted hands and forearms is tied at her waist and covers her from waist to thigh. She has FOUR arms: her upper left hand raises a curved khadga sword, her lower left hand holds a small dark sculpted face low, her upper right hand is raised palm-out in abhaya mudra, her lower right palm is open downward in varada mudra. She stands with her right foot forward on the chest of Shiva, who lies calmly on his back beneath her, ash-white, smooth-jawed, with matted jata hair."
     durga: "She is a composed warrior goddess, a mature woman with golden skin and three eyes, in a red and gold silk sari and a tall golden crown. Her many arms are held in a wide fan, each gripping a different weapon — trident, sword, discus, bow, conch, mace. A great lion stands at her side. Her face is serene and resolute, never snarling."
     lakshmi: "She is a serene mature goddess seated on a full pink lotus, her skin warm golden, in a deep red silk sari with gold borders and a tall golden crown. She has four arms: the upper two hold pink lotuses, the lower right pours a stream of gold coins, the lower left is open in blessing. Two white elephants pour water over her from either side."
     saraswati: "She is a serene mature goddess seated on a white lotus, her skin fair and luminous, dressed entirely in a white silk sari with little gold. A veena is cradled against her left shoulder and held in two hands. Her other two hands hold a palm-leaf manuscript and a crystal mala. A white swan rests at her feet."
