@@ -48,6 +48,13 @@ FOLLOW_PROMISE = {
 # AUDIT 2026-07-08: SHARES are the #1 FB growth driver (winners had 25-57 shares →
 # FB pushed them to non-followers → new followers). An explicit share/tag trigger
 # turns passive viewers into distributors. Per channel so the ask fits the content.
+# FACEBOOK HASHTAG CAP (2026-10-20 audit). Facebook throttles hashtag-heavy
+# captions — the project's pipeline notes record this after live posts were hit.
+# GoM reels were shipping 12-15 tags. Per channel, and ONLY for channels that do
+# not also post to Instagram from this same caption (godmind has instagram:false),
+# because on IG the full tag set still helps. Absent -> no cap -> unchanged.
+FB_MAX_HASHTAGS = {"godmind": 5, "gom": 5}
+
 SHARE_TRIGGER = {
     "godmind": "💬 Tag someone who needs to hear this today.",
     "gom": "💬 Tag someone who needs to hear this today.",
@@ -131,6 +138,9 @@ def _caption(script: dict, channel: str = "") -> str:
         follow = ""
     share = SHARE_TRIGGER.get(channel, "")
     tags = script.get("hashtags") or []
+    cap = FB_MAX_HASHTAGS.get(channel)
+    if cap:
+        tags = tags[:cap]
     tagline = " ".join(t if t.startswith("#") else f"#{t}" for t in tags)[:600]
     parts = [p for p in (hook, cta, share, follow, tagline) if p]
     return "\n\n".join(parts)[:2000]
