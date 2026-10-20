@@ -730,6 +730,26 @@ def main(argv: list[str]) -> int:
         except Exception:
             pass
 
+        # LOUD FAILURE ALERT (2026-10-20). A platform error is caught so it can
+        # never block the others — by design, and it is what kept Facebook alive
+        # when the YouTube channels were removed. The cost: YouTube failed every
+        # day from 2026-09-26 and nothing screamed, because the GitHub run still
+        # went green and health_check only looks at runs whose conclusion is
+        # "failure". The routine report above did carry youtube="failed", but a
+        # daily report is exactly where a steady failure hides. This is a
+        # SEPARATE, loud ping that fires only when something actually broke.
+        _failed = sorted(k for k, v in _platforms.items() if v == "failed")
+        if _failed:
+            try:
+                from pipeline.notifier_discord import alert as _dc_alert
+                _dc_alert(
+                    f"🚨 {args.niche} s{args.seed_offset}: publish FAILED on "
+                    f"{', '.join(_failed)} — run is green, so only this will tell you. "
+                    f"Topic: {str(script.get('title', '?'))[:90]}"
+                )
+            except Exception:
+                print("[alert] discord failure-alert could not be sent")
+
     return 0
 
 

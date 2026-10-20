@@ -63,7 +63,17 @@ llm:
 publish:
   instagram: false
   privacy: public
-  youtube: true
+  # YOUTUBE OFF (2026-10-20) — this niche's YouTube channel was REMOVED by
+  # YouTube. Evidence: last successful upload 2026-09-25 19:02 UTC, first
+  # `authenticatedUserAccountSuspended` 2026-09-26 11:10 UTC, and the account
+  # switcher lists the channel as "Channel removed". Four channels went at once
+  # (Gods of the Mind, TimeDecoders, Kalyaan Path, Ithaas Vani).
+  # The pipeline kept reporting SUCCESS for 24 days because a YT failure is
+  # caught so it can never block Facebook — which saved FB and hid this.
+  # run.py already treats a delivered FB post as the slot's delivery when
+  # youtube is false, so catch-up stays correct. Flip back to true if an appeal
+  # restores the channel.
+  youtube: false
 
 video:
   bitrate: 6M
