@@ -469,7 +469,17 @@ def main(argv: list[str]) -> int:
         # Every scene already has a real stock clip → splice them all (no Kling).
         hero_clips = footage_clips
         print(f"[footage] splicing {len(footage_clips)} B-roll clips across all scenes")
-    _hero_on = bool(load_config().get("video", {}).get("hero_motion", True))
+    _vcfg = load_config().get("video", {})
+    # video.opener: "motion" = animate ONLY the hook image, and only ~3s — the
+    # window the 2026-10-20 FB audit showed is where 60% of viewers are lost.
+    # That is a different trade from hero_motion (5s, ~$0.42): 3s is Kling's
+    # minimum, ~$0.25 ≈ ₹22/reel ≈ ₹375/month at 4 reels a week. Model is
+    # configurable (video.opener_model) so a cheaper I2V can be swapped in
+    # without touching code.
+    _opener = str(_vcfg.get("opener", "")).lower()
+    _hero_on = bool(_vcfg.get("hero_motion", True)) or _opener == "motion"
+    _hero_sec = int(_vcfg.get("hero_motion_sec", 3 if _opener == "motion" else 5))
+    _hero_model = _vcfg.get("opener_model") or None
     if hero_clips is None and _hero_on and not args.no_motion and not args.long_form and len(images) >= 3:
         try:
             from pipeline.kling_video import generate_hero_clip
@@ -481,9 +491,10 @@ def main(argv: list[str]) -> int:
                 "no fast movement, no morphing, keep the face and design exactly the same"
             )
             hero_clip = out_path("videos", f"_hero_{base}.mp4")
-            if generate_hero_clip(hero_motion_prompt, images[hero_idx], hero_clip, duration=5):
+            if generate_hero_clip(hero_motion_prompt, images[hero_idx], hero_clip,
+                                  duration=_hero_sec, model=_hero_model):
                 hero_clips = {hero_idx: hero_clip}
-                print(f"[motion] hero scene {hero_idx + 1} animated via Kling v3")
+                print(f"[motion] hero scene {hero_idx + 1} animated ({_hero_sec}s)")
             else:
                 print("[motion] hero clip failed — using Ken Burns still")
         except Exception as e:

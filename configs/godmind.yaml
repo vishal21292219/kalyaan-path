@@ -329,6 +329,18 @@ video:
   music_volume: 0.09   # meditative bed slightly more present (you "lean in to listen")
   stings: false
   duration_target_sec: 80
+  # ── OPENING 3 SECONDS (2026-10-20 FB audit) ─────────────────────────────────
+  # Measured: median 3-second rate 40% — six of ten viewers leave before the
+  # content starts, and average play time has NO correlation with reach
+  # (r = -0.05). The opening is the only lever that moved anything.
+  #   "cuts"  = scene 1 becomes 3 hard punch-in cuts (wide -> mid -> face). FREE.
+  #   "motion"= scene 1 becomes a real ~3s generated clip (~₹22/reel, ~₹375/mo).
+  #   absent  = unchanged Ken Burns.
+  # Running "cuts" FIRST on purpose: it costs nothing, and running both at once
+  # would make it impossible to tell which one moved the number. Flip to
+  # "motion" only after 14 reels of cuts have a 3-second rate to compare.
+  opener: cuts
+  # opener_model: fal-ai/...   # optional cheaper I2V for "motion" (default Kling v3)
   font: assets/fonts/Anton-Regular.ttf
   font_size: 80
   fps: 30

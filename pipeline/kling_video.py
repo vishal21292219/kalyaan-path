@@ -29,6 +29,7 @@ def generate_hero_clip(
     duration: int = 5,
     negative_prompt: str = "blur, distortion, low quality, extra limbs, deformed face, watermark, text",
     cfg_scale: float = 0.5,
+    model: str | None = None,
 ) -> bool:
     """Animate a reference still into a short hero clip via Kling v3 I2V.
 
@@ -61,7 +62,7 @@ def generate_hero_clip(
 
     try:
         result = fal_client.subscribe(
-            KLING_I2V_MODEL,
+            model or KLING_I2V_MODEL,
             arguments={
                 "start_image_url": ref_url,
                 "prompt": prompt,

@@ -603,6 +603,54 @@ def _cinematic_motion_filter(scene_idx: int, total_scenes: int, duration_frames:
     )
 
 
+def _opening_cuts_clip(img: Path, per: float, W: int, H: int, FPS: int,
+                       work: Path) -> Path | None:
+    """Scene 0 as THREE HARD CUTS instead of one slow Ken Burns push.
+
+    Why (2026-10-20 FB audit): the measured median three-second rate on
+    GodsOfTheMind is 40% — six of every ten viewers leave before the content
+    starts. A single still easing in for 6s reads as "nothing is happening" in
+    a feed. Three cuts (wide -> mid -> tight on the face) put visible change on
+    screen inside the window where the viewer decides.
+
+    Same image throughout, so this does NOT touch the 1:1 image<->sentence
+    mapping that everything downstream depends on: only scene 0's own window is
+    recut. Returns None when the scene is too short to cut (< 2.4s), so the
+    caller falls back to the normal zoompan path.
+    """
+    if per < 2.4:
+        return None
+    # (punch factor, vertical centre as a fraction of H) — drifting up toward
+    # the face, which is where an AI deity render puts the eyes.
+    CUTS = ((1.00, 0.50), (1.26, 0.41), (1.55, 0.34))
+    seg = per / len(CUTS)
+    parts: list[Path] = []
+    for k, (f, cy) in enumerate(CUTS):
+        cw = int((W / f) // 2 * 2)
+        ch = int((H / f) // 2 * 2)
+        x = max(0, min(W - cw, int((W - cw) / 2 // 2 * 2)))
+        y = max(0, min(H - ch, int((cy * H - ch / 2) // 2 * 2)))
+        part = work / f"open_cut_{k}.mp4"
+        _run([
+            "ffmpeg", "-y", "-loop", "1", "-i", str(img),
+            "-t", f"{seg:.3f}",
+            "-vf", (f"crop={cw}:{ch}:{x}:{y},scale={W}:{H}:flags=lanczos,"
+                    f"setsar=1,format=yuv420p"),
+            "-r", str(FPS), "-an",
+            "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p",
+            str(part),
+        ])
+        if not part.exists():
+            return None
+        parts.append(part)
+    listing = work / "open_cuts.txt"
+    listing.write_text("".join(f"file '{q.name}'\n" for q in parts))
+    out = work / "clip_00.mp4"
+    _run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", listing.name,
+          "-c", "copy", out.name], cwd=work)
+    return out if out.exists() else None
+
+
 def assemble(
     script: dict,
     voice_path: Path,
@@ -697,6 +745,16 @@ def assemble(
             print(f"[hero] scene {i + 1}/{n_scenes} → Kling clip ({per:.2f}s)")
             clips.append(clip)
             continue
+
+        # Opening cuts (video.opener: "cuts") — scene 0 only, free, no extra
+        # assets. Absent from a config -> unchanged behaviour everywhere else.
+        if i == 0 and str(cfg.get("video", {}).get("opener", "")).lower() == "cuts":
+            cut_clip = _opening_cuts_clip(img, per, W, H, FPS, work)
+            if cut_clip:
+                print(f"[opener] scene 1 → 3 hard cuts ({per:.2f}s total)")
+                clips.append(cut_clip)
+                continue
+            print(f"[opener] scene 1 too short for cuts ({per:.2f}s) — Ken Burns")
 
         per_frames = max(int(per * FPS), 15)
         # Cinematic motion variety — 6 distinct presets per video instead of static zoom.
