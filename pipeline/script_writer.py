@@ -700,6 +700,20 @@ _HOOK_BANNED = {
 # did four continents build the same thing" (58) all slipped a phrase-list check.
 _HOOK_NO_QUESTION = {"ancient"}
 
+# Names that must NOT appear in the OPENING line (2026-10-20 FB audit). Measured
+# across 20 GoM reels: the two worst 3-second rates in the whole set — 21.2%
+# (Nachiketa) and 33.1% (Vamana) — are the two reels that put an unfamiliar
+# Sanskrit name in the hook. Recognition is what buys the first three seconds;
+# Shiva/Krishna/Kali/Ganesha/Hanuman/Durga carry it, these do not. The lesser
+# name is still fine AFTER the hook lands, so this bans it in the opener only.
+# configs/godmind.yaml states the rule; this makes it enforceable.
+_HOOK_LESSER_NAMES = {
+    "godmind": (
+        "nachiketa", "vamana", "matsya", "ekadanta", "vighnaharta", "markandeya",
+        "dadhichi", "chyavana", "ashtavakra", "upamanyu", "jadabharata",
+    ),
+}
+
 
 def _hook_violation(script: dict, niche: str) -> str | None:
     """Return the banned phrase this script opens with, or None if it's clean.
@@ -710,7 +724,8 @@ def _hook_violation(script: dict, niche: str) -> str | None:
     key = (niche or "").lower()
     banned = _HOOK_BANNED.get(key)
     no_question = key in _HOOK_NO_QUESTION
-    if not banned and not no_question:
+    lesser = _HOOK_LESSER_NAMES.get(key)
+    if not banned and not no_question and not lesser:
         return None
     body = script.get("body") or []
     surfaces = [
@@ -726,6 +741,11 @@ def _hook_violation(script: dict, niche: str) -> str | None:
         for phrase in (banned or ()):
             if t.startswith(phrase):
                 return phrase.strip()
+        # An unfamiliar deity/sage name anywhere in the opening line costs the
+        # first three seconds, so this one is a CONTAINS check, not startswith.
+        for name in (lesser or ()):
+            if name in t:
+                return f"lesser name in hook ({name})"
         # The FIRST sentence being a question is itself the violation.
         if no_question:
             first = re.split(r"(?<=[.!?])\s", t, maxsplit=1)[0].strip()

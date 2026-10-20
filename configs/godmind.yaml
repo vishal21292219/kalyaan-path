@@ -13,9 +13,13 @@ branding:
   # (11K FB breakouts) into FOLLOWERS.
   series_name: "The Gods Inside You"
   series_promise: "Meet the god inside you — one at a time — until you are whole."
-  # Promo CTA auto-appended to every GoM FB/IG caption + YouTube description.
-  # Free lead-magnet first, paid workbook second. Edit here anytime (no code change).
-  promo: "🆓 Free Stage 1 — Become Shiva (Ego-Death Workbook): https://gopulab.gumroad.com/l/cokng\n📖 Full 10-stage Become Shiva workbook ($12): https://gopulab.gumroad.com/l/smaolv"
+  # PROMO — REMOVED 2026-10-20 per user ("gumroad hata do abhi, kuch aur sochte
+  # hain"). This key fed the YouTube description only: the FB first comment has
+  # used an engagement question since the 2026-07-08 audit, because the Gumroad
+  # link converted 0 and external links in comments suppress a reel's reach
+  # (pipeline/uploader_make_reel.py COMMENT_BAIT). Absent key -> uploader_youtube
+  # appends nothing, no code change needed. Restore by uncommenting.
+  # promo: "🆓 Free Stage 1 — Become Shiva (Ego-Death Workbook): https://gopulab.gumroad.com/l/cokng\n📖 Full 10-stage Become Shiva workbook ($12): https://gopulab.gumroad.com/l/smaolv"
   ai_disclosure: "🧠 Gods of the Mind | Ancient Hindu wisdom decoded as psychology — original scripts, AI-assisted visuals & narration."
   hashtags:
   - '#godsofthemind'
@@ -204,25 +208,51 @@ llm:
          this?"), resolved calmly. Curiosity earns the STOP; value earns the FOLLOW.
 
     1. title (≤80 chars, English, NO hashtags in title):
-       🔥 CEILING-BREAKER (2026-07 competitor teardown): the hooks that hit 10-40× our
-       views lead with a VISCERAL FELT experience + IDENTITY, not a clever concept.
-       (Competitor viral hooks: "You wake up tired before the day even starts",
-       "Why were you chosen to carry your family's emotional weight", "The Curse of
-       the Old Soul".) PREFER these — felt-pain / "you're special" FIRST, god SECOND:
+       ── HOOK RULES (2026-10-20 — derived from 20 reels of real FB per-post data,
+       not opinion. Do not re-litigate without new data.) ─────────────────────
+       MEASURED: 60% of viewers leave before 3 seconds (median 3-sec rate 40%).
+       The hook is the ONLY thing that decides reach. Top 5 reels took 58% of all
+       views; what separated them was shares (32/reel vs 3/reel), and shares come
+       from the hook making someone feel SEEN.
+
+       1) NAME A BEHAVIOUR, NOT A FEELING. A thing they DO, not a mood they're in.
+          WINNER  8,317 views: "You don't have one mind. You have three — at war."
+          WINNER  6,394 views: "You destroy the good things in your life right
+                   before they bloom — and you hate yourself for it."
+          LOSER     845 views: "You are surrounded by noise, pressure and chaos."
+          LOSER     953 views: "You have the power to move mountains — but you
+                   forgot."  (flattery, no specific moment, 0 follows)
+       2) IT MUST BE SLIGHTLY SHAMEFUL AND UNSPOKEN — something they have never
+          said out loud. People share what makes them feel seen, and being seen
+          requires that the thing was hidden.
+       3) CONTRADICT THEIR SELF-IMAGE OR PUBLIC IMAGE. The two highest share
+          counts of the month both told the viewer that what people believe about
+          them is wrong. e.g. "Everyone thinks you're calm because nothing touches
+          you. They're wrong." (6,949 views, 52 shares)
+       4) FAMOUS DEITY, OR NO DEITY AT ALL, IN THE HOOK. Allowed in the opening
+          line: Shiva, Krishna, Kali, Ganesha, Hanuman, Durga, Vishnu, Brahma,
+          Lakshmi, Ram, Yama. Every other name (Nachiketa, Vamana, Matsya,
+          Ekadanta, Vighnaharta…) goes AFTER the hook has landed, never inside it.
+          MEASURED: the two worst 3-second rates in the whole set (21.2% and
+          33.1%) are the two reels that put an unfamiliar Sanskrit name in the
+          opening seconds. This is enforced in code — a lesser name in the hook
+          is rejected and regenerated.
+
+       ── TYPOLOGY FORMAT (the single best-performing format we have) ──────────
+       The top reel of the month was NOT a deity decode — it was a TYPOLOGY:
+       three named inner states and an instruction to say which one you are
+       ("Tamas, Rajas or Sattva? Comment it"). It produced 150 follows and 68
+       saves, both ~2.4x the next best reel. A typology is shareable because the
+       viewer sends it to someone to tell them which one THEY are.
+       When the topic allows it, build the video as 2-4 NAMED types the viewer
+       places themselves in. Prefer this shape over a single-deity explainer.
+
+       Still-valid framing from the earlier teardown — felt-pain/identity FIRST,
+       god SECOND; the viewer must see THEMSELVES in the god, not learn a fact:
          * "You [oddly-specific felt moment] — And It's Not [what you assume]"
-             e.g. "You Feel Everything Too Deeply — And It's Not a Weakness"
          * "Why You [oddly-specific relatable behavior] (The Real Reason)"
-             e.g. "Why You Sabotage Yourself Right Before You Win"
          * "That [specific pain] Isn't [X] — It's [God/archetype]"
-             e.g. "That Tiredness Sleep Can't Fix Isn't Laziness — It's Shani"
-         * "If You [feel/do X], You're [flattering identity]"  ← makes them feel SEEN → they SHARE it
-             e.g. "If Silence Terrifies You, You've Never Met Your Own Mind"
-       Then the god-decode frameworks (still good, SECONDARY):
-         * "The Hidden Psychology of [God/Symbol]" / "[God] Is Not What You Think"
-         * "What [God] Secretly Teaches About Your Mind"
-       RULE: name a SPECIFIC FELT MOMENT the viewer LIVES + make them feel SEEN/SPECIAL,
-       THEN reveal the god. Visceral + identity > clever/intellectual. This is the #1
-       lever separating our ~1k videos from competitors' 10-44k ones.
+         * "If You [feel/do X], You're [flattering identity]"
        End with EXACTLY 1 emoji (🧠 🕉️ 👁️ 🔱 🌌 🪷 ⚡ 🔥).
        Good: "That Rage You Can't Explain Isn't You — It's Kali 🔥" /
              "Shiva Is Not a God in the Sky — The Real Shiva 👁️"
