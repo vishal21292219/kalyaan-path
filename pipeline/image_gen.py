@@ -53,15 +53,27 @@ def _generate_fal_flux(prompt: str, out_path: Path,
     image_size = "portrait_16_9" if is_portrait else "landscape_16_9"
     # schnell is a few-step distilled model (max 12 steps); pro/dev want ~28.
     steps = 8 if "schnell" in str(model).lower() else 28
+    # Endpoint schemas differ (checked 2026-10-21). flux-pro/v1.1 accepts NONE of
+    # num_inference_steps / guidance_scale / enable_safety_checker — they were
+    # being sent and silently ignored, so "we set guidance to 3.5" was never true
+    # on the premium model. dev/schnell do take them; schnell is guidance- AND
+    # timestep-distilled, so its guidance value is inert and steps cap at 12.
     arguments = {
         "prompt": prompt,
         "image_size": image_size,
-        "num_inference_steps": steps,
-        "guidance_scale": 3.5,
         "num_images": 1,
-        "enable_safety_checker": True,
         "output_format": "jpeg",
     }
+    m = str(model).lower()
+    if "flux-pro" in m:
+        arguments["safety_tolerance"] = "2"
+    else:
+        arguments["num_inference_steps"] = min(steps, 12) if "schnell" in m else steps
+        arguments["enable_safety_checker"] = True
+        if "schnell" not in m:
+            # 4.0 sits in the band that helps attribute fidelity without the
+            # plastic over-contrast that shows up past ~6.
+            arguments["guidance_scale"] = 4.0
     if seed is not None:
         arguments["seed"] = int(seed)
     try:
@@ -217,8 +229,7 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
             prompt = (
                 f"Full-body single-character reference portrait of {look}. "
                 f"Centered frontal hero pose, clean plain simple background, "
-                f"dramatic divine lighting, intricate detail, masterpiece{style}. "
-                f"Avoid: {negative}"
+                f"dramatic divine lighting, intricate detail, masterpiece{style}."
             )
             if not _generate_fal_flux(prompt, mp, model=fal_model, target_w=target_w, target_h=target_h):
                 print(f"[consistency] master FAILED for {name} — scenes will use plain FLUX")
@@ -328,7 +339,17 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     for i, raw_prompt in enumerate(visual_prompts):
         is_hero = (i < hero_scenes)   # opening scenes = retention hook + FB cover → premium
         boost = HERO_BOOST if is_hero else ""
-        prompt = f"{raw_prompt}{style}{boost}. Avoid: {negative}"
+    # 2026-10-21: the "Avoid: ..." tail was DELETED. None of the FLUX endpoints
+    # this pipeline uses (flux-pro/v1.1, flux/dev, flux/schnell) accept a
+    # negative prompt — dev and schnell are guidance-distilled, so there is no
+    # unconditional branch for a negative to work against. Concatenating the
+    # ban list onto the POSITIVE prompt was therefore describing the image:
+    # "beard on Krishna, bearded Vishnu, child, extra limbs" were being asked
+    # for, not forbidden. A controlled same-seed test reproduced it — the
+    # anti-anatomy list produced four arms and two tridents; removing it gave a
+    # correct two-armed figure. images.negative stays in config, unused here,
+    # for a model that has a real negative channel (qwen-image, flux-general).
+        prompt = f"{raw_prompt}{style}{boost}"
         path = out_dir / f"img_{i:02d}.jpg"
         seed = seeds[i] if seeds and i < len(seeds) else None
 

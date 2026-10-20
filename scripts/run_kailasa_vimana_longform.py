@@ -152,7 +152,7 @@ def main() -> int:
             print(f"[images] {i:02d} cached → skip")
             images.append(path)
             continue
-        prompt = f"{raw_prompt}{style}. Avoid: {negative}"
+        prompt = f"{raw_prompt}{style}"  # no negative channel on FLUX
         try:
             if _generate_gemini(prompt, path, model):
                 images.append(path)

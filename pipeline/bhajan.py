@@ -300,7 +300,9 @@ def _generate_images(prompts: list[str], out_dir: Path) -> list[Path]:
     results: list[Path] = []
     last_err = None
     for i, raw in enumerate(prompts):
-        full_prompt = f"{raw}\n\nStyle guidance:\n{style}\n\nAvoid: {negative}"
+        # see pipeline/image_gen.py — FLUX has no negative channel; the
+        # "Avoid:" tail was conditioning FOR the banned things.
+        full_prompt = f"{raw}\n\nStyle guidance:\n{style}"
         path = out_dir / f"scene_{i:02d}.jpg"
         if use_fal and _generate_fal_flux(full_prompt, path, model=fal_model):
             results.append(path); continue
