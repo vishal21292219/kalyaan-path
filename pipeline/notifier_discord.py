@@ -67,6 +67,14 @@ def report(niche: str, seed_offset, script: dict, platforms: dict | None = None,
       instagram: "posted" | "failed"
     Builds one colour-coded embed: channel header + a field per platform with a
     clear status and a clickable link, plus the topic + hook."""
+    # ROUTINE CARD OFF by default since 2026-10-20 (user: "discord wala report
+    # bhi off kr do"). Deliberately a SEPARATE gate from DISCORD_NOTIFY, which is
+    # the master switch for alert() and the health-check watchdog too — turning
+    # that off instead would also kill the failure alerts, and a daily card is
+    # precisely where a steady failure hides (a dead YouTube channel stayed
+    # invisible for 24 days behind these). Set DISCORD_REPORT=1 to bring it back.
+    if (os.getenv("DISCORD_REPORT") or "").strip().lower() not in ("1", "true", "on", "yes"):
+        return False
     if not _webhook():
         return False
     platforms = platforms or {}
