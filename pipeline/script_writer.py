@@ -741,11 +741,16 @@ def _hook_violation(script: dict, niche: str) -> str | None:
         for phrase in (banned or ()):
             if t.startswith(phrase):
                 return phrase.strip()
-        # An unfamiliar deity/sage name anywhere in the opening line costs the
-        # first three seconds, so this one is a CONTAINS check, not startswith.
+        # An unfamiliar deity/sage name costs the first three seconds — but only
+        # where the viewer meets it first. The rule has always been "not in the
+        # OPENING line"; the name is fine once the hook has landed (e.g. "...In
+        # Hindu scriptures a boy named Nachiketa stood before Yama..." in the
+        # middle of a hook is correct and must not be rejected). So this checks
+        # the FIRST SENTENCE only, not the whole surface.
+        opening = re.split(r"(?<=[.!?])\s", t, maxsplit=1)[0]
         for name in (lesser or ()):
-            if name in t:
-                return f"lesser name in hook ({name})"
+            if name in opening:
+                return f"lesser name in opening line ({name})"
         # The FIRST sentence being a question is itself the violation.
         if no_question:
             first = re.split(r"(?<=[.!?])\s", t, maxsplit=1)[0].strip()
