@@ -484,12 +484,36 @@ def main(argv: list[str]) -> int:
         try:
             from pipeline.kling_video import generate_hero_clip
             hero_idx = 0  # the hook image — first 3 seconds matter most for retention
+            # MOTION FROM THE SCRIPT (2026-10-21). The old prompt asked for
+            # "breathes and blinks softly... no fast movement" and that is exactly
+            # what it got — an image that appears static in a feed. The motion now
+            # describes what THIS scene's own line is about, so the movement means
+            # something instead of being decoration.
+            _scene = ""
+            try:
+                _vz = script.get("visuals") or []
+                _bd = script.get("body") or []
+                _scene = (_vz[hero_idx] if hero_idx < len(_vz) else "") or (
+                    _bd[hero_idx] if hero_idx < len(_bd) else "")
+            except Exception:
+                pass
             hero_motion_prompt = (
-                "subtle cinematic motion: a slow gentle camera push-in, soft drifting "
-                "atmosphere and divine light rays, faint particles floating, the figure "
-                "breathes and blinks softly, cloth and hair sway gently — dignified, calm, "
-                "no fast movement, no morphing, keep the face and design exactly the same"
+                (f"{_scene.strip()}. " if _scene else "")
+                + "Bring this exact frame to life with clearly visible motion that serves "
+                  "the moment: the camera moves, the air moves, cloth and hair move, ash "
+                  "and embers and mist drift through the frame, light shifts across the "
+                  "figure. The movement must be plainly noticeable within the first second. "
+                  "Keep the character's face, skin colour, ornaments and iconography exactly "
+                  "as they are — animate the scene, never redesign the deity."
             )
+            # Match the clip to the scene's real length. A 3s clip inside a 6s scene
+            # froze on its last frame for half the shot (tpad=clone in the assembler).
+            try:
+                from pipeline.assembler import _audio_duration
+                _per = _audio_duration(voice_path) / max(1, len(images))
+                _hero_sec = max(3, min(10, int(round(_per))))
+            except Exception:
+                pass
             hero_clip = out_path("videos", f"_hero_{base}.mp4")
             if generate_hero_clip(hero_motion_prompt, images[hero_idx], hero_clip,
                                   duration=_hero_sec, model=_hero_model):

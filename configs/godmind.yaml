@@ -270,23 +270,35 @@ llm:
           opening seconds. This is enforced in code — a lesser name in the hook
           is rejected and regenerated.
 
-       ── THE OPENING IMAGE (visuals[0]) — NON-NEGOTIABLE ─────────────────────
-       The hook is PAIN-FIRST in WORDS. The opening IMAGE is the opposite: it
-       must be a FRAME-FILLING PORTRAIT OF A RECOGNISABLE DEITY, face centred,
-       EYES VISIBLE, high contrast, lit so it reads at a glance on a phone.
-       Allowed in frame 1: Shiva, Krishna, Kali, Ganesha, Hanuman, Durga,
-       Vishnu, Lakshmi, Ram, Saraswati, Indra, Yama.
-       WHY, and do not "improve" on this: 75.8% of this page's views come from
-       people who do NOT follow it. A dark anonymous human silhouette gives a
-       stranger nothing to recognise in the three seconds that decide whether
-       the reel travels — and 60% of viewers are already gone by then.
-       BANNED as visuals[0]: an unnamed human figure, a figure seen from behind,
-       a silhouette with no deity, an empty landscape, an abstract texture, or
-       anything captioned "no deity yet". The narration may withhold the god;
-       the FRAME never does.
-       The reel opens on three hard cuts of this image (video.opener: cuts), so
-       it must survive a 1.55x punch-in on the face — frame the deity large,
-       centred and sharp, never small in a wide scene.
+       ── THE IMAGES — RECOGNITION *AND* RELEVANCE ────────────────────────────
+       Two rules, and a frame must pass BOTH. Passing one is what produced a
+       reel where the line said "the weight you have learned to carry alone"
+       and the frame showed a calm portrait of a face.
+
+       A) RECOGNITION. Every frame contains the deity, canonically and clearly.
+          75.8% of this page's viewers do not follow it; a stranger must know
+          whose channel this is on sight. Frame 1 especially: a recognisable
+          famous deity (Shiva, Krishna, Kali, Ganesha, Hanuman, Durga, Vishnu,
+          Lakshmi, Ram, Saraswati, Indra, Yama), large in frame, eyes visible.
+          Never an unnamed human, a figure from behind, or an empty landscape.
+
+       B) RELEVANCE. The frame must DRAMATISE THE LINE IT BELONGS TO. visuals[i]
+          shows what body[i] is saying — the state, the action, the pressure in
+          that sentence — acted out by the deity.
+            body[i]: "the weight you have learned to carry alone"
+              WRONG: "close-up portrait of Shiva, face centred, eyes calm"
+              RIGHT: "Shiva alone on a bare peak, shoulders bearing a mass of
+                      dark churning poison, no one else in the frame"
+            body[i]: "you keep the argument running in your head"
+              WRONG: "portrait of Kali"
+              RIGHT: "Kali mid-stride through a storm of circling shadow-faces
+                      that keep returning, her eyes fixed ahead"
+
+       BANNED: a portrait gallery. No more than TWO frames in the whole reel may
+       be a face close-up, and never two in a row. Every other frame must carry
+       an action, a setting, or a visible state that belongs to its line.
+       Each visuals[i] therefore names: the deity + WHAT THEY ARE DOING + WHERE,
+       in that order, before any style words.
 
        ── TYPOLOGY FORMAT (the single best-performing format we have) ──────────
        The top reel of the month was NOT a deity decode — it was a TYPOLOGY:
