@@ -77,6 +77,28 @@ llm:
   provider: claude
   model: claude-sonnet-4-6
   fallback_model: gemini-flash-latest
+
+  # ── WATCH-TIME LEVER (2026-10-20) ────────────────────────────────────────────
+  # Meta Content Monetization went live on the GoM FB Page and pays on WATCH TIME
+  # (their own note: "earnings favor watch time on longer reels"). The global
+  # script rule (90-120 words, ~65-90s) is tuned for the 40-60s channels, so GoM
+  # overrides it here. HARD ceiling is the FACEBOOK REELS LIMIT of 90 seconds —
+  # go past it and the reel loses the Reels surface entirely, which costs far
+  # more than the extra seconds earn. Length is NOT permission to pad: a dull
+  # extra line lowers retention, and retention is what sets the earnings rate.
+  # Code-enforced backstop for the band below (pipeline/script_writer.py).
+  body_word_cap: 120
+  length_spec: |
+    TOTAL words across ALL body[] lines = 100-115 words. HARD MAX = 120 words.
+    COUNT THE WORDS before you return the JSON — this cap is enforced in code
+    and over-long scripts get their closing lines CUT, which destroys the loop-back.
+    Measured: the 90-120 word rule ships GoM reels at 75-78s, so this band lands
+    roughly 80-88s — just under Facebook's 90-second Reels ceiling, which is a
+    cliff: cross it and the reel loses the Reels surface and earns nothing.
+    Spend the extra words on DEPTH, never on filler:
+      - one more beat of the felt-pain before the reveal, and
+      - a slower, fuller landing of the final realization + loop-back line.
+    If a line does not deepen the reveal or tighten the loop, delete it.
   persona: |
     You are the writer for "Gods of the Mind" — a premium YouTube Shorts channel
     that DECODES Hindu gods and timeless wisdom as PSYCHOLOGY and PHILOSOPHY. You

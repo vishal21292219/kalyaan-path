@@ -245,6 +245,16 @@ def _build_system_prompt(cfg: dict, n_images: int, long_form: bool = False) -> s
 
     spec_block = f"\n\nCONTENT SPEC (STRICT — follow exactly):\n{content_spec}" if content_spec else ""
 
+    # Per-niche LENGTH override (optional). The global LENGTH rule above (90-120
+    # words) is tuned for the 40-60s channels; a channel whose economics reward
+    # WATCH TIME (e.g. GoM on Meta content monetization) can run longer. Absent
+    # from a config -> empty string -> every other channel is untouched.
+    length_spec = (llm.get("length_spec") or "").strip()
+    length_block = (
+        f"\n\nLENGTH OVERRIDE (STRICT — replaces the TOTAL-words rule above):\n{length_spec}"
+        if length_spec else ""
+    )
+
     long_form_block = ""
     if long_form:
         long_form_block = """
@@ -355,7 +365,7 @@ IMAGE STYLE GUIDANCE:
 {image_guide}
 
 TOPIC GUIDANCE:
-{topic_guide}{spec_block}
+{topic_guide}{spec_block}{length_block}
 """
 
 
@@ -894,7 +904,10 @@ def write_script(topic: dict, context: str, long_form: bool = False,
         # (≈120s, safe margin). The cta is a separate field, so trimming trailing
         # body lines never drops the closing call-to-action. Rarely triggers
         # (the prompt already targets 90-120 words) — pure backstop.
-        MAX_WORDS = 170
+        # Per-niche override: a channel whose FB Reels ceiling (90s) binds long
+        # before the 180s Shorts cap sets a tighter cap via llm.body_word_cap.
+        # Absent -> 170 -> every other channel behaves exactly as before.
+        MAX_WORDS = int((cfg.get("llm") or {}).get("body_word_cap") or 170)
         body = script.get("body") or []
 
         def _wc(lines):
