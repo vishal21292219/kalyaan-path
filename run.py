@@ -477,14 +477,28 @@ def main(argv: list[str]) -> int:
                     _bd[hero_idx] if hero_idx < len(_bd) else "")
             except Exception:
                 pass
+            # THE DEITY MUST ACT. The previous version of this prompt asked only
+            # for ambient motion — "the camera moves, the air moves, cloth and
+            # hair move, ash and embers drift, light shifts" — and then told the
+            # model to "animate the scene, never redesign the deity". Every item
+            # on that list is weather. Kling delivered exactly that: measured on
+            # a real 7s hero clip, six frames across the whole clip show the
+            # deity in an IDENTICAL pose while the camera pushes in and the fire
+            # behind him grows. The user called it, twice: "motion ka matlab ye
+            # nahi ki image bus breath in kar raha ho".
+            # So the action leads, and it is the action of THIS scene's own line.
             hero_motion_prompt = (
-                (f"{_scene.strip()}. " if _scene else "")
-                + "Bring this exact frame to life with clearly visible motion that serves "
-                  "the moment: the camera moves, the air moves, cloth and hair move, ash "
-                  "and embers and mist drift through the frame, light shifts across the "
-                  "figure. The movement must be plainly noticeable within the first second. "
-                  "Keep the character's face, skin colour, ornaments and iconography exactly "
-                  "as they are — animate the scene, never redesign the deity."
+                "THE DEITY HIMSELF MOVES AND ACTS — he is the motion, not the "
+                "background. He performs this, visibly, within the first second: "
+                + (f"{_scene.strip()}. " if _scene else "he turns his head and "
+                   "raises a hand toward the viewer. ")
+                + "Show a real change between the first frame and the last: his "
+                  "head turns, his eyes shift, his arms and hands move, his "
+                  "weapon or attribute is raised or lowered, his posture changes. "
+                  "Ambient drift (mist, embers, cloth, light, camera push) may "
+                  "support the action but must NEVER be the only thing moving. "
+                  "Keep his face, skin colour, ornaments and iconography exactly "
+                  "as they are — animate what he DOES, never redesign who he is."
             )
             # Match the clip to the scene's real length. A 3s clip inside a 6s scene
             # froze on its last frame for half the shot (tpad=clone in the assembler).

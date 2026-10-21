@@ -40,7 +40,7 @@ SCHEMA_BLOCK = """Output JSON ONLY (no markdown fences). Schema:
      {
        "name": "Shiva",                       // the EXACT word/name you use for this character inside visuals[] prompts (used to detect which scene shows them)
        "aliases": ["Mahadev", "Shiv"],        // any other words you use for the same character in visuals[]
-       "look": "a majestic blue-skinned ascetic god, matted jata hair piled with a crescent moon, third eye on forehead, snake around neck, rudraksha beads, tiger-skin around waist, calm powerful face with a neat beard, holding a trident"   // ONE locked head-to-toe appearance, repeated identically every scene
+       "look": "a majestic ash-white ascetic god with a deep blue throat, his jaw and upper lip smooth and bare skin, matted jata hair piled with a crescent moon, third eye on forehead, snake around neck, rudraksha beads, tiger-skin around waist, a calm powerful face, holding a trident"   // ONE locked head-to-toe appearance, repeated identically every scene
      }
      // ONLY the 1-4 RECURRING named characters/deities who appear in MULTIPLE scenes. Skip one-off crowds, landscapes, objects. [] if no recurring character.
   ],
@@ -87,26 +87,32 @@ Rules:
   * Each gets ONE locked head-to-toe "look" (skin, hair, crown, weapon,
     clothing, face). The pipeline generates a single master portrait from it
     and reuses that exact identity in every scene the character appears in.
-  * 🕉️ HINDU DEITY CANON — NON-NEGOTIABLE authenticity. The "look" MUST match
-    each deity's canonical iconography, ESPECIALLY facial hair:
-      - CLEAN-SHAVEN, YOUTHFUL, NO beard, NO moustache (write these words
-        explicitly in the "look"): Vishnu, Krishna, Rama, Lakshmana, Kartikeya,
-        Hanuman, Indra, and every youthful male god. e.g. Krishna = "blue-skinned
-        youthful CLEAN-SHAVEN face, no beard, no moustache, peacock feather, flute";
-        Vishnu = "blue-skinned youthful CLEAN-SHAVEN face, no beard, four arms
-        holding conch, discus, mace, lotus, tall crown".
-      - Facial hair ONLY where canon demands it: Shiva (light/neat beard + matted
-        jata), Brahma (elderly WHITE beard, four faces), rishis/sages (long beard).
-      - Goddesses (Durga, Kali, Lakshmi, Saraswati, Parvati) = female faces, obviously
-        no facial hair.
-    If unsure, default youthful male deities to CLEAN-SHAVEN. A bearded Krishna or
-    Vishnu is a HARD FAILURE — devotees find it deeply wrong.
+  * 🕉️ HINDU DEITY CANON — NON-NEGOTIABLE authenticity.
+    WRITE EVERY FEATURE AS A PRESENT OBJECT, NEVER AS AN ABSENCE. Say "his jaw
+    and upper lip are smooth, bare skin" — NEVER "no beard" or "clean-shaven
+    (no moustache)". The image model cannot render a negation: it renders
+    whatever you NAME, so naming a beard to forbid it is what draws one. A
+    "look" reading "clean-shaven ... never a full beard" produced a bearded
+    master portrait that then propagated through an entire published reel.
+      - SMOOTH, BARE JAW AND UPPER LIP: Vishnu, Krishna, Rama, Lakshmana,
+        Kartikeya, Indra, Shiva, and every youthful male god. e.g. Krishna =
+        "a youthful man, his jaw and upper lip smooth bare skin, dark
+        blue raincloud skin, peacock feather, flute".
+      - A BEARD IS CORRECT FOR EXACTLY THREE: Brahma (elderly, full WHITE beard,
+        four faces), Yama/Shani (mature, short neat beard), and rishis/sages
+        (long beard). Nobody else. SHIVA IS NOT ONE OF THEM — his jaw is bare.
+      - Goddesses (Durga, Kali, Lakshmi, Saraswati, Parvati) = female faces.
+      - Hanuman has the face of a VANARA — a furred monkey muzzle on a man's
+        body, in the stylised devotional manner of temple art, never a
+        realistic ape and never a plain human face.
+    A bearded Krishna, Vishnu or Shiva is a HARD FAILURE — devotees find it
+    deeply wrong.
   * In visuals[], refer to each recurring character by the SAME "name" word
     you put in the bible (and list any other words used as "aliases"), so the
     pipeline can tell which scenes show them. Describe their ACTION/pose/
     background in the scene — do NOT re-describe their fixed appearance.
   * Use [] for character_bible only when the video has no recurring character
-    (pure landscape/mantra/abstract). Most mythology/bhakti videos DO have one.
+    (pure landscape/mantra/abstract). Most Pauranik/bhakti videos DO have one.
 
 VIRAL-HOOK CHECKLIST for title (most important field!):
 - ✅ Curiosity gap (not full answer in title)

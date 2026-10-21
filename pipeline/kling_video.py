@@ -28,7 +28,11 @@ def generate_hero_clip(
     out_path: Path,
     duration: int = 5,
     negative_prompt: str = "blur, distortion, low quality, extra limbs, deformed face, watermark, text",
-    cfg_scale: float = 0.5,
+    # 0.5 let Kling ignore the prompt and fall back to its default ambient
+    # drift, which is how a hero clip came back as a slow push-in on a deity
+    # that never moved. Raised to 0.8: Kling's cfg_scale is prompt adherence,
+    # and this prompt now names a specific action that must actually happen.
+    cfg_scale: float = 0.8,
     model: str | None = None,
 ) -> bool:
     """Animate a reference still into a short hero clip via Kling v3 I2V.

@@ -222,6 +222,27 @@ def _generate_gemini(prompt: str, out_path: Path, model: str) -> bool:
 # shots, crowds, landscapes) so they are never corrupted by a wrong reference.
 # ─────────────────────────────────────────────────────────────────────────
 
+_HAIR_CLAUSE = re.compile(
+    r"[^,.;—]*\b(beard|bearded|moustache|mustache|stubble|clean-shaven|cleanshaven|"
+    r"facial hair|goatee)\b[^,.;—]*", re.I)
+
+
+def _strip_facial_hair(look: str) -> str:
+    """Remove every facial-hair claim from an LLM-written `look`.
+
+    The deity_blocks in config are sourced and tested and already state the jaw
+    correctly; `look` is regenerated every run and cannot be trusted with it.
+    script_writer's template used to SHOW Shiva "with a neat beard", and told the
+    writer Shiva is one of the bearded deities -- which is wrong, and is what
+    actually produced the bearded master portraits chased through prompts,
+    references and models for a whole session. That template is fixed now, but
+    the writer is an LLM and will drift back, so where a block exists its wording
+    wins and the look's version is removed before it can contradict it."""
+    out = _HAIR_CLAUSE.sub("", look or "")
+    out = re.sub(r"\s*,\s*,", ",", out)
+    return re.sub(r"\s{2,}", " ", out).strip(" ,;—") or (look or "")
+
+
 def _detect_cast(prompt: str, bible: list[dict]) -> list[dict]:
     """Return bible characters whose name/alias appears in the scene prompt."""
     low = prompt.lower()
@@ -275,8 +296,12 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
             _icfg = load_config()          # cfg is not in this function's scope
             _blk = _deity_block(look, _icfg)
             _tail = ((_icfg.get("images", {}) or {}).get("style_tail") or "").strip() if _blk else style
+            # Where a sourced deity block exists it OWNS the iconography, so any
+            # facial-hair claim the writer put in `look` is removed before it can
+            # contradict the block. See _strip_facial_hair.
+            _look = _strip_facial_hair(look) if _blk else look
             prompt = (
-                f"Full-body single-character reference portrait of {look}. "
+                f"Full-body single-character reference portrait of {_look}. "
                 f"{_blk} "
                 f"Centered frontal hero pose, clean plain simple background, "
                 f"dramatic divine lighting, intricate detail, masterpiece{_tail}."
