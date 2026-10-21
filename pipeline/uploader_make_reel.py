@@ -259,3 +259,84 @@ def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None
     except Exception as e:
         print(f"[make-reel] error: {type(e).__name__}: {e}")
         return False
+
+
+# ── PHOTO LANE ───────────────────────────────────────────────────────────────
+
+def _cloudinary_upload_image(path: Path, cloud: str, key: str, secret: str) -> str | None:
+    ts = str(int(time.time()))
+    folder = "photos"
+    sig = hashlib.sha1((f"folder={folder}&timestamp={ts}" + secret).encode()).hexdigest()
+    with open(path, "rb") as f:
+        r = requests.post(
+            f"https://api.cloudinary.com/v1_1/{cloud}/image/upload",
+            data={"api_key": key, "timestamp": ts, "folder": folder, "signature": sig},
+            files={"file": (path.name, f, "image/jpeg")}, timeout=180,
+        )
+    if r.status_code != 200:
+        print(f"[make-photo][cloudinary] HTTP {r.status_code}: {r.text[:200]}")
+        return None
+    return r.json().get("secure_url")
+
+
+def upload_photo(image_path, caption: str, channel: str, fb_page_id: str,
+                 comment: str = "", post_at: str | None = None) -> bool:
+    """Publish (or queue) a single photo post through the same Make scenario.
+
+    The scenario routes on `post_type`: "photo" + image_url goes to the photo
+    route (http:ActionGetFile -> facebook-pages:UploadPhoto -> CreateComment),
+    while the reel routes all require post_type to be ABSENT, so the two lanes
+    cannot collide. Verified live on the Gods of the Mind page 2026-10-21.
+
+    fb_page_id is REQUIRED and must be the real page id the Make connection can
+    post to (Gods of the Mind = 1113214471881336). Without it the router matches
+    the "no fb_page_id" route and the post lands on the WRONG PAGE — which is
+    why this refuses rather than guessing.
+
+    post_at: ISO time -> queued for post_pending_reels.py (Make's UploadPhoto has
+    no scheduling parameter of its own, so scheduling has to live on our side).
+    """
+    cloud = os.getenv("CLOUDINARY_CLOUD_NAME")
+    key = os.getenv("CLOUDINARY_API_KEY")
+    secret = os.getenv("CLOUDINARY_API_SECRET")
+    webhook = os.getenv("MAKE_REEL_WEBHOOK")
+    if not all([cloud, key, secret, webhook]):
+        print("[make-photo] missing CLOUDINARY_* or MAKE_REEL_WEBHOOK — skipping")
+        return False
+    if not str(fb_page_id or "").strip():
+        print("[make-photo] REFUSING: no fb_page_id — the post would go to the wrong page")
+        return False
+    try:
+        url = _cloudinary_upload_image(Path(image_path), cloud, key, secret)
+        if not url:
+            return False
+        print(f"[make-photo] cloudinary: {url}")
+        if post_at:
+            import json
+            _PENDING.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                recs = json.loads(_PENDING.read_text()) if _PENDING.exists() else []
+            except Exception:
+                recs = []
+            rid = f"{channel}_photo_{post_at}"
+            recs = [r for r in recs if r.get("id") != rid]
+            rec = {"id": rid, "image_url": url, "post_type": "photo",
+                   "caption": caption, "channel": channel,
+                   "fb_page_id": str(fb_page_id).strip(), "post_at": post_at}
+            if comment:
+                rec["comment"] = comment
+            recs.append(rec)
+            _PENDING.write_text(json.dumps(recs, ensure_ascii=False, indent=1))
+            print(f"[make-photo] QUEUED {rid} for {post_at}")
+            return True
+        payload = {"image_url": url, "post_type": "photo", "caption": caption,
+                   "channel": channel, "fb_page_id": str(fb_page_id).strip()}
+        if comment:
+            payload["comment"] = comment
+        r = requests.post(webhook, json=payload, timeout=120)
+        ok = r.status_code in (200, 202)
+        print(f"[make-photo] webhook ({channel}, page={fb_page_id}): {r.status_code} {r.text[:120]}")
+        return ok
+    except Exception as e:
+        print(f"[make-photo] error: {type(e).__name__}: {e}")
+        return False

@@ -167,7 +167,11 @@ def main():
         if pa is None:
             dropped += 1
             continue  # malformed → drop
-        url = r.get("video_url")
+        # A photo record carries image_url instead of video_url. Everything
+        # else — the dedup ledger, the past-peak drop, the MIN_GAP_HOURS
+        # spacing — works on the url whichever kind it is, so the photo lane
+        # gets the same protections the reel lane already has.
+        url = r.get("video_url") or r.get("image_url")
         channel = r.get("channel", "")
         # Already posted this video URL, OR this slot-id was already posted → never
         # post again (even if a previous dequeue failed to commit, or it was
@@ -203,8 +207,13 @@ def main():
             continue
         # due now + spacing ok → try to post
         try:
-            payload = {"video_url": url, "caption": r.get("caption", ""),
-                       "channel": r.get("channel", "")}
+            if r.get("post_type") == "photo":
+                payload = {"image_url": url, "post_type": "photo",
+                           "caption": r.get("caption", ""),
+                           "channel": r.get("channel", "")}
+            else:
+                payload = {"video_url": url, "caption": r.get("caption", ""),
+                           "channel": r.get("channel", "")}
             if r.get("fb_page_id"):
                 payload["fb_page_id"] = r["fb_page_id"]
             if r.get("comment"):

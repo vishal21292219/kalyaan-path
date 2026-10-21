@@ -372,6 +372,49 @@ def _render_phrase_png_colored(text: str, width: int, font_size: int, out: "Path
     return out
 
 
+def caption_coverage(video: "Path", expected_windows: list) -> float:
+    """Fraction of sampled seconds that actually SHOW a caption in the finished
+    video. Best-effort; returns -1.0 if it cannot run.
+
+    This exists because the pipeline shipped a reel with a 36-SECOND hole in its
+    captions and reported success. The overlays were requested correctly — the
+    phrase windows covered the whole 82s with no gaps — and ffmpeg silently
+    dropped most of them inside one filter_complex pass. Nothing could tell,
+    because nothing ever looked at the finished file. Measuring the OUTPUT, not
+    the intent, is the only thing that catches this."""
+    import subprocess
+    try:
+        from PIL import Image
+        import numpy as np
+    except Exception:
+        return -1.0
+    try:
+        dur = float(subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "csv=p=0", str(video)],
+            capture_output=True, text=True, check=True).stdout.strip())
+    except Exception:
+        return -1.0
+    probe = Path(str(video) + ".capprobe.jpg")
+    on = tot = 0
+    try:
+        for t in range(1, int(dur), 2):
+            if expected_windows and not any(a <= t <= b for _, a, b in expected_windows):
+                continue          # no caption was asked for here — not a miss
+            subprocess.run(
+                ["ffmpeg", "-y", "-v", "error", "-ss", str(t), "-i", str(video),
+                 "-frames:v", "1", "-vf", "crop=iw:400:0:1250,scale=270:100", str(probe)],
+                check=True)
+            tot += 1
+            if (np.array(Image.open(probe).convert("L")) > 225).mean() > 0.012:
+                on += 1
+    except Exception:
+        return -1.0
+    finally:
+        probe.unlink(missing_ok=True)
+    return (on / tot) if tot else -1.0
+
+
 def _apply_caption_batches(base: "Path", entries: list, work: "Path", BR: str,
                            batch: int = 30) -> "Path":
     """Overlay many timed caption PNGs onto `base` in BATCHES. A single ffmpeg
@@ -1112,6 +1155,19 @@ def assemble(
                 "-c:a", "aac", "-b:a", "192k",
                 "-shortest", str(out_video),
             ])
+
+    # Measure what actually SHIPPED, not what was requested. A reel went out with
+    # a 36-second caption hole while every step reported success; the only thing
+    # that could ever have caught it is looking at the finished file.
+    if phrase_batch_entries:
+        _cov = caption_coverage(out_video, phrase_batch_entries)
+        if _cov < 0:
+            print("[captions] coverage check could not run")
+        elif _cov < 0.90:
+            print(f"[captions] *** ONLY {_cov*100:.0f}% OF CAPTIONED SECONDS SHOW A "
+                  f"CAPTION *** — overlays were dropped, this reel is degraded")
+        else:
+            print(f"[captions] coverage verified: {_cov*100:.0f}%")
 
     if not os.environ.get("KEEP_WORK"):
         shutil.rmtree(work, ignore_errors=True)
