@@ -493,13 +493,15 @@ video:
   # Running "cuts" FIRST on purpose: it costs nothing, and running both at once
   # would make it impossible to tell which one moved the number. Flip to
   # "motion" only after 14 reels of cuts have a 3-second rate to compare.
-  # MOTION, made the default 2026-10-21 per user ("motion ke saath banao, wahi
-  # final karo"). The cuts test is therefore ended early and deliberately — it
-  # never reached the 14 reels it needed, so it yields no verdict either way.
-  # The hook image becomes a real generated clip whose prompt is built from THAT
-  # scene's own visual line (run.py), with its duration matched to the scene so
-  # it cannot freeze on its last frame. ~₹22/reel, ~₹375/month at 4/week.
-  opener: motion
+  # OPENER: OFF (2026-10-21, user's call after seeing both cuts side by side).
+  # "motion" generated a real Kling clip for the hook — and by the end it worked:
+  # the final test clip had Durga rising from a bowed, collapsed posture to raise
+  # a flame and then a trishul, which actually matched the hook line. The user
+  # compared it against the identical reel without it and chose without. Absent
+  # key = plain Ken Burns, which is exactly the version that was approved.
+  # Saves ~₹22/reel (~₹660/month at daily). Set back to "motion" to re-enable,
+  # or "cuts" for the free hard-cut opener (that A/B never completed).
+  # opener: motion
   # opener_model: fal-ai/...   # optional cheaper I2V for "motion" (default Kling v3)
   font: assets/fonts/Anton-Regular.ttf
   font_size: 80
