@@ -107,6 +107,16 @@ Rules:
         realistic ape and never a plain human face.
     A bearded Krishna, Vishnu or Shiva is a HARD FAILURE — devotees find it
     deeply wrong.
+  * 🔱 EVERY visuals[] FRAME MUST SHOW THE DEITY. A line about modern life is
+    still a DEITY frame — put the god in it and let the modern feeling show
+    THROUGH him, never instead of him. If body[i] is "you scroll until the day
+    dissolves", visuals[i] is NOT "a lone silhouette lit by a phone screen" —
+    it is the deity filling the frame with that emptiness around him.
+    BANNED in every frame, no exceptions: a small distant silhouette of a modern
+    person, an empty landscape or sky or room, a body part with no deity, an
+    abstract light effect with nobody in it, a stock-photo human. These read as
+    self-help stock, they are what the audience does NOT come for, and a frame
+    with no deity is rejected by the pipeline and regenerated at cost.
   * In visuals[], refer to each recurring character by the SAME "name" word
     you put in the bible (and list any other words used as "aliases"), so the
     pipeline can tell which scenes show them. Describe their ACTION/pose/

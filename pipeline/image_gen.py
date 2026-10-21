@@ -604,9 +604,15 @@ def _strip_text_requests(visual: str) -> str:
     return out or (visual or "")
 
 
-_SACRED = ("trishul", "trident", "vajra", "chakra", "conch", "shankh", "lotus throne",
-           "murti", "yantra", "lingam", "shivling", "gada", "vahana", "temple", "deity",
-           "goddess", "god ")
+# CONCRETE sacred OBJECTS only. "deity", "goddess" and "god" were in this list
+# and are not objects — they are words the writer uses to DESCRIBE a frame. On
+# 2026-10-21 the hook scene "a lone human silhouette half-submerged in fog,
+# phone screen glow the only light" contained the word "deity" further along in
+# its own text, so this let it through as already-sacred, _force_deity skipped
+# it, and the reel opened on a banned modern silhouette — as its FB cover frame.
+_SACRED = ("trishul", "trident", "vajra", "chakra", "conch", "shankh",
+           "lotus throne", "murti", "yantra", "lingam", "shivling", "gada",
+           "vahana", "temple", "mandir", "damaru", "kirita", "mundamala")
 
 
 def _force_deity(visuals: list[str], cfg: dict) -> list[str]:
