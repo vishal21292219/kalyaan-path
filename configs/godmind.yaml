@@ -204,6 +204,14 @@ llm:
     now: the destroyer, the protector, or the trickster? Comment it."
 
   image_style_guidance: |
+    - PHRASE EVERY ATTRIBUTE AS A PRESENT OBJECT, NEVER AS AN ABSENCE. Write
+      "his jaw is smooth and bare" — never "no beard", "never a full beard",
+      "clean-shaven (no moustache)". FLUX has no way to render a negation: it
+      renders whatever you NAME. On 2026-10-21 a `look` reading "clean-shaven
+      with very light stubble only - never a full beard" produced a master
+      portrait with a full beard, which then propagated into every
+      reference-conditioned scene of that reel. This rule outranks every line
+      below it; if a note below still reads as a ban, convert it yourself.
     - ALWAYS render deities as MATURE ADULTS with a strong, expressive face and clear gender — never children/babies, never soft/feminine/androgynous. State age + sex explicitly in every `look`.
     - AUTHENTIC CANONICAL ICONOGRAPHY (get this RIGHT — inauthentic deities kill the channel; a bearded Krishna is WRONG):
         · Krishna, Ram, Kartikeya = YOUTHFUL clean-shaven young men (~early 20s), smooth flawless face, absolutely NO beard, NO moustache; Krishna = blue-skinned, peacock-feather crown, flute, yellow dhoti.

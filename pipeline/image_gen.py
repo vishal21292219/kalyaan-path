@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import base64
 import os
+import re
 import time
 from pathlib import Path
 
@@ -100,6 +101,30 @@ def _generate_fal_flux(prompt: str, out_path: Path,
 class GeminiUnavailable(RuntimeError):
     """Raised when all image providers fail after retries.
     Name kept for backward compat with run.py's catch logic."""
+
+
+def is_blank(path: Path) -> bool:
+    """True if the file is an effectively empty frame.
+
+    2026-10-21: img_05 of a live GoM reel was a 34KB solid-black JPEG (every
+    other scene was ~450KB) and it shipped into the finished video as a black
+    frame at 00:34. fal's premium endpoint does NOT raise when its safety
+    checker fires — it answers HTTP 200 with a black image — so every provider
+    in the chain reported success. Silent success on a failed step is this
+    project's most expensive bug class; every frame is now checked.
+
+    NOTE scope: this is the ONLY image_gen change from that investigation. The
+    bearded-Shiva problem found in the same session is NOT fixed here — three
+    prompt-level fixes were tried against flux-pro and each either failed or
+    regressed the art style into photoreal cosplay, so the master path is left
+    exactly as it was rather than shipping a fourth guess. See the session note
+    in configs/godmind.yaml (images.deity_blocks)."""
+    try:
+        from PIL import Image, ImageStat
+        st = ImageStat.Stat(Image.open(path).convert("L"))
+        return st.stddev[0] < 10 or st.mean[0] < 12
+    except Exception:
+        return True
 
 
 def _generate_hf_flux(prompt: str, out_path: Path, model: str = HF_DEFAULT_MODEL,
@@ -382,7 +407,7 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 
         # Provider chain: fal.ai FLUX 1.1-pro (paid premium) → HF FLUX schnell (free) → Gemini (free)
         ok = False
-        if use_fal and _generate_fal_flux(prompt, path, model=(hero_model if is_hero else fal_model), target_w=target_w, target_h=target_h, seed=seed):
+        if use_fal and _generate_fal_flux(prompt, path, model=(hero_model if is_hero else fal_model), target_w=target_w, target_h=target_h, seed=seed) and not is_blank(path):
             ok = True
             fal_succeeded += 1
         elif _generate_hf_flux(prompt, path):
@@ -398,6 +423,13 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
             except GeminiUnavailable as e:
                 last_error = e
                 print(f"[image_gen] img {i}: Gemini also failed: {e}")
+
+        # Last line of defence: no provider's frame reaches the assembler blank,
+        # whatever it reported. A missing scene is recoverable; a black frame in
+        # a published reel is not.
+        if ok and is_blank(path):
+            print(f"[image_gen] img {i}: provider returned a BLANK frame — dropping scene")
+            ok = False
 
         if ok:
             # Enforce target aspect ratio: resize+center-crop if provider gave wrong orientation
