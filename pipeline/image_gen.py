@@ -622,15 +622,34 @@ def _force_deity(visuals: list[str], cfg: dict) -> list[str]:
     return out
 
 
+def _match_deity(text: str, blocks: dict) -> str:
+    """Which deity_blocks key this text NAMES, as a whole word, or "".
+
+    WORD BOUNDARIES MATTER MORE THAN THEY LOOK. This matched on a bare substring
+    until 2026-10-21, which meant "dramatic" contained "ram" — so any scene
+    description with the word "dramatic" in it (and the LLM writes that
+    constantly; the channel's own style text says "dramatic chiaroscuro
+    lighting") silently had RAM's full iconography injected: dark blue skin, a
+    longbow, a kirita crown. That is why reels about other deities kept coming
+    back full of blue archers, and why a deity-less scene was left un-restaged
+    and shipped as a woman alone in a forest. "drama", "programme" and
+    "panorama" hit it too.
+
+    Longest key first so "kartikeya" is not shadowed by a shorter one."""
+    if not blocks:
+        return ""
+    low = (text or "").lower()
+    for name in sorted(blocks, key=len, reverse=True):
+        if re.search(rf"\b{re.escape(name)}\b", low):
+            return name
+    return ""
+
+
 def _deity_name(text: str, cfg: dict) -> str:
     """Which deity_blocks key this prompt names, or "". Longest key first so
     "kartikeya" is not shadowed by a shorter one — same rule as _deity_block."""
     blocks = (cfg.get("images", {}) or {}).get("deity_blocks") or {}
-    low = (text or "").lower()
-    for name in sorted(blocks, key=len, reverse=True):
-        if name in low:
-            return name
-    return ""
+    return _match_deity(text, blocks)
 
 
 def _deity_block(text: str, cfg: dict) -> str:
@@ -644,13 +663,8 @@ def _deity_block(text: str, cfg: dict) -> str:
     Longest name first so "kartikeya" is not shadowed by a shorter key.
     """
     blocks = (cfg.get("images", {}) or {}).get("deity_blocks") or {}
-    if not blocks:
-        return ""
-    low = (text or "").lower()
-    for name in sorted(blocks, key=len, reverse=True):
-        if name in low:
-            return str(blocks[name]).strip()
-    return ""
+    name = _match_deity(text, blocks)
+    return str(blocks[name]).strip() if name else ""
 
 
 def _fit_to_aspect(img, target_w: int, target_h: int):
