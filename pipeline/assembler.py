@@ -416,11 +416,26 @@ def caption_coverage(video: "Path", expected_windows: list) -> float:
 
 
 def _apply_caption_batches(base: "Path", entries: list, work: "Path", BR: str,
-                           batch: int = 30) -> "Path":
+                           batch: int = 3) -> "Path":
     """Overlay many timed caption PNGs onto `base` in BATCHES. A single ffmpeg
-    filter_complex with 100+ PNG overlays silently drops them; chunking into
-    <=`batch`-overlay passes is reliable. Intermediates use crf 16 (near-lossless)
-    so multi-pass quality loss is negligible. Returns the final captioned mp4."""
+    filter_complex with many PNG overlays SILENTLY drops most of them; chunking
+    is the fix. Intermediates use crf 16 (near-lossless) so multi-pass quality
+    loss is negligible. Returns the final captioned mp4.
+
+    BATCH SIZE IS MEASURED, NOT ASSUMED. This said 30 and called it "reliable"
+    for a long time; it is not, and a live reel shipped with a 36-SECOND hole in
+    its captions because of it. Measured 2026-10-21 against that reel's own
+    phrase PNGs over its own slides.mp4, counting seconds that actually SHOW a
+    caption in the output:
+
+        batch   30     12      8      5      4      3      2
+        shown   47%    75%    85%    95%    97%   100%   100%
+
+    A synthetic test with small PNGs over a black video passed at 30, which is
+    why the original number looked safe — the drop only appears with real
+    full-width RGBA captions over real footage. 3 is the largest size measured
+    at 100%, and the extra encode passes are worth far more than missing
+    captions on a channel where the words carry the content."""
     cur, n = base, 0
     for i in range(0, len(entries), batch):
         chunk = entries[i:i + batch]
