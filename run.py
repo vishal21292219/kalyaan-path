@@ -457,7 +457,10 @@ def main(argv: list[str]) -> int:
     # configurable (video.opener_model) so a cheaper I2V can be swapped in
     # without touching code.
     _opener = str(_vcfg.get("opener", "")).lower()
-    _hero_on = bool(_vcfg.get("hero_motion", True)) or _opener == "motion"
+    # Defaults FALSE. hero_motion is a PAID Kling call; a config key that goes
+    # missing must not silently start spending. opener: "motion" turns it on
+    # explicitly, which is how GoM enables it.
+    _hero_on = bool(_vcfg.get("hero_motion", False)) or _opener == "motion"
     _hero_sec = int(_vcfg.get("hero_motion_sec", 3 if _opener == "motion" else 5))
     _hero_model = _vcfg.get("opener_model") or None
     if hero_clips is None and _hero_on and not args.no_motion and not args.long_form and len(images) >= 3:

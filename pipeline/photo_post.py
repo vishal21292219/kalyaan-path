@@ -170,7 +170,9 @@ def _reject(line: str, deity: str) -> str:
     for w in _BANNED_WORDS:
         if w in low:
             return f"banned word '{w}'"          # settled rule, see CLAUDE.md
-    if deity not in low:
+    # Word boundary, not substring: "ram" is inside "dramatic", which is how a
+    # deity-less scene passed as having a deity elsewhere in this pipeline.
+    if not re.search(rf"\b{re.escape(deity)}\b", low):
         return "deity not named in the line"      # the gold accent needs it
     if line.count(".") > 1 or "?" in line or "!" in line:
         return "not a single calm sentence"

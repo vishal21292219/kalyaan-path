@@ -413,7 +413,9 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     # for long-form (horizontal documentary) where recurring deities are rare.
     masters: dict[str, str] = {}
     bible = character_bible or []
-    consistency_on = bool(cfg["images"].get("consistency", True)) and not long_form and bible and use_fal
+    # Defaults FALSE: deleting the key from config should turn a paid feature OFF,
+    # not silently leave it on. Same reasoning as video.hero_motion below.
+    consistency_on = bool(cfg["images"].get("consistency", False)) and not long_form and bible and use_fal
     # Cost guard: only the most impactful scenes are reference-conditioned (each
     # costs a nano-banana edit). Default 3 hero shots/video — ~80% of the visual
     # consistency benefit at a fraction of the cost. 0 = unlimited.

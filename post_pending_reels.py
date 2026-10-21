@@ -192,6 +192,13 @@ def main():
             mins = int((n - pa).total_seconds() // 60)
             print(f"[poster] DROP past-peak {r.get('id')} ({channel}) — "
                   f"{mins}m late (> {MAX_AGE_HOURS}h); off-peak, not posting")
+            # Second silent-loss path, and it used to only print. The slot was
+            # already marked delivered at RENDER time, so catch-up will not
+            # recover it either — the post is simply gone, and nothing said so.
+            _alert(f"⚠️ *Reel DROPPED* (past its peak, never posted)\n"
+                   f"channel: `{channel}`\nid: `{r.get('id')}`\n"
+                   f"due: {r.get('post_at')} ({mins}m late)\n\n"
+                   f"Catch-up will NOT recover this — the slot is already marked delivered.")
             continue
         # SOP G2/G3/G5 — NO back-to-back: if this page got a post within the last
         # MIN_GAP_HOURS (incl. one posted earlier in THIS run, since each post
@@ -218,6 +225,14 @@ def main():
                 payload["fb_page_id"] = r["fb_page_id"]
             if r.get("comment"):
                 payload["comment"] = r["comment"]   # Make posts it as the first comment
+            # KNOWN GAP: a 200 here means Make ACCEPTED the payload into its
+            # queue, NOT that Facebook published it. On 2026-10-21 a broken
+            # scenario returned 200 for every post while publishing nothing, the
+            # record was dropped from the queue as "posted", and a TimeDecoders
+            # reel was lost with no alert anywhere. Closing this properly needs
+            # the poster to read back the Make execution (an API token it does
+            # not have) or the page itself. Until then, treat the posted-ledger
+            # as "dispatched", not "published", when debugging a missing post.
             resp = requests.post(WEBHOOK, json=payload, timeout=120)
             if resp.status_code in (200, 202):
                 posted += 1

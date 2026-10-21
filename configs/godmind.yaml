@@ -460,6 +460,17 @@ video:
   # recall → follows). Gated here + fully guarded, so it can never break renders.
   brand_overlays: true
   music: true
+  # PHRASE captions, forced. Word-by-word mode makes ONE overlay per word, and
+  # overlays are applied in passes of 3 (see assembler._apply_caption_batches —
+  # 3 is the largest size measured at 100% caption retention). A sub-150-word
+  # script therefore drops into word mode and needs up to 50 full re-encodes of
+  # a 1080x1920 video, which would run past the workflow's timeout. Phrase mode
+  # caps it at ~55 overlays (~19 passes) for the 170-word body cap, and the
+  # assembler's own notes say it reads better for narration anyway.
+  # The proper fix is to composite all caption PNGs into ONE alpha track and
+  # overlay once, making the count irrelevant; that is a rewrite of a working
+  # component and is deliberately not being done at the end of a long session.
+  caption_style: phrase
   music_volume: 0.09   # meditative bed slightly more present (you "lean in to listen")
   stings: false
   duration_target_sec: 80
