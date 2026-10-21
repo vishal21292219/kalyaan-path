@@ -1,0 +1,177 @@
+{
+  "slug": "off_interview",
+  "title": "Boss ne meeting mein mera idea churaya. 2 saal baad wahi mere saamne baitha tha | Anhoni #shorts",
+  "characters": {
+    "arjun": "26-year-old Indian man, lean build, oval face, medium-brown skin, tired eyes with faint dark circles, short neatly-parted black hair, thin stubble. Wears a slightly loose plain white formal shirt with sleeves folded once, dull grey trousers, a laminated blue office ID card on a lanyard. Distinctive feature: a small chipped tooth visible when he speaks, and a habit of clutching a black spiral notebook.",
+    "rohit": "34-year-old Indian man, broad build, square jaw, wheatish skin, gelled-back black hair, thick well-groomed eyebrows, clean-shaven. Wears a sharp navy-blue blazer over a light-blue shirt, silver wristwatch, no ID card. Distinctive feature: a confident smirk and a gold-rimmed pen he keeps clicking.",
+    "meera": "48-year-old Indian woman, calm, medium build, round face, wheatish skin, short salt-and-pepper bob, small silver-rimmed glasses. Wears a deep-maroon cotton kurta with a light grey shawl, a slim gold bangle. Distinctive feature: an unhurried, reading-you gaze and a habit of tapping a pen twice before speaking."
+  },
+  "intro": "Boss ne poore boardroom ke saamne mera pura plan apne naam bol diya.",
+  "music_prompt": "emotional cinematic background music, tense-corporate turning quietly triumphant, soft piano and low strings, heartfelt build-up, no vocals",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "arjun",
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Rohit",
+      "text": "\"Yeh growth plan raat bhar maine banaya.\"",
+      "speaker": [
+        0.62,
+        0.34
+      ],
+      "prompt": "Wide boardroom shot, glass walls, long table, PPT glowing on screen. Rohit stands presenting, smirking, gold pen in hand. In the back corner Arjun sits stiff, gripping his black spiral notebook, eyes down. Warm ceiling lights, corporate blue tones."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "thought",
+      "who": "Arjun",
+      "text": "Slide 4 pe abhi bhi meri spelling galti hai.",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Close-up of Arjun at the boardroom edge, screen light on his face, jaw tight, chipped tooth just visible as he swallows. His thumb presses hard on the notebook spine. Dim corporate evening glow."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "arjun",
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Rohit",
+      "text": "\"Intern se idea aata nahi, seekho.\"",
+      "speaker": [
+        0.6,
+        0.3
+      ],
+      "prompt": "Over-shoulder shot from behind Arjun facing Rohit, who leans against a cubicle wall, clicking his pen, half-smiling. Arjun's hand rests flat on his notebook, knuckles pale. Fluorescent corridor behind, empty desks."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "thought",
+      "who": "Arjun",
+      "text": "Har draft maine ma'am ko CC kiya tha.",
+      "speaker": [
+        0.45,
+        0.42
+      ],
+      "prompt": "Close-up of Arjun's laptop, an email thread folder labelled 'GROWTH PLAN' with dated drafts, one recipient name partly visible. His finger still on the trackpad, eyes calm and sharp in the screen glow. Night office, empty desks behind."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "arjun",
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Rohit",
+      "text": "\"Promotion mera. Party tum karwa dena.\"",
+      "speaker": [
+        0.58,
+        0.32
+      ],
+      "prompt": "Medium shot near the coffee machine. Rohit grinning, holding a fresh appraisal letter, pen tucked in pocket. Arjun stands aside with a paper cup, forcing a tight small smile, notebook under his arm. Bright pantry lighting."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "arjun",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "\"Resign mat karo. Sirf ek naam yaad rakhna.\"",
+      "speaker": [
+        0.4,
+        0.36
+      ],
+      "prompt": "Two-shot in a quiet glass cabin. Meera sits behind a clean desk, tapping her pen twice, calm reading gaze over silver glasses. Arjun stands, resignation letter in hand, surprised. Soft daytime window light, muted grey office."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "thought",
+      "who": "Arjun",
+      "text": "Us din maine letter jeb mein wapas rakh liya.",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Wide shot of Arjun at the office glass doors at dusk, sliding a folded resignation letter back into his shirt pocket, black notebook pressed to his chest. Face steadier now. Golden street light spilling across the floor."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Rohit",
+      "text": "\"2 saal ho gaye. Aaj interview crack karna hai.\"",
+      "speaker": [
+        0.52,
+        0.35
+      ],
+      "prompt": "Medium shot, 2 years later. Rohit sits in a sleek reception lounge, hair greyer at the temples, no gold pen, adjusting his tie, a fresh resume trembling slightly in his lap. Cool blue premium office tones."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "arjun",
+        "rohit",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Arjun",
+      "text": "\"Andar aaiye Rohit. Panel main aur ma'am hain.\"",
+      "speaker": [
+        0.38,
+        0.3
+      ],
+      "prompt": "Dramatic over-shoulder from behind seated Rohit, frozen mid-rise. At the interview room door stands Arjun, sharper now, black notebook in hand; beside him inside, Meera seated calmly, tapping her pen. Rohit's mouth open in shock. Warm-cold contrast lighting."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "arjun",
+        "meera"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Ma'am ne notebook khola — slide 4 wali spelling galti abhi bhi likhi thi.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Close-up of the worn black spiral notebook open on the glass interview table, a dated handwritten page beside a printed email screenshot, one line circled. Meera's hand rests on it, Arjun quiet, Rohit's pale blurred face behind. Tense, satisfying stillness."
+    }
+  ],
+  "caption": "Jise sabke saamne 'sirf intern' bola tha... aaj wahi uska interview le raha hai. 😮‍💨\nAur us purane notebook ki ek chhoti si spelling galti Rohit ki poori kahani kholne wali thi.\nAap batao comments me — us din Arjun ko resign karna chahiye tha ya rukna? 👇\nPart 2 ke liye Follow karo @anhoni\n(Yeh ek kaalpanik kahani hai. This is a work of fiction.)",
+  "hashtags": [
+    "anhoni",
+    "officepolitics",
+    "credittheft",
+    "corporatelife",
+    "hindidrama",
+    "emotionalstory",
+    "underdog",
+    "interview",
+    "twistending",
+    "shorts",
+    "reels",
+    "hinglish",
+    "workplacestory",
+    "tablesturned"
+  ]
+}

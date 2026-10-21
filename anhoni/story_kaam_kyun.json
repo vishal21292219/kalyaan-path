@@ -1,0 +1,168 @@
+{
+  "slug": "kaam_kyun",
+  "title": "6 meeting ke baad Malhotra sir ne kaam ka jo solution diya... | Anhoni #shorts",
+  "characters": {
+    "simran": "Simran, an attractive stylish confident curvy young Indian woman in her mid-20s, natural hourglass figure, warm medium-brown skin, glossy voluminous wavy jet-black hair, tasteful glam makeup with defined eyes and soft lip, gold jhumka earrings; wears a stylish tan-brown formal blazer suit with matching trousers over a crisp white collared shirt buttoned up (modest neckline, no cleavage), a slim belt, company ID on a maroon lanyard; confident poised expression. Distinctive: tan-brown suit + maroon lanyard always visible.",
+    "malhotra": "Mr. Malhotra, late-40s Indian man, round stern face, medium-brown skin, thick black moustache, slightly balding with grey side hair, reading glasses low on nose, always frowning irritated expression; wears a light-grey formal shirt with a slightly tight dark maroon tie over a small paunch. Distinctive feature: reading glasses perched on nose-tip."
+  },
+  "intro": "POV: 6 meeting ke baad boss poochta hai — kaam kyun nahi hua?",
+  "music_prompt": "light quirky corporate background music, deadpan playful-tense, minimal ticking-clock vibe, no vocals",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "speech",
+      "who": "Simran",
+      "text": "Calendar khola. 6 meeting. Kaam kab?",
+      "speaker": [
+        0.55,
+        0.32
+      ],
+      "prompt": "Over-shoulder morning shot, Simran at cubicle staring at laptop calendar packed with back-to-back colour blocks, coffee mug in hand, deadpan wide eyes; glass office windows, maroon lanyard visible."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "thought",
+      "who": "Simran",
+      "text": "Bas 5 minute kaam ke mil jaate...",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Medium shot, Simran walking toward a glass meeting room clutching laptop and mug, sarcastic tight-lipped hope; blurred coffee machine and cubicles behind her."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "9 AM — 'Quick' standup. 45 minute uda diye.",
+      "speaker": [
+        0.5,
+        0.14
+      ],
+      "prompt": "Wide shot of glass meeting room, 5 people standing around a whiteboard, Simran leaning on wall visibly bored glancing at wrist watch; timestamp caption feel."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "12 PM — '5-min call'. 90 minute chala.",
+      "speaker": [
+        0.5,
+        0.14
+      ],
+      "prompt": "Meeting room shot, Simran slumped in chair, half-eaten lunch box beside laptop (laptop-lunch), glazed tired eyes; multiple video-call tiles glowing on screen."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "4 PM — Meeting: agli meeting kab rakhein.",
+      "speaker": [
+        0.5,
+        0.14
+      ],
+      "prompt": "Close-up on Simran's dead-inside deadpan face lit by laptop glow in dim meeting room, one hand propping her chin; blurred colleagues gesturing behind."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "thought",
+      "who": "Simran",
+      "text": "Kaam hua: 0%. 'Great point' bola: 12 baar.",
+      "speaker": [
+        0.55,
+        0.35
+      ],
+      "prompt": "Simran back at empty cubicle at dusk, orange evening light, staring at untouched to-do list on screen full of unchecked boxes; office nearly empty behind her."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "simran",
+        "malhotra"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "Simran, aaj ka kaam kyun nahi hua?",
+      "speaker": [
+        0.7,
+        0.28
+      ],
+      "prompt": "Malhotra leaning over Simran's cubicle wall, frowning with glasses low on nose, irritated; Simran turning slowly with disbelief, mouth slightly open, maroon lanyard visible; evening office."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "simran",
+        "malhotra"
+      ],
+      "bubble": "thought",
+      "who": "Simran",
+      "text": "Din bhar to aapki hi meetings mein thi.",
+      "speaker": [
+        0.35,
+        0.32
+      ],
+      "prompt": "Two-shot, Simran biting back the words with a fake-calm smile, side-eye at camera; Malhotra oblivious scrolling his phone calendar; glass office at night."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "simran",
+        "malhotra"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "Iska solution — kal ek meeting rakhte hain.",
+      "speaker": [
+        0.7,
+        0.28
+      ],
+      "prompt": "Malhotra pointing confidently at calendar on his phone, satisfied nod; Simran's frozen open-mouth stare straight into camera, coffee mug mid-air; night office."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Corporate ka ilaaj: kaam na ho, ek aur meeting.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Bold punchline caption panel over Simran's defeated facepalm at empty cubicle, dark office, single desk lamp glow; clean screenshot-worthy text layout."
+    }
+  ],
+  "caption": "Din bhar sirf meeting, aur shaam ko sawaal — 'kaam kyun nahi hua?' 😮‍💨\nAur is problem ka solution bhi ek... meeting. Yeh loop kab tootega?\nTag wo colleague jiske calendar mein aaj 6 meeting hai 👇\nPart 2 ke liye Follow karo @anhoni\n(Yeh ek kaalpanik katha hai — sabhi paatra aur ghatnaayein kalpanik hain.)",
+  "hashtags": [
+    "anhoni",
+    "corporatelife",
+    "officehumor",
+    "relatable",
+    "meetings",
+    "worklife",
+    "hinglishreels",
+    "quietquitting",
+    "officememes",
+    "shorts"
+  ]
+}

@@ -17,9 +17,8 @@ name: Catch-up (recover missed posts)
 on:
   schedule:
     - cron: "30 15 * * *"  # GoM#1 — before its 17:00 peak
-    - cron: "30 19 * * *"  # GoM#2 + mantra/ancient/itihaas cluster — before 21:00 peak
+    - cron: "30 19 * * *"  # GoM#2 + TimeDecoders — before 21:00 peak
     - cron: "30 23 * * *"  # GoM#3 — before its 01:00 (next-day) peak
-    - cron: "0 12 * * 0"   # Sunday bhajan — before its 13:30 go-live
   workflow_dispatch:
     inputs:
       dry_run:
@@ -58,19 +57,8 @@ jobs:
       - name: Restore OAuth + secrets to .env
         # Mirrors daily-reels.yml EXACTLY so a recovered slot publishes to every
         # channel the primary run would have (all YT channels + FB/IG via Make +
-        # Cloudinary). Previously catch-up only had YT_TOKEN + ancient → a
         # recovered GoM/ancient slot silently dropped its FB/IG reel.
         env:
-          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
-          YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
-          YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
-          YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
-          YT_ITIHAAS_TOKEN_JSON: ${{ secrets.YT_ITIHAAS_TOKEN_JSON }}
-          YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
-          YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
-          YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
-          YT_MONEURONS_TOKEN_JSON: ${{ secrets.YT_MONEURONS_TOKEN_JSON }}
-          YT_MONEURONS_CLIENT_SECRET_JSON: ${{ secrets.YT_MONEURONS_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -98,16 +86,6 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           mkdir -p secrets
-          [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
-          [ -n "$YT_CLIENT_SECRET_JSON" ] && echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
-          [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
-          [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
-          [ -n "$YT_ITIHAAS_TOKEN_JSON" ] && echo "$YT_ITIHAAS_TOKEN_JSON" > secrets/itihaas_youtube_token.json
-          [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
-          [ -n "$YT_GODMIND_TOKEN_JSON" ] && echo "$YT_GODMIND_TOKEN_JSON" > secrets/godmind_youtube_token.json
-          [ -n "$YT_GODMIND_CLIENT_SECRET_JSON" ] && echo "$YT_GODMIND_CLIENT_SECRET_JSON" > secrets/godmind_youtube_client_secret.json
-          [ -n "$YT_MONEURONS_TOKEN_JSON" ] && echo "$YT_MONEURONS_TOKEN_JSON" > secrets/moneurons_youtube_token.json
-          [ -n "$YT_MONEURONS_CLIENT_SECRET_JSON" ] && echo "$YT_MONEURONS_CLIENT_SECRET_JSON" > secrets/moneurons_youtube_client_secret.json
           cat > .env <<EOF
           ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
           FAL_KEY=$FAL_KEY

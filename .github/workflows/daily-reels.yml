@@ -8,7 +8,7 @@
 #
 # Free Actions tier (private repo): 2000 min/mo. ~15 min × 4 × 30 = 1800 min.
 # If you make the repo public, Actions are unlimited free.
-name: Daily Reels (Itihaasvani + KalyaanPath)
+name: Daily Reels (Gods of the Mind + Time Decoders)
 
 on:
   # NOTE: each cron triggers GENERATION; video lands on YT ~25 min later.
@@ -23,7 +23,6 @@ on:
   schedule:
     # Itihaasvani: 2/day (cut from 3 — quality > quantity per review data).
     # Morning history/temple drop + night-prime SERIES binge drop.
-    # - cron: "30 15 * * *"   # Itihaasvani AM trending — DISABLED 2026-06-05 per user (only PM series now)
     # NIGHT BATCH (2026-06-10 per user): all daily generation clustered into a
     # 9:00-9:30 PM IST window (15:32-16:00 UTC) so every video lands on Telegram
     # together that night — user schedules all the FB posts in one sitting. Each
@@ -31,9 +30,6 @@ on:
     # ===== HELD 2026-06-20 (per user — FOCUS on GoM + TD + MN only) =====
     # Itihaasvani, KalyaanPath (mantra+bhajan), Lakeerein paused. Configs/code
     # untouched — just re-enable these crons to bring them back.
-    # - cron: "0 16 * * *"    # Itihaasvani SERIES — HELD
-    # - cron: "32 15 * * *"   # KalyaanPath mantra — HELD
-    # - cron: "0 10 * * 0"    # KalyaanPath Sunday Bhajan — HELD
     # ===================================================================
     # TimeDecoders (English ancient mysteries): 1/day (cut 2→1 on 2026-07-23 per
     # user — one reel/day at the single best audience window). Keep the 8 PM ET
@@ -165,16 +161,6 @@ jobs:
 
       - name: Restore OAuth + Telegram secrets to .env
         env:
-          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
-          YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
-          YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
-          YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
-          YT_ITIHAAS_TOKEN_JSON: ${{ secrets.YT_ITIHAAS_TOKEN_JSON }}
-          YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
-          YT_GODMIND_TOKEN_JSON: ${{ secrets.YT_GODMIND_TOKEN_JSON }}
-          YT_GODMIND_CLIENT_SECRET_JSON: ${{ secrets.YT_GODMIND_CLIENT_SECRET_JSON }}
-          YT_MONEURONS_TOKEN_JSON: ${{ secrets.YT_MONEURONS_TOKEN_JSON }}
-          YT_MONEURONS_CLIENT_SECRET_JSON: ${{ secrets.YT_MONEURONS_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -202,16 +188,6 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           mkdir -p secrets
-          [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
-          [ -n "$YT_CLIENT_SECRET_JSON" ] && echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
-          [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
-          [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
-          [ -n "$YT_ITIHAAS_TOKEN_JSON" ] && echo "$YT_ITIHAAS_TOKEN_JSON" > secrets/itihaas_youtube_token.json
-          [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
-          [ -n "$YT_GODMIND_TOKEN_JSON" ] && echo "$YT_GODMIND_TOKEN_JSON" > secrets/godmind_youtube_token.json
-          [ -n "$YT_GODMIND_CLIENT_SECRET_JSON" ] && echo "$YT_GODMIND_CLIENT_SECRET_JSON" > secrets/godmind_youtube_client_secret.json
-          [ -n "$YT_MONEURONS_TOKEN_JSON" ] && echo "$YT_MONEURONS_TOKEN_JSON" > secrets/moneurons_youtube_token.json
-          [ -n "$YT_MONEURONS_CLIENT_SECRET_JSON" ] && echo "$YT_MONEURONS_CLIENT_SECRET_JSON" > secrets/moneurons_youtube_client_secret.json
           cat > .env <<EOF
           ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
           FAL_KEY=$FAL_KEY

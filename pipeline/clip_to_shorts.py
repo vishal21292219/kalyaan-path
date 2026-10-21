@@ -312,7 +312,7 @@ def _words_to_sentences(words: List[Dict]) -> List[Dict]:
 def _build_short_metadata(pick: Dict, long_form_script: Dict, channel_handle: str,
                           niche: str) -> Dict:
     """Build a script-dict-shaped metadata file for the Short (compatible with
-    uploader_youtube.py format if user wants to auto-publish later)."""
+    the uploader format if the user wants to auto-publish later)."""
     long_title = long_form_script.get("title", "")
     short_title = pick["hook_title"]
     if not short_title:

@@ -1,0 +1,165 @@
+{
+  "slug": "sample_a",
+  "title": "Behen ki aakhri video mein wo parcel kis ne bheja tha? | Anhoni #shorts",
+  "characters": {
+    "meera": "28-year-old Indian woman, oval face, warm brown skin, dark circles under tired eyes, straight black hair tied in a loose low bun with loose strands, wearing a faded mustard-yellow kurta and grey shawl, thin silver nose-stud, a small mole above her left eyebrow",
+    "priya": "23-year-old Indian woman, round soft face, fair-wheatish skin, shoulder-length wavy hair with a red scrunchie, wearing an olive-green hoodie over a white tee, chipped blue nail polish, a faint scar on her right cheek"
+  },
+  "intro": "Raat ke 2 baje, 19 din baad, behen ka phone khud on ho gaya.",
+  "music_prompt": "dark cinematic suspense background music, cold and creeping, tense, no vocals, no drums",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "19 din se off tha… ab khud on ho gaya?",
+      "speaker": [
+        0.4,
+        0.35
+      ],
+      "prompt": "Close-up of Meera jolting upright in a dim bedroom, a dead-looking phone suddenly glowing blue in her palm, wall clock reads 2:07 AM, cold chai and a missing-poster of Priya taped behind her; premium comic, moody shadows"
+    },
+    {
+      "id": 2,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "thought",
+      "who": "Meera",
+      "text": "Ek nayi video… aaj subah ki date?",
+      "speaker": [
+        0.55,
+        0.3
+      ],
+      "prompt": "Over-shoulder macro of the phone screen: gallery shows one fresh video uploaded today, timestamp 6:41 AM, Meera's thumb frozen above it, her mole and loose hair strand catching the light; premium comic, intimate"
+    },
+    {
+      "id": 3,
+      "chars": [
+        "priya"
+      ],
+      "bubble": "speech",
+      "who": "Priya",
+      "text": "Didi, main theek hoon. Dhoondhna band karo.",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "The video playing: Priya in olive hoodie against a plain grey wall, flat forced smile, no hostel behind her, a bare bulb overhead; grainy phone-video look; premium comic"
+    },
+    {
+      "id": 4,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Scrunchie… tera red wala nahi hai.",
+      "speaker": [
+        0.45,
+        0.4
+      ],
+      "prompt": "Extreme close-up on the paused frame: Priya's wrist shows a plain black hair-tie, not red; Meera's wide eyes reflected in the glass, lips parting; harsh blue light; premium comic"
+    },
+    {
+      "id": 5,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "thought",
+      "who": "Meera",
+      "text": "Deewar pe… humare ghar ki daraar.",
+      "speaker": [
+        0.6,
+        0.3
+      ],
+      "prompt": "Macro of the video's grey wall: a distinctive lightning-shaped crack near the switchboard, Meera's fingertip pinching to zoom, recognition dawning; grain and static; deeply unsettling; premium comic"
+    },
+    {
+      "id": 6,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Yeh… mere purane ghar ka store-room hai.",
+      "speaker": [
+        0.4,
+        0.4
+      ],
+      "prompt": "Wide shot: Meera standing, phone lit in the dark, staring at a cardboard parcel by the door she hadn't opened, a printed courier slip on top; cold moonlight through curtain gap; premium comic"
+    },
+    {
+      "id": 7,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Yeh parcel… kal raat kaun chhod gaya?",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Close-up of Meera crouched, tearing courier tape; inside, Priya's olive hoodie folded neatly and a red scrunchie on top; her hand trembling; bedside lamp barely glowing; premium comic, dread"
+    },
+    {
+      "id": 8,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Sender ka naam… mera hai. Purana surname.",
+      "speaker": [
+        0.45,
+        0.4
+      ],
+      "prompt": "Macro of the courier slip in Meera's grip: sender name printed as an unfamiliar surname matching hers, delivery address is this very flat; her breath fogging faintly; premium comic"
+    },
+    {
+      "id": 9,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "thought",
+      "who": "Meera",
+      "text": "Priya ka number… phone contacts mein nahi.",
+      "speaker": [
+        0.55,
+        0.35
+      ],
+      "prompt": "Over-shoulder of Meera scrolling the recovered phone: no Priya, no hostel, only her own number saved as 'Didi', and dozens of videos all filmed in this flat; her hand covering her mouth; premium comic"
+    },
+    {
+      "id": 10,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Yeh phone Priya ka nahi tha — 6 saal pehle Meera ne khud yahi kamre mein filmaya tha. Priya sirf ek naam thi jise Meera 'behen' bulati thi.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Final frame: Meera frozen, phone lighting half her face; on the wall the same lightning-crack as in the video — she is standing IN that grey room right now; an old ID card with the different surname slips from the parcel; premium comic, chilling cliffhanger"
+    }
+  ],
+  "caption": "Behen 19 din se gayab thi… phir uska phone khud on ho gaya. Par video mein deewar Meera ke apne kamre ki thi. 😨 Priya kaun thi? Part 2 ke liye Follow karo. (Yeh ek kaalpanik kahani hai, sirf entertainment ke liye.)",
+  "hashtags": [
+    "anhoni",
+    "suspense",
+    "hindisuspense",
+    "thriller",
+    "mystery",
+    "shorts",
+    "comicstory",
+    "gumshuda",
+    "twist",
+    "webseries"
+  ]
+}

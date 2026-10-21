@@ -28,8 +28,6 @@ jobs:
           echo "channel=$CH" >> $GITHUB_OUTPUT
           # channel(niche) -> default kind/seed for that channel's main slot
           case "$CH" in
-            bhakti)  echo "niche=bhakti"  >> $GITHUB_OUTPUT; echo "kind=mantra"   >> $GITHUB_OUTPUT; echo "seed=0" >> $GITHUB_OUTPUT ;;
-            itihaas) echo "niche=itihaas" >> $GITHUB_OUTPUT; echo "kind=series"   >> $GITHUB_OUTPUT; echo "seed=3" >> $GITHUB_OUTPUT ;;
             ancient) echo "niche=ancient" >> $GITHUB_OUTPUT; echo "kind=trending" >> $GITHUB_OUTPUT; echo "seed=1" >> $GITHUB_OUTPUT ;;
             *)       echo "niche="        >> $GITHUB_OUTPUT; echo "kind="         >> $GITHUB_OUTPUT; echo "seed=0" >> $GITHUB_OUTPUT ;;
           esac
@@ -50,12 +48,6 @@ jobs:
 
       - name: Restore secrets to .env + secrets/
         env:
-          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
-          YT_CLIENT_SECRET_JSON: ${{ secrets.YT_CLIENT_SECRET_JSON }}
-          YT_ANCIENT_TOKEN_JSON: ${{ secrets.YT_ANCIENT_TOKEN_JSON }}
-          YT_ANCIENT_CLIENT_SECRET_JSON: ${{ secrets.YT_ANCIENT_CLIENT_SECRET_JSON }}
-          YT_ITIHAAS_TOKEN_JSON: ${{ secrets.YT_ITIHAAS_TOKEN_JSON }}
-          YT_ITIHAAS_CLIENT_SECRET_JSON: ${{ secrets.YT_ITIHAAS_CLIENT_SECRET_JSON }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -67,12 +59,6 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
           mkdir -p secrets
-          [ -n "$YT_TOKEN_JSON" ] && echo "$YT_TOKEN_JSON" > secrets/youtube_token.json
-          [ -n "$YT_CLIENT_SECRET_JSON" ] && echo "$YT_CLIENT_SECRET_JSON" > secrets/youtube_client_secret.json
-          [ -n "$YT_ANCIENT_TOKEN_JSON" ] && echo "$YT_ANCIENT_TOKEN_JSON" > secrets/ancient_youtube_token.json
-          [ -n "$YT_ANCIENT_CLIENT_SECRET_JSON" ] && echo "$YT_ANCIENT_CLIENT_SECRET_JSON" > secrets/ancient_youtube_client_secret.json
-          [ -n "$YT_ITIHAAS_TOKEN_JSON" ] && echo "$YT_ITIHAAS_TOKEN_JSON" > secrets/itihaas_youtube_token.json
-          [ -n "$YT_ITIHAAS_CLIENT_SECRET_JSON" ] && echo "$YT_ITIHAAS_CLIENT_SECRET_JSON" > secrets/itihaas_youtube_client_secret.json
           cat > .env <<EOF
           ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
           FAL_KEY=$FAL_KEY

@@ -1,0 +1,167 @@
+{
+  "slug": "proven_b",
+  "title": "Watchman ne register me 5 log likhe, ghar me 4 the | Anhoni #shorts",
+  "characters": {
+    "anjali": "29-year-old Indian woman, heart-shaped face, medium wheatish skin, sharp alert eyes with a small mole under the left eye, shoulder-length wavy hair usually clipped back, wearing a teal kurti with faded jeans and a thin steel watch on the left wrist, a distinctive chipped front tooth visible when tense",
+    "ramesh": "58-year-old Indian society watchman, long thin face, dark weathered skin, salt-pepper stubble, deep-set tired eyes, wearing a khaki uniform shirt with a faded name-patch and a maroon monkey-cap pushed back, a distinctive missing button at his collar"
+  },
+  "intro": "Naye flat me 4 log shift hue. Watchman ne register me 5 likhe.",
+  "music_prompt": "dark cinematic suspense background music, quiet urban dread, tense, no vocals, no drums",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "thought",
+      "who": "Anjali",
+      "text": "Hum 4 the. Register me 5 kaise?",
+      "speaker": [
+        0.5,
+        0.32
+      ],
+      "prompt": "Close-up over a society gate register, Anjali's finger resting on a handwritten row of 5 names, her chipped tooth showing as she frowns, night sodium light on the guard desk, moving truck blurred behind the gate; premium comic realism"
+    },
+    {
+      "id": 2,
+      "chars": [
+        "anjali",
+        "ramesh"
+      ],
+      "bubble": "speech",
+      "who": "Ramesh",
+      "text": "Aap logon ke saath aaya tha ek aur.",
+      "speaker": [
+        0.65,
+        0.3
+      ],
+      "prompt": "Two-shot at the lit guard cabin at night, Ramesh in khaki leaning on the register with tired eyes, Anjali standing with a carton in her arms looking puzzled, apartment tower rising behind, one flat window glowing; cinematic urban dread"
+    },
+    {
+      "id": 3,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "Nahi kaka, hum sirf 4 hi aaye.",
+      "speaker": [
+        0.45,
+        0.38
+      ],
+      "prompt": "Medium shot inside a half-unpacked flat, cardboard boxes stacked, Anjali speaking on phone while glancing at a wall calendar, her husband's shoes and 3 pairs at the door, a single extra pair of unfamiliar slippers among them; warm bulb light"
+    },
+    {
+      "id": 4,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "thought",
+      "who": "Anjali",
+      "text": "Shayad packers ka koi banda hoga.",
+      "speaker": [
+        0.55,
+        0.3
+      ],
+      "prompt": "Over-shoulder close-up of Anjali sorting a box of cutlery, her reflection faint in a dark window, she shrugs it off with a tired half-smile, evening rain streaks on the glass; soft domestic light, subtle unease"
+    },
+    {
+      "id": 5,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "thought",
+      "who": "Anjali",
+      "text": "Chai ke 5 cup... roz ek extra jhoota.",
+      "speaker": [
+        0.5,
+        0.32
+      ],
+      "prompt": "Early morning close-up of a kitchen sink, 5 used tea cups with dried chai rings, Anjali's hand frozen over the fifth, her chipped tooth caught in a tense breath, grey window light, steam curling from a fresh cup; eerie stillness"
+    },
+    {
+      "id": 6,
+      "chars": [
+        "anjali",
+        "ramesh"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "Kaka, us 5ve bande ka naam batao.",
+      "speaker": [
+        0.4,
+        0.35
+      ],
+      "prompt": "Two-shot at the gate in fading dusk, Anjali gripping the register edge, Ramesh flipping back a page with a shaking finger, his missing collar-button visible, both faces lit orange, the peepal at the society gate looming; tense mood"
+    },
+    {
+      "id": 7,
+      "chars": [
+        "ramesh"
+      ],
+      "bubble": "speech",
+      "who": "Ramesh",
+      "text": "Yahan to koi naam likha hi nahi.",
+      "speaker": [
+        0.55,
+        0.3
+      ],
+      "prompt": "Close-up of the register page under torchlight, the 5th row blank where a name should be, only a smudge, Ramesh's weathered thumb trembling on it, his deep-set eyes wide; sharp night shadows, suspenseful"
+    },
+    {
+      "id": 8,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "CCTV nikaalo. Gate ka footage dikhao.",
+      "speaker": [
+        0.45,
+        0.36
+      ],
+      "prompt": "Medium shot in the cramped guard room, a small monitor glowing, Anjali leaning in with tight jaw, grainy footage of her family walking through the gate on the screen, Ramesh standing back reluctant; cold blue monitor light, tension"
+    },
+    {
+      "id": 9,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "thought",
+      "who": "Anjali",
+      "text": "Footage me... 5 log gate se andar aaye.",
+      "speaker": [
+        0.5,
+        0.33
+      ],
+      "prompt": "Extreme close-up of Anjali's terrified face lit by the monitor, chipped tooth bared in a gasp, mole under her eye sharp, the paused frame reflected in her pupils showing 5 blurred figures, one taller behind her family; chilling premium comic dread"
+    },
+    {
+      "id": 10,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "5va gate se andar aaya... par kabhi bahar nahi gaya.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Wide overhead shot of the quiet flat at night, 4 people asleep across two rooms, one bedroom door left slightly ajar with a sliver of dark, a 5th tea cup still steaming on the kitchen counter alone; chilling final frame"
+    }
+  ],
+  "caption": "Naye flat me sirf 4 log shift hue... par watchman ke register aur CCTV dono me 5. Chai ka 5va cup roz kaun jhootha karta hai? Aur jo gate se andar aaya, wo gaya kahan? Aap batao comments me — 5va kaun tha? Part 2 ke liye Follow karo. (Yeh ek kaal-panik kahani hai, puri tarah kaalpanik — sirf manoranjan ke liye.)",
+  "hashtags": [
+    "anhoni",
+    "hindihorror",
+    "suspense",
+    "horrorstories",
+    "reelshorts",
+    "darrkahani",
+    "twist",
+    "hindishorts",
+    "thriller",
+    "shorts"
+  ]
+}

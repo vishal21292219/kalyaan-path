@@ -12,7 +12,10 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 
-_ACTIVE_NICHE = os.getenv("ACTIVE_NICHE", "bhakti")
+# Default niche. Was "bhakti" (KalyaanPath) until 2026-10-21; that channel and
+# Itihaasvani were removed as dead (no post ever recorded in posted_reels_log,
+# crons held since June), so the default is now the live flagship.
+_ACTIVE_NICHE = os.getenv("ACTIVE_NICHE", "godmind")
 
 
 def set_active_niche(niche: str) -> None:
@@ -30,14 +33,7 @@ def load_config(niche: str | None = None) -> dict:
     niche = niche or _ACTIVE_NICHE
     cfg_path = ROOT / "configs" / f"{niche}.yaml"
     if not cfg_path.exists():
-        if niche == "bhakti":
-            legacy = ROOT / "config.yaml"
-            if legacy.exists():
-                cfg_path = legacy
-            else:
-                raise FileNotFoundError(f"No config found for niche '{niche}' (tried {cfg_path} and {legacy})")
-        else:
-            raise FileNotFoundError(f"No config found for niche '{niche}' at {cfg_path}")
+        raise FileNotFoundError(f"No config found for niche '{niche}' at {cfg_path}")
     with open(cfg_path, "r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
     cfg.setdefault("niche", niche)

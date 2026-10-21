@@ -218,7 +218,11 @@ llm:
 publish:
   instagram: false
   privacy: public
-  youtube: true
+  # youtube: REMOVED 2026-10-21. The YouTube path is gone from this repo —
+  # four of the five channels were removed by YouTube on 2026-09-26 and
+  # this one last ran 2026-07-13. See pipeline/uploader_youtube.py in git
+  # history if an appeal ever restores a channel.
+  youtube: false
   facebook_make: true     # AUTO FB + IG via Make.com (Cloudinary→webhook, channel=moneurons → page from FB_PAGE_ID_MONEURONS). Bypasses the flagged dev-app.
   facebook_make_scheduled: true  # queue the reel for its US peak (poster cron) instead of posting at render-time
   facebook_manual: false

@@ -1,0 +1,165 @@
+{
+  "slug": "aakhri_emi",
+  "title": "Uss recovery agent ki aawaz kyun jaani-pehchaani thi? | Anhoni #shorts",
+  "characters": {
+    "ramesh": "50-year-old Indian man, tired lean face, wheatish skin with deep worry lines, greying short hair combed back, salt-pepper stubble, wearing a faded light-blue cotton kameez slightly wrinkled, thin steel wristwatch on left hand; distinctive feature: a small mole above his right eyebrow and heavy dark circles under sunken eyes.",
+    "rohit": "24-year-old Indian man, round youthful face, fair-wheatish skin, neat short black hair, clean-shaven, wearing a formal navy-blue call-center shirt with a white plastic ID card on a red lanyard, black wireless headset with mic on his head; distinctive feature: same small mole above his right eyebrow as Ramesh."
+  },
+  "music_prompt": "dark cinematic suspense background music, sorrowful and tense, slow rising strings, no vocals, no drums",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "ramesh"
+      ],
+      "bubble": "speech",
+      "who": "Ramesh",
+      "text": "Sir, teen din ruk jao... biwi ICU me hai.",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Close-up of Ramesh sitting on a plastic chair in a dim hospital corridor at night, phone pressed to his ear, face pale and pleading, one hand clutching a folded medical bill; harsh tube-light overhead, blurred ICU signboard behind."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "ramesh"
+      ],
+      "bubble": "thought",
+      "who": "Ramesh",
+      "text": "Sirf Rs 15,000... itni si baat pe itni gaali?",
+      "speaker": [
+        0.5,
+        0.3
+      ],
+      "prompt": "Ramesh alone on a hospital bench, staring at his cheap phone screen showing a loan app logo, shoulders slumped, ashamed expression, night window reflection behind him, cold blue lighting."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "ramesh"
+      ],
+      "bubble": "speech",
+      "who": "Ramesh",
+      "text": "Photo mat bhejo mohalle me... please.",
+      "speaker": [
+        0.45,
+        0.4
+      ],
+      "prompt": "Ramesh standing near a hospital exit door, gripping phone with both hands close to his chest, eyes wet and terrified, a threatening message notification glowing on screen; dark parking lot visible outside."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Rohit",
+      "text": "Paisa do warna family badnaam ho jayegi.",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Wide shot of Rohit seated in a crowded call-center cubicle under white LED lights, headset on, reading coldly off a dual-monitor screen, ID card on red lanyard, robotic blank expression, rows of agents blurred behind."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "thought",
+      "who": "Rohit",
+      "text": "Bas ek aur target... phir ghar paisa bhejunga.",
+      "speaker": [
+        0.55,
+        0.3
+      ],
+      "prompt": "Rohit leaning back in his office chair for a second, tired but determined, glancing at a whiteboard reading 'DAILY RECOVERY TARGET', a small family photo taped near his monitor; harsh corporate lighting."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "ramesh"
+      ],
+      "bubble": "speech",
+      "who": "Ramesh",
+      "text": "Beta, main bhi kisi ka baap hoon.",
+      "speaker": [
+        0.45,
+        0.4
+      ],
+      "prompt": "Ramesh crouched against a hospital wall on the floor, phone at his ear, broken and crying softly, one hand covering his face; empty midnight corridor stretching behind, single flickering light."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Rohit",
+      "text": "Emotional drama band karo. Naam bolo.",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Rohit typing on keyboard, still cold, headset mic near his lips, defaulter details form open on screen; the cursor hovering over an empty name field, tense over-the-shoulder angle."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "ramesh"
+      ],
+      "bubble": "speech",
+      "who": "Ramesh",
+      "text": "Ramesh... Ramesh Verma, Sitapur wala.",
+      "speaker": [
+        0.45,
+        0.4
+      ],
+      "prompt": "Ramesh whispering his name into the phone, exhausted and defeated, dark circles heavy under his eyes; the mole above his right eyebrow clearly visible under the tube-light glow."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Rohit",
+      "text": "...Papa? Ye... ye aapka number?",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Extreme close-up of Rohit frozen in shock, mouth open, eyes wide and horrified, hand slowly rising toward his headset; monitor screen reflecting the name 'RAMESH VERMA, SITAPUR', his matching eyebrow mole catching the light."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Jis ghar ko wo barbaad kar raha tha... wo uska apna tha.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Rohit standing up in the cubicle, headset dangling from a shaking hand, staring at his father's photo pinned beside the defaulter screen; the same face on both — call-center lights suddenly feeling cold and cruel, his world collapsing."
+    }
+  ],
+  "caption": "Ramesh apni beemar biwi ke ilaaj ke liye loan leta hai... aur jo recovery agent use roz dhamka raha tha, wo uska apna beta nikla. 💔\n\nAb Rohit kya karega? Part 2 ke liye Follow karo.\n\n(Kalpanik kahani — fiction, awareness ke liye.)",
+  "hashtags": [
+    "anhoni",
+    "hindisuspense",
+    "loanapp",
+    "thriller",
+    "emotional",
+    "shorts",
+    "twist",
+    "familydrama",
+    "aakhriemi",
+    "suspensestory"
+  ],
+  "intro": "Biwi ICU mein zindagi-maut ke beech thi, jeb khaali. Majboori mein Ramesh ne ek loan app se 15,000 liye... phir shuru hui khaufnaak recovery calls."
+}

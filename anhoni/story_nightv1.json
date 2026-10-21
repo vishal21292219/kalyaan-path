@@ -1,0 +1,166 @@
+{
+  "slug": "nightv1",
+  "title": "Uski smartwatch pe do dil dhadak rahe the... par kamre mein akela tha | Anhoni #shorts",
+  "characters": {
+    "arjun": "35-year-old Indian man, oval face, medium-brown skin, short black hair with slight stubble, tired eyes with dark circles, wearing a grey V-neck t-shirt and black track pants, silver-black smartwatch on left wrist with glowing green screen — his distinctive feature.",
+    "meera": "32-year-old Indian woman, soft round face, fair-wheatish skin, long straight black hair loose over shoulders, calm unreadable expression, wearing a deep-red cotton kurta, a thin gold chain around neck — her distinctive feature."
+  },
+  "music_prompt": "dark cinematic suspense background music, cold and eerie, slow rising tension, faint heartbeat pulse, no vocals, no drums",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "thought",
+      "who": "Arjun",
+      "text": "Meri smartwatch do dhadkan dikha rahi hai?",
+      "speaker": [
+        0.5,
+        0.3
+      ],
+      "prompt": "Close-up of Arjun sitting up in a dim bedroom at night, staring in confusion at his glowing green smartwatch showing TWO heartbeat lines, blue phone light on his tense face, blanket on a bed behind him, premium comic style, hand resting on knee."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "arjun",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Arjun",
+      "text": "Meera, uth. Ye dekh watch pe.",
+      "speaker": [
+        0.35,
+        0.35
+      ],
+      "prompt": "Arjun turning toward Meera who lies asleep beside him under a beige blanket, moonlight through the window, he holds his wrist up, worried expression, quiet dark bedroom, simple pose, premium comic style."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Do heartbeat? Shayad glitch hoga.",
+      "speaker": [
+        0.6,
+        0.4
+      ],
+      "prompt": "Meera propped on one elbow, calm face, brushing her long black hair back, glancing at the watch, red kurta visible over the blanket, soft lamp glow, premium comic style, relaxed hand pose."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "speech",
+      "who": "Arjun",
+      "text": "Dono dhadkan alag speed pe hai.",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Arjun sitting on bed edge, feet on floor, staring hard at the watch screen showing two distinct pulse waves at different rhythms, sweat on forehead, dark room with faint city lights outside, premium comic style, hands on lap."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Doosri dhadkan meri hai na.",
+      "speaker": [
+        0.55,
+        0.4
+      ],
+      "prompt": "Meera sitting up now, gentle smile that feels slightly off, tilting her head, gold chain catching the dim light, shadows across half her face, quiet bedroom, premium comic style, hands folded in lap."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "thought",
+      "who": "Arjun",
+      "text": "Watch sirf mera hi dil padhti hai.",
+      "speaker": [
+        0.5,
+        0.3
+      ],
+      "prompt": "Extreme close-up of Arjun's uneasy face, eyes wide realizing something, the watch reflected in his eye showing two beats, deep shadows, cold blue tone, premium comic style."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "arjun",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Arjun",
+      "text": "Tu paas aa, dono ki milaunga.",
+      "speaker": [
+        0.35,
+        0.35
+      ],
+      "prompt": "Arjun leaning toward Meera, holding his wrist between them, testing expression, Meera sits still and calm, tense air, dark bedroom with one small lamp, premium comic style, simple reaching pose."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "speech",
+      "who": "Arjun",
+      "text": "Doosra dil abhi bhi 90 pe... kaise?",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Arjun frozen, staring at watch while Meera sits right beside him, but the second heartbeat still pulses fast on screen, his mouth open in shock, cold sweat, deep night shadows, premium comic style, hand shaking near watch."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Arjun... mera dil to dhadakta hi nahi.",
+      "speaker": [
+        0.55,
+        0.35
+      ],
+      "prompt": "Meera turning slowly toward Arjun with a still, pale calm face, no warmth in her eyes, moonlight flat on her skin, red kurta stark in the dark, Arjun recoiling in the blurred foreground, premium comic style."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "arjun"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Doosra dil abhi bhi dhadak raha tha... aur us kamre mein woh akela nahi tha.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Close-up of the smartwatch screen glowing with a text alert reading a room number, Arjun's terrified reflection in it, empty bed beside him where Meera was — now vacant with a dent in the pillow, dark hotel-like room, premium comic style, eerie cliffhanger."
+    }
+  ],
+  "caption": "Uski smartwatch pe do dil dhadak rahe the... aur doosra dil kisi aur kamre se aa raha tha. Jo saath so raha tha, uska dil dhadakta hi nahi tha. \n\nPart 2 mein pata chalega Room 402 mein kaun hai. Part 2 ke liye Follow karo! \n\n(Ye ek kaalpanik kahani hai — sirf entertainment ke liye.)",
+  "hashtags": [
+    "anhoni",
+    "hindisuspense",
+    "thriller",
+    "mystery",
+    "smartwatchmystery",
+    "comicstory",
+    "shorts",
+    "suspensestory",
+    "hindihorror",
+    "twistending"
+  ]
+}

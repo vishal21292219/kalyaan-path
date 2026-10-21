@@ -1,0 +1,168 @@
+{
+  "slug": "proven_a",
+  "title": "PG ke bathroom me 4 brush the. Hum 3 log hain | Anhoni #shorts",
+  "characters": {
+    "neha": "Woman, 26, oval face, wheatish skin, long black hair usually in a messy low bun with loose strands, tired but sharp dark eyes, faint acne scar on right cheek. Wears an oversized faded grey t-shirt, maroon cotton pyjama shorts, a thin gold chain. Distinctive feature: a chipped front tooth visible when she talks.",
+    "pooja": "Woman, 29, round soft face, fair skin, shoulder-length wavy brown hair, calm heavy-lidded eyes, small mole above left lip. Wears a dark green kurti with black leggings, a black hair clip, reading glasses pushed up on her head. Distinctive feature: always holding a steel water bottle."
+  },
+  "intro": "3 ladkiyan rehti hain is PG me. Basin par 4 toothbrush hain.",
+  "music_prompt": "dark cinematic suspense background music, slow creeping domestic dread, tense, no vocals, no drums",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "neha"
+      ],
+      "bubble": "thought",
+      "who": "Neha",
+      "text": "3 log. Phir 4 brush kiske?",
+      "speaker": [
+        0.42,
+        0.32
+      ],
+      "prompt": "Close-up of Neha in a cramped PG bathroom mirror, staring at a steel holder on the basin, her toothbrush mid-air, brow tightening. Four toothbrushes crammed in the holder, cold white tubelight, damp tiled wall. Premium noir comic, harsh fluorescent shadows."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "neha",
+        "pooja"
+      ],
+      "bubble": "speech",
+      "who": "Neha",
+      "text": "Pooja, humare PG me kitni ladkiyan hain?",
+      "speaker": [
+        0.35,
+        0.38
+      ],
+      "prompt": "Wide shot of a small shared PG room, two single beds, an almirah, clothes on a rope line, Pooja sitting cross-legged on bed sipping from her steel bottle, Neha standing at the bathroom door holding a toothbrush. Warm yellow room light, lived-in Indian PG clutter."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "pooja"
+      ],
+      "bubble": "speech",
+      "who": "Pooja",
+      "text": "3. Tu, main, aur Simran. Kyun?",
+      "speaker": [
+        0.55,
+        0.35
+      ],
+      "prompt": "Medium shot of Pooja lowering her steel bottle, glasses sliding off her head, mild confusion, a wall calendar behind her with a date circled in red. Cozy warm lamp glow, cluttered study table."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "neha"
+      ],
+      "bubble": "thought",
+      "who": "Neha",
+      "text": "Simran ki pink. Meri blue. Pooja ki green.",
+      "speaker": [
+        0.5,
+        0.3
+      ],
+      "prompt": "Over-shoulder close-up of the basin holder, three toothbrushes clearly pink, blue, green, and a fourth plain white one wedged behind them, wet. Neha's hand hovering, hesitant. Cold bathroom light, water droplets on tiles."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "neha",
+        "pooja"
+      ],
+      "bubble": "speech",
+      "who": "Pooja",
+      "text": "Safai wali bhabhi ki hogi. Chhod na.",
+      "speaker": [
+        0.6,
+        0.34
+      ],
+      "prompt": "Two-shot in the doorway, Pooja shrugging while capping her bottle, Neha unconvinced staring back at the basin, the white toothbrush visible in frame. Mix of warm room and cold bathroom light meeting at the threshold."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "neha"
+      ],
+      "bubble": "speech",
+      "who": "Neha",
+      "text": "Bhabhi 6 mahine se nahi aayi, Pooja.",
+      "speaker": [
+        0.4,
+        0.36
+      ],
+      "prompt": "Close-up of Neha turning, chipped tooth showing as she speaks, jaw tense, the white toothbrush blurred behind her in the mirror. Cold light half across her face, dawning unease."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "neha"
+      ],
+      "bubble": "thought",
+      "who": "Neha",
+      "text": "White brush geela hai. Abhi kisi ne use kiya.",
+      "speaker": [
+        0.48,
+        0.3
+      ],
+      "prompt": "Extreme close-up of the wet white toothbrush, a single droplet falling from its bristles into the basin, foam residue near the drain. Sharp macro detail, cold blue tone, silent dread."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "neha",
+        "pooja"
+      ],
+      "bubble": "speech",
+      "who": "Neha",
+      "text": "Simran kahan hai? Subah se dikhi nahi.",
+      "speaker": [
+        0.38,
+        0.37
+      ],
+      "prompt": "Wide shot, Neha stepping toward the third empty bed, sheets neatly untouched, a phone charger plugged into an empty socket, Pooja slowly setting her bottle down. Warm room turning tense, long shadows from the tubelight."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "pooja"
+      ],
+      "bubble": "speech",
+      "who": "Pooja",
+      "text": "Simran? Woh toh kabhi thi hi nahi.",
+      "speaker": [
+        0.55,
+        0.33
+      ],
+      "prompt": "Close-up of Pooja's calm, blank face, glasses now off, staring flatly at Neha, no confusion at all — unsettlingly steady. Neha's reflection in the almirah mirror behind, frozen. Cold shadow creeping over the warm room."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "neha"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Neha ne phone kholaa — gallery me har photo me sirf 2 ladkiyan. Uska naam kisi bill par nahi tha.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Extreme close-up of Neha's phone screen: PG group photos with only two girls smiling, then a rent receipt listing 2 names, her thumb frozen mid-scroll, her own reflection faint on the glass. Chilling final frame, cold blue and black."
+    }
+  ],
+  "caption": "3 ladkiyan, 4 brush... par photo me sirf 2 chehre kyun? 😨\nJo geela brush kisi ne abhi use kiya — woh kiska tha?\nAap batao comments me — chautha kaun tha? Part 2 ke liye Follow karo 🔔\n(Ye ek kaalpanik kahani hai, sirf entertainment ke liye.)",
+  "hashtags": [
+    "anhoni",
+    "hindihorror",
+    "suspense",
+    "horrorstories",
+    "pgstories",
+    "reelshorts",
+    "darkstories",
+    "thriller",
+    "hinglishhorror",
+    "part2"
+  ]
+}

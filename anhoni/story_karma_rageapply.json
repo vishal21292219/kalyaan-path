@@ -1,0 +1,166 @@
+{
+  "slug": "karma_rageapply",
+  "title": "Malhotra ne Simran ka credit churaya... CEO ke saamne | Anhoni #shorts",
+  "characters": {
+    "simran": "Confident young woman, mid-20s, oval face, tan-brown skin, wavy shoulder-length black hair, small gold jhumka earrings, tan-brown formal blazer over a buttoned white shirt, maroon lanyard around neck, calm deadpan expression, subtle knowing half-smile",
+    "malhotra": "Grumpy khadoos manager, late-40s, round paunchy build, balding head with thin side hair, thick black moustache, reading glasses on nose-tip, light-grey formal shirt with a tight maroon tie, permanent frown, sweaty forehead"
+  },
+  "intro": "Har office me ek Malhotra hota hai jo credit tumhara, blame bhi tumhara karta hai.",
+  "music_prompt": "light quirky corporate background music, playful-tense deadpan, minimal ticking rhythm, no vocals",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "malhotra",
+        "simran"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "Simran, deck raat ko bana dena. Kal meri presentation hai.",
+      "speaker": [
+        0.32,
+        0.35
+      ],
+      "prompt": "Wide shot of a premium glass meeting room, Malhotra leaning back smug pointing at Simran, Simran standing with a laptop, city skyline behind glass; deadpan tension"
+    },
+    {
+      "id": 2,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "thought",
+      "who": "Simran",
+      "text": "Meri deck, unki presentation. Classic.",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Close-up on Simran at her cubicle at night, single desk lamp on, cold half-eaten dinner beside laptop, maroon lanyard visible, tired deadpan face; dark office"
+    },
+    {
+      "id": 3,
+      "chars": [
+        "malhotra"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "'Main' ne 3 hafte mehnat ki hai is project pe.",
+      "speaker": [
+        0.4,
+        0.35
+      ],
+      "prompt": "Medium shot of Malhotra rehearsing in front of a mirror in the washroom, adjusting tie proudly, chest puffed, glasses on nose-tip; office corridor light"
+    },
+    {
+      "id": 4,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "thought",
+      "who": "Simran",
+      "text": "Slide 7 pe abhi bhi mera naam hai... footer me.",
+      "speaker": [
+        0.55,
+        0.38
+      ],
+      "prompt": "Over-shoulder close-up of Simran's laptop showing a slide, tiny author footer reading 'Prepared by: Simran', her finger hovering, faint half-smile; warm office light"
+    },
+    {
+      "id": 5,
+      "chars": [
+        "malhotra"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Agle din — CEO khud review meeting me aa gaya.",
+      "speaker": [
+        0.5,
+        0.15
+      ],
+      "prompt": "Timestamp caption panel over a wide boardroom, a stern grey-haired CEO entering, Malhotra straightening up nervously with laptop, team seated; corporate tension"
+    },
+    {
+      "id": 6,
+      "chars": [
+        "malhotra"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "Sir, yeh poora analysis maine akele banaya hai.",
+      "speaker": [
+        0.4,
+        0.35
+      ],
+      "prompt": "Medium shot of Malhotra presenting confidently on a big screen, sweat starting on forehead, hand gesturing at slide; CEO watching from front row, blurred"
+    },
+    {
+      "id": 7,
+      "chars": [
+        "malhotra"
+      ],
+      "bubble": "thought",
+      "who": "Malhotra",
+      "text": "CEO slide 7 pe ruk kyun gaya...",
+      "speaker": [
+        0.45,
+        0.35
+      ],
+      "prompt": "Close-up on Malhotra's frozen sweaty face, glasses slipping, eyes darting to the screen where a footer glows; harsh projector light on him"
+    },
+    {
+      "id": 8,
+      "chars": [
+        "malhotra"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "CEO: 'Footer me toh Simran likha hai. Wo kahaan hai?'",
+      "speaker": [
+        0.5,
+        0.15
+      ],
+      "prompt": "Caption panel over the projector screen zoomed on tiny footer 'Prepared by: Simran', CEO pointing a laser at it, whole room turning to look; deadpan"
+    },
+    {
+      "id": 9,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "speech",
+      "who": "Simran",
+      "text": "Ji sir, main hi hoon. Baaki main samjhaati hoon.",
+      "speaker": [
+        0.55,
+        0.4
+      ],
+      "prompt": "Close-up on Simran calmly standing up with her laptop, confident half-smile, gold jhumkas catching light, Malhotra out-of-focus deflating behind; satisfying deadpan"
+    },
+    {
+      "id": 10,
+      "chars": [
+        "simran"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Credit chor liya... par footer delete karna bhool gaya.",
+      "speaker": [
+        0.5,
+        0.15
+      ],
+      "prompt": "Final caption panel over Simran presenting confidently to the CEO while Malhotra sinks into his chair behind; bold screenshot-worthy text, premium comic look"
+    }
+  ],
+  "caption": "Malhotra ne poora credit le liya... bas slide 7 ka footer bhool gaya. 😌\nCEO ke ek sawaal ne game palat di — ab dekhna kya hota hai.\nPart 2 ke liye Follow karo — Malhotra ka appraisal wala scene aa raha hai. 👀\nTag wo colleague jiska credit hamesha koi aur le jaata hai.\n(Yeh kahani kaalpanik hai, kisi vyakti ya company se sambandh nahi.)",
+  "hashtags": [
+    "anhoni",
+    "corporatelife",
+    "officehumour",
+    "relatable",
+    "karma",
+    "worklife",
+    "hinglishreels",
+    "officecomedy",
+    "creditchor",
+    "shorts"
+  ]
+}

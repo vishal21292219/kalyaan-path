@@ -1,0 +1,172 @@
+{
+  "slug": "off_credit",
+  "title": "Boss ne meri poori report apne naam ki... par ek CC-email woh bhool gaya | Anhoni #shorts",
+  "characters": {
+    "rohit": "28-year-old Indian man, lean build, oval face, warm medium-brown skin, short neatly-combed black hair, thin-framed rectangular glasses; wears a plain light-blue formal shirt slightly wrinkled at cuffs, dark grey trousers, a black lanyard ID card around his neck; distinctive feature: a small blue ballpoint pen always clipped in his shirt pocket.",
+    "malhotra": "48-year-old Indian man, heavy-set, square jaw, tan skin, salt-and-pepper hair slicked back, thick black moustache; wears an expensive charcoal-grey blazer over a crisp white shirt, maroon tie, gold wristwatch; distinctive feature: a permanent tight self-satisfied smirk.",
+    "anjali": "35-year-old Indian woman, slim, sharp features, fair-wheatish skin, straight shoulder-length black hair tucked behind one ear, minimal makeup; wears a deep-teal formal kurti, silver stud earrings, reading glasses pushed up on her head; distinctive feature: calm unreadable eyes."
+  },
+  "intro": "Boss ne poori team ke saamne mera 3 hafte ka kaam apna bata diya.",
+  "music_prompt": "emotional cinematic background music, tense-corporate turning to quietly triumphant, soft piano and low strings, restrained, no vocals",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "malhotra",
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "\"Yeh plan maine banaya... late night baith ke.\"",
+      "speaker": [
+        0.7,
+        0.28
+      ],
+      "prompt": "Wide shot of a glass boardroom, projector glowing 'Q3 GROWTH PLAN'. Malhotra stands confidently at the head of the table, chest out, smirking. Rohit sits at the far end, jaw tight, hands flat on the table. Cold blue office light, corporate tension."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "thought",
+      "who": "Rohit",
+      "text": "\"Late night... mera beta bina papa ke soya.\"",
+      "speaker": [
+        0.42,
+        0.4
+      ],
+      "prompt": "Close-up over Rohit's shoulder, tired eyes reflected in his glasses, looking at his laptop showing the same slide in a folder named 'ROHIT_Q3'. A cold cup of coffee beside him. Muted cubicle background."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "malhotra",
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "\"Rohit ne bas thodi typing help ki.\"",
+      "speaker": [
+        0.65,
+        0.3
+      ],
+      "prompt": "Medium shot, Malhotra rests one open palm loosely toward Rohit, smirking. Colleagues around the table clap softly. Rohit gives a forced small nod, ears red. Warm boardroom lights, everyone facing the boss."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "rohit"
+      ],
+      "bubble": "thought",
+      "who": "Rohit",
+      "text": "\"Chup reh. Abhi mera turn nahi aaya.\"",
+      "speaker": [
+        0.5,
+        0.38
+      ],
+      "prompt": "Close-up of Rohit's hand quietly clicking his blue pen once, resting on his closed laptop. His face calm on the surface but eyes sharp behind the glasses. Selective focus on the pen and knuckles. Tense stillness."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "anjali",
+        "malhotra"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "\"Sir, yeh draft kis date ka hai?\"",
+      "speaker": [
+        0.3,
+        0.34
+      ],
+      "prompt": "Wide shot from behind Rohit, Anjali across the table in her teal kurti, calm eyes fixed on Malhotra. His smirk flickers for a split second. On the projector footer, tiny text reads 'shared file'. Cold light."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "malhotra"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "\"Date? Sab meri drive se hi gaya.\"",
+      "speaker": [
+        0.6,
+        0.3
+      ],
+      "prompt": "Close-up of Malhotra, chin raised, brushing it off with a confident half-laugh, straightening his maroon tie. A faint sweat sheen on his temple. Sharp boardroom shadows across his face."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "\"Achha. To yeh mail kisne bheja tha?\"",
+      "speaker": [
+        0.32,
+        0.35
+      ],
+      "prompt": "Medium shot of Anjali quietly turning her own laptop around so the room can see the screen. On it, an old sent-email header is visible. Her expression flat, professional. Colleagues lean forward. Light shifts toward her."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "anjali",
+        "rohit"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "\"3 hafte pehle. Bheja: Rohit. CC: main.\"",
+      "speaker": [
+        0.35,
+        0.34
+      ],
+      "prompt": "Over-shoulder shot of Anjali's laptop screen: an email dated '21 days ago', From 'Rohit', Subject 'Q3 Draft — final', with 'CC: Anjali' highlighted. Rohit's name glows. Room goes silent, colleagues' eyes widen."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "malhotra",
+        "anjali"
+      ],
+      "bubble": "speech",
+      "who": "Malhotra",
+      "text": "\"A-Anjali... yeh sab yahan zaroori nahi.\"",
+      "speaker": [
+        0.68,
+        0.3
+      ],
+      "prompt": "Wide shot: Malhotra half-rising from his chair, smirk gone, palm raised nervously, tie crooked. Anjali stays seated, calm. Colleagues turn slowly toward Malhotra. Rohit sits still, watching, unmoving."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "anjali",
+        "rohit"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Anjali dheere se boli: \"Main us mail par CC thi... kyunki iss company ki owner main hoon.\" Ab aage kya hua?",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Close-up of Anjali standing, sliding her reading glasses down onto her nose, calm faint smile. Behind her, Malhotra frozen pale, Rohit's eyes widening in disbelief. Boardroom reflected in dark glass. Quiet, satisfying tension held on the edge."
+    }
+  ],
+  "caption": "3 hafte ki mehnat boss ne 30 second me apne naam kar li... par woh bhool gaya ki us purani mail par CC kaun tha. 😳\nJise sab 'senior manager' samajh rahe the, woh asli owner nikli.\nAap batao comments me — aapne kabhi office me apna credit chori hote dekha hai?\nPart 2 ke liye Follow karo @anhoni 🔥\n(Yeh ek kaalpanik kahani hai — sirf entertainment ke liye.)",
+  "hashtags": [
+    "anhoni",
+    "officepolitics",
+    "credittheft",
+    "corporatelife",
+    "hindishorts",
+    "emotionalstory",
+    "officedrama",
+    "underdog",
+    "twist",
+    "reelsindia"
+  ]
+}

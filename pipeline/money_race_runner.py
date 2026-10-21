@@ -55,11 +55,6 @@ def main(argv):
     if not publish:
         print("[money-race] --no-publish: skipping upload"); return 0
     script = build_script(spec); cfg = load_config()
-    if cfg.get("publish", {}).get("youtube", True):
-        try:
-            from pipeline.uploader_youtube import upload as yt_upload
-            print("[money-race] youtube:", yt_upload(out, script))
-        except Exception: traceback.print_exc(); print("[money-race] youtube failed")
     if cfg.get("publish", {}).get("facebook_make", False):
         try:
             from pipeline.uploader_make_reel import upload as make_upload

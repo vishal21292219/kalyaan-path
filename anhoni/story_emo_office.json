@@ -1,0 +1,167 @@
+{
+  "slug": "emo_office",
+  "title": "Papa ki death ke baad unka 8 saal purana phone khola... to ek folder mila | Anhoni #shorts",
+  "characters": {
+    "aarav": "27-year-old Indian man, lean build, long face, medium-brown skin, short slightly messy black hair, thin unshaven stubble, tired eyes; wears a plain dark-grey t-shirt under an open olive-green shirt, sleeves pushed up; distinctive feature: a thin black thread band on his right wrist.",
+    "papa": "58-year-old Indian man, medium build, round kind face, wheatish skin with wrinkles near the eyes, thinning grey hair combed to the side, white stubble; wears a faded beige half-sleeve shirt with a small chest pocket, brown trousers; distinctive feature: an old steel Titan watch with a cracked glass on his left wrist."
+  },
+  "intro": "Papa 8 saal se naya phone nahi liya. Aaj wo phone kholna pada.",
+  "music_prompt": "emotional cinematic background music, melancholic turning to warm and tearful, soft piano and low strings, heartfelt, gentle rising swell, no vocals",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "speech",
+      "who": "Aarav",
+      "text": "\"Papa ka phone... 8 saal se yahi chala rahe the.\"",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Close-up of Aarav's hands holding an old scratched button-and-touch phone with a cracked screen, on a wooden table beside a half-burnt agarbatti and a garlanded photo frame in soft focus. Dim warm room, morning light through curtains. His face lowered, jaw tight."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "thought",
+      "who": "Aarav",
+      "text": "Isko theek karwane ke Rs 400 bacha rahe the.",
+      "speaker": [
+        0.55,
+        0.3
+      ],
+      "prompt": "Wide shot of a modest middle-class living room: a single sofa with a folded cotton blanket, an old ceiling fan, Papa's empty armchair with his cracked Titan watch resting on its arm. Aarav sits on the floor, phone in hand, back against the sofa. Grey-warm mood."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "speech",
+      "who": "Aarav",
+      "text": "\"Puri zindagi kanjoos rahe. Mere liye kabhi kuch nahi.\"",
+      "speaker": [
+        0.4,
+        0.4
+      ],
+      "prompt": "Medium close-up of Aarav wiping his eyes with the back of his hand, bitterness on his face, thumb scrolling the old phone. Behind him a faded wall calendar and a small framed college-degree certificate. Soft window light."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "thought",
+      "who": "Aarav",
+      "text": "Ek folder — naam 'ARAV'. Galat spelling.",
+      "speaker": [
+        0.55,
+        0.35
+      ],
+      "prompt": "Extreme close-up of the cracked phone screen showing a gallery folder labelled 'ARAV' with 341 items. Aarav's thumb hovers, his stubbled chin trembling slightly in the screen's glow. Dark room, phone light on his face."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "thought",
+      "who": "Aarav",
+      "text": "Har cheez ki photo... jo maine phone pe bheji thi.",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Over-shoulder shot of the phone screen filled with blurry screenshots: an admit card, a first salary slip, a marksheet, a screenshot of a chat saying 'Papa job lag gayi'. Aarav's eyes widening. Blue screen light, warm shadows around."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "speech",
+      "who": "Aarav",
+      "text": "\"Ek voice recording bhi... 2 minute 11 second.\"",
+      "speaker": [
+        0.45,
+        0.35
+      ],
+      "prompt": "Close-up of the phone showing an audio file '011_beta.m4a' with a red play button, timestamp 02:11. Aarav's finger frozen above it. His other hand grips the cracked Titan watch tightly. Trembling grip, dim light."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "papa"
+      ],
+      "bubble": "speech",
+      "who": "Papa (recording)",
+      "text": "\"Beta so gaya? Chalo, ab main practice karta hoon.\"",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Flashback style, softer sepia tone: Papa sitting alone at night on the same armchair, whispering into the old phone held close to his mouth, reading glasses low on his nose, cracked Titan watch on wrist. A dim table lamp glows beside him."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "papa"
+      ],
+      "bubble": "speech",
+      "who": "Papa (recording)",
+      "text": "\"Proud... proud of you, beta. Bolna hai, par...\"",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Sepia flashback close-up of Papa's face, eyes wet, embarrassed half-smile, practising the English word silently, lips shaping it. His hand rubs his stubble nervously. Warm lamp glow, tender atmosphere."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "thought",
+      "who": "Aarav",
+      "text": "34 recordings. Har ek me wahi lafz — kabhi mujhe nahi bola.",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Present day, tight close-up of Aarav's face crumpling, tears falling silently, phone pressed to his ear, black thread band on his wrist visible. Papa's empty armchair blurred behind him. Grey morning light, raw emotion."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "aarav"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Aakhri recording ki date... jis din Papa hospital gaye the. Us din unhone kuch aur bhi kaha tha. Part 2.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Cinematic close-up of Aarav holding the cracked phone and Papa's Titan watch together against his chest, eyes shut, first light of sun breaking through the curtain onto his face. Warm, tearful, hopeful glow."
+    }
+  ],
+  "caption": "Papa 8 saal se tuta phone chala rahe the... koi naya nahi liya. 😔 Uske andar ek folder tha jise unhone kabhi mujhe nahi dikhaya. Jo baat wo saamne kabhi nahi keh paye, wo har raat chupke record karte the. Aakhri recording ki date dekh ke haath kaanpne lage.\n\nAap batao comments me — kya aapke papa ne bhi kabhi 'proud' nahi bola? \n\nPart 2 ke liye Follow karo @anhoni 🔥\n\n(Yeh ek kalpanik kahani hai — sirf entertainment ke liye. This is a work of fiction.)",
+  "hashtags": [
+    "anhoni",
+    "papa",
+    "emotionalstory",
+    "hindidrama",
+    "fatherandson",
+    "familyfirst",
+    "shorts",
+    "reels",
+    "unsaidlove",
+    "twist",
+    "hindishorts",
+    "storytime"
+  ]
+}

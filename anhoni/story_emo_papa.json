@@ -1,0 +1,167 @@
+{
+  "slug": "emo_papa",
+  "title": "Papa roz office ka lunch skip kyun karte the? Sach jaanke aankhein bhar aayi | Anhoni #shorts",
+  "characters": {
+    "papa": "57-year-old Indian man, thin wiry build, long narrow face, wheatish weathered skin, deep lines across forehead, thinning salt-and-pepper hair combed sideways, small grey moustache, wears a faded olive-green half-sleeve shirt tucked into worn brown trousers, scuffed black sandals; distinctive feature: a dented steel tiffin dabba with a faded red rubber band around it.",
+    "anjali": "26-year-old Indian woman, medium build, round soft face, fair-wheatish skin, shoulder-length wavy black hair often in a loose clip, expressive dark eyes, wears a mustard-yellow kurti with dark leggings, a thin silver chain; distinctive feature: a small bindi and a canvas office sling bag."
+  },
+  "intro": "Papa har roz tiffin le jaate the. Kabhi khaali laate, kabhi bhara wapas.",
+  "music_prompt": "emotional cinematic background music, melancholic yet hopeful, soft piano and slow strings, heartfelt, no vocals",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "papa"
+      ],
+      "bubble": "speech",
+      "who": "Papa",
+      "text": "Aaj tiffin mat bhejna, canteen se kha lunga.",
+      "speaker": [
+        0.42,
+        0.35
+      ],
+      "prompt": "Wide morning shot of a thin older man in an olive shirt at a small kitchen doorway, steel tiffin in one hand, faint tired smile; behind him a modest middle-class kitchen with a gas stove and steel plates; soft 7am window light, premium comic style."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "thought",
+      "who": "Anjali",
+      "text": "Roz yehi bolte hain. Phir bhi dabba le jaate hain.",
+      "speaker": [
+        0.55,
+        0.4
+      ],
+      "prompt": "Over-shoulder shot of a young woman in a mustard kurti watching her father slip the tiffin into his cloth bag anyway, slight confused frown, canvas sling bag on her shoulder; small living room with a wall clock and old sofa; warm morning tone."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "papa"
+      ],
+      "bubble": "thought",
+      "who": "Papa",
+      "text": "Anjali ke exam fees... 4,500 abhi jama karni hai.",
+      "speaker": [
+        0.45,
+        0.38
+      ],
+      "prompt": "Medium shot of the older man sitting alone on a park bench near his office at lunch hour, tiffin unopened on his lap, quietly counting folded notes; a government office building blurred behind, pigeons nearby; overcast light, tired calm face."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "papa"
+      ],
+      "bubble": "speech",
+      "who": "Papa",
+      "text": "Bhaiya, ye do roti kutte ko daal dena.",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Close-up of the older man near the office gate handing his still-full tiffin's rotis to a stray dog beside a security cabin, faded red rubber band on the dabba visible; guard blurred in background; dim afternoon light, gentle self-conscious expression."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "Papa, tiffin toh aaj bhi khaali dho diya maine.",
+      "speaker": [
+        0.5,
+        0.35
+      ],
+      "prompt": "Close-up of the young woman at the kitchen sink evening, holding the washed steel tiffin, thoughtful pause, water dripping; small kitchen with tubelight and hanging steel ladles; warm yellow bulb glow, subtle curiosity on her face."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "papa"
+      ],
+      "bubble": "speech",
+      "who": "Papa",
+      "text": "Bhookh nahi thi beta. Tu apni fees jama kar di?",
+      "speaker": [
+        0.45,
+        0.4
+      ],
+      "prompt": "Two-shot at the dinner table, the older man deflecting with a tired smile, plate barely touched, daughter across him noticing his thinning cheeks; steel glasses and a single roti on the table; soft overhead light, quiet tension."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "thought",
+      "who": "Anjali",
+      "text": "Fees toh college ne kaha... abhi tak nahi aayi?",
+      "speaker": [
+        0.5,
+        0.42
+      ],
+      "prompt": "Emotional close-up of the young woman frozen mid-thought at her college corridor next day, phone in hand showing a fees-pending message, dawning worry in her eyes; blurred notice board behind; cool daylight, premium comic emotion."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "thought",
+      "who": "Anjali",
+      "text": "Toh Papa ka lunch ka paisa... kahan jaa raha tha?",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Extreme close-up of the young woman opening her father's cloth office bag at home, finding a small handwritten savings diary tucked beside the empty tiffin; shallow focus, evening room blurred; realization tightening her face."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "speech",
+      "who": "Anjali",
+      "text": "Papa... ye diary mein har din 40 rupaye?",
+      "speaker": [
+        0.5,
+        0.4
+      ],
+      "prompt": "Close-up of the young woman holding open a worn savings diary with rows of small daily entries, eyes welling; father's blurred figure in doorway reaching to take it back; soft golden lamp light, deeply emotional premium comic frame."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "anjali"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Diary ke akhri page pe likha tha: 'Anjali ki fees — 1 din aur, ho jayegi.' Us din bhi Papa bhookhe the.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Final shot, the young woman clutching the open savings diary as the empty tiffin slips from her hand, father's hand gently on her head, both blinking back tears at the dinner table; warm heavy lighting; emotional gut-punch, premium cinematic comic."
+    }
+  ],
+  "caption": "Papa roz tiffin le jaate the — par kabhi khaate nahi the. Diary ka akhri page dekh ke sab samajh aaya... 💔\nAap batao comments me — aapke Papa ne aapke liye chupke se kya kiya tha? 👇\nPart 2 ke liye Follow karo.\n(Ye ek kaalpanik kahani hai / This is a fictional story.)",
+  "hashtags": [
+    "anhoni",
+    "papa",
+    "emotionalstory",
+    "hindidrama",
+    "familylove",
+    "sacrifice",
+    "fatherslove",
+    "reels",
+    "shorts",
+    "storytime",
+    "middleclass",
+    "feels"
+  ]
+}

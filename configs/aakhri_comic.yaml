@@ -1,0 +1,89 @@
+# AAKHRI — one-off cinematic romantic-suspense reel ("Aakhri Mulaqat").
+# Reuses the Itihaasvani VOICE (ElevenLabs Aakash, mystery/thriller, eleven_v3),
+# suspense music bed + SFX, Devanagari captions, and character-consistency —
+# but swaps the ancient-epic image style for a MODERN cinematic photoreal look
+# (rainy night, old railway station, lake) that fits a present-day love story.
+niche: aakhri_comic
+
+branding:
+  channel_handle: '@Anhoni'
+  cta: "🌙 Aisi hi kahaniyon ke liye Follow karo"
+  ai_disclosure: "🎬 Kaalpanik kahani — sirf entertainment ke liye. AI-assisted visuals & narration."
+  hashtags:
+  - '#hindistory'
+  - '#suspense'
+  - '#lovestory'
+  - '#thriller'
+  - '#kahani'
+  - '#shorts'
+  - '#reels'
+  - '#emotional'
+  music_credit: "Music: cinematic suspense drone — original, royalty-free"
+
+paths:
+  state_dir: data/state
+  music_dir: data/music_aakhri     # custom emotional horror-romantic bed
+  drone_dir: data/music_aakhri     # pick_drone → emotional_bed.mp3
+
+images:
+  provider: fal
+  model: fal-ai/flux/schnell        # bulk scenes — cheap
+  master_model: fal-ai/flux/dev     # character master — premium, propagated via consistency
+  hero_model: fal-ai/flux/dev       # opening scenes premium
+  gemini_image_model: gemini-3.1-flash-image-preview
+  fallback_model: black-forest-labs/FLUX.1-schnell
+  consistency: true                 # lock Aarav + Riya faces across scenes
+  consistency_max_scenes: 0         # 0 = condition EVERY scene with a recurring char (max face consistency)
+  hero_scenes: 3
+  num_per_reel: 12
+  # Comic-setting negative: ban speech bubbles / panel borders / captions (we add
+  # our own word-synced captions), plus the usual anatomy/quality bans.
+  negative: speech bubble, thought bubble, text, caption, panel border, gutter, watermark, logo, signature, ugly, deformed, mutated, malformed limbs, extra fingers, extra arms, extra heads, missing limbs, distorted face, asymmetric face, melted features, broken anatomy, twisted body, blurry, low quality, chibi, doll-like, cluttered, gore, blood, photorealistic photo
+  style_suffix: ', premium modern comic book / graphic-novel illustration, bold clean ink linework, smooth cel shading, RICH VIBRANT cinematic colors, dramatic lighting and deep shadows, expressive detailed faces, moody romantic-suspense atmosphere, authentic contemporary Indian characters and setting, detailed background, single focal subject, vertical 9:16 portrait full-bleed single illustration (NOT a multi-panel grid), no speech bubbles, no text, no watermark, high-quality digital art'
+
+llm:
+  language: hindi
+  # Not used at runtime for this reel (script is hand-written), kept for parity.
+  provider: claude
+  model: claude-sonnet-4-6
+
+video:
+  bitrate: 6M
+  hero_motion: false
+  duration_target_sec: 75
+  music: true
+  music_volume: 0.10
+  sfx: true            # impact boom on hook + whoosh risers into reveals
+  heartbeat: true      # subtle heartbeat suspense bed
+  stings: false
+  font: /System/Library/Fonts/Supplemental/Devanagari Sangam MN.ttc
+  font_size: 72
+  fps: 30
+  height: 1920
+  width: 1080
+  subtitle_box_opacity: 0.0
+
+thumbnail: false
+
+voice:
+  provider: elevenlabs
+  fallback_to_edge: true
+  # Edge fallback (free) — deep storyteller Hindi
+  pitch: -8Hz
+  rate: -8%
+  voice: hi-IN-MadhurNeural
+  # ElevenLabs (premium) — Aakash Aryan, "Mystery & Thriller", eleven_v3 (expressive)
+  elevenlabs_voice_id: ogCFP29Q71Wj6WHkN69b
+  elevenlabs_model: eleven_v3
+  elevenlabs_settings:
+    stability: 0.30
+    similarity_boost: 0.75
+    style: 0.60
+    use_speaker_boost: true
+
+publish:
+  instagram: false
+  youtube: false
+  facebook: false
+  facebook_make: false
+  privacy: private

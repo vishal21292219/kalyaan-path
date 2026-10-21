@@ -118,55 +118,6 @@ def _norm_topic(title: str) -> str:
     return _norm_title(head)
 
 
-# niche → YouTube @handle (for the real-time channel-side dedup below).
-_YT_HANDLES = {
-    "godmind": "GodsOfTheMind", "gom": "GodsOfTheMind",
-    "ancient": "TimeDecoders",
-    "moneurons": "moneurons",
-    "bhakti": "KalyaanPath", "bhajan": "KalyaanPath",
-    "itihaas": "Itihaasvani",
-    "lakeerein": "LakeereinStories",
-}
-_READONLY_SCOPE = "https://www.googleapis.com/auth/youtube.readonly"
-
-
-def _reader_creds():
-    """A readonly-capable YouTube OAuth credential. readonly can read the PUBLIC
-    uploads of ANY channel, so one such token (TimeDecoders/ancient is restored in
-    every workflow) works as a universal reader. Returns None if none available."""
-    for name in ("ancient", "bhakti", "lakeerein"):
-        p = ROOT / "secrets" / f"{name}_youtube_token.json"
-        if not p.exists():
-            continue
-        try:
-            d = json.loads(p.read_text())
-        except Exception:
-            continue
-        if _READONLY_SCOPE not in (d.get("scopes") or []):
-            continue
-        try:
-            from google.oauth2.credentials import Credentials
-            return Credentials(
-                token=d.get("token"), refresh_token=d.get("refresh_token"),
-                token_uri=d.get("token_uri", "https://oauth2.googleapis.com/token"),
-                client_id=d.get("client_id"), client_secret=d.get("client_secret"),
-                scopes=d.get("scopes"))
-        except Exception:
-            return None
-    return None
-
-
-_GENERIC_TOK = {
-    "ancient", "mystery", "mysteries", "secret", "secrets", "hidden", "before",
-    "cannot", "couldnt", "science", "scientists", "people", "something", "really",
-    "inside", "beneath", "across", "without", "around", "between", "against",
-    "stronger", "oldest", "largest", "deepest", "little", "almost", "nobody",
-    "everyone", "reveal", "reveals", "explains", "explained", "should", "shouldnt",
-    "meaning", "psychology", "hidden", "secret", "reason", "history", "modern",
-    "world", "years", "still", "found", "never", "buried", "forgotten", "greatest",
-}
-
-
 def _rare_entity_tokens(topic_title: str, niche: str) -> set:
     """Distinctive words (>=6 chars, not generic) in topic_title that are RARE in
     the niche's topic pool (appear in <=1 pool topic). These uniquely identify ONE
@@ -195,73 +146,6 @@ def _rare_entity_tokens(topic_title: str, niche: str) -> set:
                 freq[t] += 1
     return {t for t in cand if freq[t] <= 1}   # unique-to-one-topic → safe to match on
 
-
-def topic_live_on_youtube(topic_title: str, niche: str, days: int = 45) -> bool:
-    """Real-time dedup against ACTUAL YouTube — True if this topic already exists
-    among the channel's recent uploads (last `days`). Immune to the git-race state
-    loss that let duplicates through when runs bunched up (catch-up floods, manual
-    back-to-back triggers). FAIL-OPEN: any error / missing token / quota → False,
-    so it can NEVER block a legitimate upload (a missed slot is worse than a rare
-    dup that the other two ledgers still guard)."""
-    key = _norm_topic(topic_title)
-    handle = _YT_HANDLES.get((niche or "").lower())
-    if not key or len(key) < 10 or not handle:
-        return False
-    rare = _rare_entity_tokens(topic_title, niche)   # unique-entity words → catch rewritten-title re-picks
-    try:
-        creds = _reader_creds()
-        if creds is None:
-            return False
-        from googleapiclient.discovery import build
-        yt = build("youtube", "v3", credentials=creds, cache_discovery=False)
-        chs = yt.channels().list(part="contentDetails", forHandle=handle).execute().get("items") or []
-        if not chs:
-            return False
-        up = chs[0]["contentDetails"]["relatedPlaylists"]["uploads"]
-        # Fetch a WIDE window of recent uploads (~120 ≈ 40 days at 3/day) so a topic
-        # that already aired weeks ago is still caught — the Iron Pillar (aired 06-13)
-        # and Baghdad Battery (06-04) dups slipped through when this only looked at the
-        # last ~13 days.
-        ids, tok = [], None
-        while len(ids) < 120:
-            pit = yt.playlistItems().list(part="contentDetails", playlistId=up,
-                                          maxResults=50, pageToken=tok).execute()
-            ids += [i["contentDetails"]["videoId"] for i in pit.get("items", [])]
-            tok = pit.get("nextPageToken")
-            if not tok:
-                break
-        if not ids:
-            return False
-        cutoff = (date.today() - timedelta(days=days)).isoformat()
-        for b in range(0, len(ids), 50):
-            vr = yt.videos().list(part="snippet", id=",".join(ids[b:b + 50])).execute()
-            for v in vr.get("items", []):
-                sn = v.get("snippet", {})
-                if (sn.get("publishedAt", "") or "")[:10] < cutoff:
-                    continue
-                other = _norm_topic(sn.get("title", ""))
-                if not other:
-                    continue
-                if other == key or other.startswith(key + " ") or key.startswith(other + " "):
-                    print(f"[dedup] LIVE YouTube match — '{topic_title}' already on @{handle} "
-                          f"(as '{sn.get('title')}') → skipping to avoid a duplicate")
-                    return True
-                # Rewritten-title catch: the script writer often reshapes the title
-                # (pool 'The Antikythera Mechanism' → live 'Antikythera: 2,000-Year-Old
-                # Computer'). If a UNIQUE-entity word from the pool topic appears in the
-                # live title, it's the same topic. `rare` only holds words unique to one
-                # pool topic, so same-deity GoM topics are never falsely matched.
-                if rare:
-                    other_words = set(_norm_title(sn.get("title", "")).split())
-                    hit = rare & other_words
-                    if hit:
-                        print(f"[dedup] LIVE YouTube match (entity '{next(iter(hit))}') — "
-                              f"'{topic_title}' already on @{handle} (as '{sn.get('title')}') → skipping")
-                        return True
-        return False
-    except Exception as e:
-        print(f"[dedup] live YT check skipped ({type(e).__name__}: {e})")
-        return False
 
 
 def _load_titles() -> dict:

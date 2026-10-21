@@ -1,0 +1,169 @@
+{
+  "slug": "sample_b",
+  "title": "Har Raat 2 Baje Wahi Ek Photo Aata Hai | Anhoni #shorts",
+  "characters": {
+    "rohan": "35-year-old Indian man, oval face, medium-brown skin, tired eyes with dark circles, short black hair slightly messy, 2-day stubble; wears a wrinkled grey formal shirt with sleeves rolled up and a loose navy tie; distinctive feature: a thin healed scar above his left eyebrow.",
+    "meera": "32-year-old Indian woman, round soft face, wheatish skin, long straight black hair tied in a low bun, calm watchful eyes; wears a deep maroon cotton kurta with a thin gold chain; distinctive feature: a small black bindi and a silver watch worn on her right wrist."
+  },
+  "intro": "Raat 2:14 baje phone bajta hai — aur photo mere apne ghar ki hoti hai.",
+  "music_prompt": "dark cinematic suspense background music, cold creeping dread, tense, no vocals, no drums",
+  "panels": [
+    {
+      "id": 1,
+      "chars": [
+        "rohan"
+      ],
+      "bubble": "speech",
+      "who": "Rohan",
+      "text": "Ye photo... meri hi chhat se li gayi hai.",
+      "speaker": [
+        0.5,
+        0.3
+      ],
+      "prompt": "Close-up of Rohan's face lit only by phone glow in a dark bedroom, sweat beading on forehead, eyes wide; wall clock behind reads 2:14; the phone screen shows a grainy photo of a sleeping man from directly above. Crumpled bedsheet, half-empty water glass."
+    },
+    {
+      "id": 2,
+      "chars": [
+        "rohan"
+      ],
+      "bubble": "thought",
+      "who": "Rohan",
+      "text": "Isme main so raha hoon. Kal raat wala.",
+      "speaker": [
+        0.6,
+        0.25
+      ],
+      "prompt": "Over-shoulder shot of the phone, Rohan's thumb zooming into the photo — it shows himself asleep, same bedsheet, same water glass. Morning light now, cold tea, a Maruti key on the table, his hand trembling slightly."
+    },
+    {
+      "id": 3,
+      "chars": [
+        "rohan",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Raat ko darwaza tune khula chhoda tha.",
+      "speaker": [
+        0.7,
+        0.35
+      ],
+      "prompt": "Medium two-shot in a small kitchen, Meera at the gas stove stirring dal, back to Rohan who sits gripping his phone. Steam rising, steel tiffin, a wall calendar with three dates circled in red pen."
+    },
+    {
+      "id": 4,
+      "chars": [
+        "rohan"
+      ],
+      "bubble": "speech",
+      "who": "Rohan",
+      "text": "Main chhat pe kabhi nahi jaata, Meera.",
+      "speaker": [
+        0.4,
+        0.4
+      ],
+      "prompt": "Low-angle close-up of Rohan's uneasy face, phone light harsh from below, his loose tie hanging; behind him a locked terrace door with a rusted bolt, cobwebs on its handle, kitchen blurred."
+    },
+    {
+      "id": 5,
+      "chars": [
+        "rohan",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Police ko dikha. Mera cousin cyber cell mein hai.",
+      "speaker": [
+        0.65,
+        0.3
+      ],
+      "prompt": "Wide shot of the living room, Meera calmly on a beige sofa scrolling her own phone, Rohan pacing near a barred window; evening orange light, a framed wedding photo on the wall, an unplugged landline in the corner."
+    },
+    {
+      "id": 6,
+      "chars": [
+        "rohan"
+      ],
+      "bubble": "thought",
+      "who": "Rohan",
+      "text": "Har photo mein woh gold chain dikhti hai.",
+      "speaker": [
+        0.5,
+        0.25
+      ],
+      "prompt": "Extreme close-up of the phone photo, Rohan squinting; in the corner of the top-down frame, a thin gold chain lies on the floor near the bed. His scarred eyebrow visible, dim hallway behind, brows knitting."
+    },
+    {
+      "id": 7,
+      "chars": [
+        "rohan",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Rohan",
+      "text": "Teri chain us raat kahan gayi thi?",
+      "speaker": [
+        0.35,
+        0.35
+      ],
+      "prompt": "Tense over-shoulder shot facing Meera who stands still by the terrace door, a key in her hand, face unreadable; Rohan seen from behind, shoulders rigid. A shoe rack, her maroon dupatta on a hook beside them."
+    },
+    {
+      "id": 8,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Meera",
+      "text": "Main tujhe dikhana chahti thi, khud dekh.",
+      "speaker": [
+        0.5,
+        0.3
+      ],
+      "prompt": "Close-up of Meera's calm face, a faint sad smile, silver watch on her right wrist catching lamp light; behind her the terrace door now open, a stepladder against the wall, one photo taped to the frame."
+    },
+    {
+      "id": 9,
+      "chars": [
+        "rohan",
+        "meera"
+      ],
+      "bubble": "speech",
+      "who": "Rohan",
+      "text": "Tu... upar se meri photo kheenchti thi?",
+      "speaker": [
+        0.4,
+        0.4
+      ],
+      "prompt": "Dramatic wide shot on the open terrace at dusk, Rohan stepping back near the edge, Meera standing beside a tripod with a phone clamped facing down into an open skylight over the bedroom. Water tanks, drying clothes, harsh shadow."
+    },
+    {
+      "id": 10,
+      "chars": [
+        "meera"
+      ],
+      "bubble": "caption",
+      "who": "",
+      "text": "Skylight ke neeche jo aadmi so raha tha — woh Rohan nahi, koi aur tha.",
+      "speaker": [
+        0.5,
+        0.5
+      ],
+      "prompt": "Extreme close-up of the taped photo on the terrace door: the sleeping man's face is turned — it is NOT Rohan, a stranger in Rohan's bed wearing his grey shirt. Meera's silver watch reflects in the glossy print, clock in the distance reads 2:14."
+    }
+  ],
+  "caption": "Har raat 2:14 baje uske apne ghar ki photo aati thi... par bistar pe woh khud nahi tha. Toh Rohan roz kahan sota tha?\n\nPart 2 ke liye Follow karo.\n\n(Ye ek kaalpanik kahani hai. This is a work of fiction.)",
+  "hashtags": [
+    "anhoni",
+    "suspense",
+    "thriller",
+    "hindistory",
+    "mystery",
+    "shorts",
+    "comicstory",
+    "twistending",
+    "darkstory",
+    "webseries"
+  ]
+}

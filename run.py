@@ -21,14 +21,9 @@ from pipeline.utils import dedupe_script_narration, load_config, out_path, set_a
 # (niche, kind, seed_offset). The generation cron fires HOURS earlier (buffer for
 # GitHub's late crons); YouTube flips the private upload public at this exact time.
 PUBLISH_TIMES = {
-    ("bhakti",  "mantra",   0): "01:30",  # ~7:00 AM IST
     ("ancient", "trending", 1): "18:00",  # 2:00 PM ET (US afternoon)
     ("ancient", "trending", 2): "00:00",  # 8:00 PM ET (US evening prime)
     ("ancient", "trending", 3): "21:00",  # 5:00 PM ET (US afternoon — 3rd daily TD slot)
-    ("bhajan",  "trending", 0): "13:30",  # ~7:00 PM IST Sunday
-    ("itihaas", "trending", 1): "03:00",  # ~8:30 AM IST next morning (AM drop)
-    ("itihaas", "series",   3): "14:30",  # ~8:00 PM IST — PM series (Mahabharat Villains, ACTIVE)
-    ("itihaas", "trending", 3): "14:30",  # ~8:00 PM IST — PM standalone rahasya (fallback mapping)
     # GoM (audience US 60%, proven peaks 1 PM & 9 PM ET): generate EARLY with a big
     # 5-6h buffer (gen 12:00/15:00/19:00 UTC), then YT native-schedules to these
     # exact times AND FB/IG are queued (facebook_make_scheduled) → posted by the
@@ -89,23 +84,14 @@ def _publish_at_iso(hhmm: str | None) -> str | None:
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument(
-        "--niche", default="bhakti",
-        choices=["bhakti", "itihaas", "bhajan", "ancient", "godmind", "moneurons"],
-        help="Which niche to run (bhakti = KalyaanPath; itihaas = Itihaasvani; bhajan = Flow Music MP3; ancient = Ancient World Decoded English; godmind = Gods of the Mind; moneurons = Moneurons US money-psychology)",
-    )
-    ap.add_argument(
-        "--deity",
-        choices=["hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai", "khatu_shyam", "neem_karoli", "general"],
-        help="For --niche bhajan: pick MP3 from data/music_bhajan/[deity]/. If omitted, scans all deity folders (excludes one-off specials like neem_karoli). Falls back to env BHAJAN_DEITY.",
-    )
-    ap.add_argument(
-        "--bhajan-audio",
-        help="For --niche bhajan: explicit path to MP3 (overrides --deity auto-pick).",
+        "--niche", default="godmind",
+        choices=["ancient", "godmind", "moneurons"],
+        help="Which niche to run (ancient = Time Decoders; godmind = Gods of the Mind; moneurons = Moneurons US money-psychology)",
     )
     ap.add_argument(
         "--kind", default="auto",
         choices=["auto", "shloka", "trending", "mantra", "series"],
-        help="auto = legacy daily rotation; shloka = next Gita verse episode (PARKED — pivoted to mantra); trending = current festival/popular deity; mantra = mantra-rahasya format (KalyaanPath morning slot, post-pivot)",
+        help="auto = legacy daily rotation; trending = current popular topic",
     )
     ap.add_argument(
         "--topic", default="auto",
@@ -157,8 +143,6 @@ def main(argv: list[str]) -> int:
         args.auto_thumb = True
     # Env fallbacks for workflow-driven one-offs (keeps the run steps clean; empty
     # env on normal runs → no effect).
-    if not args.deity:
-        args.deity = os.environ.get("BHAJAN_DEITY", "").strip() or None
     if not args.publish_at:
         args.publish_at = os.environ.get("PUBLISH_AT_ISO", "").strip() or None
 
@@ -177,10 +161,6 @@ def main(argv: list[str]) -> int:
                 return 0
         except Exception:
             traceback.print_exc()
-
-    # Bhajan mode: MP3 → bhajan video (separate flow, no script/TTS)
-    if args.niche == "bhajan":
-        return _run_bhajan(args)
 
     # 1. topic — check pregen cache FIRST (saves Gemini calls at peak hours)
     from datetime import date as _date_t
@@ -252,12 +232,12 @@ def main(argv: list[str]) -> int:
     # FB) if this topic was already published in the last 10 days. --force bypasses.
     if (args.publish or args.notify_telegram) and not args.force:
         try:
-            from pipeline.publish_log import title_published_recently, topic_live_on_youtube
+            from pipeline.publish_log import title_published_recently
             _tt = topic.get("title", "")
             # Two layers: (1) local ledger (fast, but can be stale under a git-race),
             # (2) LIVE YouTube check (slower, but immune to state loss — catches the
             # same-topic-different-subtitle dups the ledger missed). Either → skip.
-            if title_published_recently(_tt) or topic_live_on_youtube(_tt, args.niche):
+            if title_published_recently(_tt):
                 print(f"[dedup] topic '{_tt}' already published "
                       f"recently — skipping to avoid a duplicate upload (use --force)")
                 return 0
@@ -317,7 +297,7 @@ def main(argv: list[str]) -> int:
     _real_q = os.environ.get("FORCE_REAL_PHOTOS", "").strip()
     if _real_q:
         topic["query"] = _real_q   # clean English search term for Commons
-    wiki_mode = (footage_mode and args.niche == "itihaas") or (bool(_real_q) and not args.long_form)
+    wiki_mode = bool(_real_q) and not args.long_form
     if wiki_mode:
         footage_mode = False
     footage_clips: dict[int, Path] = {}
@@ -595,21 +575,6 @@ def main(argv: list[str]) -> int:
         cfg = load_config()
         publish_cfg = cfg.get("publish", {})
 
-        if publish_cfg.get("youtube", True):
-            try:
-                from pipeline.uploader_youtube import upload as yt_upload
-                url = yt_upload(video_path, script, thumb_path=thumb_path,
-                                publish_at=_publish_at_iso(_slot_publish_at(args)))
-                print(f"[publish] youtube: {url}")
-                _platforms["youtube"] = url
-                _delivered = True
-            except Exception:
-                traceback.print_exc()
-                _platforms["youtube"] = "failed"
-                print("[publish] youtube failed — see traceback above")
-        else:
-            print("[publish] skipped youtube (disabled in config)")
-
         # Facebook Page Reel (bonus channel — never blocks YouTube). Enable per
         # niche with `publish.facebook: true` + FB_PAGE_ID / FB_PAGE_TOKEN secrets.
         if publish_cfg.get("facebook", False):
@@ -620,11 +585,9 @@ def main(argv: list[str]) -> int:
                 if fb_url:
                     print(f"[publish] facebook: {fb_url}")
                     _platforms["facebook"] = fb_url
-                    # Bonus channel: only counts as "slot delivered" (which
-                    # suppresses catch-up) when YouTube isn't the primary. Else a
-                    # YT failure would be masked and never recovered.
-                    if not publish_cfg.get("youtube", True):
-                        _delivered = True
+                    # Facebook is now the ONLY publish target (YouTube removed
+                    # 2026-10-21), so a delivered FB post IS the slot.
+                    _delivered = True
             except Exception:
                 traceback.print_exc()
                 print("[publish] facebook failed — see traceback above")
@@ -641,12 +604,11 @@ def main(argv: list[str]) -> int:
                 from pipeline.uploader_make_reel import upload as make_upload
                 # Resolve this channel's FB page id. GoM has no FB_PAGE_ID secret →
                 # use its known page id; others use their proven FB_PAGE_ID_<NICHE>
-                # secret (bhajan shares the bhakti/KalyaanPath page).
                 _GOM_PAGE = "1113214471881336"
                 if args.niche == "godmind":
                     _pg = _GOM_PAGE
                 else:
-                    _k = "BHAKTI" if args.niche in ("bhakti", "bhajan") else args.niche.upper()
+                    _k = args.niche.upper()
                     _pg = (os.getenv(f"FB_PAGE_ID_{_k}") or os.getenv("FB_PAGE_ID") or "").strip()
                 # If the niche schedules FB (facebook_make_scheduled), queue the reel
                 # for its exact peak (poster cron fires it → no render-time drift).
@@ -663,13 +625,10 @@ def main(argv: list[str]) -> int:
                 if make_upload(video_path, script, channel=args.niche, fb_page_id=_pg, post_at=_fb_at):
                     print(f"[publish] make-reel {('queued for ' + _fb_at) if _fb_at else 'posted'} ({args.niche} → FB page {_pg})")
                     _platforms["facebook"] = ("queued", _fb_at) if _fb_at else "posted"
-                    # Bonus channel: the reel-poster + posted-ledger own FB/IG
-                    # reliability. Only mark the SLOT delivered (which suppresses
-                    # catch-up) when YouTube isn't the primary for this niche —
-                    # otherwise a failed YT upload would look "done" and the
-                    # catch-up sweep would never recover the YouTube video.
-                    if not publish_cfg.get("youtube", True):
-                        _delivered = True
+                    # The reel-poster + posted-ledger own FB/IG reliability.
+                    # Facebook is now the only publish target (YouTube removed
+                    # 2026-10-21), so a delivered FB post IS the slot.
+                    _delivered = True
             except Exception:
                 traceback.print_exc()
                 _platforms["facebook"] = "failed"
@@ -788,157 +747,6 @@ def main(argv: list[str]) -> int:
     return 0
 
 
-# ─── Bhajan mode ─────────────────────────────────────────────────────────
-def _load_bhajan_lyrics(deity: str) -> str | None:
-    """Lyrics for a lyric-synced bhajan (data/bhajan_lyrics_<deity>.txt), or None."""
-    from pipeline.utils import ROOT
-    p = ROOT / f"data/bhajan_lyrics_{deity}.txt"
-    return p.read_text(encoding="utf-8").strip() if p.exists() else None
-
-
-def _run_bhajan(args) -> int:
-    """Flow Music MP3 → bhajan video pipeline (vertical 9:16 Short)."""
-    from pipeline.bhajan import (
-        pick_bhajan_audio, mark_audio_processed,
-        generate_scene_prompts, _generate_images,
-        assemble_bhajan_video, build_bhajan_metadata,
-    )
-
-    # 1. Pick audio
-    if args.bhajan_audio:
-        mp3 = Path(args.bhajan_audio).resolve()
-        if not mp3.exists():
-            print(f"[bhajan] MP3 not found: {mp3}")
-            return 1
-        # Try to infer deity from parent folder name
-        deity = mp3.parent.name.lower() if mp3.parent.name.lower() in {
-            "hanuman", "krishna", "shiva", "ram", "devi", "ganesh", "sai",
-            "khatu_shyam", "neem_karoli", "general"
-        } else "general"
-    else:
-        picked = pick_bhajan_audio(args.deity)
-        if not picked:
-            print("[bhajan] nothing to process — drop MP3s in data/music_bhajan/[deity]/")
-            return 0
-        mp3, deity = picked
-
-    print(f"[bhajan] processing {mp3.name} (deity={deity})")
-
-    stamp = today_stamp()
-    slug = slugify(mp3.stem)
-    base = f"{stamp}_bhajan_{deity}_{slug}"
-
-    # 2. Generate scene storyboard via LLM
-    from pipeline.utils import load_config
-    cfg = load_config()
-    n_scenes = cfg["images"]["num_per_bhajan"]
-    # One-off real-saint bhajans (e.g. Neem Karoli Baba): storyboard the ACTUAL
-    # lyrics in order (visuals sync to the verses) and splice his REAL free-licensed
-    # photos in (AI never fakes a real person's face).
-    _lyrics = _load_bhajan_lyrics(deity) if deity == "neem_karoli" else None
-    _real_photo_q = "Neem Karoli Baba" if deity == "neem_karoli" else None
-    scene_prompts = generate_scene_prompts(deity, n_scenes, lyrics=_lyrics)
-
-    # 3. Generate images
-    img_dir = out_path("images", base)
-    images = _generate_images(scene_prompts, img_dir)
-    if not images:
-        print("[bhajan] image generation failed entirely")
-        return 1
-    print(f"[bhajan] {len(images)} scene images ready")
-
-    # 3b. Real-photo splice for real-person saints — pin the iconic face at the
-    # opening + a couple more spots (his actual likeness, free-licensed, auto-credit).
-    _real_credit_block = ""
-    if _real_photo_q and images:
-        try:
-            import shutil as _sh
-            from pipeline.wiki_images import fetch_wiki_images, build_credit_block
-            real_dir = out_path("images", base + "_real")
-            real_imgs, real_credits = fetch_wiki_images({"query": _real_photo_q}, real_dir, want=6)
-            if real_imgs:
-                n = len(images)
-                slots = [0] + ([n // 3, (2 * n) // 3] if n >= 6 else [])
-                used = []
-                for k, (slot, rp) in enumerate(zip(slots, real_imgs)):
-                    try:
-                        _sh.copy2(rp, images[slot])
-                        used.append(real_credits[k])
-                    except Exception:
-                        pass
-                print(f"[bhajan] spliced {len(used)} real photos into slots {slots[:len(used)]}")
-                _real_credit_block = build_credit_block(used)
-            else:
-                print("[bhajan] no real photos found — using AI ambiance only")
-        except Exception as e:
-            print(f"[bhajan] real-photo splice failed (non-fatal): {type(e).__name__}: {e}")
-
-    # 4. Assemble video
-    video_path = out_path("videos", f"{base}.mp4")
-    assemble_bhajan_video(mp3, images, video_path)
-
-    # 5. Build script-like metadata for thumbnail/telegram/upload
-    script = build_bhajan_metadata(deity, mp3.stem)
-    if _real_credit_block:
-        script["description"] = (script.get("description", "") + "\n\n" + _real_credit_block).strip()
-    # Save script JSON (used by uploader)
-    script_path = out_path("scripts", f"{base}.json")
-    script_path.write_text(json.dumps({**script, "visuals": scene_prompts}, indent=2, ensure_ascii=False))
-
-    # 6. Thumbnail (auto-generate via existing module)
-    thumb_path = None
-    if args.auto_thumb or args.notify_telegram:
-        try:
-            from pipeline.thumbnail_gen import make_thumbnail
-            thumb_path = out_path("thumbnails", f"{base}.jpg")
-            make_thumbnail(script, args.niche, thumb_path)
-        except Exception:
-            traceback.print_exc()
-            print("[bhajan] thumbnail failed — continuing without")
-
-    # 7. Endcard
-    if thumb_path and Path(thumb_path).exists():
-        try:
-            from pipeline.endcard import append_thumbnail_endcard
-            append_thumbnail_endcard(video_path, thumb_path, duration_sec=2.5)
-        except Exception:
-            traceback.print_exc()
-
-    # 8. Mark processed (so next cron run doesn't re-pick this MP3)
-    mark_audio_processed(mp3)
-
-    # 9. Notify Telegram
-    if args.notify_telegram:
-        try:
-            from pipeline.notifier_telegram import notify as tg_notify
-            tg_notify(video_path, thumb_path, script, args.niche)
-        except Exception:
-            traceback.print_exc()
-
-    # 10. Publish to YouTube
-    _delivered = False
-    if args.publish:
-        try:
-            from pipeline.uploader_youtube import upload as yt_upload
-            url = yt_upload(video_path, script, thumb_path=thumb_path,
-                            publish_at=_publish_at_iso(_slot_publish_at(args)))
-            print(f"[publish] youtube: {url}")
-            _delivered = True
-        except Exception:
-            traceback.print_exc()
-    elif args.notify_telegram:
-        _delivered = True  # bhajan TG drop already sent above
-
-    if _delivered:
-        try:
-            from pipeline.publish_log import mark_published
-            mark_published("bhajan", "trending", args.seed_offset)
-            print("[catchup] marked bhajan as delivered today")
-        except Exception:
-            traceback.print_exc()
-
-    print(f"[bhajan] DONE → {video_path}")
-    return 0
 
 
 if __name__ == "__main__":
