@@ -112,10 +112,14 @@ images:
   # each block to 5-6 marks in distinct spatial slots; past that they drop out.
   deity_blocks:
     shiva: "His jaw is smooth and bare, his upper lip smooth and bare. His skin is ash-white like a silver mountain and only his throat is deep blue. Three horizontal white ash lines cross his brow with a vertical third eye above them. His hair is thick matted jata coiled into a high topknot with a thin white crescent moon at its crest. A tiger skin is wrapped at his waist. A tall trishul is gripped in his hand."
-    krishna: "He is a youthful man in his early twenties with a smooth clean-shaven jaw and a smooth bare upper lip. His skin is dark with a blue-green raincloud cast. One upright peacock feather stands in a tuft of his dark curled hair. A bamboo flute is held at his lips in both hands. A vaijayanti garland of forest flowers falls past his knees over a golden-yellow pitambara dhoti. He stands in a thrice-bent tribhanga curve. He has two arms."
+    krishna: "His skin is a deep luminous BLUE all over — the blue of a monsoon raincloud, unmistakably blue and never brown or tan. He is a youthful man in his early twenties with a smooth clean-shaven jaw and a smooth bare upper lip, his dark hair in soft waves. One upright peacock feather stands in a tuft of his dark curled hair. A bamboo flute is held at his lips in both hands. A vaijayanti garland of forest flowers falls past his knees over a golden-yellow pitambara dhoti. He stands in a thrice-bent tribhanga curve. He has two arms."
     vishnu: "He is a serene youthful crowned man with a smooth clean-shaven jaw and a smooth bare upper lip. His skin is dark storm-cloud blue. A tall conical golden kirita crown rises from his head. He has four arms: a white conch in the upper right, a golden chakra in the upper left, a golden mace in the lower left, a pink lotus in the lower right. A shrivatsa curl marks his right chest, a vanamala garland hangs to his knees, and yellow silk drapes his waist."
     ram: "He is a youthful prince in his twenties with a smooth clean-shaven jaw and a smooth bare upper lip. His skin is dark blue, visibly darker than anyone beside him. A cylindrical golden kirita crown sits on his dark hair. An arrow is held in his right hand and a great wooden longbow in his left. He wears reddish garments with a girdle and a sacred thread across his chest. He has two arms."
-    hanuman: "Hanuman has the FACE OF A MONKEY — a furred monkey muzzle with a monkey's nose and mouth pushed forward, round monkey eyes full of devotion, and monkey ears set high with gold earrings. This monkey head sits on the strong upright body of a man. His skin and fur are bright sindoor orange-red. A long monkey tail rises behind him like a flag. In his right hand he holds a gada: a short thick club with a heavy round ball of gold at its top, resting against his shoulder."
+    # 2026-10-21: "FACE OF A MONKEY" alone pulled a photoreal CHIMPANZEE —
+    # technically a monkey face, so the vision gate passed it, but not a
+    # deity. Named as the STYLISED VANARA of temple art instead, with the
+    # devotional expression and the sindoor colour leading.
+    hanuman: "He is Hanuman the vanara, painted in the stylised devotional manner of Hindu temple art, never as a realistic ape. His face is a gentle vanara face: a short furred muzzle, a small rounded nose, a calm closed mouth and large warm eyes full of devotion, framed by a neat golden crown and gold earrings. His fur and skin are bright sindoor orange-red all over. His body is the strong upright body of a man in a golden dhoti with a sacred thread across his chest. A long tail curves up behind him like a flag. In his right hand he holds a gada: a short thick club with a heavy round ball of gold at its top, resting against his shoulder."
     ganesha: "He has the head of an elephant on the body of a mature adult man with a large round belly. His skin is warm red-orange, never grey. His right tusk is broken and his left tusk is whole. His trunk curves down and to his left. His ears are very large and fan-like. A serpent is wound around his belly as a belt. A small conical crown sits between his ears. He has four arms: a goad, a noose, a bowl of modaka sweets that his trunk reaches down to taste, and one palm raised in blessing. A small mouse sits at his feet."
     # 2026-10-21: "severed heads" / "severed head" trip fal's prompt content
     # checker — EVERY Kali prompt was rejected outright (caught building the
@@ -461,7 +465,13 @@ video:
   # Running "cuts" FIRST on purpose: it costs nothing, and running both at once
   # would make it impossible to tell which one moved the number. Flip to
   # "motion" only after 14 reels of cuts have a 3-second rate to compare.
-  opener: cuts
+  # MOTION, made the default 2026-10-21 per user ("motion ke saath banao, wahi
+  # final karo"). The cuts test is therefore ended early and deliberately — it
+  # never reached the 14 reels it needed, so it yields no verdict either way.
+  # The hook image becomes a real generated clip whose prompt is built from THAT
+  # scene's own visual line (run.py), with its duration matched to the scene so
+  # it cannot freeze on its last frame. ~₹22/reel, ~₹375/month at 4/week.
+  opener: motion
   # opener_model: fal-ai/...   # optional cheaper I2V for "motion" (default Kling v3)
   font: assets/fonts/Anton-Regular.ttf
   font_size: 80

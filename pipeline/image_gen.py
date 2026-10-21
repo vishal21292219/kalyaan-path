@@ -281,8 +281,37 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
                 f"Centered frontal hero pose, clean plain simple background, "
                 f"dramatic divine lighting, intricate detail, masterpiece{_tail}."
             )
-            if not _generate_fal_flux(prompt, mp, model=fal_model, target_w=target_w, target_h=target_h):
+            # The master is the HIGHEST-LEVERAGE frame in the whole render: every
+            # reference-conditioned scene inherits its face. Measured on a real
+            # Indra reel 2026-10-21 — the master came back bearded and all EIGHT
+            # conditioned scenes carried that beard into the finished video, while
+            # the per-scene gate only ever saw the four plain-FLUX frames. So the
+            # master is gated here, and hard: regenerate until it passes.
+            ok_master = False
+            for attempt in range(3):
+                if not _generate_fal_flux(prompt, mp, model=fal_model,
+                                          target_w=target_w, target_h=target_h):
+                    continue
+                if is_blank(mp):
+                    print(f"[consistency] master {name}: blank frame — retrying")
+                    continue
+                if not (load_config().get("images", {}) or {}).get("frame_check"):
+                    ok_master = True
+                    break
+                from .frame_check import check as _fc
+                good, why = _fc(mp, slugify(name), f"a reference portrait of {name}")
+                if good:
+                    ok_master = True
+                    break
+                print(f"[consistency] master {name} attempt {attempt+1}: "
+                      f"FRAME CHECK FAILED — {'; '.join(why)}")
+            if not ok_master:
+                FRAME_ISSUES.append(f"master {name}: never passed the frame check")
                 print(f"[consistency] master FAILED for {name} — scenes will use plain FLUX")
+                try:
+                    mp.unlink()
+                except Exception:
+                    pass
                 continue
         url = _fal_upload(mp)
         if url:
@@ -418,6 +447,18 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
                     char_name=names, art_style=style.lstrip(", ").strip(),
                     target_w=target_w, target_h=target_h,
                 ):
+                    # Gate the conditioned frame too. This path used to
+                    # `continue` straight past the vision check below, so on a
+                    # real render 8 of 12 frames were never looked at — the whole
+                    # point of the gate, missed by where it was wired.
+                    _d = _deity_name(raw_prompt, cfg)
+                    if (cfg.get("images", {}) or {}).get("frame_check"):
+                        from .frame_check import check as _fc
+                        _good, _why = _fc(path, _d, raw_prompt)
+                        if not _good:
+                            FRAME_ISSUES.append(f"img {i} (ref): {'; '.join(_why)}")
+                            print(f"[image_gen] img {i}: FRAME CHECK FAILED on the "
+                                  f"reference path — {'; '.join(_why)}")
                     ref_succeeded += 1
                     ref_used += 1
                     results.append(path)
