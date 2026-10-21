@@ -156,6 +156,16 @@ def _generate_hf_flux(prompt: str, out_path: Path, model: str = HF_DEFAULT_MODEL
                 # Rate limited — back off
                 print(f"[image_gen][hf] attempt {attempt}: 429 rate-limited, backing off")
                 time.sleep(25)
+            elif r.status_code == 410:
+                # TIER IS DEAD, NOT FLAKY. Verified 2026-10-21: FLUX.1-schnell,
+                # FLUX.1-dev and SDXL all return 410 "model is deprecated and no
+                # longer supported by provider hf-inference" — the whole
+                # hf-inference image endpoint is gone, so retrying is pure delay.
+                # This tier is no longer a safety net; fal is effectively the only
+                # image provider, which is why fal now retries itself.
+                print(f"[image_gen][hf] HTTP 410 — hf-inference image models are "
+                      f"deprecated; this fallback tier is DEAD, not retrying")
+                return False
             else:
                 print(f"[image_gen][hf] attempt {attempt}: HTTP {r.status_code} {r.text[:150]}")
                 if attempt < max_retries:
@@ -506,9 +516,29 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 
         # Provider chain: fal.ai FLUX 1.1-pro (paid premium) → HF FLUX schnell (free) → Gemini (free)
         ok = False
-        if use_fal and _generate_fal_flux(prompt, path, model=(hero_model if is_hero else fal_model), target_w=target_w, target_h=target_h, seed=seed) and not is_blank(path):
-            ok = True
-            fal_succeeded += 1
+        # RETRY FAL BEFORE FALLING THROUGH. The two tiers below it are both dead:
+        # HF answers 410 ("model is deprecated and no longer supported") on every
+        # call, and Gemini is quota-exhausted (429 x5). Measured 2026-10-21 on a
+        # real run where fal returned a blank frame for two scenes — the blank
+        # guard correctly rejected them, said NOTHING, fell through to two dead
+        # providers and silently dropped both scenes, leaving 8 images for 10
+        # narration lines. A single fal attempt is not enough when it is in
+        # practice the only provider.
+        if use_fal:
+            for _try in range(3):
+                if not _generate_fal_flux(prompt, path,
+                                          model=(hero_model if is_hero else fal_model),
+                                          target_w=target_w, target_h=target_h, seed=seed):
+                    print(f"[image_gen] img {i}: fal attempt {_try+1} failed")
+                elif is_blank(path):
+                    print(f"[image_gen] img {i}: fal attempt {_try+1} returned a BLANK frame")
+                else:
+                    ok = True
+                    fal_succeeded += 1
+                    break
+                time.sleep(4)
+        if ok:
+            pass
         elif _generate_hf_flux(prompt, path):
             print(f"[image_gen] img {i}: HF FLUX schnell succeeded")
             ok = True
