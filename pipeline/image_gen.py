@@ -415,7 +415,11 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     # cover). Cost ~$0.05/video — still trivial vs the removed Kling clip.
     hero_scenes = max(1, int(cfg["images"].get("hero_scenes", 2)))
 
-    for i, raw_prompt in enumerate(visual_prompts):
+    for i, _vp in enumerate(visual_prompts):
+        # Enforce the "no text in frame" rule the writer keeps breaking.
+        raw_prompt = _strip_text_requests(_vp)
+        if raw_prompt != _vp:
+            print(f"[image_gen] img {i}: stripped a text-rendering request from the scene")
         is_hero = (i < hero_scenes)   # opening scenes = retention hook + FB cover → premium
         boost = HERO_BOOST if is_hero else ""
         # No "Avoid: ..." tail: FLUX has no negative channel, so appending the
@@ -541,6 +545,28 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 # Frames that failed the vision gate in the current run. run.py can surface this
 # (the Discord failure alert already exists) so a flagged render is never silent.
 FRAME_ISSUES: list[str] = []
+
+
+_TEXT_REQUEST = re.compile(
+    r"[^,.;—]*\b(?:the\s+)?(?:sanskrit\s+|devanagari\s+)?"
+    r"(?:word|words|letters?|lettering|script|inscription|text|writing|written|"
+    r"spelled|calligraphy|mantra\s+written)\b[^,.;—]*", re.I)
+
+
+def _strip_text_requests(visual: str) -> str:
+    """Drop clauses asking for WORDS to be rendered inside the image.
+
+    2026-10-21: a live reel's scene 9 asked for "a radiant Sanskrit word SATTVA
+    in pure gold light floating at the centre of the frame". No diffusion model
+    can spell Sanskrit, so it produced a halo of convincing-looking nonsense
+    letters — which the vision gate correctly failed, twice, burning a
+    regeneration each time. images.image_style_guidance already says NO text and
+    the writer asked for it anyway, so the ban is enforced here instead of
+    merely requested. The rest of the scene direction is kept."""
+    out = _TEXT_REQUEST.sub("", visual or "")
+    out = re.sub(r"\s*,\s*,", ",", out)
+    out = re.sub(r"\s{2,}", " ", out).strip(" ,;—")
+    return out or (visual or "")
 
 
 def _deity_name(text: str, cfg: dict) -> str:
