@@ -430,6 +430,7 @@ def build(item: dict, out_dir: Path, model: str = "") -> dict:
                 url, item["visual"], raw, char_name=item["deity"].title(),
                 art_style=style, aspect_ratio="3:4", target_w=W, target_h=H) \
                 and not _is_blank(raw):
+            _gate(raw, item, cfg)
             compose(raw, item["line"], item["deity"], final)
             return {"line": item["line"], "deity": item["deity"], "visual": item["visual"],
                     "image": str(final), "raw": str(raw),
@@ -451,7 +452,22 @@ def build(item: dict, out_dir: Path, model: str = "") -> dict:
     else:
         raise RuntimeError(f"image generation failed for: {item['line']}")
 
+    _gate(raw, item, cfg)
     compose(raw, item["line"], item["deity"], final)
     return {"line": item["line"], "deity": item["deity"], "visual": item["visual"],
             "image": str(final), "raw": str(raw),
             "caption": caption(item["line"], item["deity"]), "prompt": prompt}
+
+
+def _gate(raw: Path, item: dict, cfg: dict) -> None:
+    """Vision check before the caption goes on. RAISES on failure — unlike the
+    reel path, a photo post is a single frame posted on its own, so there is
+    nothing to salvage and shipping it flagged would be worse than shipping
+    nothing. See pipeline/frame_check.py."""
+    if not (cfg.get("images", {}) or {}).get("frame_check"):
+        return
+    from .frame_check import check
+    good, why = check(raw, item["deity"], item["visual"])
+    if not good:
+        raise RuntimeError(f"frame check failed for '{item['line']}': {'; '.join(why)}")
+    print(f"[photo] frame check passed ({'; '.join(why)[:70]})")

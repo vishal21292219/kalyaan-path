@@ -65,13 +65,39 @@ images:
   # the assembler. Upgrade model to fal-ai/flux-pro/v1.1 for max quality (+cost).
   mode: image
   provider: fal
-  model: fal-ai/flux/schnell        # BULK scenes — cheap
+  # BULK model raised schnell -> dev 2026-10-21. Measured on the SAME prompt
+  # (scene 4 of a live reel, "a vast cosmic ocean churning, Halahala rising"):
+  # schnell ignored the scene entirely and returned a bearded Shiva portrait;
+  # dev returned a clean-shaven Shiva standing in churning ocean waves. schnell
+  # is a 4-8 step distilled model and was the single cause of BOTH complaints —
+  # "images script ke hisaab se nahi" and the beard in the non-hero scenes. It
+  # was never a token-cap problem: the full prompt measured ~196 T5 tokens
+  # against schnell's 256 cap, so nothing was being truncated.
+  # COST: ~$0.05/img on dev vs ~$0.006 on schnell -> roughly +₹35/reel,
+  # ~₹560/month at 4 reels/week. Image quality is the channel's main lever and
+  # the page is monetised, so this is bought deliberately.
+  model: fal-ai/flux/dev            # BULK scenes
   master_model: fal-ai/flux/dev     # MASTER deity portrait — premium 28-step face, propagated via consistency
   hero_model: fal-ai/flux/dev       # FIRST image (hook + FB cover) — premium since Kling hero-motion is off. Bump to fal-ai/flux-pro/v1.1 for max wow (+cost).
   hero_scenes: 2                    # how many OPENING scenes get premium treatment (the part viewers judge). ~$0.05/video.
   num_per_reel: 10
   consistency: true                 # lock the dev-quality deity face across the hero scenes
-  consistency_max_scenes: 3         # cost guard: only top-3 hero scenes reference-conditioned
+  # VISION GATE (pipeline/frame_check.py). One Claude-vision call per frame,
+  # checked against the things this channel cannot ship: facial hair on a deity
+  # whose canon is a bare jaw, an unclothed goddess, a deity rendered as a child,
+  # a picture that does not depict its own line, garbled lettering. Added
+  # 2026-10-21 because all four of those reached a published reel while the
+  # pipeline reported SUCCESS — the output is a picture and the code could not
+  # see it. Validated on six real frames from that reel: the bearded master, the
+  # off-brief scene and an unclothed Kali all FAIL; three good frames PASS.
+  frame_check: true
+  # Raised 3 -> 8 on 2026-10-21. With only the first 3 scenes reference-
+  # conditioned, scenes 3+ came from plain text-to-image in a visibly DIFFERENT
+  # art style (flat calendar art against the hero scenes' rich painting), which
+  # is what made the finished reel look incoherent. The references are now
+  # pinned, hand-checked files (assets/refs/), so conditioning more scenes
+  # propagates correct iconography instead of propagating a bad master.
+  consistency_max_scenes: 8
 
   # ── PER-DEITY ICONOGRAPHY BLOCKS (2026-10-21) ────────────────────────────────
   # Replaces the universal style_suffix for any scene that names a deity below.

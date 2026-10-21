@@ -18,7 +18,7 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-from .utils import load_config, slugify
+from .utils import ROOT, load_config, slugify
 
 load_dotenv(override=True)
 
@@ -250,6 +250,25 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
         if not name or not look:
             continue
         mp = out_dir / f"master_{slugify(name)}.jpg"
+
+        # PINNED REFERENCE. A hand-checked frame in assets/refs/<deity>.jpg wins
+        # over anything we can generate. Added 2026-10-21 after the master for
+        # Shiva came back bearded on every prompt form tried (negation stripped,
+        # block alone, bare-jaw sentence leading) and that beard then propagated
+        # into every reference-conditioned scene of a live reel. Prompt wording
+        # was the wrong tool. Each pinned file was produced by generating for
+        # canon and then EDITING the one wrong attribute (nano-banana-2/edit),
+        # so it carries correct iconography AND the channel's art style.
+        # To pin a deity: drop a verified frame at assets/refs/<lowercase>.jpg.
+        pinned = ROOT / "assets/refs" / f"{slugify(name)}.jpg"
+        if pinned.exists():
+            url = _fal_upload(str(pinned))
+            if url:
+                masters[name] = url
+                print(f"[consistency] master ← PINNED assets/refs/{pinned.name} → {name}")
+                continue
+            print(f"[consistency] pinned ref upload failed for {name} — generating instead")
+
         if not mp.exists():
             # The master portrait defines the deity for every scene that
             # references it, so it gets the same one-deity treatment.
@@ -431,6 +450,25 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
             print(f"[image_gen] img {i}: provider returned a BLANK frame — dropping scene")
             ok = False
 
+        # VISION GATE. The pipeline cannot see its own output, so every rule the
+        # channel actually cares about (bare jaw, clothed goddess, adult deity,
+        # picture matching its line) has until now been unenforceable prose. One
+        # vision call per frame makes it a check. Retry once, then keep the frame
+        # but record it loudly — a missing scene breaks the render, a flagged one
+        # only needs a human to look.
+        if ok and (cfg.get("images", {}) or {}).get("frame_check"):
+            from .frame_check import check
+            good, why = check(path, _deity_name(raw_prompt, cfg), raw_prompt)
+            if not good:
+                print(f"[image_gen] img {i}: FRAME CHECK FAILED — {'; '.join(why)} — regenerating")
+                if use_fal and _generate_fal_flux(
+                        prompt, path, model=(hero_model if is_hero else fal_model),
+                        target_w=target_w, target_h=target_h) and not is_blank(path):
+                    good, why = check(path, _deity_name(raw_prompt, cfg), raw_prompt)
+                if not good:
+                    FRAME_ISSUES.append(f"img {i}: {'; '.join(why)}")
+                    print(f"[image_gen] img {i}: STILL FAILING after retry — {'; '.join(why)}")
+
         if ok:
             # Enforce target aspect ratio: resize+center-crop if provider gave wrong orientation
             try:
@@ -442,6 +480,11 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
                 print(f"[image_gen] resize warning on img {i}: {e}")
             results.append(path)
 
+    if FRAME_ISSUES:
+        print(f"[image_gen] {len(FRAME_ISSUES)} FRAME(S) FAILED THE VISION CHECK:")
+        for f in FRAME_ISSUES:
+            print(f"  - {f}")
+
     print(f"[image_gen] {len(results)}/{len(visual_prompts)} generated "
           f"(ref-consistent: {ref_succeeded}, fal: {fal_succeeded}, HF: {hf_succeeded}, "
           f"Gemini: {gemini_succeeded}) @ {target_w}x{target_h}")
@@ -452,6 +495,22 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     if not results:
         raise GeminiUnavailable("All providers failed for every image")
     return results
+
+
+# Frames that failed the vision gate in the current run. run.py can surface this
+# (the Discord failure alert already exists) so a flagged render is never silent.
+FRAME_ISSUES: list[str] = []
+
+
+def _deity_name(text: str, cfg: dict) -> str:
+    """Which deity_blocks key this prompt names, or "". Longest key first so
+    "kartikeya" is not shadowed by a shorter one — same rule as _deity_block."""
+    blocks = (cfg.get("images", {}) or {}).get("deity_blocks") or {}
+    low = (text or "").lower()
+    for name in sorted(blocks, key=len, reverse=True):
+        if name in low:
+            return name
+    return ""
 
 
 def _deity_block(text: str, cfg: dict) -> str:
