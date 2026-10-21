@@ -421,6 +421,14 @@ llm:
        NEVER use #HinduMythology / #mythology / #myth — they offend devotees.
 
 publish:
+  # The page's PUBLIC id — not a secret, and there is no FB_PAGE_ID_GODMIND
+  # secret for this channel. Confirmed 2026-10-21 against the Make connection's
+  # own page list (facebook-pages RPC "Pages"): "Gods of the Mind" ->
+  # 1113214471881336. run.py hardcodes the same value for the reel path.
+  # It MATTERS that this is right: the Make router sends a payload with no
+  # fb_page_id down the "no fb_page_id" route, so a wrong or missing id does not
+  # fail — it posts to a different page.
+  fb_page_id: '1113214471881336'
   instagram: false
   privacy: public
   # YOUTUBE OFF (2026-10-20) — this niche's YouTube channel was REMOVED by

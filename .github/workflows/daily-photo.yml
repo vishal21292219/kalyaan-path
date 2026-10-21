@@ -1,0 +1,134 @@
+name: Daily Photo (Gods of the Mind)
+
+# WHY THIS EXISTS
+# Measured against the two competitor pages the user picked (2026-10-21):
+#
+#                     Divya Darshan   Awakeners      Gods of the Mind
+#   followers             388K           151K             2.9K
+#   posts / week        ~14-28          ~14               4
+#   format           mostly photo    mostly photo    100% reel
+#   typical reel         2,000         3,200           1,658
+#   photo engagement   1-42 likes    104-668 likes,    (no photos)
+#                      (dead)        28-81 shares
+#
+# On Awakeners' OWN page in the SAME week, their photos beat their own reels by
+# 10-40x (a reel: 17 likes / a photo: 668). Both competitors are photo-heavy and
+# post ~14/week; GoM posted 4/week and all of them reels. GoM's share rate
+# (0.75%) already beats Divya Darshan's (0.25%), so the content is not the
+# problem — the volume is.
+#
+# A photo costs roughly a tenth of a scripted reel (no script, no TTS, no
+# motion, no assembly) and Meta's Content Monetization pays on photos as well as
+# reels, so this lane earns as well as grows.
+#
+# TIMING. Generation runs at 10:00 UTC and QUEUES the post for 01:00 UTC — GoM's
+# second proven peak (9 PM ET, the 9.3k slot). The scripted reel posts at 17:00
+# UTC (1 PM ET), so the two are 8 hours apart and never trip the poster's
+# MIN_GAP_HOURS=3 spacing guard. Posting is done by reel-poster.yml, which
+# already owns the ledger, the dedup and the past-peak drop.
+
+on:
+  schedule:
+    - cron: "0 10 * * *"    # generate 10:00 UTC → queued for 01:00 UTC (15h buffer)
+  workflow_dispatch:
+    inputs:
+      post_at:
+        description: "UTC HH:MM to queue the post for"
+        required: false
+        default: "01:00"
+      now:
+        description: "Post immediately instead of queueing (true/false)"
+        required: false
+        default: "false"
+
+jobs:
+  photo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    concurrency:
+      group: daily-photo
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install python deps
+        run: pip install -r requirements.txt
+
+      - name: Restore secrets to .env
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          MAKE_REEL_WEBHOOK: ${{ secrets.MAKE_REEL_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          cat > .env <<EOF
+          ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
+          FAL_KEY=$FAL_KEY
+          GEMINI_API_KEY=$GEMINI_API_KEY
+          CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
+          CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
+          CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
+          MAKE_REEL_WEBHOOK=$MAKE_REEL_WEBHOOK
+          DISCORD_WEBHOOK=$DISCORD_WEBHOOK
+          EOF
+
+      # Keep the line pool topped up so the lane can never run dry mid-week.
+      # Cheap (one Claude call) and a no-op when the pool is already deep.
+      - name: Top up the line pool if low
+        env:
+          ACTIVE_NICHE: godmind
+        run: |
+          UNUSED=$(python - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("data/photo_lines_godmind.json")
+          pool = json.loads(p.read_text()) if p.exists() else []
+          print(sum(1 for i in pool if not i.get("posted_at")))
+          PY
+          )
+          echo "unused lines: $UNUSED"
+          if [ "$UNUSED" -lt 7 ]; then
+            python scripts/make_photo_post.py --refill 10
+          else
+            echo "pool deep enough — skipping refill"
+          fi
+
+      - name: Build + queue the photo post
+        env:
+          ACTIVE_NICHE: godmind
+        run: |
+          python -u scripts/run_photo_post.py \
+            --post-at "${{ github.event.inputs.post_at || '01:00' }}" \
+            ${{ github.event.inputs.now == 'true' && '--now' || '' }}
+
+      - name: Alert Discord on failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          [ -z "$DISCORD_WEBHOOK" ] && exit 0
+          curl -sS -H 'Content-Type: application/json' -X POST "$DISCORD_WEBHOOK" \
+            -d '{"content":"❌ Daily Photo (GoM) FAILED — no photo queued for the 01:00 UTC peak. See the run log."}' || true
+
+      - name: Commit queue + pool state
+        if: always()
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A data/state data/photo_lines_godmind.json || true
+          git diff --cached --quiet || git commit -m "auto: photo queue + pool [skip ci]"
+          git pull --rebase --autostash origin main || true
+          git push || true
