@@ -107,6 +107,18 @@ Rules:
         realistic ape and never a plain human face.
     A bearded Krishna, Vishnu or Shiva is a HARD FAILURE — devotees find it
     deeply wrong.
+  * 🙏 THE DEITY IS NEVER SHOWN BROKEN. No tears, no weeping, no grief on the
+    deity's face, no begging, no defeat, no humiliation, no exhaustion, no
+    slumped or collapsed posture. A god's face carries stillness, resolve,
+    compassion or fierceness — never the viewer's weakness. This channel's whole
+    method is to show the viewer their pain THROUGH a deity, and that means the
+    pain lives in the SCENE AROUND the deity (the shadows, the weight, the
+    emptiness, what is reaching toward them), never on the deity themself.
+    Writing "eyes fierce yet holding quiet grief" produced a Durga with visible
+    tears running down both cheeks — devotees find the goddess of strength shown
+    weeping deeply wrong, and it had to be thrown away. Do not write grief,
+    tears, sorrow, weeping, brokenness, bending under weight, or defeat into any
+    deity's face, body or posture. Ever.
   * 🔱 EVERY visuals[] FRAME MUST SHOW THE DEITY. A line about modern life is
     still a DEITY frame — put the god in it and let the modern feeling show
     THROUGH him, never instead of him. If body[i] is "you scroll until the day

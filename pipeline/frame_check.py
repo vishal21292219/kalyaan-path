@@ -72,6 +72,7 @@ Return STRICT JSON, no prose:
   "scene_match": 0|1|2,          // how well the image matches this description: 2 = clearly this scene, 1 = the right subject but staged differently (pose, props, angle, colour all differ - this is FINE), 0 = a DIFFERENT subject, or the central element of the description is entirely absent. Described scene: "{scene}"
   "form_ok": true|false,         // {form_q}
   "garbled_text": true|false,    // any rendered lettering or watermark that is not real words
+  "deity_undignified": true|false, // TRUE if the deity is shown WEEPING or with tears on the face, begging, defeated, humiliated, collapsed, slumped, or visibly breaking down. A fierce, grave or sorrowful EXPRESSION is fine; actual tears, a bowed-in-defeat posture or a face that reads as crying is NOT.
   "deity_dominant": true|false,  // TRUE only if a HINDU DEITY, or a bold sacred object (trishul, vahana, yantra, murti, conch, lotus-throne), is the LARGE dominant subject of this frame, clearly visible and taking up most of it. Answer FALSE for: an ordinary modern person, a small distant silhouette, a body part with no face or deity, an empty landscape, sky or room, an abstract light effect with no figure.
   "note": "one short sentence on anything clearly wrong"
 }}"""
@@ -175,4 +176,11 @@ def check(path: Path, deity: str = "", scene: str = "") -> tuple[bool, list[str]
     # does not run. The user's words: "images bhagwaan wali feeling nahi de rahe".
     if v.get("deity_dominant") is False:
         bad.append("no deity or sacred symbol dominates the frame")
+    # A deity is never shown broken. The writer put "eyes fierce yet holding
+    # quiet grief" into a Durga close-up on 2026-10-21 and FLUX drew visible
+    # tears down both cheeks — the goddess of strength, weeping. The user caught
+    # it; nothing in the pipeline did. The viewer's pain belongs in the scene
+    # AROUND the deity, never on the deity's face.
+    if v.get("deity_undignified"):
+        bad.append("deity shown weeping/defeated — never canonical")
     return (not bad), (bad or [v.get("note") or "ok"])

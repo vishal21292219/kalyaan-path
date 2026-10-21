@@ -465,6 +465,10 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
         raw_prompt = _strip_text_requests(_vp)
         if raw_prompt != _vp:
             print(f"[image_gen] img {i}: stripped a text-rendering request from the scene")
+        _pre_grief = raw_prompt
+        raw_prompt = _strip_grief(raw_prompt)
+        if raw_prompt != _pre_grief:
+            print(f"[image_gen] img {i}: stripped grief/defeat from the deity's own description")
         is_hero = (i < hero_scenes)   # opening scenes = retention hook + FB cover → premium
         boost = HERO_BOOST if is_hero else ""
         # No "Avoid: ..." tail: FLUX has no negative channel, so appending the
@@ -610,6 +614,31 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 # Frames that failed the vision gate in the current run. run.py can surface this
 # (the Discord failure alert already exists) so a flagged render is never silent.
 FRAME_ISSUES: list[str] = []
+
+
+_GRIEF_CLAUSE = re.compile(
+    r"[^,.;—]*\b(tears?|teary|weep\w*|cry\w*|sob\w*|grief|grieving|sorrow\w*|"
+    r"anguish|despair|broken|breaking down|defeated|slumped|collapsed|"
+    r"bending under|exhausted)\b[^,.;—]*", re.I)
+
+
+def _strip_grief(visual: str) -> str:
+    """Remove clauses that put the VIEWER'S pain on the DEITY.
+
+    2026-10-21: a scene direction reading "Durga's face ... eyes forward and
+    fierce yet holding quiet grief" produced a Durga with visible tears running
+    down both cheeks. The goddess of strength, weeping. Devotees find that
+    deeply wrong and the frame was unusable. Two other scenes in the same script
+    asked for a "tear"-lit hall and arms "bending under" weight.
+
+    This channel decodes the viewer's pain THROUGH a deity, which is exactly why
+    the writer keeps reaching for it — so the rule is enforced here rather than
+    only asked for: the pain stays in the scene around the deity, never on them.
+    """
+    out = _GRIEF_CLAUSE.sub("", visual or "")
+    out = re.sub(r"\s*,\s*,", ",", out)
+    out = re.sub(r"\s{2,}", " ", out).strip(" ,;—")
+    return out or (visual or "")
 
 
 _TEXT_REQUEST = re.compile(
