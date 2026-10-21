@@ -146,16 +146,22 @@ def write_lines(n: int = 8, avoid: list[str] | None = None, model: str = "") -> 
 
 _BANNED_WORDS = ("myth", "mythology")
 
-# Deities this lane may NOT use yet, with the reason. Kali: FLUX's prior for her
-# is bare-chested and four separate prompt wordings on 2026-10-21 failed to
+# Deities whose text-to-image prior is wrong in a way no prompt wording fixes,
+# pinned instead to a known-good reference frame in assets/refs/<deity>.jpg and
+# rendered through nano-banana-2/edit so the reference's clothing and identity
+# carry into every new scene.
+#
+# Kali, 2026-10-21: FLUX renders her bare-chested and FIVE wordings failed to
 # override it — "chest fully covered" (ignored twice), a sari over one shoulder
-# (left breast exposed, twice), and an "armoured choli" which did cover her but
-# rendered as Western fantasy armour, not devotional iconography. A nudity strike
-# on a page that has just been monetised is not worth another guess, so she is
-# out of rotation until it is solved with a reference image rather than wording.
-# NOTE: this blocks the PHOTO lane only — pipeline/image_gen.py still generates
-# Kali scenes for reels from the same block and carries the same risk.
-DENY_DEITIES = {"kali": "unreliable torso coverage on FLUX (see 2026-10-21)"}
+# (breast exposed, twice), and an "armoured choli" that covered her but came out
+# as Western fantasy armour rather than devotional iconography. Prompt wording
+# was the wrong tool. What worked: generate her once for canon (black skin,
+# three eyes, protruding tongue, supine Shiva underfoot), EDIT that frame to add
+# a red silk blouse and the mundamala draped shoulder-to-hip, and pin the result.
+# Verified on two unrelated scenes: clothing and style both held.
+REF_DEITIES = {"kali"}
+
+REFS_DIR = ROOT / "assets/refs"
 
 
 def _reject(line: str, deity: str) -> str:
@@ -411,6 +417,24 @@ def build(item: dict, out_dir: Path, model: str = "") -> dict:
     slug = re.sub(r"[^a-z0-9]+", "_", item["line"].lower())[:48].strip("_")
     raw = out_dir / f"{slug}__raw.jpg"
     final = out_dir / f"{slug}.jpg"
+
+    # Pinned-reference path first, for deities text-to-image gets wrong (see
+    # REF_DEITIES). The reference carries identity AND clothing into the scene,
+    # which is the whole reason it exists.
+    ref = REFS_DIR / f"{item['deity']}.jpg"
+    if item["deity"] in REF_DEITIES and ref.exists():
+        from .char_consistent import _fal_upload, generate_scene_with_reference
+        url = _fal_upload(str(ref))
+        style = ((cfg.get("images", {}) or {}).get("style_tail") or "").lstrip(", ").strip()
+        if url and generate_scene_with_reference(
+                url, item["visual"], raw, char_name=item["deity"].title(),
+                art_style=style, aspect_ratio="3:4", target_w=W, target_h=H) \
+                and not _is_blank(raw):
+            compose(raw, item["line"], item["deity"], final)
+            return {"line": item["line"], "deity": item["deity"], "visual": item["visual"],
+                    "image": str(final), "raw": str(raw),
+                    "caption": caption(item["line"], item["deity"]), "prompt": f"[ref:{ref.name}] {item['visual']}"}
+        print(f"[photo] reference path failed for {item['deity']} — falling back to text-to-image")
 
     prompt = _build_prompt(item["deity"], item["visual"], cfg)
     chain = [model] if model else [PRIMARY_MODEL, FALLBACK_MODEL]
