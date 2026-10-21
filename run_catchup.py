@@ -55,7 +55,7 @@ from pipeline.topic_generator import has_active_reservation
 # never fires at all.
 SLOTS = [
     ("ancient",   "trending", 2, "publish", 15,  0, None),  # cron 0 15 → go-live 00:00 UTC / 8 PM ET PRIME (sole daily TD run)
-    ("godmind",   "trending", 1, "publish",  6,  0, (0, 3, 4, 5)),  # cron 0 6 * * 1,4,5,6 → go-live 17:00 UTC / 1 PM ET (Mon/Thu/Fri/Sat)
+    ("godmind",   "trending", 1, "publish",  6,  0, None),  # cron 0 6 * * * → go-live 17:00 UTC / 1 PM ET (DAILY from 2026-10-21)
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled
