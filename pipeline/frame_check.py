@@ -72,6 +72,7 @@ Return STRICT JSON, no prose:
   "scene_match": 0|1|2,          // how well the image matches this description: 2 = clearly this scene, 1 = the right subject but staged differently (pose, props, angle, colour all differ - this is FINE), 0 = a DIFFERENT subject, or the central element of the description is entirely absent. Described scene: "{scene}"
   "form_ok": true|false,         // {form_q}
   "garbled_text": true|false,    // any rendered lettering or watermark that is not real words
+  "deity_dominant": true|false,  // TRUE only if a HINDU DEITY, or a bold sacred object (trishul, vahana, yantra, murti, conch, lotus-throne), is the LARGE dominant subject of this frame, clearly visible and taking up most of it. Answer FALSE for: an ordinary modern person, a small distant silhouette, a body part with no face or deity, an empty landscape, sky or room, an abstract light effect with no figure.
   "note": "one short sentence on anything clearly wrong"
 }}"""
 
@@ -166,4 +167,12 @@ def check(path: Path, deity: str = "", scene: str = "") -> tuple[bool, list[str]
         bad.append("image shows a different subject than its line")
     if v.get("garbled_text"):
         bad.append("garbled lettering in frame")
+    # The channel's whole proposition is darshan — the viewer SEEING the deity.
+    # Measured 2026-10-21 on a finished reel: 5 of 9 sampled frames had no deity
+    # at all (a person asleep in bed, a silhouette in a doorway, a tiny figure in
+    # a light beam, a bare torso, a woman's profile made of clouds). Every one of
+    # those is already BANNED in images.image_style_guidance — in prose, which
+    # does not run. The user's words: "images bhagwaan wali feeling nahi de rahe".
+    if v.get("deity_dominant") is False:
+        bad.append("no deity or sacred symbol dominates the frame")
     return (not bad), (bad or [v.get("note") or "ok"])

@@ -415,6 +415,14 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
     # cover). Cost ~$0.05/video — still trivial vs the removed Kling clip.
     hero_scenes = max(1, int(cfg["images"].get("hero_scenes", 2)))
 
+    # Enforce DARSHAN before anything else: a scene with no deity in it cannot be
+    # fixed by regenerating it, so the prompt itself is re-staged. See _force_deity.
+    _forced = _force_deity(list(visual_prompts), cfg)
+    _nf = sum(1 for a, b in zip(visual_prompts, _forced) if a != b)
+    if _nf:
+        print(f"[image_gen] re-staged {_nf}/{len(_forced)} deity-less scenes around the deity")
+    visual_prompts = _forced
+
     for i, _vp in enumerate(visual_prompts):
         # Enforce the "no text in frame" rule the writer keeps breaking.
         raw_prompt = _strip_text_requests(_vp)
@@ -567,6 +575,51 @@ def _strip_text_requests(visual: str) -> str:
     out = re.sub(r"\s*,\s*,", ",", out)
     out = re.sub(r"\s{2,}", " ", out).strip(" ,;—")
     return out or (visual or "")
+
+
+_SACRED = ("trishul", "trident", "vajra", "chakra", "conch", "shankh", "lotus throne",
+           "murti", "yantra", "lingam", "shivling", "gada", "vahana", "temple", "deity",
+           "goddess", "god ")
+
+
+def _force_deity(visuals: list[str], cfg: dict) -> list[str]:
+    """Make every scene a DARSHAN frame.
+
+    2026-10-21, measured on a finished reel: 5 of 9 sampled frames had no deity
+    in them at all — a person asleep in bed with a phone, a silhouette in a
+    doorway, a tiny figure in a light beam, a bare torso, a woman's profile made
+    of clouds. The script's own visual directions asked for exactly that. Every
+    one of those shapes is already BANNED in images.image_style_guidance, which
+    is prose and therefore never ran. The user's words: "images bhagwaan wali
+    feeling nahi de rahe, aur relevant nahi lag rahe".
+
+    A deity-less scene cannot be rescued by regenerating it — the prompt itself
+    has no deity in it — so the prompt is rewritten here: the scene's action is
+    kept and re-staged around the deity this script is actually about, found
+    from whichever deity the script names most often.
+    """
+    blocks = (cfg.get("images", {}) or {}).get("deity_blocks") or {}
+    if not blocks:
+        return visuals
+    counts: dict[str, int] = {}
+    for v in visuals:
+        d = _deity_name(v, cfg)
+        if d:
+            counts[d] = counts.get(d, 0) + 1
+    lead = max(counts, key=counts.get) if counts else ""
+    out = []
+    for v in visuals:
+        low = (v or "").lower()
+        if _deity_name(v, cfg) or any(k in low for k in _SACRED):
+            out.append(v)
+            continue
+        if lead:
+            out.append(f"{lead.title()} is the large dominant figure filling the frame, "
+                       f"facing the viewer. Around him: {v}")
+        else:
+            out.append(f"A Hindu deity is the large dominant figure filling the frame, "
+                       f"facing the viewer in ornate devotional iconography. Around the deity: {v}")
+    return out
 
 
 def _deity_name(text: str, cfg: dict) -> str:
