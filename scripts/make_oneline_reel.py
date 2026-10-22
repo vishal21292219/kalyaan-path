@@ -11,9 +11,12 @@ better than anything the scripted long-form reels on this channel have done.
 
 It costs almost nothing next to a scripted reel: one image instead of twelve, no
 ElevenLabs, no caption passes, no motion clip. And because there is no narration,
-it is the only reel format on this channel that can carry FACEBOOK'S OWN TRENDING
-AUDIO — which the Business Suite composer does expose, and which the API path
-cannot reach at all. On a narrated reel a trending track just fights the voice.
+it is the only reel format on this channel that can carry FACEBOOK'S OWN AUDIO —
+which the Business Suite reel composer exposes at its Edit step and which the
+API path cannot reach at all. On a narrated reel a music bed just fights the
+voice. Checked 2026-10-23: that library is Meta's royalty-free Sound Collection
+(search + genre/mood/vocals/tempo filters), NOT the consumer trending chart —
+there is no trending feed in Business Suite, so do not promise one.
 
 Output is 1080x1920 so it posts as a reel, not a photo.
 

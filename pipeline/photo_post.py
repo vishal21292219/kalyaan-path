@@ -159,7 +159,13 @@ _BANNED_WORDS = ("myth", "mythology")
 # three eyes, protruding tongue, supine Shiva underfoot), EDIT that frame to add
 # a red silk blouse and the mundamala draped shoulder-to-hip, and pin the result.
 # Verified on two unrelated scenes: clothing and style both held.
-REF_DEITIES = {"kali"}
+# Vishnu, 2026-10-23: text-to-image read him as feminine — soft face, no male
+# presentation, and a kirita floating detached above the head. Reworded to a
+# "broad-shouldered adult man, strong square jaw" and the next pass gave him a
+# TRISHUL (Shiva's weapon) and six-fingered hands. Same lesson as Kali: wording
+# is the wrong tool for identity. assets/refs/vishnu.jpg is already pinned and
+# gate-verified, so he goes through the reference path too.
+REF_DEITIES = {"kali", "vishnu"}
 
 REFS_DIR = ROOT / "assets/refs"
 
@@ -317,21 +323,27 @@ def _scrim(img, text_top: int):
     Keyed to the text rather than the image because the first version faded from
     a fixed 55% and left only alpha 58 under the opening line — on a bright frame
     (pale smoke behind Shiva) the white serif sat on near-white and the post was
-    unusable. Legibility must never depend on what the image model returned."""
+    unusable. Legibility must never depend on what the image model returned.
+
+    Sized from the IMAGE, not from the module's 4:5 constants. The one-line reel
+    lane reuses this on a 1080x1920 frame; while the gradient was built at the
+    photo's 1350 height, Image.composite pasted it over only the top 1350px and
+    left a hard black edge straight across the reel just under the text."""
     from PIL import Image
-    grad = Image.new("L", (1, H), 0)
+    w, h = img.size
+    grad = Image.new("L", (1, h), 0)
     px = grad.load()
     start = max(0, text_top - FADE)
-    for y in range(H):
+    for y in range(h):
         if y <= start:
             px[0, y] = 0
         elif y < text_top:
             px[0, y] = int(ALPHA_AT_TEXT * (y - start) / max(1, text_top - start))
         else:
-            t = (y - text_top) / max(1, H - text_top)
+            t = (y - text_top) / max(1, h - text_top)
             px[0, y] = int(ALPHA_AT_TEXT + (ALPHA_AT_FOOT - ALPHA_AT_TEXT) * t)
-    grad = grad.resize((W, H))
-    black = Image.new("RGB", (W, H), (6, 8, 12))
+    grad = grad.resize((w, h))
+    black = Image.new("RGB", (w, h), (6, 8, 12))
     return Image.composite(black, img, grad)
 
 
