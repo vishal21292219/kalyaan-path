@@ -55,7 +55,14 @@ from pipeline.topic_generator import has_active_reservation
 # never fires at all.
 SLOTS = [
     ("ancient",   "trending", 2, "publish", 15,  0, None),  # cron 0 15 → go-live 00:00 UTC / 8 PM ET PRIME (sole daily TD run)
-    ("godmind",   "trending", 1, "publish",  6,  0, None),  # cron 0 6 * * * → go-live 17:00 UTC / 1 PM ET (DAILY from 2026-10-21)
+    # ("godmind", "trending", 1, "publish",  6,  0, None),  # cron 0 6 * * * → go-live 17:00 UTC / 1 PM ET
+    # PAUSED 2026-10-23, with the daily-reels and daily-photo crons. GoM is on
+    # batch mode: 23 Oct - 1 Nov is already built and scheduled on Facebook's
+    # own scheduler. Its generation cron is commented out, so this slot would
+    # look undelivered EVERY day — catch-up would regenerate a reel each
+    # morning and queue it for the same 17:00 UTC peak the native schedule
+    # already owns. That is a paid-for duplicate post per day, not a recovery.
+    # Re-enable this line in the same commit that re-enables the GoM gen cron.
 ]
 
 # Only recover a slot once it's at least this many minutes past its scheduled
