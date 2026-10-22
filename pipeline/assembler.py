@@ -775,6 +775,34 @@ def assemble(
         print(f"[assembler] image timing: sentence-synced "
               f"(durations {[round(d, 2) for d in image_durations]})")
 
+    # video.opener: "images" — front-load the FIRST THREE images so the viewer
+    # sees three different pictures inside the decision window, instead of one
+    # picture cropped tighter ("cuts", below, which recuts scene 0 only).
+    #
+    # 2026-10-23: 60% of viewers leave before 3s and the first image held for
+    # 7.05s, so nothing new appeared while they were deciding. A new picture is
+    # a far stronger "something is happening" signal than a punch-in on the one
+    # they are already looking at.
+    #
+    # Image ORDER is untouched and the total duration is unchanged — the time
+    # taken off the first three is given back to the rest in proportion, so the
+    # narration still ends on the last image.
+    if str(cfg.get("video", {}).get("opener", "")).lower() == "images" and n >= 4:
+        HEAD, K = 1.2, 3
+        head_total = sum(image_durations[:K])
+        if head_total > HEAD * K + 1.0:
+            freed = head_total - HEAD * K
+            tail = image_durations[K:]
+            tail_sum = sum(tail) or 1.0
+            image_durations = ([HEAD] * K
+                               + [d + freed * d / tail_sum for d in tail])
+            print(f"[opener] first {K} images front-loaded to {HEAD}s each — "
+                  f"new picture at {HEAD:.1f}s, {2 * HEAD:.1f}s and "
+                  f"{3 * HEAD:.1f}s; rest {image_durations[K]:.2f}s each")
+        else:
+            print(f"[opener] scenes too short to front-load "
+                  f"({head_total:.2f}s across first {K}) — left as is")
+
     work = out_video.parent / f"_work_{out_video.stem}"
     if work.exists():
         shutil.rmtree(work)
@@ -822,7 +850,7 @@ def assemble(
         if i == 0 and str(cfg.get("video", {}).get("opener", "")).lower() == "cuts":
             cut_clip = _opening_cuts_clip(img, per, W, H, FPS, work)
             if cut_clip:
-                print(f"[opener] scene 1 → 3 hard cuts ({per:.2f}s total)")
+                print(f"[opener] scene 1 → hard cuts ({per:.2f}s total)")
                 clips.append(cut_clip)
                 continue
             print(f"[opener] scene 1 too short for cuts ({per:.2f}s) — Ken Burns")
