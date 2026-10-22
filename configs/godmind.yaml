@@ -97,7 +97,10 @@ images:
   # is what made the finished reel look incoherent. The references are now
   # pinned, hand-checked files (assets/refs/), so conditioning more scenes
   # propagates correct iconography instead of propagating a bad master.
-  consistency_max_scenes: 8
+  # 2026-10-22: 8 → 0 (= every scene). On the Indra reel the cap sent scenes 9-10
+  # to plain FLUX, and exactly those two came back bearded past the vision
+  # gate's retry; the eight conditioned on the pinned clean-shaven ref passed.
+  consistency_max_scenes: 0
 
   # ── PER-DEITY ICONOGRAPHY BLOCKS (2026-10-21) ────────────────────────────────
   # Replaces the universal style_suffix for any scene that names a deity below.

@@ -126,6 +126,11 @@ on:
         description: "Topic variation offset"
         required: false
         default: "0"
+      force:
+        description: "Remake a forced topic even if its slot/title is already marked delivered today (only applies with topic set). The queue replaces the slot's earlier entry."
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   generate:
@@ -392,12 +397,13 @@ jobs:
         run: |
           NOTIFY="${{ steps.route.outputs.niche == 'godmind' && '--notify-telegram' || '' }}"
           TOPIC="${{ steps.route.outputs.topic }}"
+          FORCE="${{ inputs.force && '--force' || '' }}"
           if [ -n "$TOPIC" ]; then
             python -u run.py \
               --niche ${{ steps.route.outputs.niche }} \
               --kind ${{ steps.route.outputs.kind }} \
               --topic "$TOPIC" \
-              --publish --auto-thumb $NOTIFY \
+              --publish --auto-thumb $NOTIFY $FORCE \
               --seed-offset ${{ steps.route.outputs.seed }}
           else
             python -u run.py \
