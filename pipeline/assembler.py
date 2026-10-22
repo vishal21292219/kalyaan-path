@@ -675,15 +675,28 @@ def _opening_cuts_clip(img: Path, per: float, W: int, H: int, FPS: int,
     mapping that everything downstream depends on: only scene 0's own window is
     recut. Returns None when the scene is too short to cut (< 2.4s), so the
     caller falls back to the normal zoompan path.
+
+    2026-10-23: the cuts are FRONT-LOADED, not an equal split. Scene 0 runs
+    ~9s on this channel, so thirds put the first visible change at 3.0s — and
+    the measured data says 60% of viewers are already gone by 3s, so an equal
+    split spends its whole effect on people who stayed anyway. Fixed short
+    heads instead (1.0s, 1.2s, 1.5s) put three changes inside the decision
+    window, at 1.0s, 2.2s and 3.7s, and the final cut absorbs the remainder.
     """
     if per < 2.4:
         return None
     # (punch factor, vertical centre as a fraction of H) — drifting up toward
     # the face, which is where an AI deity render puts the eyes.
-    CUTS = ((1.00, 0.50), (1.26, 0.41), (1.55, 0.34))
-    seg = per / len(CUTS)
+    CUTS = ((1.00, 0.50), (1.22, 0.44), (1.40, 0.38), (1.60, 0.33))
+    HEADS = (1.0, 1.2, 1.5)          # the cuts that land inside the 3s window
+    # Use only the heads that fit, and let the last cut carry what is left so
+    # scene 0's total duration is unchanged.
+    heads = [h for h in HEADS if sum(HEADS[:HEADS.index(h) + 1]) < per - 0.8]
+    segs = heads + [per - sum(heads)]
+    cuts = CUTS[:len(segs)]
     parts: list[Path] = []
-    for k, (f, cy) in enumerate(CUTS):
+    for k, (f, cy) in enumerate(cuts):
+        seg = segs[k]
         cw = int((W / f) // 2 * 2)
         ch = int((H / f) // 2 * 2)
         x = max(0, min(W - cw, int((W - cw) / 2 // 2 * 2)))

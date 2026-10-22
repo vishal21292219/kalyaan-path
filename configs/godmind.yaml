@@ -504,7 +504,11 @@ video:
   # key = plain Ken Burns, which is exactly the version that was approved.
   # Saves ~₹22/reel (~₹660/month at daily). Set back to "motion" to re-enable,
   # or "cuts" for the free hard-cut opener (that A/B never completed).
-  # opener: motion
+  # 2026-10-23: "cuts" ENABLED. Measured on 28d of FB data — 60% of viewers
+  # leave before 3s and scene 0 held one still picture until ~9s, so the frame
+  # simply never changed inside the window where they decide. This is the free
+  # opener (no I2V spend); "motion" remains the paid alternative.
+  opener: cuts
   # opener_model: fal-ai/...   # optional cheaper I2V for "motion" (default Kling v3)
   font: assets/fonts/Anton-Regular.ttf
   font_size: 80
