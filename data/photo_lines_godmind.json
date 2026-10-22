@@ -96,12 +96,14 @@
   {
     "line": "Ram bore the grief of being misread by everyone who claimed to love him.",
     "deity": "ram",
-    "visual": "Ram standing at the boundary of a forest at night, the warm lights of a city glowing far behind him across a dark river, his face turned neither toward it nor away, the lower third deep black water reflecting nothing, the frame saturated in indigo and muted gold, solitude without self-pity."
+    "visual": "Ram standing at the boundary of a forest at night, the warm lights of a city glowing far behind him across a dark river, his face turned neither toward it nor away, the lower third deep black water reflecting nothing, the frame saturated in indigo and muted gold, solitude without self-pity.",
+    "oneline_at": "built"
   },
   {
     "line": "Yama weighs the years you spent performing aliveness rather than living it.",
     "deity": "yama",
-    "visual": "Yama holding a vast set of scales in near-total darkness, one side bearing a faint glowing human mask, the other side sinking under pure black weight that dissolves into the dark ground, the lower third consumed in black smoke and deep blood-red shadow, the scales still moving, no verdict yet rendered."
+    "visual": "Yama holding a vast set of scales in near-total darkness, one side bearing a faint glowing human mask, the other side sinking under pure black weight that dissolves into the dark ground, the lower third consumed in black smoke and deep blood-red shadow, the scales still moving, no verdict yet rendered.",
+    "oneline_at": "built"
   },
   {
     "line": "Lakshmi does not mistake your exhaustion for a character flaw.",
