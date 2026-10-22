@@ -55,7 +55,10 @@ def _compose_vertical(raw: Path, line: str, deity: str, out: Path) -> Path:
     margin = 90
     font, lines = photo_post._layout(line, W - 2 * margin)
     line_h = int(font.size * 1.26)
-    baseline = H - 210                      # higher than 4:5 — reel UI sits lower
+    # Text sits at ~70% height, well clear of Facebook's own reel chrome — the
+    # page name, audio strip and the like/comment/share column all live in the
+    # bottom quarter and were covering the line.
+    baseline = int(H * 0.70)
     y0 = baseline - line_h * len(lines)
     _a1, _a2 = photo_post.ALPHA_AT_TEXT, photo_post.ALPHA_AT_FOOT
     photo_post.ALPHA_AT_TEXT, photo_post.ALPHA_AT_FOOT = 215, 238
@@ -66,7 +69,7 @@ def _compose_vertical(raw: Path, line: str, deity: str, out: Path) -> Path:
     mark = ImageFont.truetype(str(photo_post.FONT_MARK), 32)
     mark.set_variation_by_axes([600])
     t = "G O D S   O F   T H E   M I N D"
-    draw.text(((W - mark.getlength(t)) / 2, H - 170), t, font=mark, fill=photo_post.GOLD)
+    draw.text(((W - mark.getlength(t)) / 2, baseline + 28), t, font=mark, fill=photo_post.GOLD)
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out, "JPEG", quality=94)
     return out
