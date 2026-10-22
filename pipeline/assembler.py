@@ -787,6 +787,30 @@ def assemble(
     # Image ORDER is untouched and the total duration is unchanged — the time
     # taken off the first three is given back to the rest in proportion, so the
     # narration still ends on the last image.
+    # video.opener: "ramp" — like "images", but every scene is only slightly
+    # longer than the one before instead of three short ones and then a cliff.
+    #
+    # "images" put the first three at 1.2s and the rest at 9.56s. Watching it
+    # back, that 8x step reads as a glitch: three fast changes, then one picture
+    # held for ten seconds. A linear ramp keeps consecutive scenes within about
+    # 1.2-1.6x of each other, so the pace eases off instead of stopping dead,
+    # while a new picture still arrives at ~1.5s and again at ~4s.
+    if str(cfg.get("video", {}).get("opener", "")).lower() == "ramp" and n >= 4:
+        FIRST = 1.5
+        # d_i = FIRST + i*b, chosen so the durations still sum to the narration.
+        b = (duration - n * FIRST) / (n * (n - 1) / 2)
+        if b > 0:
+            image_durations = [FIRST + i * b for i in range(n)]
+            marks, t = [], 0.0
+            for d in image_durations[:3]:
+                t += d
+                marks.append(round(t, 1))
+            print(f"[opener] ramp {FIRST:.1f}s → {image_durations[-1]:.1f}s "
+                  f"(+{b:.2f}s per scene) — new picture at {marks}")
+        else:
+            print(f"[opener] ramp skipped — {n} scenes do not fit "
+                  f"{FIRST:.1f}s each in {duration:.1f}s")
+
     if str(cfg.get("video", {}).get("opener", "")).lower() == "images" and n >= 4:
         HEAD, K = 1.2, 3
         head_total = sum(image_durations[:K])
