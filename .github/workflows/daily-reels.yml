@@ -65,7 +65,11 @@ on:
     # after 4 weeks before treating the days as settled.
     # MUST stay in sync with: the routing matcher below AND run_catchup.py SLOTS
     # (a daily catch-up entry would regenerate the very days we just cut).
-    - cron: "0 6 * * *"  # gen 06:00 UTC → peak 17:00 UTC / 1 PM ET (11h buffer)  [GoM — DAILY from 2026-10-21]
+    # GoM DAILY cron PAUSED 2026-10-22: content is now batch-built and queued
+    # 10 days ahead. Leaving this on would queue a second reel for the same
+    # slot every day — two posts on one page, which this project measured as
+    # halving per-post reach. Re-enable when the batch queue runs dry.
+    # - cron: "0 6 * * *"  # gen 06:00 UTC → peak 17:00 UTC / 1 PM ET  [GoM daily]
     # - cron: "0 15 * * *"  # [GoM #2 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day (quality>quantity). Keep proven 1 PM (10.6k) + 9 PM (9.3k).
     # - cron: "0 19 * * *"  # [GoM #3 / 9 PM ET] DROPPED 2026-07-23 — GoM cut to 1/day, keep proven-best 1 PM only.
     # Money Neurons (MN — US money-psychology): 3/day, big buffer → publishAt peaks.

@@ -305,8 +305,8 @@ def _layout(text: str, max_w: int, max_lines: int = 3):
 
 
 FADE = 340          # px of gradient above the text block
-ALPHA_AT_TEXT = 170  # guaranteed darkness where the first line starts
-ALPHA_AT_FOOT = 210  # at the very bottom
+ALPHA_AT_TEXT = 195  # guaranteed darkness where the first line starts
+ALPHA_AT_FOOT = 225  # at the very bottom
 
 
 def _scrim(img, text_top: int):
@@ -348,7 +348,13 @@ def _draw_accented(draw, lines, font, deity: str, y0: int, line_h: int):
         y = y0 + i * line_h
         for w, wd in zip(words, widths):
             colour = GOLD if needle in re.sub(r"[^a-z]", "", w.lower()) else WHITE
-            draw.text((x, y), w, font=font, fill=colour)
+            # Dark stroke behind every word. The scrim alone is not enough: on a
+            # bright frame (Yama's glowing ledger, 2026-10-22) gold text on gold
+            # light was unreadable. Legibility must not depend on what the image
+            # model happened to put behind the words.
+            draw.text((x, y), w, font=font, fill=colour,
+                      stroke_width=max(2, int(font.size * 0.045)),
+                      stroke_fill=(0, 0, 0))
             x += wd + space
 
 

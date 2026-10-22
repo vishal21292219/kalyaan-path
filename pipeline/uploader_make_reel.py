@@ -146,7 +146,7 @@ def _caption(script: dict, channel: str = "") -> str:
     return "\n\n".join(parts)[:2000]
 
 
-def _prune_old(cloud: str, key: str, secret: str, prefix: str = "reels/", days: int = 2) -> None:
+def _prune_old(cloud: str, key: str, secret: str, prefix: str = "reels/", days: int = 14) -> None:
     """Delete Cloudinary video assets older than `days` (FB/IG already ingested
     them within minutes). Keeps the free tier from filling. Best-effort/non-fatal."""
     import datetime
@@ -239,7 +239,11 @@ def upload(video_path, script: dict, channel: str, fb_page_id: str | None = None
         return False
     video_path = Path(video_path)
     try:
-        _prune_old(cloud, key, secret, prefix="reels/", days=2)
+        # 14 days, not 2. A batch that schedules ten days of reels in one go
+        # keeps unposted videos on Cloudinary for up to ten days; pruning at 2
+        # would delete day-3-onward videos before the poster ever fires them,
+        # and the queue record would point at a dead URL.
+        _prune_old(cloud, key, secret, prefix="reels/", days=14)
         url = _cloudinary_upload(video_path, cloud, key, secret)
         if not url:
             return False

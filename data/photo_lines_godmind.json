@@ -1,49 +1,111 @@
 [
- {
-  "line": "Shiva sits inside the silence you have been running from for years.",
-  "deity": "shiva",
-  "visual": "Shiva seated absolutely still at the centre of a vast, lightless cave, a single shaft of deep indigo bioluminescence falling on his closed eyes while the lower third dissolves into black stone floor and pooling shadow, the silence made visible by ash drifting upward in slow spirals around him.",
-  "posted_at": "2026-10-23T01:00:00Z",
-  "slug": "shiva_sits_inside_the_silence_you_have_been_runn"
- },
- {
-  "line": "Kali does not flinch at the version of you that you have never shown anyone.",
-  "deity": "kali",
-  "visual": "Kali in direct eye contact with the viewer, blood-red and violet firelight carving her face from total darkness, the lower third sinking into black smoke"
- },
- {
-  "line": "Saraswati knows what you abandoned because someone told you it was not practical.",
-  "deity": "saraswati",
-  "visual": "Saraswati reaching one hand toward a half-finished canvas or instrument lying face-down on a dark floor, deep teal and gold light pooling only on her hand and the abandoned object, the lower third lost in layered shadow, dust motes hanging in the beam like time that has stopped."
- },
- {
-  "line": "Vishnu sustains the life you have decided is not worth sustaining.",
-  "deity": "vishnu",
-  "visual": "Vishnu reclining on the cosmic ocean, one arm extended beneath the surface of dark indigo water as if holding something submerged and precious, the lower third entirely underwater and black, faint gold light radiating from his palm upward through the dark water, the surface barely visible above."
- },
- {
-  "line": "Durga holds the boundary you collapsed because you feared being called difficult.",
-  "deity": "durga",
-  "visual": "Durga braced at a threshold, her body filling a narrow doorway of ember-orange and blood-red light, the space behind her deep violet and protected, the lower third a dark stone floor cracked under the pressure of what she is holding back, her arms extended wide against the frame's edges."
- },
- {
-  "line": "Yama records every choice you made out of fear and calls none of them shameful.",
-  "deity": "yama",
-  "visual": "Yama bent over an enormous open ledger that glows deep gold from within, the recorded lines of text visible as light, the lower third consumed by black smoke and the suggestion of an abyss beneath the writing desk, his expression absorbed and without judgment as the pages fill themselves."
- },
- {
-  "line": "Hanuman carries the weight you insist only you were strong enough to have survived.",
-  "deity": "hanuman",
-  "visual": "Hanuman mid-stride through a dark landscape carrying an enormous boulder of compressed darkness on his shoulders, deep teal sky above and the lower third black earth under his feet, the boulder itself radiating a faint blood-red light as if something alive is sealed inside it."
- },
- {
-  "line": "Krishna watched you choose suffering over uncertainty and did not look away.",
-  "deity": "krishna",
-  "visual": "Krishna standing at a distance in deep indigo dusk, face turned toward the viewer across an empty field, the lower third lost in dark unlit grass and shadow, a single ember-gold flame from his flute illuminating only his watching eyes, the rest of the frame held in saturated violet twilight."
- },
- {
-  "line": "Lakshmi does not arrive where you have taught yourself you are undeserving.",
-  "deity": "lakshmi",
-  "visual": "Lakshmi paused at the edge of a doorway, gold and lotus-pink light blazing behind her, her foot lifted but not crossing the threshold, the interior she faces plunged in deep shadow and black, the lower third a dark floor with no offering, the contrast between her radiance and the unlit room absolute."
- }
+  {
+    "line": "Shiva sits inside the silence you have been running from for years.",
+    "deity": "shiva",
+    "visual": "Shiva seated absolutely still at the centre of a vast, lightless cave, a single shaft of deep indigo bioluminescence falling on his closed eyes while the lower third dissolves into black stone floor and pooling shadow, the silence made visible by ash drifting upward in slow spirals around him.",
+    "posted_at": "2026-10-23T01:00:00Z",
+    "slug": "shiva_sits_inside_the_silence_you_have_been_runn"
+  },
+  {
+    "line": "Kali does not flinch at the version of you that you have never shown anyone.",
+    "deity": "kali",
+    "visual": "Kali in direct eye contact with the viewer, blood-red and violet firelight carving her face from total darkness, the lower third sinking into black smoke",
+    "posted_at": "2026-10-24T01:00:00Z",
+    "slug": "kali_does_not_flinch_at_the_version_of_you_that"
+  },
+  {
+    "line": "Saraswati knows what you abandoned because someone told you it was not practical.",
+    "deity": "saraswati",
+    "visual": "Saraswati reaching one hand toward a half-finished canvas or instrument lying face-down on a dark floor, deep teal and gold light pooling only on her hand and the abandoned object, the lower third lost in layered shadow, dust motes hanging in the beam like time that has stopped.",
+    "posted_at": "2026-10-25T01:00:00Z",
+    "slug": "saraswati_knows_what_you_abandoned_because_someo"
+  },
+  {
+    "line": "Vishnu sustains the life you have decided is not worth sustaining.",
+    "deity": "vishnu",
+    "visual": "Vishnu reclining on the cosmic ocean, one arm extended beneath the surface of dark indigo water as if holding something submerged and precious, the lower third entirely underwater and black, faint gold light radiating from his palm upward through the dark water, the surface barely visible above.",
+    "posted_at": "2026-10-26T01:00:00Z",
+    "slug": "vishnu_sustains_the_life_you_have_decided_is_not"
+  },
+  {
+    "line": "Durga holds the boundary you collapsed because you feared being called difficult.",
+    "deity": "durga",
+    "visual": "Durga braced at a threshold, her body filling a narrow doorway of ember-orange and blood-red light, the space behind her deep violet and protected, the lower third a dark stone floor cracked under the pressure of what she is holding back, her arms extended wide against the frame's edges.",
+    "posted_at": "2026-10-27T01:00:00Z",
+    "slug": "durga_holds_the_boundary_you_collapsed_because_y"
+  },
+  {
+    "line": "Yama records every choice you made out of fear and calls none of them shameful.",
+    "deity": "yama",
+    "visual": "Yama bent over an enormous open ledger that glows deep gold from within, the recorded lines of text visible as light, the lower third consumed by black smoke and the suggestion of an abyss beneath the writing desk, his expression absorbed and without judgment as the pages fill themselves.",
+    "oneline_at": "built"
+  },
+  {
+    "line": "Hanuman carries the weight you insist only you were strong enough to have survived.",
+    "deity": "hanuman",
+    "visual": "Hanuman mid-stride through a dark landscape carrying an enormous boulder of compressed darkness on his shoulders, deep teal sky above and the lower third black earth under his feet, the boulder itself radiating a faint blood-red light as if something alive is sealed inside it."
+  },
+  {
+    "line": "Krishna watched you choose suffering over uncertainty and did not look away.",
+    "deity": "krishna",
+    "visual": "Krishna standing at a distance in deep indigo dusk, face turned toward the viewer across an empty field, the lower third lost in dark unlit grass and shadow, a single ember-gold flame from his flute illuminating only his watching eyes, the rest of the frame held in saturated violet twilight.",
+    "posted_at": "2026-10-28T01:00:00Z",
+    "slug": "krishna_watched_you_choose_suffering_over_uncert"
+  },
+  {
+    "line": "Lakshmi does not arrive where you have taught yourself you are undeserving.",
+    "deity": "lakshmi",
+    "visual": "Lakshmi paused at the edge of a doorway, gold and lotus-pink light blazing behind her, her foot lifted but not crossing the threshold, the interior she faces plunged in deep shadow and black, the lower third a dark floor with no offering, the contrast between her radiance and the unlit room absolute.",
+    "posted_at": "2026-10-29T01:00:00Z",
+    "slug": "lakshmi_does_not_arrive_where_you_have_taught_yo"
+  },
+  {
+    "line": "Ganesha removes the obstacle you built yourself to avoid arriving.",
+    "deity": "ganesha",
+    "visual": "Ganesha's heavy foot pressing through a dense wall of tangled roots and locked doors that splinter outward into gold dust, the lower third swallowed in deep black earth and violet shadow, a single ember-lit corridor opening beyond the wreckage into deep teal distance.",
+    "posted_at": "2026-10-30T01:00:00Z",
+    "slug": "ganesha_removes_the_obstacle_you_built_yourself"
+  },
+  {
+    "line": "Parvati became formidable in the years everyone watched her wait.",
+    "deity": "parvati",
+    "visual": "Parvati seated alone on a dark mountain ledge in deep indigo night, snow dissolving into black below her, her stillness radiating a faint blood-red warmth that illuminates cracked stone around her hands, the lower third pure dark rock swallowed in shadow, nothing soft anywhere in the frame.",
+    "posted_at": "2026-10-31T01:00:00Z",
+    "slug": "parvati_became_formidable_in_the_years_everyone"
+  },
+  {
+    "line": "Brahma already wove meaning into the life you keep calling a mistake.",
+    "deity": "brahma",
+    "visual": "Brahma's four hands drawing luminous golden threads out of absolute darkness, the threads forming a human silhouette that the figure below cannot yet see, the lower third pooled in black void with faint ember-coloured lines tracing upward like roots reversed, deep indigo above.",
+    "posted_at": "2026-11-01T01:00:00Z",
+    "slug": "brahma_already_wove_meaning_into_the_life_you_ke"
+  },
+  {
+    "line": "Indra has fallen a thousand times from exactly where you are standing.",
+    "deity": "indra",
+    "visual": "Indra mid-descent through storm clouds, lightning fracturing the deep violet sky around him, his crown still on his head but tilted, rain turning to black smoke in the lower third where the ground waits in darkness, no softness in the atmosphere, the fall rendered with dignity rather than ruin.",
+    "posted_at": "2026-11-02T01:00:00Z",
+    "slug": "indra_has_fallen_a_thousand_times_from_exactly_w"
+  },
+  {
+    "line": "Kartikeya left what was familiar because purpose required it of him.",
+    "deity": "kartikeya",
+    "visual": "Kartikeya moving away from a vast lit gathering visible far behind him, his back to the viewer, ahead of him only deep teal-black forest and a narrow ember path, the lower third completely dark ground, the distance between him and the light already irreversible and already deliberate.",
+    "oneline_at": "built"
+  },
+  {
+    "line": "Ram bore the grief of being misread by everyone who claimed to love him.",
+    "deity": "ram",
+    "visual": "Ram standing at the boundary of a forest at night, the warm lights of a city glowing far behind him across a dark river, his face turned neither toward it nor away, the lower third deep black water reflecting nothing, the frame saturated in indigo and muted gold, solitude without self-pity."
+  },
+  {
+    "line": "Yama weighs the years you spent performing aliveness rather than living it.",
+    "deity": "yama",
+    "visual": "Yama holding a vast set of scales in near-total darkness, one side bearing a faint glowing human mask, the other side sinking under pure black weight that dissolves into the dark ground, the lower third consumed in black smoke and deep blood-red shadow, the scales still moving, no verdict yet rendered."
+  },
+  {
+    "line": "Lakshmi does not mistake your exhaustion for a character flaw.",
+    "deity": "lakshmi",
+    "visual": "Lakshmi descending toward a figure collapsed at the base of a dark staircase, golden light falling only where she moves, the surrounding space held in deep violet and teal shadow, lotuses opening slowly in still black water in the lower third, no rescue in the image, only unhurried recognition."
+  }
 ]

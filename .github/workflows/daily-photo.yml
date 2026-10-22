@@ -29,7 +29,10 @@ name: Daily Photo (Gods of the Mind)
 
 on:
   schedule:
-    - cron: "0 10 * * *"    # generate 10:00 UTC → queued for 01:00 UTC (15h buffer)
+    # PAUSED 2026-10-22 for the same reason as the reel cron: photos are now
+    # batch-built and queued 10 days ahead, so a daily generate would stack a
+    # second photo onto a day that already has one.
+    # - cron: "0 10 * * *"    # generate 10:00 UTC → queued for 01:00 UTC
   workflow_dispatch:
     inputs:
       post_at:
