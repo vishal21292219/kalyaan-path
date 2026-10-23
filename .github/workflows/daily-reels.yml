@@ -20,7 +20,11 @@ on:
   # User receives 3 videos in TG at 21:00, 21:15, 21:30 IST — schedules them
   # for next day at 06:00 / 13:00 / 22:30 IST respectively (5 min/night).
   #
-  schedule:
+  # schedule:   <-- KEY COMMENTED 2026-10-23. Every cron under it is now off
+  # (GoM on batch mode 2026-10-22, TimeDecoders stopped 2026-10-23). A
+  # `schedule:` key with zero entries makes GitHub reject the whole file as an
+  # invalid workflow, which ALSO kills workflow_dispatch — the manual escape
+  # hatch. Re-enabling any cron below means un-commenting this key too.
     # Itihaasvani: 2/day (cut from 3 — quality > quantity per review data).
     # Morning history/temple drop + night-prime SERIES binge drop.
     # NIGHT BATCH (2026-06-10 per user): all daily generation clustered into a

@@ -31,7 +31,10 @@ name: Daily Photo (Gods of the Mind)
 # already owns the ledger, the dedup and the past-peak drop.
 
 on:
-  schedule:
+  # schedule:   <-- KEY COMMENTED 2026-10-23. Its only cron was paused
+  # 2026-10-22, and a `schedule:` key with zero entries makes GitHub reject
+  # the whole file as an invalid workflow — which also killed this workflow's
+  # workflow_dispatch. Un-comment this key when re-enabling the cron below.
     # PAUSED 2026-10-22 for the same reason as the reel cron: photos are now
     # batch-built and queued 10 days ahead, so a daily generate would stack a
     # second photo onto a day that already has one.
