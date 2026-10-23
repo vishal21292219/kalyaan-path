@@ -11,7 +11,11 @@ Auto-loaded in this repo (channels: GodsOfTheMind, TimeDecoders, Itihaasvani, bh
 
 ## Content direction (data-backed, don't re-litigate)
 - GodsOfTheMind: felt-pain / identity-first hook, then the deity. Second-person "you/your" + contrarian reveal wins.
-- TimeDecoders: specific impossible object + precise number + "shouldn't exist". Egypt filler is the worst-performing theme.
+- TimeDecoders: **STOPPED 2026-10-23** (per user: waste of money). Gen cron, catch-up
+  slot and topic refill are all off; configs/secrets intact. Do not restart it, or
+  plan TD work, without him saying so. Historic direction, if it ever returns:
+  specific impossible object + precise number + "shouldn't exist". Egypt filler is
+  the worst-performing theme.
 - Raising the floor ≠ manufacturing virality — say so plainly rather than promising breakouts.
 
 ### Measured 2026-10-23 (GoM, 28d to 21 Oct: 57.9K views, 2,977 followers)
