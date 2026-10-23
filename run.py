@@ -24,12 +24,16 @@ PUBLISH_TIMES = {
     ("ancient", "trending", 1): "18:00",  # 2:00 PM ET (US afternoon)
     ("ancient", "trending", 2): "00:00",  # 8:00 PM ET (US evening prime)
     ("ancient", "trending", 3): "21:00",  # 5:00 PM ET (US afternoon — 3rd daily TD slot)
-    # GoM (audience US 60%, proven peaks 1 PM & 9 PM ET): generate EARLY with a big
-    # 5-6h buffer (gen 12:00/15:00/19:00 UTC), then YT native-schedules to these
-    # exact times AND FB/IG are queued (facebook_make_scheduled) → posted by the
-    # reel-poster cron at the exact peak. Big buffer = even a multi-hour GitHub
-    # cron lag finishes before peak → no missed slot (SOP G3); zero platform drift.
-    ("godmind", "trending", 1): "17:00",  # 1 PM ET (US lunch — proven 10.6k)
+    # GoM: generate EARLY with a big buffer, then FB is queued
+    # (facebook_make_scheduled) → posted by the reel-poster cron at the exact slot.
+    # Seed 1 MOVED 17:00 → 19:00 UTC (= 00:30 IST) on 2026-10-24. Measured on 81
+    # GoM reels, 29 Jul–23 Oct 2026 (Business Suite → Insights → Content): reels
+    # posted 00:00–05:00 IST had a median of 1,096 views and 429 follows (n=41);
+    # 22:00–24:00 IST had 690 and 148 (n=36). Same-month check held (Sep 1,096 vs
+    # 769, Oct 1,112 vs 808), so it is the slot, not the page's age. The old
+    # "proven 1 PM ET" rested on one 10.6K breakout reel. Photos sit at 22:00 UTC
+    # (03:30 IST), 3h later — see docs/fb-native-scheduling.md.
+    ("godmind", "trending", 1): "19:00",  # 00:30 IST / 3 PM ET (2 PM after US DST ends 1 Nov)
     ("godmind", "trending", 2): "21:00",  # 5 PM ET (US afternoon — spread between the 1 PM & 9 PM proven peaks)
     ("godmind", "trending", 3): "01:00",  # 9 PM ET (US night — proven 9.3k)
     # Money Neurons (MN) — US money-psychology, same proven US windows. Generate

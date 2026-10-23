@@ -6,7 +6,7 @@ record into data/state/pending_reels.json with a post_at. post_pending_reels.py
 fires it at that exact time — the same poster, ledger, dedup, past-peak drop and
 MIN_GAP_HOURS spacing the reel lane already has.
 
-    python scripts/run_photo_post.py --post-at 17:00
+    python scripts/run_photo_post.py --post-at 22:00   # 03:30 IST
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ COMMENT = ("🕉️ Which part of this is you right now? Tell me honestly — "
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--post-at", default="17:00", help="UTC HH:MM for the peak")
+    ap.add_argument("--post-at", default="22:00", help="UTC HH:MM for the slot (22:00 = 03:30 IST)")
     ap.add_argument("--now", action="store_true", help="post immediately instead of queueing")
     args = ap.parse_args()
 

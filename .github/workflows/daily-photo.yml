@@ -21,10 +21,13 @@ name: Daily Photo (Gods of the Mind)
 # motion, no assembly) and Meta's Content Monetization pays on photos as well as
 # reels, so this lane earns as well as grows.
 #
-# TIMING. Generation runs at 10:00 UTC and QUEUES the post for 01:00 UTC — GoM's
-# second proven peak (9 PM ET, the 9.3k slot). The scripted reel posts at 17:00
-# UTC (1 PM ET), so the two are 8 hours apart and never trip the poster's
-# MIN_GAP_HOURS=3 spacing guard. Posting is done by reel-poster.yml, which
+# TIMING (moved 2026-10-24, see docs/fb-native-scheduling.md). Generation runs at
+# 10:00 UTC and QUEUES the post for 22:00 UTC = 03:30 IST, inside the 00:00–05:00
+# IST window where GoM's reels measurably do best. (Was 01:00 UTC.) The scripted
+# reel posts at 19:00 UTC (00:30 IST), 3h earlier. That is exactly the poster's
+# MIN_GAP_HOURS=3, measured from when the reel ACTUALLY posted — so if the reel
+# fired late, the 22:00 run holds the photo and the 23:00 backstop posts it.
+# Posting is done by reel-poster.yml, which
 # already owns the ledger, the dedup and the past-peak drop.
 
 on:
@@ -32,13 +35,13 @@ on:
     # PAUSED 2026-10-22 for the same reason as the reel cron: photos are now
     # batch-built and queued 10 days ahead, so a daily generate would stack a
     # second photo onto a day that already has one.
-    # - cron: "0 10 * * *"    # generate 10:00 UTC → queued for 01:00 UTC
+    # - cron: "0 10 * * *"    # generate 10:00 UTC → queued for 22:00 UTC (03:30 IST)
   workflow_dispatch:
     inputs:
       post_at:
-        description: "UTC HH:MM to queue the post for"
+        description: "UTC HH:MM to queue the post for (22:00 = 03:30 IST)"
         required: false
-        default: "01:00"
+        default: "22:00"
       now:
         description: "Post immediately instead of queueing (true/false)"
         required: false
@@ -114,7 +117,7 @@ jobs:
           ACTIVE_NICHE: godmind
         run: |
           python -u scripts/run_photo_post.py \
-            --post-at "${{ github.event.inputs.post_at || '01:00' }}" \
+            --post-at "${{ github.event.inputs.post_at || '22:00' }}" \
             ${{ github.event.inputs.now == 'true' && '--now' || '' }}
 
       - name: Alert Discord on failure
@@ -124,7 +127,7 @@ jobs:
         run: |
           [ -z "$DISCORD_WEBHOOK" ] && exit 0
           curl -sS -H 'Content-Type: application/json' -X POST "$DISCORD_WEBHOOK" \
-            -d '{"content":"❌ Daily Photo (GoM) FAILED — no photo queued for the 01:00 UTC peak. See the run log."}' || true
+            -d '{"content":"❌ Daily Photo (GoM) FAILED — no photo queued for the 22:00 UTC (03:30 IST) slot. See the run log."}' || true
 
       - name: Commit queue + pool state
         if: always()

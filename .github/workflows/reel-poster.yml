@@ -3,18 +3,23 @@ name: Reel Poster (scheduled FB/IG)
 # Fires queued FB/IG reels at their exact target time (decoupled from generation,
 # so slow renders never push a post off its peak). Tiny job (~1 min). Reads
 # data/state/pending_reels.json, posts due records via the Make webhook, removes
-# posted + stale ones. Times are GoM US peaks (UTC) + a safety sweep.
+# posted + stale ones. Times are the channels' slots (UTC) + safety sweeps.
 on:
   schedule:
-    # Fire every 2h across the active window (17:00–07:00 UTC) so GitHub cron lag/
-    # skips can't strand a queued reel — peaks 17/21/01 are included, and the
-    # in-between runs (19/23/03/05/07) catch any missed peak within ~2h. A reel
-    # posts at most once (posted-ledger), so extra runs are cheap no-ops.
-    - cron: "0 17 * * *"   # 1 PM ET — GoM #1 peak
-    - cron: "0 19 * * *"   # backstop
-    - cron: "0 21 * * *"   # 5 PM ET — GoM #2 peak
-    - cron: "0 23 * * *"   # backstop
-    - cron: "0 1 * * *"    # 9 PM ET — GoM #3 peak
+    # Fire across the active window (17:00–07:00 UTC) so GitHub cron lag/skips
+    # can't strand a queued post. A post fires at most once (posted-ledger), so
+    # extra runs are cheap no-ops.
+    # GoM slots MOVED 2026-10-24 (docs/fb-native-scheduling.md): scripted reel
+    # 19:00 UTC (00:30 IST), photo / one-line reel 22:00 UTC (03:30 IST). The
+    # 22:00 run was added for the photo; 23:00 is its backstop when the 3h
+    # MIN_GAP guard holds it behind a late reel. The other runs are kept for the
+    # remaining channels' slots and as backstops.
+    - cron: "0 17 * * *"   # 1 PM ET — Money Neurons #1 slot / backstop
+    - cron: "0 19 * * *"   # 00:30 IST — GoM scripted reel
+    - cron: "0 21 * * *"   # 5 PM ET — backstop
+    - cron: "0 22 * * *"   # 03:30 IST — GoM photo / one-line reel
+    - cron: "0 23 * * *"   # backstop (GoM photo held by the gap guard)
+    - cron: "0 1 * * *"    # 9 PM ET — Money Neurons #3 slot / backstop
     - cron: "0 3 * * *"    # backstop
     - cron: "0 5 * * *"    # backstop
     - cron: "0 7 * * *"    # final sweep

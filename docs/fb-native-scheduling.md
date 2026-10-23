@@ -93,11 +93,59 @@ There is no "swap the video" — delete and re-create. On the scheduled list, th
 row's `…` menu → Manage post → **Delete post**, confirm, then schedule the new
 file into the same slot.
 
+## Moving an already-scheduled post
+
+Content → Posts & reels → **Scheduled** → select the row → post details panel →
+**Actions (…)** → **Reschedule post**. Edit only the fields that change (the
+date textbox, `hours`, `minutes`, `meridiem` — same rules as above) and confirm.
+No re-upload, the post keeps its ID. Used on 2026-10-24 to move 21 posts.
+
+Two traps:
+
+- **Click menu items by their text, never by coordinate.** Reels and photos
+  have different "…" menus. A coordinate that hits "Reschedule post" on a reel
+  hits **"Duplicate post"** on a photo, which opens a pre-filled composer. If
+  that happens: Cancel → **Discard changes**, then check Published to confirm
+  nothing went out.
+- **The list refreshes late.** Right after a reschedule the row can still show
+  the old time for a few seconds. Reload before deciding it failed.
+
+To pull a post out of the schedule without losing it, use **Move to Drafts**
+instead of Delete. It then shows in Scheduled as a "Failed to publish" row and
+in **Drafts** as a normal draft — that label does not mean anything broke.
+
 ## Slots in use
 
-- **06:30 IST** — photo, or a one-line reel 2 days a week
-- **22:30 IST** — the scripted reel
+| Post | IST | UTC | US Eastern (EDT → EST after 1 Nov) |
+|---|---|---|---|
+| Scripted reel | **00:30** | 19:00 (previous UTC day) | 3:30 PM → 2 PM |
+| Photo, or a one-line reel 2 days a week | **03:30** | 22:00 (previous UTC day) | 6:30 PM → 5:30 PM |
 
-Both are IST. The queue's `post_at` values are UTC (`01:00Z` = 06:30 IST,
-`17:00Z` = 22:30 IST); do not mix the two up when reconciling against
-`pending_reels.json`.
+**Why these times (measured 2026-10-24).** Business Suite → Insights → Content,
+last 90 days (29 Jul – 23 Oct 2026), 81 GoM reels by publish time:
+
+| Posted (IST) | Reels | Median views | Follows |
+|---|---|---|---|
+| 00:00–05:00 | 41 | 1,096 | 429 |
+| 22:00–24:00 | 36 | 690 | 148 |
+
+The gap held inside the same month (Sep 1,096 vs 769, Oct 1,112 vs 808), so it
+is the slot and not the page getting older. The previous slots (22:30 reel,
+06:30 photo) rested on single breakout reels (the "10.6K" and "9.3K" slots) and
+were never re-checked against the whole catalogue.
+Business Suite no longer shows a "when your followers are online" chart, so
+re-measure this way: Insights → Content → Last 90 days, group by publish hour.
+
+Photo timing has **not** been measured yet — only two photos had posted when
+this was set. Re-check once the photo lane has 10+ posts.
+
+The two slots are 3h apart, which equals `MIN_GAP_HOURS` in
+`post_pending_reels.py`. For posts scheduled here that does not matter (Facebook
+fires them itself). For anything queued through Make, a reel that posted late
+can make the poster hold the 22:00 photo until its 23:00 backstop run.
+
+Both are IST. The queue's `post_at` values are UTC (`19:00Z` = 00:30 IST and
+`22:00Z` = 03:30 IST, both on the NEXT IST calendar day); do not mix the two up
+when reconciling against `pending_reels.json`. `scripts/batch_reels.py` and
+`scripts/batch_photos.py` default to these UTC times, and their `--start` is the
+UTC date.

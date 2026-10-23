@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Build N photo posts and queue each for its own day's 01:00 UTC slot.
+"""Build N photo posts and queue each for its own day's 22:00 UTC slot (03:30 IST).
+
+--start is the UTC date: 22:00 UTC on --start is 03:30 IST on the NEXT
+calendar day.
 
 Batch mode exists because a daily cron that nobody watches shipped a bearded
 Indra and a weeping Durga. Building ahead means every post is looked at before
@@ -27,7 +30,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--count", type=int, default=10)
     ap.add_argument("--start", required=True, help="first post date, YYYY-MM-DD")
-    ap.add_argument("--hour", default="01:00", help="UTC HH:MM")
+    ap.add_argument("--hour", default="22:00", help="UTC HH:MM (22:00 = 03:30 IST next day)")
     ap.add_argument("--dry", action="store_true", help="build + gate only, do not queue")
     a = ap.parse_args()
 

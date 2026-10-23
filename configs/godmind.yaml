@@ -456,10 +456,11 @@ publish:
   youtube: false
   facebook_make: true     # AUTO FB via Make.com (Cloudinary→webhook, channel=gom → "Gods of the Mind" page). Bypasses the flagged dev-app.
   facebook_make_scheduled: true  # queue the reel for its exact US peak (poster cron) instead of posting at render-time → no drift
-  # FB 2/day (2026-07-08 v2): match the 2/day YT so NO video is wasted on FB.
-  # Both slots (17:00 UTC / 1 PM ET + 01:00 UTC / 9 PM ET) are 8h apart → the
-  # poster's MIN_GAP_HOURS=3 + one-post-per-page-per-run guard fires both cleanly,
-  # never back-to-back. (No facebook_make_slots key → all YT slots also post to FB.)
+  # SLOTS (moved 2026-10-24, measured — see docs/fb-native-scheduling.md):
+  # scripted reel 19:00 UTC = 00:30 IST (run.py PUBLISH_TIMES), photo / one-line
+  # reel 22:00 UTC = 03:30 IST (batch_photos.py / daily-photo.yml). 3h apart =
+  # the poster's MIN_GAP_HOURS, so a late reel can push the photo to the 23:00
+  # backstop run. (No facebook_make_slots key → all slots also post to FB.)
   facebook_manual: false  # no longer needed — FB now auto via facebook_make
   facebook: false  # direct Graph-API still paused (dev-app flagged); Make path used instead.
 

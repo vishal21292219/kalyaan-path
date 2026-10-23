@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Build N reels and queue each for its own day's 17:00 UTC slot.
+"""Build N reels and queue each for its own day's 19:00 UTC slot (00:30 IST).
+
+--start is the UTC date: 19:00 UTC on --start is 00:30 IST on the NEXT
+calendar day, so the reel for the 26 Oct (IST) slot needs --start 2026-10-25.
 
 Runs run.py once per day-slot with --publish-at, so each reel takes the next
 topic by min-seq and lands its own queue record. Nothing is posted here: the
@@ -20,7 +23,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--count", type=int, default=10)
     ap.add_argument("--start", required=True)
-    ap.add_argument("--hour", default="17:00")
+    ap.add_argument("--hour", default="19:00", help="UTC HH:MM (19:00 = 00:30 IST next day)")
     a = ap.parse_args()
 
     hh, mm = (int(x) for x in a.hour.split(":"))
