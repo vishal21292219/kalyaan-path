@@ -152,7 +152,9 @@ def refill(niche: str) -> int:
 
 
 def main(niches=None) -> int:
-    niches = niches or ["godmind", "ancient", "moneurons"]
+    # "ancient" (TimeDecoders) removed 2026-10-23 — channel stopped; refilling
+    # its pool was paid LLM calls for topics nothing would ever render.
+    niches = niches or ["godmind", "moneurons"]
     total = 0
     for n in niches:
         try:

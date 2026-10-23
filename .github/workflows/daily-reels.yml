@@ -39,7 +39,13 @@ on:
     # this slot over 21 runs: MEDIAN 156 min, MAX 259 min. At max lag the run was
     # starting 23:01 and finishing ~14 min before its 00:00 go-live. 15:00 gives a
     # 9h buffer. Go-live (publishAt 00:00 UTC / 8 PM ET PRIME) is UNCHANGED.
-    - cron: "0 15 * * *"    # TimeDecoders (seed2, go-live 00:00 UTC / 8 PM ET PRIME) — sole daily TD run, best audience window.
+    # ===== TimeDecoders STOPPED 2026-10-23 (per user: "waste of money") =====
+    # TD generation is OFF. Every TD reel costs image/TTS/LLM credits + ~100
+    # Actions minutes and the channel has not earned them back. Configs, FB/YT
+    # secrets and the routing branch below are left intact — re-enabling this
+    # one cron (and the ancient SLOT in run_catchup.py, in the SAME commit)
+    # brings the channel back exactly as it was.
+    # - cron: "0 15 * * *"    # TimeDecoders (seed2, go-live 00:00 UTC / 8 PM ET PRIME) — sole daily TD run.
     # - cron: "45 17 * * *"  # [TD #3 / 5 PM ET] DROPPED 2026-07-08 — YT 3->2/day. Keep 2 PM (seed1) + 8 PM PRIME (seed2).
     # GodsOfTheMind (English god-psychology): 3/day, generate-ahead + publishAt
     # so each video LANDS at the exact reach window.

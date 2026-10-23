@@ -15,10 +15,15 @@
 name: Catch-up (recover missed posts)
 
 on:
-  schedule:
-    - cron: "30 15 * * *"  # GoM#1 — before its 17:00 peak
-    - cron: "30 19 * * *"  # GoM#2 + TimeDecoders — before 21:00 peak
-    - cron: "30 23 * * *"  # GoM#3 — before its 01:00 (next-day) peak
+  # ===== ALL SWEEPS PAUSED 2026-10-23 =====
+  # run_catchup.py SLOTS is now EMPTY: GoM is on a hand-scheduled batch queue
+  # (paused 2026-10-22) and TimeDecoders was stopped 2026-10-23. Three sweeps a
+  # day over an empty slot list is pure Actions spend for a guaranteed no-op.
+  # Re-enable the sweep that covers a slot in the same commit that re-adds it.
+  # schedule:
+  #   - cron: "30 15 * * *"  # GoM#1 — before its 17:00 peak
+  #   - cron: "30 19 * * *"  # GoM#2 + TimeDecoders — before 21:00 peak
+  #   - cron: "30 23 * * *"  # GoM#3 — before its 01:00 (next-day) peak
   workflow_dispatch:
     inputs:
       dry_run:

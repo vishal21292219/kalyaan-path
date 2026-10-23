@@ -54,7 +54,12 @@ from pipeline.topic_generator import has_active_reservation
 # "due" window and either fires early (racing the primary run for a topic) or
 # never fires at all.
 SLOTS = [
-    ("ancient",   "trending", 2, "publish", 15,  0, None),  # cron 0 15 → go-live 00:00 UTC / 8 PM ET PRIME (sole daily TD run)
+    # ("ancient", "trending", 2, "publish", 15,  0, None),  # cron 0 15 → go-live 00:00 UTC / 8 PM ET PRIME
+    # STOPPED 2026-10-23 with the TD gen cron in daily-reels.yml (per user:
+    # TD is a waste of money). Left in, this slot would look undelivered every
+    # single day and catch-up would generate + publish a paid TD reel daily —
+    # i.e. it would quietly undo the stop. Re-enable only in the same commit
+    # that re-enables the gen cron.
     # ("godmind", "trending", 1, "publish",  6,  0, None),  # cron 0 6 * * * → go-live 17:00 UTC / 1 PM ET
     # PAUSED 2026-10-23, with the daily-reels and daily-photo crons. GoM is on
     # batch mode: 23 Oct - 1 Nov is already built and scheduled on Facebook's
