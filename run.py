@@ -12,7 +12,8 @@ from pipeline.assembler import assemble
 from pipeline.image_gen import generate_images
 from pipeline.scraper import gather_context
 from pipeline.script_writer import write_script
-from pipeline.topic_generator import pick_mantra, pick_series, pick_shloka_episode, pick_topic, pick_trending
+from pipeline.topic_generator import (TopicPoolExhausted, pick_mantra, pick_series,
+                                      pick_shloka_episode, pick_topic, pick_trending)
 from pipeline.tts import synthesize
 from pipeline.utils import dedupe_script_narration, load_config, out_path, set_active_niche, slugify, today_stamp
 
@@ -183,7 +184,11 @@ def main(argv: list[str]) -> int:
             # Safety check: verify pregen topic still matches what realtime picker would choose
             # (catches edge case: shloka sequence drifted, festival appeared since pregen, etc.)
             if args.kind == "trending":
-                realtime_topic = pick_trending(seed_offset=args.seed_offset)
+                try:
+                    realtime_topic = pick_trending(seed_offset=args.seed_offset)
+                except TopicPoolExhausted as e:
+                    print(e)          # every topic has aired — skip, never repeat
+                    return 0
             elif args.kind == "shloka":
                 # For shloka, only peek (don't mutate state — we'll mutate at actual publish)
                 from pipeline.scheduler import _peek_shloka_at_offset
@@ -214,7 +219,11 @@ def main(argv: list[str]) -> int:
         elif args.kind == "shloka":
             topic = pick_shloka_episode()
         elif args.kind == "trending":
-            topic = pick_trending(seed_offset=args.seed_offset)
+            try:
+                topic = pick_trending(seed_offset=args.seed_offset)
+            except TopicPoolExhausted as e:
+                print(e)              # every topic has aired — skip, never repeat
+                return 0
         else:
             topic = pick_topic("auto", seed_offset=args.seed_offset)
 
@@ -785,6 +794,16 @@ if __name__ == "__main__":
     _argv = sys.argv[1:]
     try:
         _rc = main(_argv)
+    except TopicPoolExhausted as _e:
+        # Any other path into pick_trending (pick_topic("auto")): skip the slot
+        # cleanly — never repeat an aired topic, never count it as a crash.
+        print(_e)
+        try:
+            from pipeline.notifier_discord import alert as _dc_alert
+            _dc_alert(f"⏭️ {_e}\nargs: {' '.join(_argv)}")
+        except Exception:
+            pass
+        _rc = 0
     except Exception as _e:
         try:
             from pipeline.notifier_discord import alert as _dc_alert

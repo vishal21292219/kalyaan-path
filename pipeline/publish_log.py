@@ -41,7 +41,7 @@ TITLE_LOG_PATH = ROOT / "data" / "state" / "published_titles.json"
 # 2 uploads/day is ~240 entries; the file stays trivially small. This is what
 # stopped "Why Every Ancient Culture Built Pyramids" (01 Jun) re-airing on 14 Sep
 # for 4 views.
-_TITLE_KEEP_DAYS = 120
+_TITLE_KEEP_DAYS = None   # 2026-10-26: never pruned (see mark_title_published)
 
 
 def slot_key(niche: str, kind: str, seed: int = 0) -> str:
@@ -157,27 +157,34 @@ def _load_titles() -> dict:
     return {}
 
 
-def title_published_recently(title: str, days: int = 10) -> bool:
-    """True if (essentially) this topic was already published in the last `days`.
-    Catches duplicate uploads the slot guard misses (cross-slot same-topic, a
-    festival topic repeating, a re-run after a lost marker)."""
-    key = _norm_title(title)
-    if not key:
+def title_published_recently(title: str, days: int | None = None) -> bool:
+    """True if this topic was already published — by full title OR by its topic
+    segment (subtitle stripped), so "X — The Psychology Behind" and "X — The
+    Hidden Psychology" are one topic. days=None (default) means EVER: a topic
+    that aired once never airs again (2026-10-26 — the 10-day default let old
+    topics re-upload and YouTube penalised the repeats). Pass days for a window."""
+    keys = {k for k in (_norm_title(title), _norm_topic(title)) if k}
+    if not keys:
         return False
-    cutoff = (date.today() - timedelta(days=days)).isoformat()
-    val = _load_titles().get(key)
-    return bool(val and str(val) >= cutoff)
+    data = _load_titles()
+    cutoff = (date.today() - timedelta(days=days)).isoformat() if days else ""
+    return any(data.get(k) and str(data[k]) >= cutoff for k in keys)
+
+
+def topic_ever_published(title: str) -> bool:
+    return title_published_recently(title, days=None)
 
 
 def mark_title_published(title: str) -> None:
-    """Record a published topic (normalised key → today). Pruned + idempotent."""
-    key = _norm_title(title)
-    if not key:
+    """Record a published topic under its full-title AND topic-segment keys.
+    Never pruned: a few KB a year, and pruning is what let old topics back in."""
+    keys = {k for k in (_norm_title(title), _norm_topic(title)) if k}
+    if not keys:
         return
     TITLE_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    cutoff = (date.today() - timedelta(days=_TITLE_KEEP_DAYS)).isoformat()
-    data = {k: v for k, v in _load_titles().items() if str(v) >= cutoff}
-    data[key] = date.today().isoformat()
+    data = _load_titles()
+    for k in keys:
+        data[k] = date.today().isoformat()
     TITLE_LOG_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
 

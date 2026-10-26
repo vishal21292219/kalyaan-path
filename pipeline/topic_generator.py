@@ -444,6 +444,11 @@ def confirm_topic(niche: str, title: str) -> None:
         print(f"[topic] confirm_topic skipped ({type(e).__name__}: {e})")
 
 
+class TopicPoolExhausted(RuntimeError):
+    """Every topic in the pool has already aired. The caller skips the slot —
+    re-airing an old topic is what got the channel penalised (2026-10-26)."""
+
+
 def pick_viral(seed_offset: int = 0) -> dict:
     """Pick from the FRESH researched viral-topic pool (data/viral_topics_{niche}.json),
     avoiding anything used in the last 30 days. This is what kills the 'same videos
@@ -462,12 +467,17 @@ def pick_viral(seed_offset: int = 0) -> dict:
     sp = _viral_state_path(niche)
     sp.parent.mkdir(parents=True, exist_ok=True)
     state = json.loads(sp.read_text()) if sp.exists() else {"history": []}
-    cutoff = date.today() - timedelta(days=30)
-    recent_entries = [h for h in state["history"]
-                      if _safe_day(h.get("date")) and _safe_day(h["date"]) >= cutoff
-                      and _is_blocking(h)]
-    recent = {h["title"] for h in recent_entries}
-    avail = [t for t in pool if t["title"] not in recent]
+    # 2026-10-26: NO time window. A topic that aired once never airs again —
+    # the old 30-day window (plus a pruned ledger) let >30-day-old topics back
+    # in, and YouTube penalised the repeats. Expired pending reservations still
+    # don't block (_is_blocking).
+    from .publish_log import _norm_topic, topic_ever_published
+    aired = {h["title"] for h in state["history"] if h.get("title") and _is_blocking(h)}
+    aired_topics = {_norm_topic(t) for t in aired}
+    avail = [t for t in pool
+             if t["title"] not in aired
+             and _norm_topic(t["title"]) not in aired_topics
+             and not topic_ever_published(t["title"])]
 
     # NEAR-DUPLICATE GUARD (2026-09-19 audit). Exact-title dedup could never catch
     # the real repeats, because the POOL itself holds rephrasings of one subject.
@@ -475,32 +485,17 @@ def pick_viral(seed_offset: int = 0) -> dict:
     #   "The Demon Every God Kills Is Inside You" 1018 → "Every Hindu God Kills
     #    the Same Demon" 93 | Ravana's 10 Heads 963 → 320 | Voynich 646 → 34 |
     #   Menkaure 359 → 40 | "Something Is Dragging Our Galaxy" 70 → 19 (same day).
-    # Drop any candidate that shares >=60% of its distinctive words with a topic
-    # aired in the window. Guarded + never allowed to empty the pool.
+    # Drop any candidate that shares >=60% of its distinctive words with ANY topic
+    # ever aired. It is a heuristic, so it may never empty the pool on its own.
     try:
-        near = [t for t in avail if not _too_similar(t.get("title", ""), recent)]
+        near = [t for t in avail if not _too_similar(t.get("title", ""), aired)]
         if near:
             dropped = len(avail) - len(near)
             if dropped:
-                print(f"[topic] near-dup guard dropped {dropped} rephrasing(s) of recent topics")
+                print(f"[topic] near-dup guard dropped {dropped} rephrasing(s) of aired topics")
             avail = near
     except Exception as e:
         print(f"[topic] near-dup guard skipped ({type(e).__name__}: {e})")
-
-    # Also drop topics ALREADY published all-time. A published video lives on YouTube
-    # forever, so run.py's live-YouTube dedup would skip it — but pick_viral's 30-day
-    # window let a >30-day-old published topic re-enter `avail` and get picked (lowest
-    # seq) then skipped EVERY run = a dead slot, no upload. Align the picker with the
-    # permanent published ledger so only genuinely-fresh (never-published) topics are
-    # eligible. Guarded + falls back to the un-filtered list so we never pick nothing.
-    try:
-        from .publish_log import _norm_title, TITLE_LOG_PATH
-        published = set(json.loads(TITLE_LOG_PATH.read_text())) if TITLE_LOG_PATH.exists() else set()
-        never_pub = [t for t in avail if _norm_title(t.get("title", "")) not in published]
-        if never_pub:
-            avail = never_pub
-    except Exception:
-        pass
 
     rng = random.Random(_seed_for_today(seed_offset))
     # STRICT planned sequence (launch ramp): if any available topic carries an
@@ -522,13 +517,12 @@ def pick_viral(seed_offset: int = 0) -> dict:
         weights = [t.get("weight", 1 if t.get("footage") else 3) for t in avail]
         chosen = rng.choices(avail, weights=weights, k=1)[0]
     else:
-        # Pool exhausted (every topic used within 30 days). Instead of a random
-        # pick from the full pool (which can repeat yesterday's → duplicate
-        # uploads), choose the LEAST-recently-used topic so spacing is maximal.
-        last_used: dict[str, str] = {}
-        for h in state["history"]:
-            last_used[h["title"]] = h["date"]  # later entries win → most recent date
-        chosen = min(pool, key=lambda t: last_used.get(t["title"], "0000-00-00"))
+        # Pool exhausted: every topic has aired. Never re-air one (the old
+        # least-recently-used fallback did exactly that) — skip the slot. The
+        # topic-refill cron tops the pool up before it gets here.
+        raise TopicPoolExhausted(
+            f"[topic] {niche}: all {len(pool)} pool topics have already aired — "
+            f"skipping this slot instead of repeating one (run topic refill)")
     # PENDING reservation — confirmed by run.py via confirm_topic() only after the
     # video actually reaches its primary channel. Expires after RESERVE_HOURS so a
     # failed run gives the topic back instead of burning it (see RESERVE_HOURS).
@@ -538,7 +532,7 @@ def pick_viral(seed_offset: int = 0) -> dict:
         "pending": True,
         "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     })
-    state["history"] = state["history"][-500:]
+    state["history"] = state["history"][-5000:]
     sp.write_text(json.dumps(state, indent=2, ensure_ascii=False))
     print(f"[topic] reserved '{chosen['title']}' (pending, expires in {RESERVE_HOURS}h)")
 

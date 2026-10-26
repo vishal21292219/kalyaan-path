@@ -4,8 +4,8 @@
 So the pipeline NEVER has to repeat topics for lack of fresh ones, and nobody has
 to manually top up the pools. Runs on its own cron (.github/workflows/topic-
 refill.yml). For each niche:
-  1. Count topics NOT used in the last 30 days (the "fresh" pool pick_viral draws
-     from).
+  1. Count topics that have NEVER aired (the "fresh" pool pick_viral draws
+     from — no time window since 2026-10-26).
   2. If fresh < MIN_FRESH, ask the LLM (same provider chain as the script writer:
      Claude → Gemini) to generate brand-new on-brand topics (title + pain-first
      hook) that don't duplicate any existing title.
@@ -29,7 +29,7 @@ from .utils import ROOT, load_config
 
 load_dotenv()
 
-MIN_FRESH = 30       # below this many unused-in-30d topics → refill
+MIN_FRESH = 30       # below this many never-aired topics → refill
 TARGET_FRESH = 60    # top the fresh pool back up to ~this
 MAX_POOL = 400       # safety cap on total pool size
 MAX_PER_RUN = 40     # cap LLM output per niche per run
@@ -47,12 +47,19 @@ def _safe_date(s):
 
 
 def _fresh_count(pool: list, niche: str) -> int:
+    """Topics that have NEVER aired — the same rule pick_viral uses since
+    2026-10-26 (no 30-day window), so a refill happens before the picker runs
+    dry and has to skip a slot."""
+    from .publish_log import _norm_topic, topic_ever_published
+    from .topic_generator import _is_blocking
     sp = ROOT / f"data/state/viral_history_{niche}.json"
     hist = json.loads(sp.read_text()).get("history", []) if sp.exists() else []
-    cut = date.today() - timedelta(days=30)
-    recent = {h["title"] for h in hist
-              if (_safe_date(h.get("date")) and _safe_date(h["date"]) >= cut)}
-    return sum(1 for t in pool if t.get("title") not in recent)
+    aired = {h["title"] for h in hist if h.get("title") and _is_blocking(h)}
+    aired_topics = {_norm_topic(t) for t in aired}
+    return sum(1 for t in pool
+               if t.get("title") not in aired
+               and _norm_topic(t.get("title", "")) not in aired_topics
+               and not topic_ever_published(t.get("title", "")))
 
 
 def _parse(txt: str) -> list:
