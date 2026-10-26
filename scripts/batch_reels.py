@@ -12,11 +12,19 @@ stays the single posting authority.
     python scripts/batch_reels.py --count 10 --start 2026-10-23
 """
 from __future__ import annotations
-import argparse, json, subprocess, sys, time
+import argparse, json, os, subprocess, sys, time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def reel_env(i: int, when: str) -> dict:
+    """Environment for the i-th reel of the batch. REEL_FORMAT_INDEX makes
+    pipeline/script_writer.pick_format rotate the GoM formats strictly
+    (typology → verse → darshan → …) across the batch."""
+    return {**os.environ, "ACTIVE_NICHE": "godmind", "PUBLISH_AT_ISO": when,
+            "REEL_FORMAT_INDEX": str(i)}
 
 
 def main() -> int:
@@ -47,8 +55,7 @@ def main() -> int:
                  # the same day instead of one per day.
                  "--publish", "--publish-at", when],
                 cwd=ROOT, stdout=fh, stderr=subprocess.STDOUT,
-                env={**__import__("os").environ, "ACTIVE_NICHE": "godmind",
-                     "PUBLISH_AT_ISO": when}).returncode
+                env=reel_env(i, when)).returncode
         txt = log.read_text()
         title = next((l.split("title: ")[-1].strip() for l in txt.splitlines()
                       if "[script] title:" in l), "?")

@@ -255,6 +255,15 @@ def main(argv: list[str]) -> int:
     # 2. scrape context  (skipped if pregen — already in cached script)
     if not pregen_active:
         context = gather_context(topic)
+        # A hand-checked brief (facts verified against the source texts, plus
+        # popular claims to avoid) goes in front of the scraped context, so the
+        # writer builds on it instead of on whatever the scrape returned.
+        _brief = os.environ.get("REEL_BRIEF_FILE")
+        if _brief and Path(_brief).exists():
+            context = ("VERIFIED BRIEF — use only these facts for any scripture or "
+                       "story claim, and avoid everything it marks wrong:\n"
+                       + Path(_brief).read_text(encoding="utf-8") + "\n\n" + context)
+            print(f"[scrape] + verified brief {Path(_brief).name}")
         print(f"[scrape] context length: {len(context)}")
 
     # 3. script via LLM (skipped if pregen — already cached)
@@ -335,7 +344,8 @@ def main(argv: list[str]) -> int:
         _visuals = [f"{v}. {_style}" for v in (script.get("visuals") or [])]
         try:
             images = generate_images(_visuals, img_dir, long_form=args.long_form,
-                                     character_bible=script.get("character_bible"))
+                                     character_bible=script.get("character_bible"),
+                                     title_band_first=bool(script.get("hook_image")))
             print(f"[images] {len(images)} AI scene-matched (hybrid base)")
         except Exception as e:
             print(f"[images] AI base unavailable ({type(e).__name__}: {e}) — trying all real photos")
@@ -426,7 +436,8 @@ def main(argv: list[str]) -> int:
     else:
         try:
             images = generate_images(script["visuals"], img_dir, long_form=args.long_form,
-                                     character_bible=script.get("character_bible"))
+                                     character_bible=script.get("character_bible"),
+                                     title_band_first=bool(script.get("hook_image")))
             print(f"[images] generated {len(images)}")
         except Exception as e:
             # GeminiUnavailable etc. — save to retry queue, exit cleanly

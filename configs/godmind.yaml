@@ -80,7 +80,7 @@ images:
   master_model: fal-ai/flux/dev     # MASTER deity portrait — premium 28-step face, propagated via consistency
   hero_model: fal-ai/flux/dev       # FIRST image (hook + FB cover) — premium since Kling hero-motion is off. Bump to fal-ai/flux-pro/v1.1 for max wow (+cost).
   hero_scenes: 2                    # how many OPENING scenes get premium treatment (the part viewers judge). ~$0.05/video.
-  num_per_reel: 10
+  num_per_reel: 6                   # 2026-10-25: 15-35s reels have 3-6 body lines (visuals are 1:1 with body); was 10
   consistency: true                 # lock the dev-quality deity face across the hero scenes
   # VISION GATE (pipeline/frame_check.py). One Claude-vision call per frame,
   # checked against the things this channel cannot ship: facial hair on a deity
@@ -173,14 +173,131 @@ llm:
   model: claude-sonnet-4-6
   fallback_model: gemini-flash-latest
 
-  # ── LENGTH: left at the global default (90-120 words, ~75-78s) ──────────────
-  # 2026-10-20 am: raised toward 88s on the theory that Meta content monetization
-  # pays on watch time. 2026-10-20 pm: REVERTED after pulling per-post data —
-  # average play time correlates -0.05 with reach across 20 reels, and median
-  # watch is 12.9s on a 76s reel (17% completion). Longer reels optimise a
-  # non-driver and would contaminate the hook test that IS the priority.
-  # The mechanism stays in pipeline/script_writer.py (llm.length_spec +
-  # llm.body_word_cap) for a clean A/B later — set both to re-enable.
+  # ── LENGTH: SHORT (2026-10-25 audit, user's go-ahead) ───────────────────────
+  # 82 reels: median watch 14s on a ~76s reel (~18%), watch time vs views r=0.19,
+  # 59% gone before 3s. The 13s verse test reel (25 Oct) got 2,183 views at 74%
+  # watched — 4.6x the reels around it. So: 15-35s. body_word_cap is the hard
+  # backstop in script_writer; cta_word_cap trims the SPOKEN cta to whole
+  # sentences (the follow ask lives in the caption, uploader_make_reel._caption).
+  # Old default (90-120 words, ~76s) = delete these three keys.
+  length_spec: |
+    Write a SHORT reel: 15-35 seconds spoken in total.
+    - TOTAL spoken words (hook + all body lines + cta) = 35-75 words.
+    - body = 2-6 lines, each 6-13 words, exactly as the FORMAT block says.
+      One idea, said once, no recap.
+    - VERSE: 28-40 words in total (about 15 seconds), body = exactly 3 short lines.
+    - TYPOLOGY: 60-75 words in total (one short line per type).
+    - DARSHAN: 45-60 words in total.
+    - cta = ONE choice question ("A or B?" / "Which one…?"), max 14 words. No follow/subscribe ask.
+  body_word_cap: 70
+  cta_word_cap: 14
+
+  # ── FORMATS: one per reel, rotated A→B→C by scripts/batch_reels.py ──────────
+  # (env REEL_FORMAT_INDEX = the batch position; without it, a stable hash of
+  # the topic title picks). Each brief is injected into the user prompt as
+  # "FORMAT FOR THIS REEL". 14-day test from 28 Oct: pass = median 1,500+ views
+  # and 8+ follows per 1K views; fail = median under 800.
+  formats:
+    - key: typology
+      max_words: 75
+      brief: |
+        TYPOLOGY — "which one runs you?". Structure, exactly:
+          hook   = a claim that there are N types (2-4) and one of them is
+                   running the viewer. A claim, never a question.
+          body   = one short line per type (6-12 words), each a specific
+                   behaviour people recognise, then ONE line naming the types
+                   together ("Tamas runs from it. Rajas devours it. Sattva sees it.").
+          cta    = which one are you, naming the types ("Tamas, Rajas or Sattva —
+                   which one ran your day? Comment it.").
+        Use a real Hindu framework or famous deities: the three gunas (tamas,
+        rajas, sattva); Brahma, Vishnu and Shiva as the part of you that starts,
+        keeps and ends things; the four kinds of people Krishna says come to God
+        (Gita 7.16: the distressed, the seeker of knowledge, the seeker of gain,
+        the wise). 60-75 spoken words in total. Proven: "You don't have one mind.
+        You have three" — 8,352 views, 150 follows.
+    - key: verse
+      max_words: 40                 # 2026-10-26: viral formula = verse under ~15-20s. 3 lines + the hook's own picture = 4 pictures
+      body_lines: 3                 # 1 picture per body line, plus the hook picture
+      ref_overrides: {krishna: krishna_sarathi}   # Gita scenes: charioteer Krishna, no flute (assets/refs/krishna_sarathi.jpg)
+      brief: |
+        VERSE — a negation plus ONE scripture line. 28-40 spoken words in total,
+        about 15 seconds. Structure, exactly:
+          hook   = negate a common belief about God, death, the soul, karma or
+                   the self ("God is not…", "No one ever told you…", "Stop…").
+          body   = exactly 3 lines, each 5-10 words, each its own picture:
+                   (1) the source and what it says ("Bhagavad Gita 2.20: the
+                       soul is never born.")
+                   (2) the rest of it, or its image ("It never dies. It only
+                       changes bodies.")
+                   (3) the meaning for the viewer, in one sentence.
+          cta    = a choice question ("Body or soul — which are you?").
+        Only cite ONE verse from the VERIFIED VERSES list below — even
+        when the topic's deity is someone else, pick the listed verse that
+        speaks to the topic. Cite it exactly as written there (e.g. "Bhagavad
+        Gita 2.20") and keep to its meaning; do not stretch it into a claim the
+        verse does not make. Any other text or number is rejected in code.
+        Put the citation in the description too. Every frame shows
+        the deity of that scripture — for the Gita, Krishna as Arjuna's
+        charioteer at Kurukshetra (youthful, clean-shaven, blue skin, crowned,
+        holding the reins, no flute) teaching Arjuna. Proven: the 25 Oct test
+        reel, 2,183 views, 74% watched.
+      # Checked by hand 2026-10-25. script_writer._format_violation rejects a
+      # VERSE reel whose citation is not on this list. Add verses here only
+      # after checking the number against a standard translation.
+      verses:
+        - {ref: "Bhagavad Gita 2.13", meaning: "As the soul passes through childhood, youth and old age in this body, it passes into another body; the wise are not shaken by this."}
+        - {ref: "Bhagavad Gita 2.14", meaning: "Heat and cold, pleasure and pain come from the senses touching the world; they come and go and do not last, so bear them patiently."}
+        - {ref: "Bhagavad Gita 2.20", meaning: "The soul is never born and never dies; it is unborn and eternal, and it is not killed when the body is killed."}
+        - {ref: "Bhagavad Gita 2.22", meaning: "As a person throws off worn-out clothes and puts on new ones, the soul leaves worn-out bodies and enters new ones."}
+        - {ref: "Bhagavad Gita 2.23", meaning: "Weapons cannot cut the soul, fire cannot burn it, water cannot wet it and wind cannot dry it."}
+        - {ref: "Bhagavad Gita 2.47", meaning: "You have a right to your action alone, never to its fruits; do not act for the fruit, and do not cling to inaction either."}
+        - {ref: "Bhagavad Gita 2.48", meaning: "Act steady in yoga, giving up attachment, the same in success and failure; that evenness of mind is called yoga."}
+        - {ref: "Bhagavad Gita 2.59", meaning: "The objects of the senses fall away from one who abstains, but the craving remains; even the craving goes when one sees the Supreme."}
+        - {ref: "Bhagavad Gita 2.62", meaning: "Dwelling on the objects of the senses breeds attachment; from attachment comes desire, and from desire comes anger."}
+        - {ref: "Bhagavad Gita 2.63", meaning: "From anger comes delusion, from delusion lost memory, from lost memory the ruin of reason, and with reason gone a person is lost."}
+        - {ref: "Bhagavad Gita 2.70", meaning: "As the ocean stays still while rivers pour into it, the one whom desires enter without moving them finds peace, not the one who chases desires."}
+        - {ref: "Bhagavad Gita 3.35", meaning: "Better your own dharma done imperfectly than another's dharma done well."}
+        - {ref: "Bhagavad Gita 4.7", meaning: "Whenever dharma declines and adharma rises, I manifest myself."}
+        - {ref: "Bhagavad Gita 4.8", meaning: "To protect the good, to destroy the wicked and to re-establish dharma, I appear age after age."}
+        - {ref: "Bhagavad Gita 6.5", meaning: "Lift yourself up by your own self and do not let yourself sink; the self alone is your friend, and the self alone is your enemy."}
+        - {ref: "Bhagavad Gita 6.6", meaning: "For one who has mastered the mind, the mind is the best friend; for one who has not, the mind behaves like an enemy."}
+        - {ref: "Bhagavad Gita 6.34", meaning: "Arjuna says the mind is restless, turbulent, strong and stubborn, as hard to hold as the wind."}
+        - {ref: "Bhagavad Gita 6.35", meaning: "Krishna answers that the mind is hard to control, but it is held by steady practice and detachment."}
+        - {ref: "Bhagavad Gita 7.16", meaning: "Four kinds of good people come to me: the distressed, the seeker of knowledge, the seeker of gain, and the wise."}
+        - {ref: "Bhagavad Gita 9.22", meaning: "To those who worship me alone with steady devotion, I bring what they lack and protect what they have."}
+        - {ref: "Bhagavad Gita 9.26", meaning: "Whoever offers me with devotion a leaf, a flower, a fruit or water, I accept that offering of love."}
+        - {ref: "Bhagavad Gita 18.61", meaning: "The Lord dwells in the heart of every being, turning all beings by his power as if mounted on a machine."}
+        - {ref: "Bhagavad Gita 18.66", meaning: "Give up all other duties and take refuge in me alone; I will free you from all sin, do not grieve."}
+        - {ref: "Chandogya Upanishad 6.8.7", meaning: "Tat tvam asi: that subtle essence is the Self of all that exists, and you are That."}
+        - {ref: "Brihadaranyaka Upanishad 1.4.10", meaning: "Aham Brahmasmi: whoever knows 'I am Brahman' becomes all this; even the gods cannot stop him."}
+        - {ref: "Brihadaranyaka Upanishad 1.3.28", meaning: "Lead me from the unreal to the real, from darkness to light, from death to immortality."}
+        - {ref: "Katha Upanishad 1.2.18", meaning: "The knowing Self is never born and never dies; it is not killed when the body is killed."}
+        - {ref: "Katha Upanishad 1.3.3", meaning: "Know the Self as the rider of a chariot and the body as the chariot; the intellect is the charioteer and the mind the reins."}
+        - {ref: "Mundaka Upanishad 3.1.1", meaning: "Two birds sit on the same tree: one eats the fruit, sweet and bitter, while the other simply watches without eating."}
+        - {ref: "Isha Upanishad 1", meaning: "All this, whatever moves in the world, is filled by the Lord; enjoy it by letting go, and do not covet anyone's wealth."}
+    - key: darshan
+      max_words: 65                 # 60 -> 65: live runs came back at 70-87 and burned 2 regenerations every time
+      brief: |
+        DARSHAN — one famous deity in full glory and one bold claim about their
+        power or a famous act from the scriptures or temple tradition, told with
+        reverence. 45-60 spoken words in total. Structure, exactly:
+          hook   = a claim stated as fact that NAMES the deity in the first
+                   words ("Every god gave Durga a weapon.", "In Kashi, even Yama
+                   waits for Kaal Bhairav."). Use Durga, Kali, Shiva, Hanuman,
+                   Krishna, Ganesha, Kaal Bhairav, Vishnu or Lakshmi.
+          body   = 4-5 lines of the story's most vivid moment, then one line on
+                   what it means for the viewer. ONE GOD PER LINE: every line
+                   becomes one picture, so "Shiva gave his trident." and
+                   "Vishnu gave his chakra." are two lines, never one.
+          cta    = a devotional choice ("Which form of Maa protects your home?
+                   Comment it.").
+        The claim must be TRUE to the scriptures or the temple tradition — no
+        "never"/"always" exaggerations you cannot stand behind (Indra did fight
+        his rivals; do not write that he never did). No psychology diagnosis in
+        the hook, never "you are broken". Every frame
+        is vivid and ornate, the deity filling the frame in reds and golds.
+        Proven: the three pinned June reels — Durga on the lion 11K, Kaal 10K,
+        "Every god in Hindu wisdom kills" 11K.
   persona: |
     You are the writer for "Gods of the Mind" — a premium YouTube Shorts channel
     that DECODES Hindu gods and timeless wisdom as PSYCHOLOGY and PHILOSOPHY. You
@@ -204,20 +321,19 @@ llm:
     ("when you feel invisible, this is the god who has always seen you"), because
     emotion is what gets SHARED. Warmth + recognition first, insight second.
 
-    THE FORMAT THAT WORKS (proven: @Awoken_Yodha hit 400K+/video with this):
-    - Take ONE god / symbol (Shiva, Kali, Krishna, Indra, Ganesha, a vahana, a
-      weapon, a posture) and reveal its HIDDEN PSYCHOLOGICAL meaning.
-    - hook = open on the VIEWER'S inner pain/feeling in 2nd person ("you…") in the
-      first 2 seconds, THEN pivot to the god as the hidden cause or cure. This
-      "make them feel SEEN first, reveal the god second" formula massively
-      outperforms opening cold on the concept (proven in this exact lane:
-      pain-first hooks pull 12K–48K views vs concept hooks). Examples:
-        "You destroy the good things in your life right before they bloom — that's
-         not self-sabotage, that's Kali, and she's clearing the way."
-        "You feel everything too deeply and it drains you. The ancients had a name
-         for carrying that much weight: Shiva."
-      NEVER open with "Did you know", a slow setup, or cold on the concept.
-      Open on the viewer's felt experience, then name the god.
+    THE FORMAT (2026-10-25 audit — the user prompt names ONE of three formats per
+    reel: TYPOLOGY, VERSE or DARSHAN. Follow that block exactly; it decides the
+    opening line and the length):
+    - Every reel is SHORT (see LENGTH OVERRIDE) and carries ONE idea, said once.
+    - The opening line is a CLAIM that contradicts what the viewer believes —
+      about themselves, about God, about death, about karma — never a mood
+      description. Measured on 82 reels: the generic 2nd-person mood opener
+      ("You feel…", "You are surrounded by…") was 70 of 82 hooks and the median
+      reel; the breakouts were a typology ("You don't have one mind. You have
+      three" 8,352 views / 150 follows), a contradiction of the viewer's public
+      image ("Everyone thinks you're calm…" 7,053) and a negation + Gita verse
+      (2,183 views in 13s). "You" is allowed; a vague feeling is not.
+      NEVER open with "Did you know", a slow setup, or a question.
     - CRITICAL: the hook is spoken FIRST. body[0] must CONTINUE from the hook and
       go DEEPER — do NOT repeat, restate, or paraphrase the hook line in body[0]
       (the viewer already heard it, so repeating it makes the voiceover say the
@@ -226,15 +342,20 @@ llm:
     - Land a "mind-blown" realization at ~70-80%, then a reflective close.
     - It must feel PROFOUND and CALM, like a truth being revealed — not hyped.
     Tone: calm, wise, intimate, slightly hypnotic — a voice you lean in to hear.
-    Audience: global English "seekers" 18-40 — into psychology, spirituality,
-    self-improvement, mindfulness, stoicism (US/UK/Canada/Australia/India-English).
+    Audience (MEASURED 2026-10-25 from the page's own 2,995 followers): the
+    English-speaking Hindu diaspora, mostly 35-54 (84% are 35+), 64% men — US 33%
+    (New York first), Trinidad & Tobago, Guyana, Canada, South Africa, Mauritius,
+    UK, India. They grew up with these gods. They want darshan, the scriptures
+    and pride in their tradition, with the psychology as the insight — never a
+    lecture and never a self-help diagnosis of what is wrong with them. Write
+    plain, warm English a 50-year-old takes in at a glance.
     Keep content about GODS-AS-PSYCHOLOGY. Do NOT drift into astrology, birth
     charts, planetary placements, or "comment your sign" — that is a DIFFERENT
-    audience. Borrow only the pain-first hook + personal comment-bait STYLE.
-    Always end by inviting them to "Subscribe to Gods of the Mind" + a PERSONAL
-    comment-bait that makes them reveal themselves (drives comments = reach):
-    vary it per video, tied to the video's god — e.g. "Which lives in you right
-    now: the destroyer, the protector, or the trickster? Comment it."
+    audience.
+    The SPOKEN close (cta) is ONE short choice question, max 14 words, tied to
+    this reel — e.g. "Tamas, Rajas or Sattva — which one ran your day? Comment
+    it." Do NOT speak a follow/subscribe ask: the caption adds it automatically,
+    and a spoken ask adds 10+ seconds nobody watches.
 
   image_style_guidance: |
     - PHRASE EVERY ATTRIBUTE AS A PRESENT OBJECT, NEVER AS AN ABSENCE. Write
@@ -261,6 +382,10 @@ llm:
       constellations, sacred geometry, galaxies, lotus, fire, water, shadow.
     - Dramatic chiaroscuro: deep dark background, divine golden/violet rim light.
     - Single awe-inspiring focal subject in 9:16. Profound, calm, premium.
+    - WHEN TWO FIGURES SHARE A FRAME (a god handing a weapon to Durga, Krishna
+      teaching Arjuna): both are shown complete and fully inside the frame, side by
+      side, with clear space around each — never one of them cut off at the edge.
+      The reel slowly zooms, so keep every figure inside the central 80%.
     - NO text, NO modern objects, NO cluttered scenes.
     - DEITY-DOMINANT, FRAME-FILLING (biggest visual lever — 2026-07-20): the
       DEITY (or a bold sacred symbol — weapon, vahana, yantra, murti) MUST be the
@@ -318,6 +443,8 @@ llm:
     1. title (≤80 chars, English, NO hashtags in title):
        ── HOOK RULES (2026-10-20 — derived from 20 reels of real FB per-post data,
        not opinion. Do not re-litigate without new data.) ─────────────────────
+       These apply inside every FORMAT; the FORMAT block in the user prompt
+       decides the reel's shape and length.
        MEASURED: 60% of viewers leave before 3 seconds (median 3-sec rate 40%).
        The hook is the ONLY thing that decides reach. Top 5 reels took 58% of all
        views; what separated them was shares (32/reel vs 3/reel), and shares come
@@ -360,7 +487,9 @@ llm:
 
        B) RELEVANCE. The frame must DRAMATISE THE LINE IT BELONGS TO. visuals[i]
           shows what body[i] is saying — the state, the action, the pressure in
-          that sentence — acted out by the deity.
+          that sentence — acted out by the deity. The hook gets NO picture of its
+          own (it plays over visuals[0]), so visuals[0] depicts body[0], never the
+          hook; a god named in body[i] must appear in visuals[i] (checked in code).
             body[i]: "the weight you have learned to carry alone"
               WRONG: "close-up portrait of Shiva, face centred, eyes calm"
               RIGHT: "Shiva alone on a bare peak, shoulders bearing a mass of
@@ -385,8 +514,8 @@ llm:
        When the topic allows it, build the video as 2-4 NAMED types the viewer
        places themselves in. Prefer this shape over a single-deity explainer.
 
-       Still-valid framing from the earlier teardown — felt-pain/identity FIRST,
-       god SECOND; the viewer must see THEMSELVES in the god, not learn a fact:
+       Title templates for the TYPOLOGY format (VERSE and DARSHAN titles state
+       their claim directly, e.g. "The Gita Says You Never Die 🕉️"):
          * "You [oddly-specific felt moment] — And It's Not [what you assume]"
          * "Why You [oddly-specific relatable behavior] (The Real Reason)"
          * "That [specific pain] Isn't [X] — It's [God/archetype]"
@@ -396,7 +525,7 @@ llm:
              "Shiva Is Not a God in the Sky — The Real Shiva 👁️"
 
     2. description (≤1500 chars):
-       Line 1: A pain-first hook in 2nd person ("you…") then the god + emoji.
+       Line 1: the reel's opening claim, then the god (or verse citation) + emoji.
        Line 2-3: tease the insight without fully giving it (curiosity gap).
        Line 4: reflective engagement question ("Which god lives in your mind?").
        Line 5 (verbatim): "Subscribe to Gods of the Mind — meet the god inside
@@ -411,21 +540,17 @@ llm:
        - Each line = ONE calm breath, 8-13 words, simple profound English.
        - STATEMENT → REFRAME → DEEPER TRUTH structure.
        - No hype words, no "you won't believe". Let the insight hit quietly.
-       - Build toward ONE clear realization; don't list 5 things.
+       - Build toward ONE clear realization; don't list 5 things (a TYPOLOGY
+         names its 2-4 types, one line each — that is the format, not a list).
 
-    4. cta:
-       - PERSONAL comment-bait that makes them out themselves (max comments =
-         max reach). Tie it to THIS video's god/theme and offer a choice, e.g.
-         "Which rules you right now — the destroyer, the protector, or the
-         trickster? Comment it." Vary every video; never reuse the same line.
-       - Then a SELF-MAP follow-ask (THE subscribe lever) that frames this video
-         as ONE part of the viewer now decoded, with more of them still un-met,
-         so following = completing the map of THEMSELVES. Vary it, tie it to the
-         god, e.g. "That's one god inside you. A different one is hiding in every
-         part of you — follow Gods of the Mind and we'll meet them all, one at a
-         time, until you see the whole of yourself." Use the verb "Follow" (reads
-         right on FB; = Subscribe on YouTube). Never skip it — this is what
-         converts the reach we already get into FOLLOWERS.
+    4. cta (SPOKEN — max 14 words, enforced in code by llm.cta_word_cap):
+       - ONE choice question tied to THIS reel, e.g. "Which rules you right now —
+         the destroyer, the protector, or the trickster? Comment it." Vary every
+         video; never reuse the same line.
+       - Do NOT speak a follow/subscribe ask. The caption already adds "Follow
+         Gods of the Mind — a new god decoded every day" (uploader_make_reel
+         FOLLOW_PROMISE). Follows track reach (r=0.91 over 82 reels), not the
+         ask, and a spoken ask costs 10+ seconds on a 20-second reel.
 
     5. hashtags (description only): always #GodsOfTheMind #Psychology
        #SanatanDharma #Spirituality #Philosophy #Consciousness #Shorts
@@ -486,7 +611,13 @@ video:
   caption_style: phrase
   music_volume: 0.09   # meditative bed slightly more present (you "lean in to listen")
   stings: false
-  duration_target_sec: 80
+  # 2026-10-26 (user: the punch-in opener felt abrupt): the hook gets its own
+  # picture (script hook_visual -> visuals[0], script_writer) and every picture
+  # change is a crossfade of this many seconds (assembler._xfade_plan keeps
+  # each picture starting on its own line).
+  hook_image: true
+  crossfade: 0.45
+  duration_target_sec: 30   # 2026-10-25: documentation only — no code reads this key; length is set by llm.length_spec + body_word_cap
   # ── OPENING 3 SECONDS (2026-10-20 FB audit) ─────────────────────────────────
   # Measured: median 3-second rate 40% — six of ten viewers leave before the
   # content starts, and average play time has NO correlation with reach

@@ -57,6 +57,13 @@ FORM_REQUIRED = {
     "ganesha": "the head of an ELEPHANT, with a trunk and large fan-like ears",
     "jagannath": "a stylised wooden temple murti with huge round eyes and an "
                  "abstract armless form, never a realistic human",
+    # 2026-10-26 (user: "krishna murli ek hath se kyu pakad rhe?"): the pinned
+    # reference itself held the flute in one hand and every scene copied it.
+    "krishna": "BOTH hands on the flute whenever a flute is at his lips (one near the "
+               "mouth, one further along it); no flute at all is also correct",
+    # 2026-10-25: a two-armed blue Vishnu read as Krishna in the Durga reel.
+    "vishnu": "FOUR arms (whenever his arms are in frame), holding a conch and the "
+              "Sudarshana chakra — a two-armed blue figure reads as Krishna",
 }
 
 MODEL = os.getenv("FRAME_CHECK_MODEL", "claude-haiku-5-5")
@@ -74,6 +81,7 @@ Return STRICT JSON, no prose:
   "garbled_text": true|false,    // any rendered lettering or watermark that is not real words
   "deity_undignified": true|false, // TRUE if the deity is shown WEEPING or with tears on the face, begging, defeated, humiliated, collapsed, slumped, or visibly breaking down. A fierce, grave or sorrowful EXPRESSION is fine; actual tears, a bowed-in-defeat posture or a face that reads as crying is NOT.
   "deity_dominant": true|false,  // TRUE only if a HINDU DEITY, or a bold sacred object (trishul, vahana, yantra, murti, conch, lotus-throne), is the LARGE dominant subject of this frame, clearly visible and taking up most of it. Answer FALSE for: an ordinary modern person, a small distant silhouette, a body part with no face or deity, an empty landscape, sky or room, an abstract light effect with no figure.
+  "face_in_top_band": true|false, // TRUE if ANY face (deity or person) is inside the TOP 30% of the image height, measured from the top edge
   "note": "one short sentence on anything clearly wrong"
 }}"""
 
@@ -137,7 +145,8 @@ def inspect(path: Path, scene: str = "", deity: str = "") -> dict | None:
         return None
 
 
-def check(path: Path, deity: str = "", scene: str = "") -> tuple[bool, list[str]]:
+def check(path: Path, deity: str = "", scene: str = "",
+          title_band: bool = False, require_deity: bool = True) -> tuple[bool, list[str]]:
     """(ok, reasons). ok is True when nothing disqualifying was SEEN.
 
     An unavailable checker returns ok=True with a reason noting it did not run,
@@ -156,7 +165,9 @@ def check(path: Path, deity: str = "", scene: str = "") -> tuple[bool, list[str]
         bad.append(f"facial hair on {d} (canon: bare jaw)")
     if d in GODDESSES and v.get("torso_covered") is False:
         bad.append(f"{d} is not clothed")
-    if v.get("is_child"):
+    # About deities only: a story frame (require_deity=False, no deity named)
+    # may show a young devotee — Markandeya is sixteen.
+    if v.get("is_child") and (d or require_deity):
         bad.append("deity rendered as a child")
     # Only a 0 fails. A boolean here was tried both ways on 2026-10-21 and
     # neither worked: strict rejected a good Hanuman over where he held a
@@ -174,7 +185,11 @@ def check(path: Path, deity: str = "", scene: str = "") -> tuple[bool, list[str]
     # a light beam, a bare torso, a woman's profile made of clouds). Every one of
     # those is already BANNED in images.image_style_guidance — in prose, which
     # does not run. The user's words: "images bhagwaan wali feeling nahi de rahe".
-    if v.get("deity_dominant") is False:
+    # 2026-10-26: except a STORY frame — the script's own character in the
+    # situation its line describes (Arjuna dropping the Gandiva). Forcing the
+    # deity there put a flute-playing Krishna on every line ("waha situational
+    # image daalo"). image_gen decides which frames are story frames.
+    if require_deity and v.get("deity_dominant") is False:
         bad.append("no deity or sacred symbol dominates the frame")
     # A deity is never shown broken. The writer put "eyes fierce yet holding
     # quiet grief" into a Durga close-up on 2026-10-21 and FLUX drew visible
@@ -183,4 +198,8 @@ def check(path: Path, deity: str = "", scene: str = "") -> tuple[bool, list[str]
     # AROUND the deity, never on the deity's face.
     if v.get("deity_undignified"):
         bad.append("deity shown weeping/defeated — never canonical")
+    # The hook picture carries the cover title in its top band (2026-10-26:
+    # "chera pe hi letter aa rha"). A face there would sit under the title.
+    if title_band and v.get("face_in_top_band"):
+        bad.append("face in the title band (top 30%) — the cover title would cover it")
     return (not bad), (bad or [v.get("note") or "ok"])

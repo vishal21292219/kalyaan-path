@@ -105,6 +105,74 @@ def _compute_image_durations(voice_path: Path, n_images: int, total_duration: fl
     return durations
 
 
+def _line_synced_durations(script: dict, boundaries: list, n_images: int,
+                           total_duration: float) -> list[float] | None:
+    """Image i on screen exactly while body[i] is narrated, from word timings.
+
+    tts.py speaks hook + body + cta in that order and ElevenLabs returns one
+    timing per word (the .words.json sidecar). Image 0 also covers the hook;
+    the last image runs to the end (cta + tail). Returns None — caller keeps
+    its old timing — unless the spoken words line up one-to-one with the
+    script, so a mismatch can never shift pictures onto the wrong line.
+    Added 2026-10-25: GoM never got sentence-synced images (no sentences.json
+    on ElevenLabs) and "Shiva gave his trident" played over a Vishnu frame."""
+    import re as _re
+    body = [str(b) for b in (script.get("body") or [])]
+    # hook_image: picture 0 is the hook's own (script_writer prepends it), so
+    # there is one more picture than body lines and it covers only the hook.
+    hook_pic = bool(script.get("hook_image"))
+    if not boundaries or n_images <= 0 or n_images != len(body) + (1 if hook_pic else 0):
+        return None
+    has_word = lambda t: bool(_re.search(r"\w", str(t)))
+    words = [b for b in boundaries if has_word(b.get("text", ""))]
+    count = lambda t: sum(1 for x in str(t).split() if has_word(x))
+    sizes = [count(script.get("hook", ""))] + [count(b) for b in body] + [count(script.get("cta", ""))]
+    if sum(sizes) != len(words):
+        return None
+    starts, idx = [], sizes[0]
+    for size in sizes[1:-1]:
+        if idx >= len(words):
+            return None
+        starts.append(float(words[idx]["start"]))
+        idx += size
+    starts = ([0.0] + starts) if hook_pic else ([0.0] + starts[1:])
+    edges = starts + [float(total_duration)]
+    durations = [edges[i + 1] - edges[i] for i in range(n_images)]
+    if min(durations) < 0.5:
+        return None
+    return durations
+
+
+def _xfade_plan(durations: list[float], fade: float) -> tuple[list[float], list[float], float]:
+    """Clip lengths and xfade offsets that keep every picture on its line.
+
+    Each picture except the last is rendered `fade` seconds longer, and picture
+    k starts fading in exactly at its scheduled start S_k (= sum of the earlier
+    durations). The output length stays sum(durations), so narration sync and
+    total length are unchanged. The fade shrinks for very short scenes."""
+    n = len(durations)
+    if n < 2 or fade <= 0:
+        return list(durations), [], 0.0
+    fade = min(fade, 0.5 * min(durations))
+    lens = [d + fade for d in durations[:-1]] + [durations[-1]]
+    offsets, t = [], 0.0
+    for d in durations[:-1]:
+        t += d
+        offsets.append(t)
+    return lens, offsets, fade
+
+
+def _effective_opener(opener: str, line_synced: bool, hook_image: bool) -> str:
+    """Which opener actually runs. A line-synced reel never gets the ramp (it
+    re-times scenes and breaks sync) and never the punch-in "cuts" either —
+    the user found three hard zooms into one picture abrupt (2026-10-26). With
+    a hook picture the hook itself is the new frame inside the first seconds."""
+    opener = (opener or "").lower()
+    if line_synced and opener in ("ramp", "images"):
+        return "none"
+    return opener
+
+
 def _audio_duration(path: Path) -> float:
     out = subprocess.check_output(
         [
@@ -325,6 +393,27 @@ _EN_KEY = {
 }
 
 
+def _phrase_windows(phrases: list[dict]) -> list[tuple[float, float]]:
+    """(start, end) on-screen window for each phrase caption.
+
+    Each caption appears 0.05s before its first word and persists until the
+    NEXT caption appears, so it stays up through speech pauses (the narration
+    has ~29% pause time). Windows never overlap: before 2026-10-25 a caption
+    ended 0.02s before the next WORD while the next caption started 0.05s
+    before it, and short phrases were stretched to 0.4s regardless, so two
+    captions sat on screen together ("Sudthunderbolt kra")."""
+    starts = [max(0.0, p["start"] - 0.05) for p in phrases]
+    out = []
+    for i, p in enumerate(phrases):
+        s = starts[i]
+        nxt = starts[i + 1] if i + 1 < len(phrases) else None
+        e = nxt if nxt is not None else p["end"] + 0.6
+        if e - s < 0.4:
+            e = s + 0.4 if nxt is None else min(s + 0.4, nxt)
+        out.append((s, max(e, s + 0.01)))
+    return out
+
+
 def _render_phrase_png_colored(text: str, width: int, font_size: int, out: "Path") -> "Path":
     """Render a caption phrase with PER-WORD colour: white base, yellow for key
     words / numbers (same rules as _word_style), bold black stroke. Gives the
@@ -461,8 +550,66 @@ def _apply_caption_batches(base: "Path", entries: list, work: "Path", BR: str,
     return cur
 
 
+def _cover_words(text: str) -> list[tuple[str, bool]]:
+    """ "NEVER *BORN*" -> [("NEVER", False), ("BORN", True)] — *word* = yellow."""
+    out = []
+    for tok in str(text or "").split():
+        key = tok.startswith("*") and tok.rstrip(".,!?").endswith("*")
+        out.append((tok.replace("*", "").upper(), key))
+    return [(w, k) for w, k in out if w]
+
+
+def _render_cover_png(text: str, width: int, out: "Path", font_size: int = 150) -> "Path":
+    """The opening-frame title (= the FB thumbnail title): 2-4 huge words,
+    white with one yellow keyword, heavy outline + soft shadow, at most two
+    lines, sized to sit in the top band the hook picture leaves open."""
+    words = _cover_words(text)
+    max_w = width - 120
+    size = font_size
+    while True:
+        font = _find_font(size)
+        space = font.getlength(" ")
+        lines, cur, cur_w = [], [], 0.0
+        for w, k in words:
+            ww = font.getlength(w)
+            if cur and cur_w + space + ww > max_w:
+                lines.append(cur); cur, cur_w = [], 0.0
+            cur.append((w, k, ww)); cur_w += (space if len(cur) > 1 else 0) + ww
+        if cur:
+            lines.append(cur)
+        widest = max((sum(x[2] for x in ln) + space * (len(ln) - 1)) for ln in lines) if lines else 0
+        if (len(lines) <= 2 and widest <= max_w) or size <= 70:
+            break
+        size -= 10
+    line_h = int(size * 1.12)
+    h = line_h * max(1, len(lines)) + 60
+    img = Image.new("RGBA", (width, h), (0, 0, 0, 0))
+    shadow = Image.new("RGBA", (width, h), (0, 0, 0, 0))
+    d, ds = ImageDraw.Draw(img), ImageDraw.Draw(shadow)
+    y = 24
+    for ln in lines:
+        lw = sum(x[2] for x in ln) + space * (len(ln) - 1)
+        x = (width - lw) / 2
+        for w, k, ww in ln:
+            ds.text((x + 6, y + 8), w, font=font, fill=(0, 0, 0, 210))
+            d.text((x, y), w, font=font, fill=(255, 214, 64) if k else (255, 255, 255),
+                   stroke_width=max(6, size // 14), stroke_fill=(0, 0, 0, 255))
+            x += ww + space
+        y += line_h
+    shadow = shadow.filter(ImageFilter.GaussianBlur(10))
+    Image.alpha_composite(shadow, img).save(out)
+    return out
+
+
+def _cover_window(script: dict, durations: list[float]) -> tuple[float, float]:
+    """Cover title is on screen while the hook picture is (or the first 2.5s)."""
+    first = float(durations[0]) if durations else 2.5
+    return (0.0, first if script.get("hook_image") else min(2.5, first))
+
+
 def _apply_brand_overlays(base: "Path", work: "Path", BR: str, cfg: dict,
-                          script: dict, W: int, H: int, duration: float) -> "Path":
+                          script: dict, W: int, H: int, duration: float,
+                          cover_end: float | None = None) -> "Path":
     """OPTIONAL on-screen brand + retention overlays, gated by `video.brand_overlays`
     and FULLY guarded. Adds a small persistent channel WORDMARK (brand recall →
     follows) in the top-left corner.
@@ -475,23 +622,43 @@ def _apply_brand_overlays(base: "Path", work: "Path", BR: str, cfg: dict,
     if not cfg.get("video", {}).get("brand_overlays"):
         return base
     try:
-        entries = []  # (png, x_expr, y_expr, start, end)
+        entries = []  # (png, x_expr, y_expr, start, end, fade_out)
         # Persistent wordmark (brand "bug"), small, top-left, whole video.
         mark = ((cfg.get("branding", {}) or {}).get("channel_handle") or "").strip()
         if mark:
             mp = work / "brand_mark.png"
             _render_caption_png(mark, W, 40, 0.0, mp)
-            entries.append((mp, "40", "46", 0.0, max(float(duration), 1.0)))
+            entries.append((mp, "40", "46", 0.0, max(float(duration), 1.0), False))
+        # Opening-frame title (= thumbnail title), 2026-10-26. Top band, below
+        # the wordmark, over the hook picture only; fades as the hook ends.
+        cover = str(script.get("cover_text") or "").strip()
+        if cover:
+            cp = _render_cover_png(cover, W, work / "cover.png")
+            ce = float(cover_end) if cover_end else 2.5
+            entries.append((cp, "(W-w)/2", str(int(H * 0.085)), 0.0, ce, True))
+        # Authority on screen: the verse a VERSE reel cites, last 3 seconds.
+        cite = str(script.get("citation") or "").strip()
+        if cite:
+            sp = work / "citation.png"
+            _render_caption_png(f"— {cite}", W, 64, 0.0, sp)
+            entries.append((sp, "(W-w)/2", str(int(H * 0.80)),
+                            max(0.0, float(duration) - 3.0), float(duration), False))
         if not entries:
             return base
         cur = base
-        for i, (png, x, y, s, e) in enumerate(entries):
+        for i, (png, x, y, s, e, fade) in enumerate(entries):
             out = work / f"brandov_{i:02d}.mp4"
+            enable = f"enable='between(t\\,{s:.3f}\\,{e:.3f})'"
+            if fade:
+                src = ["-loop", "1", "-t", f"{e:.3f}", "-i", str(png)]
+                graph = (f"[1:v]format=rgba,fade=t=out:st={max(0.0, e - 0.35):.3f}:d=0.35:"
+                         f"alpha=1[ov];[0:v][ov]overlay=x={x}:y={y}:{enable}[v]")
+            else:
+                src = ["-i", str(png)]
+                graph = f"[0:v][1:v]overlay=x={x}:y={y}:{enable}[v]"
             _run([
-                "ffmpeg", "-y", "-i", str(cur), "-i", str(png),
-                "-filter_complex",
-                f"[0:v][1:v]overlay=x={x}:y={y}:"
-                f"enable='between(t\\,{s:.3f}\\,{e:.3f})'[v]",
+                "ffmpeg", "-y", "-i", str(cur), *src,
+                "-filter_complex", graph,
                 "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast",
                 "-crf", "16", "-pix_fmt", "yuv420p", str(out),
             ])
@@ -767,7 +934,22 @@ def assemble(
     # actually matches the line being narrated. Falls back to equal split if
     # the sentences.json sidecar isn't available (e.g., for ElevenLabs).
     image_durations = _compute_image_durations(voice_path, n, duration)
-    if image_durations is None:
+    # Line-synced timing from the ElevenLabs word timings wins when it lines up.
+    line_synced = None
+    if not long_form:
+        try:
+            _wj = voice_path.with_suffix(".words.json")
+            if _wj.exists():
+                import json as _json
+                line_synced = _line_synced_durations(
+                    script, _json.loads(_wj.read_text(encoding="utf-8")), n, duration)
+        except Exception as e:
+            print(f"[assembler] line sync skipped ({type(e).__name__}: {e})")
+    if line_synced:
+        image_durations = line_synced
+        print(f"[assembler] image timing: line-synced to narration "
+              f"(durations {[round(d, 2) for d in image_durations]})")
+    elif image_durations is None:
         per_uniform = duration / n
         image_durations = [per_uniform] * n
         print(f"[assembler] image timing: equal split ({per_uniform:.2f}s each)")
@@ -795,7 +977,15 @@ def assemble(
     # held for ten seconds. A linear ramp keeps consecutive scenes within about
     # 1.2-1.6x of each other, so the pace eases off instead of stopping dead,
     # while a new picture still arrives at ~1.5s and again at ~4s.
-    if str(cfg.get("video", {}).get("opener", "")).lower() == "ramp" and n >= 4:
+    # Ramp re-times every scene on a fixed curve, which would undo line sync —
+    # so a line-synced reel gets the sync-safe "cuts" opener on scene 0 instead
+    # (a new framing inside the first three seconds, same picture, same timing).
+    _opener = _effective_opener(str(cfg.get("video", {}).get("opener", "")),
+                                bool(line_synced), bool(script.get("hook_image")))
+    if line_synced and _opener == "none":
+        print("[opener] line-synced — no ramp/punch-ins; "
+              + ("the hook has its own picture" if script.get("hook_image") else "plain Ken Burns"))
+    if _opener == "ramp" and n >= 4:
         FIRST = 1.5
         # d_i = FIRST + i*b, chosen so the durations still sum to the narration.
         b = (duration - n * FIRST) / (n * (n - 1) / 2)
@@ -811,7 +1001,7 @@ def assemble(
             print(f"[opener] ramp skipped — {n} scenes do not fit "
                   f"{FIRST:.1f}s each in {duration:.1f}s")
 
-    if str(cfg.get("video", {}).get("opener", "")).lower() == "images" and n >= 4:
+    if _opener == "images" and n >= 4:
         HEAD, K = 1.2, 3
         head_total = sum(image_durations[:K])
         if head_total > HEAD * K + 1.0:
@@ -839,9 +1029,13 @@ def assemble(
     # (visible window covered only 25% of the image content).
     clips: list[Path] = []
     n_scenes = len(image_paths)
+    # Crossfade (video.crossfade seconds): every clip but the last is rendered
+    # longer by the fade so the pictures overlap without moving off their lines.
+    _xf = 0.0 if long_form else float(cfg.get("video", {}).get("crossfade") or 0)
+    clip_lens, xf_offsets, xf_fade = _xfade_plan([max(0.5, d) for d in image_durations], _xf)
     for i, img in enumerate(image_paths):
         clip = work / f"clip_{i:02d}.mp4"
-        per = max(0.5, image_durations[i])  # min 0.5s per image
+        per = clip_lens[i]  # = max(0.5, duration) (+ fade when crossfading)
 
         # Hero scene: splice a real generative video clip (Kling v3) at this
         # scene's audio-synced duration instead of a Ken Burns still.
@@ -871,7 +1065,7 @@ def assemble(
 
         # Opening cuts (video.opener: "cuts") — scene 0 only, free, no extra
         # assets. Absent from a config -> unchanged behaviour everywhere else.
-        if i == 0 and str(cfg.get("video", {}).get("opener", "")).lower() == "cuts":
+        if i == 0 and _opener == "cuts":
             cut_clip = _opening_cuts_clip(img, per, W, H, FPS, work)
             if cut_clip:
                 print(f"[opener] scene 1 → hard cuts ({per:.2f}s total)")
@@ -903,15 +1097,41 @@ def assemble(
         ])
         clips.append(clip)
 
-    # 2. Concat slides
-    concat_list = work / "concat.txt"
-    concat_list.write_text("\n".join(f"file '{c.name}'" for c in clips))
+    # 2. Join slides — crossfaded when configured, else a straight concat.
     slides = work / "slides.mp4"
-    _run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-        "-i", str(concat_list),
-        "-c", "copy", str(slides),
-    ])
+    joined = False
+    if xf_fade > 0 and len(clips) > 1:
+        try:
+            graph, last = [], "0:v"
+            for k, off in enumerate(xf_offsets, start=1):
+                out = f"x{k}"
+                graph.append(f"[{last}][{k}:v]xfade=transition=fade:duration={xf_fade:.3f}:"
+                             f"offset={off:.3f}[{out}]")
+                last = out
+            _run(["ffmpeg", "-y", *sum((["-i", str(c)] for c in clips), []),
+                  "-filter_complex", ";".join(graph), "-map", f"[{last}]",
+                  "-r", str(FPS), "-c:v", "libx264", "-preset", "veryfast",
+                  "-pix_fmt", "yuv420p", str(slides)])
+            joined = True
+            print(f"[assembler] crossfade {xf_fade:.2f}s between {len(clips)} pictures")
+        except Exception as e:
+            print(f"[assembler] crossfade failed ({e}) — falling back to hard cuts")
+    if not joined:
+        concat_list = work / "concat.txt"
+        lines = []
+        for k, c in enumerate(clips):
+            lines.append(f"file '{c.name}'")
+            if xf_fade > 0 and k < len(clips) - 1:
+                # Clips were rendered longer for the fade; trim back to schedule.
+                lines.append(f"outpoint {clip_lens[k] - xf_fade:.3f}")
+        concat_list.write_text("\n".join(lines))
+        _run([
+            "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+            "-i", str(concat_list),
+            *(["-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p"]
+              if xf_fade > 0 else ["-c", "copy"]),
+            str(slides),
+        ])
 
     # 3. Compose overlays. For shloka_episode mode: top "Shloka N" badge
     # (persistent) + centered Sanskrit verse (also persistent), no scrolling
@@ -1023,19 +1243,9 @@ def assemble(
                 # phrase white+yellow and apply them later in ffmpeg-safe BATCHES
                 # (see _apply_caption_batches). Timing comes from real word
                 # boundaries, so captions stay perfectly in sync.
-                for i, p in enumerate(phrases):
+                for i, (p, (p_start, p_end)) in enumerate(zip(phrases, _phrase_windows(phrases))):
                     png = work / f"phrase_{i:04d}.png"
                     _render_phrase_png_colored(p["text"], W, int(font_size * 1.25), png)
-                    p_start = max(0.0, p["start"] - 0.05)
-                    # Persist each caption until the NEXT phrase begins, so captions
-                    # stay on screen THROUGH speech pauses (no blank gaps — the
-                    # narration has ~29% pause time where captions used to vanish).
-                    if i + 1 < len(phrases):
-                        p_end = phrases[i + 1]["start"] - 0.02
-                    else:
-                        p_end = p["end"] + 0.6
-                    if p_end - p_start < 0.4:
-                        p_end = p_start + 0.4
                     phrase_batch_entries.append((png, p_start, p_end))
                 used_words = True
                 boundaries = []  # skip the word-by-word branch below
@@ -1139,7 +1349,8 @@ def assemble(
 
     # OPTIONAL on-screen brand + retention overlays (gated by video.brand_overlays,
     # fully guarded — see _apply_brand_overlays). Isolated pass after captions.
-    _branded = _apply_brand_overlays(slides_subbed, work, BR, cfg, script, W, H, duration)
+    _branded = _apply_brand_overlays(slides_subbed, work, BR, cfg, script, W, H, duration,
+                                     cover_end=_cover_window(script, image_durations)[1])
     if _branded != slides_subbed:
         shutil.copy(_branded, slides_subbed)
 

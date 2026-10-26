@@ -119,16 +119,25 @@ Rules:
     weeping deeply wrong, and it had to be thrown away. Do not write grief,
     tears, sorrow, weeping, brokenness, bending under weight, or defeat into any
     deity's face, body or posture. Ever.
-  * 🔱 EVERY visuals[] FRAME MUST SHOW THE DEITY. A line about modern life is
-    still a DEITY frame — put the god in it and let the modern feeling show
-    THROUGH him, never instead of him. If body[i] is "you scroll until the day
-    dissolves", visuals[i] is NOT "a lone silhouette lit by a phone screen" —
-    it is the deity filling the frame with that emptiness around him.
-    BANNED in every frame, no exceptions: a small distant silhouette of a modern
-    person, an empty landscape or sky or room, a body part with no deity, an
-    abstract light effect with nobody in it, a stock-photo human. These read as
-    self-help stock, they are what the audience does NOT come for, and a frame
-    with no deity is rejected by the pipeline and regenerated at cost.
+  * 🔱 WHICH FRAMES SHOW THE DEITY (user rule, 2026-10-26).
+    - MESSAGE LINE — the line names the god, or carries his teaching or words
+      (a verse, "Krishna said", the sattvic/rajasic/tamasic definitions, "take
+      refuge in me"): the god MUST be in that picture, large and clear.
+    - STORY LINE — what happened to Arjuna, Markandeya, Nachiketa, a devotee:
+      show THAT situation literally (Arjuna's hands as the Gandiva slips), in
+      a Pauranik setting. Do not paste the god over someone else's moment.
+    - LIFE LINE — "the scroll", "the workout you avoid": show that relatable
+      situation, with the god's reference in the frame (his sign — peacock
+      feather and flute for Krishna, trishul and crescent for Shiva — a murti,
+      a diya, or his faint presence). The situation is the subject.
+    - Krishna in any Gita / Kurukshetra scene is the charioteer: reins, no flute.
+    - FLAW LINE — "one had tapas but anger owned him": the one with the flaw
+      is an UNNAMED mortal (sage, king, scholar) with NO deity marks — never
+      a trishul, blue skin, jata or divine crown. Drawing Shiva for "anger
+      owned him" (Lakshmi reel, 2026-10-26) reads as "Shiva's flaw is anger".
+    BANNED in every frame: a stock-photo human with no sacred reference at all,
+    a small distant silhouette, an empty landscape or sky or room, an abstract
+    light effect with nobody in it.
   * In visuals[], refer to each recurring character by the SAME "name" word
     you put in the bible (and list any other words used as "aliases"), so the
     pipeline can tell which scenes show them. Describe their ACTION/pose/
@@ -462,14 +471,55 @@ CRITICAL: Generate a 20-25 minute documentary-style script.
 - hashtags: 12-15 mix
 
 Return ONLY the JSON object."""
+    # Per-niche reel FORMAT (only niches with llm.formats — GoM). Guarded: a
+    # niche with no config file (bhakti/itihaas defaults) simply gets none.
+    fmt = None
+    if not long_form:
+        try:
+            fmt = pick_format(load_config(niche), topic)
+        except Exception:
+            fmt = None
+
     hook_block = ""
     if topic.get("hook") and topic.get("kind") in ("viral", "mantra"):
-        hook_block = (
-            f"\nVIRAL ANGLE (build the whole video around THIS specific hook — it is the "
-            f"reason this topic is trending, do NOT drift to a generic overview):\n"
-            f"  → {topic['hook']}\n"
-            f"Open body[0] on this exact dramatic point.\n"
+        if fmt:
+            # The pool's hooks were written for the old 2nd-person pain format;
+            # keep the insight, let the FORMAT decide the opening line.
+            hook_block = (
+                f"\nTOPIC ANGLE (the insight this reel is about — use it, but do NOT "
+                f"copy this sentence as the opening; the FORMAT below decides the "
+                f"opening line):\n"
+                f"  → {topic['hook']}\n"
+            )
+        else:
+            hook_block = (
+                f"\nVIRAL ANGLE (build the whole video around THIS specific hook — it is the "
+                f"reason this topic is trending, do NOT drift to a generic overview):\n"
+                f"  → {topic['hook']}\n"
+                f"Open body[0] on this exact dramatic point.\n"
+            )
+
+    format_block = ""
+    if fmt:
+        format_block = (
+            f"\nFORMAT FOR THIS REEL: {fmt['key'].upper()} (MANDATORY — it overrides any "
+            f"other structure or length guidance; the next reel uses a different format)\n"
+            f"{fmt['brief'].strip()}\n"
         )
+        format_block += (
+            "Also return \"hook_visual\": ONE image prompt for the HOOK line alone — it is "
+            "on screen while the hook is spoken, before visuals[0], and it is the reel's "
+            "THUMBNAIL. Show the famous deity the hook names (or the scene the hook sets), "
+            "large, complete and vivid, with the face in the lower two thirds and the top "
+            "third of the frame open (sky, halo, temple glow) because a title sits there. "
+            "visuals[] stays exactly one per body line.\n"
+            "Also return \"cover_text\": the 2-4 word ALL-CAPS title printed over that top "
+            "third — a punchy contradiction or claim, NOT a copy of the spoken hook. Wrap the "
+            "one keyword in *asterisks* (it turns yellow). e.g. \"YOU NEVER *DIED*\", "
+            "\"EVERY GOD. *ONE* GODDESS.\", \"*THREE* MINDS\".\n")
+        if fmt.get("verses"):
+            format_block += "VERIFIED VERSES (cite ONE of these, exactly as written):\n" + "".join(
+                f"  - {v['ref']} — {v['meaning']}\n" for v in fmt["verses"])
 
     series_block = ""
     if topic.get("kind") == "series":
@@ -544,7 +594,7 @@ above — a tight reel keeps retention; a long slow one gets swiped):
 Kind: {topic.get('kind', 'general')}
 Tags: {', '.join(topic.get('tags', []))}
 Niche: {niche}
-{hook_block}{series_block}{variety_block}
+{hook_block}{format_block}{series_block}{variety_block}
 Reference facts (from Wikipedia, may be long — distill the essentials):
 \"\"\"
 {context}
@@ -787,6 +837,257 @@ def _hook_violation(script: dict, niche: str) -> str | None:
     return None
 
 
+def pick_format(cfg: dict, topic: dict) -> dict | None:
+    """The reel FORMAT for this topic, or None when the niche defines none.
+
+    configs/<niche>.yaml llm.formats is an ordered list of {key, brief}. Only
+    GoM has one (2026-10-25 audit: typology / verse / darshan). scripts/
+    batch_reels.py sets REEL_FORMAT_INDEX to the batch position so a batch
+    rotates A→B→C strictly; a single run without it falls back to a stable hash
+    of the topic title, so the same topic always gets the same format."""
+    formats = [f for f in (((cfg or {}).get("llm") or {}).get("formats") or [])
+               if isinstance(f, dict) and f.get("key") and f.get("brief")]
+    if not formats:
+        return None
+    try:
+        i = int(os.environ["REEL_FORMAT_INDEX"])
+    except (KeyError, ValueError):
+        import hashlib
+        i = int(hashlib.md5(str(topic.get("title", "")).encode()).hexdigest(), 16)
+    return formats[i % len(formats)]
+
+
+# Deities a stranger recognises on sight — the DARSHAN format must open on one.
+_FAMOUS_DEITIES = (
+    "durga", "kali", "shiva", "mahadev", "hanuman", "krishna", "ganesha", "ganesh",
+    "bhairav", "vishnu", "lakshmi", "rama", "ram", "saraswati", "parvati",
+    "narasimha", "yama", "brahma", "indra",
+)
+# "Bhagavad Gita 2.20", "Gita (2:20)", "Gita, chapter 2, verse 20",
+# "Chandogya Upanishad 6.8.7", "Isha Upanishad 1" -> ("gita", "2.20") etc.
+_CITATION_RE = re.compile(
+    r"\b(bhagavad\s+gita|gita|chandogya|brihadaranyaka|katha|mundaka|isha|mandukya|"
+    r"taittiriya|kena|prashna)(?:\s+upanishad)?[\s,(]*(?:chapter\s*)?(\d+)"
+    r"(?:\s*(?:[.:]|,?\s*verse)\s*(\d+))?(?:\s*[.:]\s*(\d+))?", re.I)
+
+
+def _citations(text: str) -> set[tuple[str, str]]:
+    """{(text, "chapter.verse")} for every scripture citation in `text`; the
+    Gita's two spellings collapse to one key and ":"/"verse" become "."."""
+    out = set()
+    # Hashtags are not citations: "#Gita220" read as Gita 220 (debug run).
+    text = re.sub(r"#\w+", " ", text or "")
+    for name, *nums in _CITATION_RE.findall(text):
+        key = "gita" if "gita" in name.lower() else name.lower()
+        out.add((key, ".".join(n for n in nums if n)))
+    return out
+
+
+# Names that can appear in a line and its picture, grouped so an alias in the
+# visual ("Mahadev") still counts for the god in the line ("Shiva").
+_GOD_GROUPS = {
+    "shiva": ("shiva", "mahadev", "shankar", "rudra", "bholenath"),
+    "vishnu": ("vishnu", "narayana", "narayan"),
+    "krishna": ("krishna", "govinda", "keshava", "kanha"),
+    "rama": ("rama", "ram", "raghav"),
+    "durga": ("durga", "sherawali"),
+    "kali": ("kali", "mahakali"),
+    "hanuman": ("hanuman", "bajrangbali", "maruti"),
+    "ganesha": ("ganesha", "ganesh", "ganapati", "vinayaka"),
+    "lakshmi": ("lakshmi",), "saraswati": ("saraswati",), "parvati": ("parvati",),
+    "brahma": ("brahma",), "indra": ("indra",), "yama": ("yama", "yamraj"),
+    "bhairav": ("bhairav", "bhairava"), "narasimha": ("narasimha",),
+    "varuna": ("varuna",), "agni": ("agni",), "surya": ("surya",), "arjuna": ("arjuna",),
+}
+
+
+# Openers measured as the median-or-worse shape on GoM (82 reels, 2026-10-25):
+# a vague mood with nothing to push against. "You are not…" / "You destroy…"
+# (specific act or contradiction) stay allowed.
+_GENERIC_OPENER = re.compile(
+    r"^(you feel\b|you are surrounded\b|you have the (power|strength)\b|you're being pulled\b)", re.I)
+
+
+def _gods_in(text: str) -> set[str]:
+    t = (text or "").lower()
+    return {g for g, names in _GOD_GROUPS.items()
+            if any(re.search(rf"\b{n}\b", t) for n in names)}
+
+
+def _visual_out_of_step(script: dict) -> str | None:
+    """A line that names a god must have that god in its own picture.
+
+    Durga render 2 (2026-10-25): visuals[0] drew the hook's Durga instead of
+    body[0]'s Shiva, so every picture landed one line late."""
+    body = script.get("body") or []
+    visuals = script.get("visuals") or []
+    for i, line in enumerate(body):
+        if i >= len(visuals):
+            break
+        named = _gods_in(str(line))
+        if named and not (named & _gods_in(str(visuals[i]))):
+            return (f"visual {i} does not show {', '.join(sorted(named))}, who body[{i}] names — "
+                    f"visuals[i] must depict body[i] (the hook plays over visuals[0] too, "
+                    f"it gets no picture of its own)")
+    return None
+
+
+# A line that carries the god's teaching or message — his picture is mandatory
+# there (user, 2026-10-26: "jab bhagwaan ki baat and unka koi msg ho to waha
+# bhagwaan ki photo mandatory hai"). Every other line may show its own
+# situation, inside the god's reference (image_gen._force_deity).
+_TEACHING = re.compile(
+    r"\b(gita|upanishad\w*|veda\w*|purana\w*|verse|shloka|sattv\w*|rajas\w*|tamas\w*|guna\w*|"
+    r"dharma|atman|brahman|moksha|refuge|surrender)\b", re.I)
+_SPEECH = re.compile(
+    r"\b(said|says|spoke|speaks|told|tells|taught|teaches|promised?|promises|named|names|"
+    r"calls?|answered|replied|declared?|declares)\b", re.I)
+_NOT_GODS = {"arjuna"}
+
+
+def _message_lines(body: list) -> list[int]:
+    """Indexes of body lines that are the god's teaching or message: the line
+    names a god, quotes scripture terms, or continues a line where a god
+    starts speaking ("Then Krishna spoke —" / "arise, ...")."""
+    out = []
+    speaking = False
+    for i, line in enumerate(body or []):
+        t = str(line or "")
+        gods = _gods_in(t) - _NOT_GODS
+        if gods or _TEACHING.search(t) or speaking:
+            out.append(i)
+        speaking = bool(gods and _SPEECH.search(t) and t.rstrip().endswith(("—", "-", ":", ",")))
+    return out
+
+
+def _lead_god(script: dict) -> str:
+    counts: dict[str, int] = {}
+    for t in [script.get("hook"), *(script.get("body") or [])]:
+        for g in _gods_in(str(t or "")) - _NOT_GODS:
+            counts[g] = counts.get(g, 0) + 1
+    return max(counts, key=counts.get) if counts else ""
+
+
+def _enforce_deity_visuals(script: dict) -> None:
+    """Put the god in the picture of every message line (body[i] -> visuals[i],
+    before the hook picture is prepended). Situation lines are left alone."""
+    lead = _lead_god(script)
+    if not lead:
+        return
+    visuals = list(script.get("visuals") or [])
+    body = script.get("body") or []
+    for i in _message_lines(body):
+        if i >= len(visuals):
+            break
+        if _gods_in(str(visuals[i])) - _NOT_GODS:
+            continue
+        name = (_gods_in(str(body[i])) - _NOT_GODS or {lead}).pop()
+        visuals[i] = (f"{name.title()}, large and clearly visible, conveying this teaching — "
+                      f"{visuals[i]}")
+    script["visuals"] = visuals
+
+
+_GITA = re.compile(r"\b(gita|arjuna|kurukshetra|chariot|partha|gandiva)\b", re.I)
+
+
+def _gita_refs(script: dict) -> None:
+    """A Gita / Kurukshetra script uses the charioteer Krishna (no flute) in
+    every format, not only the verse format's ref_overrides (2026-10-26: Arjuna
+    reel showed a flute-playing Krishna on the battlefield)."""
+    text = " ".join([str(script.get("hook") or ""), *map(str, script.get("body") or []),
+                     *map(str, script.get("visuals") or [])])
+    if not _GITA.search(text):
+        return
+    for ch in script.get("character_bible") or []:
+        if str(ch.get("name", "")).strip().lower() == "krishna" and not ch.get("ref"):
+            ch["ref"] = "krishna_sarathi"
+
+
+def _format_violation(script: dict, fmt: dict | None) -> str | None:
+    """Why this script breaks its FORMAT (llm.formats), or None if it fits.
+
+    Added after the first live run (2026-10-25): the VERSE reel cited "the Devi
+    Bhagavata" in 82 words and the DARSHAN reel opened on a psychology line with
+    no deity. Checks only what can be checked without a second model call."""
+    if not fmt:
+        return None
+    hook = str(script.get("hook") or "")
+    body = [str(b) for b in (script.get("body") or [])]
+    cta = str(script.get("cta") or "")
+    words = len(" ".join([hook, *body, cta]).split())
+    budget = int(fmt.get("max_words") or 0)
+    if budget and words > budget * 1.2:
+        return f"{words} spoken words, the {fmt['key']} budget is {budget}"
+    step = _visual_out_of_step(script)
+    if step:
+        return step
+    hv = script.get("hook_visual")
+    if hv:
+        named = _gods_in(hook)
+        if named and not (named & _gods_in(str(hv))):
+            return (f"hook_visual does not show {', '.join(sorted(named))}, whom the hook names")
+    cover = str(script.get("cover_text") or "").strip()
+    if cover:
+        norm = lambda t: " ".join(re.findall(r"[a-z0-9']+", t.lower()))
+        n = len(norm(cover).split())
+        if not 2 <= n <= 4:
+            return f"cover_text has {n} words — it needs 2-4 (it is the thumbnail title)"
+        if norm(cover) in norm(hook):
+            return "cover_text repeats the spoken hook — write a different 2-4 word title"
+    if _GENERIC_OPENER.match(hook.strip()):
+        return ("generic mood opener — open on a claim that contradicts a belief, a "
+                "specific behaviour, a god's act or a verse, never a vague feeling")
+    if not ("?" in cta and re.search(r"\b(or|which)\b", cta, re.I)):
+        return "cta must be a choice question (A or B? / which one…?) — that is what gets shared"
+    key = fmt["key"]
+    if key == "verse":
+        text = " ".join([hook, *body, str(script.get("description") or "")])
+        found = _citations(text)
+        allowed = set()
+        for v in fmt.get("verses") or []:
+            allowed |= _citations(str(v.get("ref", "")))
+        if not found:
+            return ("verse format needs a citation from the VERIFIED VERSES list, "
+                    "written with its number (e.g. Bhagavad Gita 2.20)")
+        if allowed and not found <= allowed:
+            off = ", ".join(f"{t} {n}" for t, n in sorted(found - allowed))
+            return (f"citation not on the VERIFIED VERSES list ({off}) — use one "
+                    f"listed verse, cited exactly as written there")
+        lines = fmt.get("body_lines")
+        if lines and len(body) != int(lines):
+            return (f"verse body has {len(body)} lines — it needs exactly {lines} short "
+                    f"lines (one image each)")
+    elif key == "darshan":
+        deity_re = re.compile(r"\b(" + "|".join(_FAMOUS_DEITIES) + r")\b", re.I)
+        m = deity_re.search(hook)
+        if not m:
+            return "darshan hook names no famous deity — line 1 must state a claim about one"
+        # Each body line is ONE picture. Besides the reel's own deity, a line
+        # may name one god; the Durga render put Shiva, Vishnu and Indra in one
+        # line and two of them never reached the screen.
+        main = _gods_in(m.group(1)) or {m.group(1).lower()}
+        for line in body:
+            others = _gods_in(line) - main
+            if len(others) > 1:
+                return (f"one god per line — \"{line[:60]}\" names {', '.join(sorted(others))}; "
+                        f"split it so each line (= one picture) shows one of them")
+    return None
+
+
+def _trim_cta(cta: str, cap: int) -> str:
+    """Keep whole sentences of the SPOKEN cta up to `cap` words.
+
+    The first sentence always survives (it is the choice question); anything
+    after it is dropped once the cap would be passed. Never cuts mid-sentence."""
+    sentences = [s for s in re.split(r"(?<=[.!?])\s+", (cta or "").strip()) if s]
+    kept: list[str] = []
+    for s in sentences:
+        if kept and len(" ".join(kept + [s]).split()) > cap:
+            break
+        kept.append(s)
+    return " ".join(kept)
+
+
 def write_script(topic: dict, context: str, long_form: bool = False,
                  prefer_free: bool = False) -> dict:
     cfg = load_config()
@@ -918,6 +1219,50 @@ def write_script(topic: dict, context: str, long_form: bool = False,
             print(f"[script_writer] ⚠⚠ SHIPPING WITH BANNED OPENER ({bad}) — "
                   f"2 regenerations did not clear it. Topic: {topic.get('title', '')!r}")
 
+        # FORMAT ENFORCEMENT (llm.formats — GoM only; None elsewhere). Same
+        # policy as the hook ban: regenerate twice, then fail OPEN and say so
+        # loudly — a reel that misses its format beats a missed slot.
+        fmt = pick_format(cfg, topic)
+        bad_fmt = _format_violation(script, fmt)
+        for fix_attempt in range(2):
+            if not bad_fmt:
+                break
+            print(f"[script_writer] ⚠ format {fmt['key']} broken: {bad_fmt} — regenerating "
+                  f"({fix_attempt + 1}/2)")
+            user = user + (
+                f"\n\nREJECTED — {bad_fmt}. Rewrite following FORMAT FOR THIS REEL: "
+                f"{fmt['key'].upper()} exactly, within {fmt.get('max_words', '')} spoken "
+                f"words in total (hook + body + cta).\n{fmt['brief'].strip()}"
+            )
+            try:
+                script = _extract_json(_try_chain())
+                bad_fmt = _format_violation(script, fmt)
+            except Exception as e:
+                print(f"[script_writer] format-fix regeneration failed ({e}) — keeping previous")
+                break
+        if bad_fmt:
+            print(f"[script_writer] ⚠⚠ SHIPPING OFF-FORMAT ({bad_fmt}) — 2 regenerations did "
+                  f"not clear it. Topic: {topic.get('title', '')!r}")
+        if fmt:
+            script["format"] = fmt["key"]
+            # Authority on screen: the verse actually cited, as the list spells it.
+            if fmt.get("verses"):
+                by_cite = {}
+                for v in fmt["verses"]:
+                    for c in _citations(str(v.get("ref", ""))):
+                        by_cite[c] = v["ref"]
+                text = " ".join([str(script.get("hook") or ""), *map(str, script.get("body") or []),
+                                 str(script.get("description") or "")])
+                for c in sorted(_citations(text)):
+                    if c in by_cite:
+                        script["citation"] = by_cite[c]
+                        break
+            # Per-format reference portraits (e.g. Gita = charioteer Krishna).
+            for ch in script.get("character_bible") or []:
+                ref = (fmt.get("ref_overrides") or {}).get(str(ch.get("name", "")).strip().lower())
+                if ref:
+                    ch["ref"] = ref
+
     # Enforce 1:1 visual-body sync for Shorts (biggest quality lever).
     # If LLM returned mismatched counts, pad or truncate visuals to match body.
     if not long_form:
@@ -981,10 +1326,38 @@ def write_script(topic: dict, context: str, long_form: bool = False,
                 if script.get("visuals"):
                     script["visuals"] = script["visuals"][:n]
 
+        # SPOKEN cta cap (per niche, llm.cta_word_cap — GoM only). The cta is
+        # voiced (tts.py speaks hook + body + cta), so a 40-word follow ask is
+        # 15+ seconds on a 20-second reel. Absent key -> untouched.
+        cta_cap = (cfg.get("llm") or {}).get("cta_word_cap")
+        if cta_cap and script.get("cta"):
+            old = str(script["cta"])
+            new = _trim_cta(old, int(cta_cap))
+            if new != old:
+                print(f"[script_writer] cta {len(old.split())}w > {cta_cap}w → kept {len(new.split())}w")
+                if not script.get("cta_roman") or script.get("cta_roman") == old:
+                    script["cta_roman"] = new
+                script["cta"] = new
+
+    # Message lines get the god; Gita scripts get the charioteer Krishna.
+    # deity_blocks is GoM-only, so no other channel changes.
+    if not long_form and (cfg.get("images") or {}).get("deity_blocks"):
+        _enforce_deity_visuals(script)
+        _gita_refs(script)
+
     # Drop a body[0] (and its 1:1 body_roman/visuals) that merely restates the
     # hook — otherwise the opening sentence is spoken/captioned twice. Runs after
     # the visual-sync repair so counts stay aligned.
     dedupe_script_narration(script)
+
+    # HOOK PICTURE (video.hook_image, GoM). Prepended LAST, after every 1:1
+    # check and repair, so visuals[1:] stay one per body line; the assembler
+    # and dedupe read script["hook_image"] to know picture 0 is the hook's.
+    hv = str(script.get("hook_visual") or "").strip()
+    if (hv and not long_form and (cfg.get("video") or {}).get("hook_image")
+            and not script.get("hook_image")):
+        script["visuals"] = [hv] + list(script.get("visuals") or [])
+        script["hook_image"] = True
     return script
 
 

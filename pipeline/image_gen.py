@@ -267,6 +267,19 @@ def _detect_cast(prompt: str, bible: list[dict]) -> list[dict]:
     return hits
 
 
+def _pinned_ref(ch: dict) -> Path:
+    """assets/refs file for a character. A bible entry may name a variant
+    ("ref": "krishna_sarathi" — set per format by script_writer, e.g. the
+    Gita charioteer without a flute); it wins only if that file exists."""
+    refs = ROOT / "assets/refs"
+    # Variant names keep their underscores (slugify would turn krishna_sarathi
+    # into krishna-sarathi and never find the file).
+    variant = re.sub(r"[^a-z0-9_-]", "", (ch.get("ref") or "").strip().lower())
+    if variant and (refs / f"{variant}.jpg").exists():
+        return refs / f"{variant}.jpg"
+    return refs / f"{slugify((ch.get('name') or '').strip())}.jpg"
+
+
 def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
                              negative: str, target_w: int, target_h: int,
                              fal_model: str = FAL_FLUX_PRO) -> dict[str, str]:
@@ -291,7 +304,7 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
         # canon and then EDITING the one wrong attribute (nano-banana-2/edit),
         # so it carries correct iconography AND the channel's art style.
         # To pin a deity: drop a verified frame at assets/refs/<lowercase>.jpg.
-        pinned = ROOT / "assets/refs" / f"{slugify(name)}.jpg"
+        pinned = _pinned_ref(ch)
         if pinned.exists():
             url = _fal_upload(str(pinned))
             if url:
@@ -334,7 +347,9 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
                     ok_master = True
                     break
                 from .frame_check import check as _fc
-                good, why = _fc(mp, slugify(name), f"a reference portrait of {name}")
+                # A story character (Arjuna) is not a deity: don't demand one.
+                good, why = _fc(mp, slugify(name), f"a reference portrait of {name}",
+                                require_deity=bool(_deity_name(name, load_config())))
                 if good:
                     ok_master = True
                     break
@@ -358,7 +373,8 @@ def _build_character_masters(bible: list[dict], out_dir: Path, style: str,
 def generate_images(visual_prompts: list[str], out_dir: Path,
                     long_form: bool = False,
                     seeds: list[int | None] | None = None,
-                    character_bible: list[dict] | None = None) -> list[Path]:
+                    character_bible: list[dict] | None = None,
+                    title_band_first: bool = False) -> list[Path]:
     """Generate scene images. For long-form (documentary), output 1920x1080
     horizontal. For Shorts, output 1080x1920 vertical (existing default).
     Post-processes each image to enforce target aspect (Gemini doesn't always
@@ -454,7 +470,11 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
 
     # Enforce DARSHAN before anything else: a scene with no deity in it cannot be
     # fixed by regenerating it, so the prompt itself is re-staged. See _force_deity.
-    _forced = _force_deity(list(visual_prompts), cfg)
+    _story = _story_names(character_bible, cfg)
+    # Gate on the ORIGINAL line: the added deity sign names the god, but a
+    # life/story frame must not then be failed for not making him dominant.
+    _orig = list(visual_prompts)
+    _forced = _force_deity(list(visual_prompts), cfg, story_names=_story)
     _nf = sum(1 for a, b in zip(visual_prompts, _forced) if a != b)
     if _nf:
         print(f"[image_gen] re-staged {_nf}/{len(_forced)} deity-less scenes around the deity")
@@ -507,11 +527,25 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
                     _d = _deity_name(raw_prompt, cfg)
                     if (cfg.get("images", {}) or {}).get("frame_check"):
                         from .frame_check import check as _fc
-                        _good, _why = _fc(path, _d, raw_prompt)
+                        _tb = bool(title_band_first and i == 0)
+                        _rq = _needs_deity(i, _orig[i] if i < len(_orig) else raw_prompt, _story, cfg)
+                        _good, _why = _fc(path, _d, raw_prompt, title_band=_tb, require_deity=_rq)
                         if not _good:
-                            FRAME_ISSUES.append(f"img {i} (ref): {'; '.join(_why)}")
+                            # Retry once, like the plain-FLUX path below. Until
+                            # 2026-10-25 this path only logged, so a two-armed
+                            # Vishnu shipped and batch_reels (which counts "STILL
+                            # FAILING") reported the reel as clean.
                             print(f"[image_gen] img {i}: FRAME CHECK FAILED on the "
-                                  f"reference path — {'; '.join(_why)}")
+                                  f"reference path — {'; '.join(_why)} — regenerating")
+                            if generate_scene_with_reference(
+                                    ref_urls, raw_prompt + boost, path,
+                                    char_name=names, art_style=style.lstrip(", ").strip(),
+                                    target_w=target_w, target_h=target_h):
+                                _good, _why = _fc(path, _d, raw_prompt, title_band=_tb, require_deity=_rq)
+                            if not _good:
+                                FRAME_ISSUES.append(f"img {i} (ref): {'; '.join(_why)}")
+                                print(f"[image_gen] img {i}: STILL FAILING after retry "
+                                      f"(reference path) — {'; '.join(_why)}")
                     ref_succeeded += 1
                     ref_used += 1
                     results.append(path)
@@ -572,13 +606,15 @@ def generate_images(visual_prompts: list[str], out_dir: Path,
         # only needs a human to look.
         if ok and (cfg.get("images", {}) or {}).get("frame_check"):
             from .frame_check import check
-            good, why = check(path, _deity_name(raw_prompt, cfg), raw_prompt)
+            _tb = bool(title_band_first and i == 0)
+            _rq = _needs_deity(i, _orig[i] if i < len(_orig) else raw_prompt, _story, cfg)
+            good, why = check(path, _deity_name(raw_prompt, cfg), raw_prompt, title_band=_tb, require_deity=_rq)
             if not good:
                 print(f"[image_gen] img {i}: FRAME CHECK FAILED — {'; '.join(why)} — regenerating")
                 if use_fal and _generate_fal_flux(
                         prompt, path, model=(hero_model if is_hero else fal_model),
                         target_w=target_w, target_h=target_h) and not is_blank(path):
-                    good, why = check(path, _deity_name(raw_prompt, cfg), raw_prompt)
+                    good, why = check(path, _deity_name(raw_prompt, cfg), raw_prompt, title_band=_tb, require_deity=_rq)
                 if not good:
                     FRAME_ISSUES.append(f"img {i}: {'; '.join(why)}")
                     print(f"[image_gen] img {i}: STILL FAILING after retry — {'; '.join(why)}")
@@ -674,21 +710,68 @@ _SACRED = ("trishul", "trident", "vajra", "chakra", "conch", "shankh",
            "vahana", "temple", "mandir", "damaru", "kirita", "mundamala")
 
 
-def _force_deity(visuals: list[str], cfg: dict) -> list[str]:
-    """Make every scene a DARSHAN frame.
+# The lead deity's presence in a scene that is about something else. Used
+# instead of re-staging the whole scene around the deity (2026-10-26).
+_DEITY_SIGNS = {
+    "krishna": "a peacock feather and a bamboo flute resting in the scene, a faint blue-skinned Krishna watching in the soft background light",
+    "shiva": "a trishul and a thin crescent moon in the scene, a faint ash-marked Shiva in meditation in the soft background light",
+    "vishnu": "a conch and a spinning chakra glowing in the scene, a faint four-armed Vishnu in the soft background light",
+    "durga": "Durga's trishul and a lion's silhouette in the scene, the goddess faintly present in the soft background light",
+    "kali": "a red hibiscus garland and a curved sword in the scene, Kali faintly present in the soft background light",
+    "hanuman": "a golden gada resting in the scene, Hanuman faintly present in the soft background light",
+    "ganesha": "a modak and a small Ganesha murti glowing in the scene",
+    "lakshmi": "a pink lotus and a glowing diya with gold coins in the scene, Lakshmi faintly present in the soft background light",
+    "saraswati": "a veena and a white lotus in the scene, Saraswati faintly present in the soft background light",
+    "yama": "a dark buffalo silhouette and a coiled noose in the shadows of the scene",
+}
 
-    2026-10-21, measured on a finished reel: 5 of 9 sampled frames had no deity
-    in them at all — a person asleep in bed with a phone, a silhouette in a
-    doorway, a tiny figure in a light beam, a bare torso, a woman's profile made
-    of clouds. The script's own visual directions asked for exactly that. Every
-    one of those shapes is already BANNED in images.image_style_guidance, which
-    is prose and therefore never ran. The user's words: "images bhagwaan wali
-    feeling nahi de rahe, aur relevant nahi lag rahe".
+
+def _story_names(bible: list[dict] | None, cfg: dict) -> set[str]:
+    """Lower-cased names + aliases of the script's NON-deity characters
+    (Arjuna, Markandeya, Nachiketa). Their scenes are story frames."""
+    out: set[str] = set()
+    for ch in bible or []:
+        for n in [ch.get("name"), *(ch.get("aliases") or [])]:
+            n = str(n or "").strip()
+            if n and not _deity_name(n, cfg):
+                out.add(n.lower())
+    return out
+
+
+def _is_story_scene(text: str, story_names) -> bool:
+    low = (text or "").lower()
+    return any(re.search(rf"\b{re.escape(n)}\b", low) for n in (story_names or ()))
+
+
+def _needs_deity(i: int, text: str, story_names, cfg: dict) -> bool:
+    """Does the vision gate require a dominant deity in frame i? Only frames
+    whose own line names a deity, and the hook picture (the thumbnail) unless
+    it is a story frame (Arjuna dropping his bow can open the reel)."""
+    if _deity_name(text, cfg):
+        return True
+    return i == 0 and not _is_story_scene(text, story_names)
+
+
+def _force_deity(visuals: list[str], cfg: dict, story_names=()) -> list[str]:
+    """Keep every frame inside the deity's reference — without pasting the deity
+    over the story.
+
+    2026-10-26 (user review): forcing the deity into every frame put a
+    flute-playing Krishna on lines about Arjuna's bow slipping. "jaruri nhi hai
+    ki image bhagwaan ji ki ho, relatable and appropriate according to script
+    koi bhi image ... lekin bhagwan ke reference me." So now:
+      * frame 0 (the thumbnail) without a deity is still re-staged around him;
+      * a scene naming a story character (Arjuna, Markandeya) is left as is;
+      * any other deity-less scene keeps its own situation as the subject and
+        gains the lead deity's sign / faint presence (_DEITY_SIGNS).
+
+    History, still true for frame 0: 2026-10-21 a finished reel had 5 of 9
+    frames with no sacred reference at all, and the user said "images bhagwaan
+    wali feeling nahi de rahe".
 
     A deity-less scene cannot be rescued by regenerating it — the prompt itself
-    has no deity in it — so the prompt is rewritten here: the scene's action is
-    kept and re-staged around the deity this script is actually about, found
-    from whichever deity the script names most often.
+    has no deity in it — so the prompt is rewritten here, using the deity this
+    script names most often.
     """
     blocks = (cfg.get("images", {}) or {}).get("deity_blocks") or {}
     if not blocks:
@@ -700,17 +783,25 @@ def _force_deity(visuals: list[str], cfg: dict) -> list[str]:
             counts[d] = counts.get(d, 0) + 1
     lead = max(counts, key=counts.get) if counts else ""
     out = []
-    for v in visuals:
+    for i, v in enumerate(visuals):
         low = (v or "").lower()
-        if _deity_name(v, cfg) or any(k in low for k in _SACRED):
+        if (_deity_name(v, cfg) or any(k in low for k in _SACRED)
+                or _is_story_scene(v, story_names)):
             out.append(v)
             continue
-        if lead:
-            out.append(f"{lead.title()} is the large dominant figure filling the frame, "
-                       f"facing the viewer. Around him: {v}")
-        else:
-            out.append(f"A Hindu deity is the large dominant figure filling the frame, "
-                       f"facing the viewer in ornate devotional iconography. Around the deity: {v}")
+        if i == 0:
+            if lead:
+                out.append(f"{lead.title()} is the large dominant figure filling the frame, "
+                           f"facing the viewer. Around him: {v}")
+            else:
+                out.append(f"A Hindu deity is the large dominant figure filling the frame, "
+                           f"facing the viewer in ornate devotional iconography. Around the deity: {v}")
+            continue
+        sign = _DEITY_SIGNS.get(lead) or (
+            f"a small glowing murti of {lead.title()} and a lit diya in the scene" if lead
+            else "a lit diya and a small glowing murti of a Hindu deity in the scene")
+        out.append(f"{v}, with {sign} — the scene stays the subject, the deity's presence is "
+                   f"the sacred reference, traditional Indian setting and dress")
     return out
 
 

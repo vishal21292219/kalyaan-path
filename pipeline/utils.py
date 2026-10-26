@@ -110,6 +110,9 @@ def dedupe_script_narration(script: dict) -> dict:
 
     body_roman = list(script.get("body_roman") or [])
     visuals = list(script.get("visuals") or [])
+    # hook_image: visuals[0] is the hook's own picture, the rest are 1:1 with body.
+    hook_pic = visuals[:1] if (script.get("hook_image") and len(visuals) == len(body) + 1) else []
+    visuals = visuals[len(hook_pic):]
     roman_synced = len(body_roman) == len(body)
     visuals_synced = len(visuals) == len(body)
 
@@ -128,7 +131,7 @@ def dedupe_script_narration(script: dict) -> dict:
     if roman_synced:
         script["body_roman"] = [body_roman[i] for i in keep]
     if visuals_synced:
-        script["visuals"] = [visuals[i] for i in keep]
+        script["visuals"] = hook_pic + [visuals[i] for i in keep]
     print(f"[dedupe] removed {len(body) - len(keep)} duplicate narration line(s) "
           f"(hook was repeated as body opener)")
     return script
