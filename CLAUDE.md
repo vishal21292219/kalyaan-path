@@ -8,6 +8,9 @@ Auto-loaded in this repo (channels: GodsOfTheMind, TimeDecoders, Itihaasvani, bh
 3. **Duplicate topics throttled both channels once.** Dedup on the normalised topic (strip subtitle after — : |), not the full title, and check the channel's actual recent uploads. Never manually trigger a channel while the seq-queue is loaded — manual + cron both grab min-seq before state persists.
 4. **Push before dispatch**; the workflows run from the remote. A global hook blocks dispatch with unpushed commits.
 5. **Catch-up floods cause throttling.** After an outage, do not let the pipeline dump a backlog in one day.
+6. **A topic that aired never airs again.** No recency windows in dedup (pick_viral's 30-day window re-aired old topics; fixed 16d248c). Empty pool → skip the slot, never repeat. Before hand-scheduling a reel, check ±14 days for the same verse or core claim.
+7. **GoM frames follow the line** (user rule 2026-10-26): line names the god or carries his message → god mandatory; story line → that situation (Arjuna, Markandeya); life line → the situation plus the god's sign/presence; flaw line ("had tapas but anger owned him") → an unnamed mortal, never a recognisable deity; Gita/Kurukshetra → charioteer Krishna, no flute.
+8. **Look at every GoM reel before scheduling**: cover title not on a face, line↔picture match, canon (Krishna two hands on flute, Vishnu four arms), caption rewritten for FB/IG with every scripture claim checked against the brief (script descriptions have carried errors). The vision gate passes things a human rejects.
 
 ## Content direction (data-backed, don't re-litigate)
 - GodsOfTheMind: felt-pain / identity-first hook, then the deity. Second-person "you/your" + contrarian reveal wins.
