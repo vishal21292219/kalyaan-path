@@ -516,7 +516,15 @@ Return ONLY the JSON object."""
             "Also return \"cover_text\": the 2-4 word ALL-CAPS title printed over that top "
             "third — a punchy contradiction or claim, NOT a copy of the spoken hook. Wrap the "
             "one keyword in *asterisks* (it turns yellow). e.g. \"YOU NEVER *DIED*\", "
-            "\"EVERY GOD. *ONE* GODDESS.\", \"*THREE* MINDS\".\n")
+            "\"EVERY GOD. *ONE* GODDESS.\", \"*THREE* MINDS\".\n"
+            "Also return \"end_card\": {\"question\": the god asking the viewer, 4-9 words, "
+            "e.g. \"Tell me — which fear do you carry?\", \"options\": 2-3 short answers in the "
+            "VIEWER'S OWN VOICE (\"I\"/\"my\"), e.g. [\"Losing what I have\", \"Never getting "
+            "what I need\"]}. It is printed on the closing card; the spoken cta must ask the "
+            "SAME question with the SAME options (in \"you\" form).\n"
+            "Also return \"cta_visual\": ONE image prompt for that closing card — the deity "
+            "close, looking at the viewer, face in the TOP third only, the lower two thirds "
+            "a calm, dark, empty background (the card text sits there).\n")
         if fmt.get("verses"):
             format_block += "VERIFIED VERSES (cite ONE of these, exactly as written):\n" + "".join(
                 f"  - {v['ref']} — {v['meaning']}\n" for v in fmt["verses"])
@@ -1353,12 +1361,22 @@ def write_script(topic: dict, context: str, long_form: bool = False,
     # HOOK PICTURE (video.hook_image, GoM). Prepended LAST, after every 1:1
     # check and repair, so visuals[1:] stay one per body line; the assembler
     # and dedupe read script["hook_image"] to know picture 0 is the hook's.
+    _attach_cta_visual(script, cfg if not long_form else {})
     hv = str(script.get("hook_visual") or "").strip()
     if (hv and not long_form and (cfg.get("video") or {}).get("hook_image")
             and not script.get("hook_image")):
         script["visuals"] = [hv] + list(script.get("visuals") or [])
         script["hook_image"] = True
     return script
+
+
+def _attach_cta_visual(script: dict, cfg: dict) -> None:
+    """With video.end_card on, the closing card gets its own last picture
+    (assembler: script["cta_image"]). Runs before the hook picture is prepended."""
+    cv = str(script.get("cta_visual") or "").strip()
+    if cv and (cfg.get("video") or {}).get("end_card") and not script.get("cta_image"):
+        script["visuals"] = list(script.get("visuals") or []) + [cv]
+        script["cta_image"] = True
 
 
 def _try_chain_repair(system: str, user: str, provider: str, model: str) -> str:

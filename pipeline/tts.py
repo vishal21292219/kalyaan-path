@@ -31,9 +31,19 @@ def _strip_for_speech(text: str) -> str:
     return "".join(ch for ch in text if ord(ch) < 0x2700)
 
 
-def _build_text(script: dict) -> str:
+def _build_text(script: dict, pause: float | None = None) -> str:
     lines = [script["hook"], *script["body"], script["cta"]]
-    return ". ".join(_strip_for_speech(l).strip().rstrip(".") for l in lines if l) + "."
+    # End each line with exactly one terminal mark: keep ? and ! (a period after
+    # them showed up in the captions as "yours?."), add "." only when missing.
+    out = []
+    for l in lines:
+        t = _strip_for_speech(l or "").strip().rstrip(".").rstrip()
+        if t:
+            out.append(t if t.endswith(("?", "!")) else t + ".")
+    # voice.line_pause (ElevenLabs only): a breath between lines, as the
+    # <break> tags v2 understands. 2026-10-30 user pick "B".
+    sep = f' <break time="{pause:g}s" /> ' if pause else " "
+    return sep.join(out)
 
 
 # ─── Edge TTS (free Microsoft voices) ────────────────────────────────────
@@ -389,7 +399,15 @@ def _words_from_char_alignment(align: dict) -> list[dict]:
         return []
     words: list[dict] = []
     cur, w_start, w_end = "", None, None
+    in_tag = False
     for ch, s, e in zip(chars, starts, ends):
+        # <break time="0.6s" /> comes back in the alignment; it is not a word.
+        if ch == "<":
+            in_tag = True
+        if in_tag:
+            if ch == ">":
+                in_tag = False
+            continue
         if ch.isspace():
             if cur:
                 words.append({"text": cur, "start": round(w_start, 3), "end": round(w_end, 3)})
@@ -623,7 +641,9 @@ def synthesize(script: dict, out_path: Path, seed_offset: int = 0) -> Path:
     boundaries: list[dict] = []
     if provider == "elevenlabs":
         try:
-            boundaries = _synth_elevenlabs(text, out_path, v, is_shloka)
+            _pause = v.get("line_pause")
+            _el_text = _build_text(script, pause=float(_pause)) if _pause else text
+            boundaries = _synth_elevenlabs(_el_text, out_path, v, is_shloka)
             print(f"[tts] provider=elevenlabs ({len(text)} chars)")
         except Exception as e:
             if v.get("fallback_to_edge", True):

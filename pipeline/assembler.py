@@ -121,7 +121,9 @@ def _line_synced_durations(script: dict, boundaries: list, n_images: int,
     # hook_image: picture 0 is the hook's own (script_writer prepends it), so
     # there is one more picture than body lines and it covers only the hook.
     hook_pic = bool(script.get("hook_image"))
-    if not boundaries or n_images <= 0 or n_images != len(body) + (1 if hook_pic else 0):
+    # cta_image: the choice question has its own last picture (the end card).
+    cta_pic = bool(script.get("cta_image"))
+    if not boundaries or n_images <= 0 or n_images != len(body) + (1 if hook_pic else 0) + (1 if cta_pic else 0):
         return None
     has_word = lambda t: bool(_re.search(r"\w", str(t)))
     words = [b for b in boundaries if has_word(b.get("text", ""))]
@@ -136,11 +138,95 @@ def _line_synced_durations(script: dict, boundaries: list, n_images: int,
         starts.append(float(words[idx]["start"]))
         idx += size
     starts = ([0.0] + starts) if hook_pic else ([0.0] + starts[1:])
+    if cta_pic:
+        if idx >= len(words):
+            return None
+        starts.append(float(words[idx]["start"]))
     edges = starts + [float(total_duration)]
     durations = [edges[i + 1] - edges[i] for i in range(n_images)]
     if min(durations) < 0.5:
         return None
     return durations
+
+
+def _cta_start(script: dict, boundaries: list) -> float | None:
+    """Time the first CTA word is spoken, from the ElevenLabs word timings —
+    where the end card takes over. None unless the words line up with the script."""
+    import re as _re
+    has_word = lambda t: bool(_re.search(r"\w", str(t)))
+    words = [b for b in (boundaries or []) if has_word(b.get("text", ""))]
+    count = lambda t: sum(1 for x in str(t).split() if has_word(x))
+    lead = count(script.get("hook", "")) + sum(count(b) for b in (script.get("body") or []))
+    if not words or lead + count(script.get("cta", "")) != len(words) or lead >= len(words):
+        return None
+    return float(words[lead]["start"])
+
+
+def end_card_from_cta(cta: str) -> dict | None:
+    """'A, or B — which X is yours?' → {question, options, prompt}. The card
+    numbers the options so a viewer can answer with one digit. None when the
+    CTA is not a 2–4 way choice."""
+    import re as _re
+    t = str(cta or "").strip()
+    m = _re.match(r"^(.*?)\s+[—–-]\s+(.+)$", t)
+    if not m:
+        return None
+    opts_part, rest = m.group(1), m.group(2)
+    q = _re.split(r"(?<=\?)\s", rest.strip(), maxsplit=1)[0].strip()
+    if not q.endswith("?"):
+        return None
+    opts = [o.strip(" ,.") for o in _re.split(r",\s*or\s+|\s+or\s+|,\s*", opts_part) if o.strip(" ,.")]
+    if not 2 <= len(opts) <= 4:
+        return None
+    cap = lambda x: x[:1].upper() + x[1:]
+    return {"question": cap(q), "options": [cap(_first_person(o)) for o in opts],
+            "prompt": END_CARD_PROMPT}
+
+
+END_CARD_PROMPT = "Type your number below."
+
+
+def _first_person(option: str) -> str:
+    """The viewer answers in their own voice: "what you have" → "what I have"."""
+    import re as _re
+    t = _re.sub(r"\byourself\b", "myself", option, flags=_re.I)
+    t = _re.sub(r"\byours\b", "mine", t, flags=_re.I)
+    t = _re.sub(r"\byour\b", "my", t, flags=_re.I)
+    return _re.sub(r"\byou\b(?=\s+\w)", "I", t, flags=_re.I)
+
+
+def end_card_for(script: dict) -> dict | None:
+    """The writer's own end_card {question, options} wins; else parse the CTA."""
+    ec = script.get("end_card")
+    if isinstance(ec, dict) and str(ec.get("question", "")).strip() \
+            and isinstance(ec.get("options"), list) and 2 <= len(ec["options"]) <= 4:
+        return {"question": str(ec["question"]).strip(),
+                "options": [str(o).strip() for o in ec["options"]],
+                "prompt": END_CARD_PROMPT}
+    return end_card_from_cta(script.get("cta", ""))
+
+
+def _before_card(phrases: list, card_start: float | None) -> list:
+    """Running captions stop where the end card starts (it shows the words)."""
+    if card_start is None:
+        return phrases
+    return [p for p in phrases if float(p["start"]) < card_start - 0.05]
+
+
+def _words_before_card(words: list, card_start: float | None) -> list:
+    """Drop CTA words from the caption stream — the card shows them. Grouping
+    otherwise glued "already holds it. Losing what you" into one caption that
+    sat on top of the card (2026-10-30)."""
+    if card_start is None:
+        return words
+    return [w for w in words if float(w["start"]) < card_start - 0.01]
+
+
+def _clip_to_card(windows: list, card_start: float | None) -> list:
+    """No caption window runs into the card."""
+    if card_start is None:
+        return windows
+    return [(s0, min(e0, card_start)) for s0, e0 in windows if s0 < card_start]
 
 
 def _xfade_plan(durations: list[float], fade: float) -> tuple[list[float], list[float], float]:
@@ -601,6 +687,64 @@ def _render_cover_png(text: str, width: int, out: "Path", font_size: int = 150) 
     return out
 
 
+def _render_end_card_png(card: dict, width: int, out: "Path", citation: str = "",
+                         height: int = 1150) -> "Path":
+    """End card, design 3 (user pick 2026-10-30): Krishna's question as a quote
+    — a big gold opening quote mark, the question in serif, each option as one
+    quiet numbered line, "Type your number below." and the verse. The PNG
+    carries its own soft dark gradient so the text reads on any picture."""
+    serif = ROOT / "assets/fonts/PlayfairDisplay.ttf"
+    small = ROOT / "assets/fonts/CormorantGaramond.ttf"
+
+    def font(path, size, wght):
+        f = ImageFont.truetype(str(path), size)
+        try:
+            f.set_variation_by_axes([wght])
+        except Exception:
+            pass
+        return f
+
+    def wrap(text, f, w):
+        lines, cur = [], ""
+        for word in text.split():
+            nxt = (cur + " " + word).strip()
+            if f.getlength(nxt) <= w or not cur:
+                cur = nxt
+            else:
+                lines.append(cur); cur = word
+        return lines + ([cur] if cur else [])
+
+    img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    grad = Image.new("L", (1, height))
+    for yy in range(height):
+        grad.putpixel((0, yy), int(230 * min(1.0, (yy / height) * 1.7)))
+    shade = Image.new("RGBA", (width, height), (0, 0, 0, 255))
+    shade.putalpha(grad.resize((width, height)))
+    img = Image.alpha_composite(img, shade)
+    d = ImageDraw.Draw(img)
+    gold, cream, grey = (240, 198, 96), (255, 236, 190), (225, 225, 225)
+    x, maxw = 150, width - 150 - 90
+    y = 150
+    d.text((x - 40, y - 130), "\u201c", font=font(serif, 200, 700), fill=gold)
+    qf = font(serif, 88, 600)
+    for ln in wrap(card["question"], qf, maxw):
+        d.text((x, y), ln, font=qf, fill=(255, 255, 255), stroke_width=2, stroke_fill=(0, 0, 0))
+        y += 108
+    y += 70
+    of = font(serif, 54, 500)
+    for i, opt in enumerate(card["options"], 1):
+        for j, ln in enumerate(wrap(f"{i}  —  {opt}", of, maxw)):
+            d.text((x + (0 if j == 0 else 70), y), ln, font=of, fill=gold if i == 1 else cream)
+            y += 70
+        y += 14
+    y += 34
+    d.text((x, y), card.get("prompt", END_CARD_PROMPT), font=font(small, 48, 600), fill=grey)
+    if citation:
+        d.text((x, y + 70), f"— {citation}", font=font(small, 40, 500), fill=(200, 200, 200))
+    img.save(out)
+    return out
+
+
 def _cover_window(script: dict, durations: list[float]) -> tuple[float, float]:
     """Cover title is on screen while the hook picture is (or the first 2.5s)."""
     first = float(durations[0]) if durations else 2.5
@@ -609,7 +753,9 @@ def _cover_window(script: dict, durations: list[float]) -> tuple[float, float]:
 
 def _apply_brand_overlays(base: "Path", work: "Path", BR: str, cfg: dict,
                           script: dict, W: int, H: int, duration: float,
-                          cover_end: float | None = None) -> "Path":
+                          cover_end: float | None = None,
+                          end_card: dict | None = None,
+                          card_start: float | None = None) -> "Path":
     """OPTIONAL on-screen brand + retention overlays, gated by `video.brand_overlays`
     and FULLY guarded. Adds a small persistent channel WORDMARK (brand recall →
     follows) in the top-left corner.
@@ -638,6 +784,12 @@ def _apply_brand_overlays(base: "Path", work: "Path", BR: str, cfg: dict,
             entries.append((cp, "(W-w)/2", str(int(H * 0.085)), 0.0, ce, True))
         # Authority on screen: the verse a VERSE reel cites, last 3 seconds.
         cite = str(script.get("citation") or "").strip()
+        if end_card and card_start is not None:
+            # The card carries the citation itself, so no separate cite line.
+            kp = _render_end_card_png(end_card, W, work / "end_card.png", citation=cite)
+            entries.append((kp, "(W-w)/2", str(int(H - 1150)), float(card_start),
+                            max(float(duration), float(card_start) + 0.5), "in"))
+            cite = ""
         if cite:
             sp = work / "citation.png"
             _render_caption_png(f"— {cite}", W, 64, 0.0, sp)
@@ -649,7 +801,11 @@ def _apply_brand_overlays(base: "Path", work: "Path", BR: str, cfg: dict,
         for i, (png, x, y, s, e, fade) in enumerate(entries):
             out = work / f"brandov_{i:02d}.mp4"
             enable = f"enable='between(t\\,{s:.3f}\\,{e:.3f})'"
-            if fade:
+            if fade == "in":
+                src = ["-loop", "1", "-t", f"{e:.3f}", "-i", str(png)]
+                graph = (f"[1:v]format=rgba,fade=t=in:st={s:.3f}:d=0.4:"
+                         f"alpha=1[ov];[0:v][ov]overlay=x={x}:y={y}:{enable}[v]")
+            elif fade:
                 src = ["-loop", "1", "-t", f"{e:.3f}", "-i", str(png)]
                 graph = (f"[1:v]format=rgba,fade=t=out:st={max(0.0, e - 0.35):.3f}:d=0.35:"
                          f"alpha=1[ov];[0:v][ov]overlay=x={x}:y={y}:{enable}[v]")
@@ -945,6 +1101,23 @@ def assemble(
                     script, _json.loads(_wj.read_text(encoding="utf-8")), n, duration)
         except Exception as e:
             print(f"[assembler] line sync skipped ({type(e).__name__}: {e})")
+    # END CARD (video.end_card, GoM): the choice CTA as an on-screen card from
+    # the first CTA word to the end. Needs word timings; silently off otherwise.
+    end_card, card_start = None, None
+    if not long_form and cfg.get("video", {}).get("end_card"):
+        try:
+            end_card = end_card_for(script)
+            _wj2 = voice_path.with_suffix(".words.json")
+            if end_card and _wj2.exists():
+                import json as _json2
+                card_start = _cta_start(script, _json2.loads(_wj2.read_text(encoding="utf-8")))
+            if card_start is None:
+                end_card = None
+            else:
+                print(f"[end-card] {end_card['question']} {end_card['options']} from {card_start:.2f}s")
+        except Exception as e:
+            end_card, card_start = None, None
+            print(f"[end-card] skipped ({type(e).__name__}: {e})")
     if line_synced:
         image_durations = line_synced
         print(f"[assembler] image timing: line-synced to narration "
@@ -1218,7 +1391,7 @@ def assemble(
                 print(f"[captions] phrase mode ({'forced via config' if _force_phrase else f'{len(boundaries)} words > {MAX_WORDS_FOR_PER_WORD}'}) — grouping into persistent phrases")
                 phrases = []
                 buf, buf_start = [], None
-                for b in boundaries:
+                for b in _words_before_card(boundaries, card_start):
                     if buf_start is None:
                         buf_start = b["start"]
                     buf.append(b)
@@ -1243,7 +1416,8 @@ def assemble(
                 # phrase white+yellow and apply them later in ffmpeg-safe BATCHES
                 # (see _apply_caption_batches). Timing comes from real word
                 # boundaries, so captions stay perfectly in sync.
-                for i, (p, (p_start, p_end)) in enumerate(zip(phrases, _phrase_windows(phrases))):
+                phrases = _before_card(phrases, card_start)
+                for i, (p, (p_start, p_end)) in enumerate(zip(phrases, _clip_to_card(_phrase_windows(phrases), card_start))):
                     png = work / f"phrase_{i:04d}.png"
                     _render_phrase_png_colored(p["text"], W, int(font_size * 1.25), png)
                     phrase_batch_entries.append((png, p_start, p_end))
@@ -1350,7 +1524,8 @@ def assemble(
     # OPTIONAL on-screen brand + retention overlays (gated by video.brand_overlays,
     # fully guarded — see _apply_brand_overlays). Isolated pass after captions.
     _branded = _apply_brand_overlays(slides_subbed, work, BR, cfg, script, W, H, duration,
-                                     cover_end=_cover_window(script, image_durations)[1])
+                                     cover_end=_cover_window(script, image_durations)[1],
+                                     end_card=end_card, card_start=card_start)
     if _branded != slides_subbed:
         shutil.copy(_branded, slides_subbed)
 

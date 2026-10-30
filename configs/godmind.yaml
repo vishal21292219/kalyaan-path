@@ -616,6 +616,9 @@ video:
   # change is a crossfade of this many seconds (assembler._xfade_plan keeps
   # each picture starting on its own line).
   hook_image: true
+  # 2026-10-30: the choice CTA ("A, or B — which…?") shows as an end card —
+  # question large, options numbered, "Comment 1 or 2"; captions stop under it.
+  end_card: true
   crossfade: 0.45
   duration_target_sec: 30   # 2026-10-25: documentation only — no code reads this key; length is set by llm.length_spec + body_word_cap
   # ── OPENING 3 SECONDS (2026-10-20 FB audit) ─────────────────────────────────
@@ -669,8 +672,12 @@ voice:
   elevenlabs_voice_id: JBFqnCBsd6RMkjVDRZzb        # George — warm captivating storyteller
   elevenlabs_voice_id_female: EXAVITQu4vr4xnSDxMaL  # Sarah — mature, reassuring
   elevenlabs_model: eleven_multilingual_v2          # BEST quality (flagship). v3 available if preferred.
+  # 2026-10-30 user pick "B" (A/B/C samples): more expressive + a breath
+  # between lines. Was stability 0.55 / style 0.30 / no pause ("emotion as per
+  # script nahi lag rha").
   elevenlabs_settings:
-    stability: 0.55
+    stability: 0.30
     similarity_boost: 0.80
-    style: 0.30
+    style: 0.60
     use_speaker_boost: true
+  line_pause: 0.6
